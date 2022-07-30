@@ -1,0 +1,371 @@
+@misc{data-race-fix1,
+  title = {{ipv6: annotate accesses to fn->fn_sernum}},
+  author = {{Linux}},
+  year = {2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=aafc2e3285c2d7a79b7ee15221c19fbeca7b1509}}
+}
+
+@misc{data-race-fix2,
+  title = {{ipv6: fix data-race in fib6_info_hw_flags_set / fib6_purge_rt}},
+  author = {{Linux}},
+  year = {2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d95d6320ba7a51d61c097ffc3bcafcf70283414e}}
+}
+
+
+@misc{data-race-fix3,
+  title = {{af_packet: fix data-race in packet_setsockopt / packet_setsockopt}},
+  author = {{Linux}},
+  year = {2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e42e70ad6ae2ae511a6143d2e8da929366e58bd9}}
+}
+
+@misc{lkmm,
+  title = {{Explanation of the Linux-Kernel Memory Consistency Model}},
+  author = {Linux},
+  year = {2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/explanation.txt}}
+}
+
+@misc{lockdep,
+  title = {{Runtime locking correctness validator}},
+  author = {Linux},
+  year = {2022},
+  note={\url{https://www.kernel.org/doc/Documentation/locking/lockdep-design.txt}}
+}
+
+@inproceedings{razzer,
+  title={Razzer: Finding kernel race bugs through fuzzing},
+  author={Jeong, Dae R and Kim, Kyungtae and Shivakumar, Basavesh and Lee, Byoungyoung and Shin, Insik},
+  crossref={SP19},
+}
+
+@inproceedings{healer,
+  title={HEALER: Relation Learning Guided Kernel Fuzzing},
+  author={Sun, Hao and Shen, Yuheng and Wang, Cong and Liu, Jianzhong and Jiang, Yu and Chen, Ting and Cui, Aiguo},
+  crossref={SOSP21}
+}
+
+@inproceedings{krace,
+  title={Krace: Data race fuzzing for kernel file systems},
+  author={Xu, Meng and Kashyap, Sanidhya and Zhao, Hanqing and Kim, Taesoo},
+  crossref={SP20}
+}
+
+@inproceedings{snowboard,
+  title={Snowboard: Finding kernel concurrency bugs through systematic inter-thread communication analysis},
+  author={Gong, Sishuai and Altinb{\"u}ken, Deniz and Fonseca, Pedro and Maniatis, Petros},
+  crossref={SOSP21}
+}
+
+@inproceedings{ski,
+  title={$\{$SKI$\}$: Exposing Kernel Concurrency Bugs through Systematic Schedule Exploration},
+  author={Fonseca, Pedro and Rodrigues, Rodrigo and Brandenburg, Bj{\"o}rn B},
+  crossref={OSDI14}
+}
+
+@inproceedings{pctalgorithm,
+  title={A randomized scheduler with probabilistic guarantees of finding bugs},
+  author={Burckhardt, Sebastian and Kothari, Pravesh and Musuvathi, Madanlal and Nagarakatte, Santosh},
+  crossref={ASPLOS10}
+}
+
+
+@misc{C-standard-n2310,
+  title={{ISO/IEC 9899:2018}},
+  author={{International Organization for Standardization}},
+  year={2017},
+  note={\url{https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2310.pdf}}
+}
+
+@misc{JAVA-standard,
+  title={The Java Language Specification},
+  author={Oracle},
+  year={2022},
+  note={\url{https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5}}
+}
+
+@inproceedings{learningfrommistakes,
+  title={Learning from mistakes: a comprehensive study on real world concurrency bug characteristics},
+  author={Lu, Shan and Park, Soyeon and Seo, Eunsoo and Zhou, Yuanyuan},
+  crossref={ASPLOS08}
+}
+
+@inproceedings{tsan,
+  title={ThreadSanitizer: data race detection in practice},
+  author={Serebryany, Konstantin and Iskhodzhanov, Timur},
+  booktitle={Proceedings of the workshop on binary instrumentation and applications},
+  year={2009}
+}
+
+@inproceedings{prorace,
+  title={Prorace: Practical data race detection for production use},
+  author={Zhang, Tong and Jung, Changhee and Lee, Dongyoon},
+  crossref={ASPLOS17}
+}
+
+@inproceedings{txrace,
+  title={Txrace: Efficient data race detection using commodity hardware transactional memory},
+  author={Zhang, Tong and Lee, Dongyoon and Jung, Changhee},
+  crossref={ASPLOS16}
+}
+
+@inproceedings{crsampler,
+  title={A deployable sampling strategy for data race detection},
+  author={Cai, Yan and Zhang, Jian and Cao, Lingwei and Liu, Jian},
+  crossref={FSE16}
+}
+
+@inproceedings{muzz,
+  title={$\{$MUZZ$\}$: Thread-aware grey-box fuzzing for effective bug hunting in multithreaded programs},
+  author={Chen, Hongxu and Guo, Shengjian and Xue, Yinxing and Sui, Yulei and Zhang, Cen and Li, Yuekang and Wang, Haijun and Liu, Yang},
+  crossref={SEC20}
+}
+
+@inproceedings{exprace,
+  title={$\{$ExpRace$\}$: Exploiting Kernel Races through Raising Interrupts},
+  author={Lee, Yoochan and Min, Changwoo and Lee, Byoungyoung},
+  crossref={SEC21}
+}
+
+@inproceedings{wang2019sensitive,
+  title={Be sensitive and collaborative: Analyzing impact of coverage metrics in greybox fuzzing},
+  author={Wang, Jinghan and Duan, Yue and Song, Wei and Yin, Heng and Song, Chengyu},
+  crossref={RAID19}
+}
+
+@misc{syzkaller,
+  title={{Syzkaller - kernel fuzzer}},
+  author={Google},
+  year={2022},
+  note={\url{https://github.com/google/syzkaller}}
+}
+
+@inproceedings{imf,
+  title={Imf: Inferred model-based fuzzer},
+  author={Han, HyungSeok and Cha, Sang Kil},
+  crossref={CCS17}
+}
+
+@inproceedings{hfl,
+  title={HFL: Hybrid Fuzzing on the Linux Kernel.},
+  author={Kim, Kyungtae and Jeong, Dae R and Kim, Chung Hwan and Jang, Yeongjin and Shin, Insik and Lee, Byoungyoung},
+  crossref={NDSS20},
+}
+
+@inproceedings{moonshine,
+  title={$\{$MoonShine$\}$: Optimizing $\{$OS$\}$ Fuzzer Seed Selection with Trace Distillation},
+  author={Pailoor, Shankara and Aday, Andrew and Jana, Suman},
+  crossref={SEC18}
+}
+
+@inproceedings{janus,
+  title={Fuzzing file systems via two-dimensional input space exploration},
+  author={Xu, Wen and Moon, Hyungon and Kashyap, Sanidhya and Tseng, Po-Ning and Kim, Taesoo},
+  crossref={SP19}
+}
+
+@inproceedings{hydra,
+  title={Finding semantic bugs in file systems with an extensible fuzzing framework},
+  author={Kim, Seulbae and Xu, Meng and Kashyap, Sanidhya and Yoon, Jungyeon and Xu, Wen and Kim, Taesoo},
+  crossref={SOSP19}
+}
+
+@article{topologicalsort,
+  title={Topological sorting of large networks},
+  author={Kahn, Arthur B},
+  journal={Communications of the ACM},
+  volume={5},
+  number={11},
+  pages={558--562},
+  year={1962},
+  publisher={ACM New York, NY, USA}
+}
+
+@inproceedings{frightening,
+  title={Frightening small children and disconcerting grown-ups: Concurrency in the Linux kernel},
+  author={Alglave, Jade and Maranget, Luc and McKenney, Paul E and Parri, Andrea and Stern, Alan},
+  crossref={ASPLOS18}
+}
+
+@inproceedings{sctbench,
+  title={Concurrency testing using schedule bounding: An empirical study},
+  author={Thomson, Paul and Donaldson, Alastair F and Betts, Adam},
+  crossref={PPOPP14}
+}
+
+@inproceedings{portend,
+  title={Data races vs. data race bugs: telling the difference with portend},
+  author={Kasikci, Baris and Zamfir, Cristian and Candea, George},
+  crossref={ASPLOS12}
+}
+
+@inproceedings{replayanalysis,
+  title={Automatically classifying benign and harmful data races using replay analysis},
+  author={Narayanasamy, Satish and Wang, Zhenghao and Tigani, Jordan and Edwards, Andrew and Calder, Brad},
+  crossref={PLDI07},
+}
+
+@misc{afpacket,
+  title={{packet: fix bitfield update race}},
+  author={Linux},
+  year={2018},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a6361f0ca4b25460f2cdf3235ebe8115f622901e}}
+}
+
+@misc{noninclusive1,
+  title={{ALSA: seq: Fix race at creating a queue}},
+  author={Linux},
+  year={2017},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4842e98f26dd80be3623c4714a244ba52ea096a8}}
+}
+
+@misc{noninclusive2,
+  title={{android: binder: fix the race mmap and alloc_new_buf_locked}},
+  author={Linux},
+  year={2018},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=da1b9564e85b1d7baf66cbfabcab27e183a1db63}}
+}
+
+@misc{kcsan,
+  title={The Kernel Concurrency Sanitizer (KCSAN)},
+  author={Linux},
+  year={2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/dev-tools/kcsan.rst}}
+}
+
+@inproceedings{qsym,
+  title={$\{$QSYM$\}$: A practical concolic execution engine tailored for hybrid fuzzing},
+  author={Yun, Insu and Lee, Sangho and Xu, Meng and Jang, Yeongjin and Kim, Taesoo},
+  crossref={SEC18}
+}
+
+@inproceedings{driller,
+  title={Driller: Augmenting fuzzing through selective symbolic execution.},
+  author={Stephens, Nick and Grosen, John and Salls, Christopher and Dutcher, Andrew and Wang, Ruoyu and Corbetta, Jacopo and Shoshitaishvili, Yan and Kruegel, Christopher and Vigna, Giovanni},
+  crossref={NDSS16}
+}
+
+@inproceedings{crfuzz,
+  title={CrFuzz: Fuzzing multi-purpose programs through input validation},
+  author={Song, Suhwan and Song, Chengyu and Jang, Yeongjin and Lee, Byoungyoung},
+  crossref={ICSE20}
+}
+
+@inproceedings{r2z2,
+  title={R2Z2: Detecting Rendering Regressions in Web Browsers through Differential Fuzz Testing},
+  author={Song, Suhwan and Hur, Jaewon and Kim, Sunwoo and Rogers, Philip and Lee, Byoungyoung},
+  crossref={ICSE22}
+}
+
+@inproceedings{fuzzusb,
+  title={FUZZUSB: Hybrid Stateful Fuzzing of USB Gadget Stacks},
+  author={Kim, Kyungtae and Kim, Taegyu and Warraich, Ertza and Lee, Byoungyoung and Butler, Kevin RB and Bianchi, Antonio and Tian, Dave Jing},
+  crossref={SP22}
+}
+
+@inproceedings{cafl,
+  title={Constraint-guided directed greybox fuzzing},
+  author={Lee, Gwangmu and Shim, Woochul and Lee, Byoungyoung},
+  crossref={SEC21}
+}
+
+@inproceedings{cabfuzz,
+  title={$\{$CAB-Fuzz$\}$: Practical Concolic Testing Techniques for $\{$COTS$\}$ Operating Systems},
+  author={Kim, Su Yong and Lee, Sangho and Yun, Insu and Xu, Wen and Lee, Byoungyoung and Yun, Youngtae and Kim, Taesoo},
+  crossref={ATC17}
+}
+
+@inproceedings{fuzzorigin,
+  title={FUZZORIGIN: Detecting UXSS vulnerabilities in Browsers through Origin Fuzzing},
+  author={Kim, Sunwoo and Kim, Young Min and Hur, Jaewon and Song, Suhwan and Lee, Gwangmu and Lee, Byoungyoung},
+  crossref={SEC22}
+}
+
+@inproceedings{sparsernr,
+  title={Sparse record and replay with controlled scheduling},
+  author={Lidbury, Christopher and Donaldson, Alastair F},
+  crossref={PLDI19}
+}
+
+@inproceedings{asan,
+  title={$\{$AddressSanitizer$\}$: A Fast Address Sanity Checker},
+  author={Serebryany, Konstantin and Bruening, Derek and Potapenko, Alexander and Vyukov, Dmitriy},
+  crossref={ATC12}
+}
+
+@inproceedings{meds,
+  title={Enhancing memory error detection for large-scale applications and fuzz testing},
+  author={Han, Wookhyun and Joe, Byunggill and Lee, Byoungyoung and Song, Chengyu and Shin, Insik},
+  crossref={NDSS18}
+}
+
+@misc{kasan,
+  title={{The Kernel Address Sanitizer (KASAN)}},
+  author={Linux},
+  year={2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/dev-tools/kasan.rst}}
+}
+
+@misc{kcov,
+  title={{kcov: code coverage for fuzzing}},
+  author={Linux},
+  year={2022},
+  note={\url{https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/dev-tools/kcov.rst}}
+}
+
+@misc{fnv,
+  title={{FNV Hash}},
+  author={Fowler, Glenn and Noll, Landon Curt and Vo, Kiem-Phong},
+  year={2022},
+  note={\url{http://isthe.com/chongo/tech/comp/fnv/index.html}}
+}
+
+@misc{fnv-go,
+  title={{The Go Programming Language}},
+  author={Google},
+  year={2022},
+  note={\url{https://pkg.go.dev/hash/fnv}}
+}
+
+@misc{llvm,
+  title={{The LLVM Compiler Infrastructure}},
+  author={LLVM Project},
+  year={2022},
+  note={\url{https://llvm.org/}}
+}
+
+@misc{qemu,
+  title={{QEMU}},
+  author={QEMU},
+  year={2022},
+  note={\url{https://www.qemu.org}}
+}
+
+@inproceedings{tlbshootdown,
+  title={Don't shoot down TLB shootdowns!},
+  author={Amit, Nadav and Tai, Amy and Wei, Michael},
+  crossref={EUROSYS20}
+}
+
+@misc{hwbp,
+  title={{Hardware and Software Breakpoints}},
+  author={{Intel Corporation}},
+  year={2020},
+  note={\url{https://software.intel.com/en-us/node/676419}}
+}
+
+@misc{scc,
+  author={Ben Boyter},
+  title={{Sloc Cloc and Code (scc)}},
+  year={2020},
+  note={\url{https://github.com/boyter/scc/}}
+}
+
+@misc{sloccount,
+  author={David A. Wheeler},
+  title={{SLOCCount}},
+  year={2020},
+  note={\url{https://dwheeler.com/sloccount/}}
+}
+

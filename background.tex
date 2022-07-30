@@ -1,0 +1,437 @@
+\section{Background and Motivation}
+\label{s:background}
+
+While concurrency has been a cornerstone of performance benefits in
+the multicore era, it leaves a risk of malfunction, \ie, concurrency
+bug, caused by insufficient thought of concurrent events.
+%
+In this section, we describe two types of concurrency bug, data race
+and race condition, and introduce prior approaches to spot out
+concurrency bugs.
+
+\subsection{Concurrency Bug}
+\label{ss:concurrencybugs}
+
+A concurrency bug can be classified into two categories according to
+how it adversely affects a program.
+
+\begin{figure}
+  \centering
+  \subfloat[Data race.\label{subfig:datarace}] {
+    \includegraphics[width=0.45\linewidth]{fig/datarace.pdf}
+  }
+  \hfill
+  \subfloat[Race condition.\label{subfig:racecondition}] {
+    \includegraphics[width=0.45\linewidth]{fig/racecondition.pdf}
+  }
+  \caption{Two types of concurrency bugs.}
+  \label{fig:concurrencybugs}
+\end{figure}  
+
+
+\PP{Data race.}
+%
+Although the concept of data race is well known, its formal definition
+depends on a programming language~\cite{C-standard-n2310,
+  java-standard} or a program in development~\cite{lkmm}. In this
+paper, we employ the definition from Linux Kernel Memory Model
+(LKMM)~\cite{lkmm}. According to LKMM, a data race occurs when there
+are two memory accesses such that 1) they access the same location, 2)
+at least one of them is a store, 3) at least one of them is not
+annotated with special operations such as \texttt{WRITE_ONCE()}, or
+\texttt{smp_load_acquire()}, 4) they occur on different CPUs (or in
+different threads on the same CPU), and 5) they execute concurrently.
+%
+Informally, a data race indicates un-annotated concurrent accesses to
+a shared memory location.
+
+Data races are problematic because they may confuse a compiler.  LKMM
+allows a compiler to assume that there will be no data race during the
+runtime. Based on the assumption, a compiler has its rights to
+arbitrarily transform plain accesses (\ie, accesses not annotated with
+above operations), making the results unpredictable if there is a data
+race during the runtime.
+%
+Therefore, LKMM defines the outcome of the program as undefined
+behavior if a data race occurs.
+%
+Also, to prevent such undefined behaviors, LKMM requires developers to
+annotate accesses if they possibly run
+concurrently~\cite{data-race-fix1, data-race-fix2, data-race-fix3}.
+% %
+% On the other hand, data races may or may not cause a real-world issue
+% such as memory corruption. Many data races fixes~\cite{data-race-fix1,
+%   data-race-fix2, data-race-fix3} annotate memory accessing
+% instructions with above operations, which actually does not affect the
+% compiled binary.
+
+
+\PP{Race condition.}
+%
+Race condition is another type of concurrency bug. While a race
+condition broadly indicates that an outcome differs depending on the
+timing of concurrent events, we restrict the definition to indicate
+the correctness of the outcome differs according to the timing of
+concurrent events.
+%
+Specifically, if developers do not take consider of all possible
+interleavings, a program may execute an erroneous interleaving which
+leads the program into an unintended state.
+%
+Immediately or after a certain amount of time, the unintended state
+causes erroneous behaviors of the program such as memory corruption,
+deadlock, and assertion violation.
+
+% \dr{TODO: what more?}
+% In order to fix the errorneous interelaving, developers often utilize
+% synchronization primitives such as a lock, or switch the order of
+% instructions in a program~\cite{learningfrommistakes}.
+
+
+% https://stackoverflow.com/questions/11276259/are-data-races-and-race-condition-actually-the-same-thing-in-context-of-conc
+%
+\PP{Differences between data race and race condition}
+%
+\dr{TODO: rewrite to enphasize that finding race condition is
+  important and combine this into the race condition paragraph}
+%
+Although both race condition and data race are a bug caused by
+concurrenct events, there are a few differences.
+%
+First, a data race is regards to a single pair of conflicting accesses
+while a race condition is about an interleaving.
+%
+Therefore, methods to detect them are also different.  While data race
+detectors~\cite{tsan, krace, prorace, crsampler, txrace} monitor
+whether two conflicting plain accesses are executed concurrently, race
+conditions can be observed only through an erroneous behavior caused
+by a specific interleaving.
+%
+Second, whereas a data race occurs if such conflicting accesses exists
+no matter it causes an erroneous behavior or not, a race condition is
+told by an abnormal outcome of a program.
+%
+% In the security perspective, a data race requires further
+% investigation to determine whether it is harmful or
+% not~\cite{portend, replayanalysis}, the effect of a race condition
+% is exmained by erroneous behaviors such as general protection fault,
+% assertion violations, sanitizers~\cite{asan, kasan} and
+% lockdep~\cite{lockdep} reports.
+%
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.45\linewidth]{fig/venndiagram.pdf}
+%   \caption{Relation between data race and race condition. This paper
+%     focuses on the striped region. \dr{I don't think we need this.}}
+%   \label{fig:venndiagram}
+% \end{figure}  
+%
+Lastly, they are not a subset or a superset of one another. Although
+there are race conditions that occur with data races, neither one is
+the sufficient nor necessary condition for the other. Therefore, we
+would argue that finding data races and finding race condditions are
+complementary with each other.
+
+
+\PP{Scope of this paper}
+%
+This paper focuses on finding race conditions instead of data races.
+
+\dr{TODO: why? want to say finding race condition is more important,
+  and existing approaches to find data races are limited}
+
+\dr{TODO: need to say the importance of observing erroneous outcomes}
+
+
+\subsection{Concurrency Fuzzing}
+\label{ss:concurrencyfuzzing}
+
+\dr{keep in mind: concurrency fuzzing to expose erroneous behaviors}
+
+Since fuzzing has proved its effectiveness in finding bugs, several
+attempts~\cite{razzer, krace, snowboard, muzz} have been made to
+improve fuzzing techniques specifically in exposing concurrency bugs.
+%
+These approaches make different choices in various aspects depending
+on their own purposes; some of these approaches~\cite{krace,
+  snowboard} adopt a data race detector to find out data races, while
+others~\cite{razzer, muzz} rely on existing sanitizers to observe
+erroneous behaviors (\ie, race conditions).
+%
+Aside from the use of data race detectors, they take different
+strategies for the sake of two objectives, namely scheduling
+instructions and capturing interesting behaviors (\ie, coverage) in
+the concurrency dimension.
+
+% \PP{Coverage-guided fuzzing}
+% %
+% Throughout decades, a fuzzing has shown its ability to find bugs in
+% various software layers including the userprogram space~\cite{qsym,
+%   driller, symsan, crfuzz, r2z2, cafl, fuzzorigin} and the kernel
+% space~\cite{fuzzusb, syzkaller, hfl, cabfuzz, razzer, krace, janus,
+%   hydra, healer}.
+% %
+% A primary task of fuzzing is to generate and mutate different inputs
+% of a target program.
+% %
+% When running the inputs, a fuzzer monitors a program's behavior, and
+% observes malfunctions with a help of various sanitizers~\cite{asan,
+%   kasan, meds}.
+
+% A coverage-guided fuzzer adopts a coverage metric to abstract
+% program's interesting behaviors.
+% %
+% During fuzzing, a fuzzer accumulates all experienced coverage as the
+% abstraction of tested behaviors of a program.
+% %
+% When a new input is given, a fuzzer compares coverage of the input
+% with the accumulated coverage to determine whether the input exposes a
+% new interesting behavior. If it does, a fuzzer keeps and mutates the
+% input to generate another input that potentially exhibits unknown
+% coverage.
+
+% \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
+
+\PP{Instruction scheduling.}
+%
+Instead of relying on the uncontrollable kernel scheduler, concurrency
+fuzzing generally consists of a customized scheduler to increase the
+probability of bugs being exposed.
+%
+Depending on how a customized scheduler schedules instructions, it is
+largely categorized into randomized scheduler and scheduling
+hint-directed scheduler (shortly, hint-directed scheduler).
+
+A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
+designed to randomly schedule intstructions in a disciplined
+manner. It tries to keep only one thread to execute while the thread
+runs until a certain number of instructions are executed or a certain
+amount of time has elapsed.
+%
+A fuzzer and the scheduler share a small number of parameters used for
+the scheduler to pseudo-randomly determine the number of instructions
+or the amount of time to execute.
+%
+In this way, interleavings are diversified across fuzzing runs while a
+fuzzer can tailor the non-determinism caused by scheduling.
+
+On the other side, a hint-directed scheduler~\cite{razzer, snowboard}
+enfoces a specific requirement of interleaving called a scheduling
+hint.
+%
+A scheduling hint is generally in the form of an interleaving pattern
+that possibly causes a concurrency bug. For example, a scheduling hint
+may consists of execution order indicating a single-variable order
+violation; \textit{``thread A executes a store operation writing into
+  $X$ before thread B executes a load operation reading from $X$''}.
+%
+During fuzzing, a fuzzer keeps generating different scheduling hints,
+and enforces an interleaving that contains a scheduling hint to
+observe the interleaving causes an erroneous behavior.
+
+
+\PP{Coverage in the concurrency dimension.}
+%
+To the best of our knowledge, Krace~\cite{krace} is the first work
+that asserts the necessity of a coverage metric in the concurrency
+dimension.
+%
+While many coverage metrics are proposed with their own pros and
+cons~\cite{wang2019sensitive}, they only track the sequential aspect
+of a program (\eg, branch coverage tracks whether a branch is taken or
+not) without paying attention to communication between threads.
+%
+Krace states that even after sequential coverage is saturated, there
+could be more interesting behaviors caused by thread interleavings,
+and that if there are unexplored thread interleavings in an input, a
+fuzzer should keep paying attention to the input.
+
+To capture unique behaviors in the concurrency dimension, Krace
+proposes a coverage metric called alias coverage.
+%
+Alias coverage tracks inter-thread reads-from relation between a pair
+of instructions. In other words, alias coverage tracks
+\texttt{$I_S \rightarrow I_L$} if a load instruction \texttt{$I_L$}
+reads a value written by a store instruction \texttt{$I_S$} and they
+are executed in different threads.
+%
+% For example, if a fuzzer wants to test an interleaving that , it can
+% instruct a scheduler to enfore such requirement on the two
+% instructions.
+%
+\dr{TODO: MUZZ, and others?}
+%
+Although Razzer~\cite{razzer} and Snowboard~\cite{snowboard} adopt a
+hint-directed scheduler, they do not make use of a concurrency
+coverage metric. Therefore they do not distinguish whether two inputs
+exhibit different behaviors. Instead, they concentrate on less
+frequent inter-thread data flow based on an idea that those
+inter-thread data flow is less likely tested and more likley causes an
+abnormal behavior.
+
+\subsection{Motivation}
+\label{ss:motivation}
+
+In spite of enormous efforts, finding concurrency bugs is still a
+daunting task.
+%
+To better find concurreny bugs, we first study when and how
+concurrency bugs manifest.
+%
+Afterwards, we identify characteristics of concurrency bugs that have
+not been tackled in prior approaches, and clarify our goals for
+solving them at the end of this section.
+
+
+
+\PP{Manifestation of race conditions}
+%
+According to an extensive survey of concurrency
+bugs~\cite{learningfrommistakes}, most race conditions manifest
+depending on a partial order of a few memory accesses.
+%
+Specifically, 92\% of race conditions the authors studied are
+guaranteed to manifest if a specific partial order among at most 4
+memory accesses is enforced.
+%
+For all other memory accesses, their execution orders and values
+written and read by them do not affect bugs's manifestation.
+
+
+One of the factors that makes it difficult to find concurrency bugs is
+that, they may be detected only when a program shows an abnormal
+behavior.
+%
+\autoref{subfig:racecondition} is the example of such concurrency bug.
+%
+In this example, the timing of accesses are not correctly
+contemplated. When instructions are executed in the order of
+\dr{TODO:}..., the program runs differently than the developer
+intention, causing a use-after-free bug.
+%
+However there are no plain accesses (\ie, all accesses are annotated),
+and therefore, there is no data race.
+%
+By the definition, data race detectors~\cite{tsan, kcsan, krace,
+  prorace, txrace, crsampler} are not applicable to detect this kind
+of race conditions.
+
+
+In worse cases, race conditions hardly manifest with the kernel
+scheduler. In detail, a race condition may manifest only when one
+thread stalls for a long time while another thread executes numerous
+instructions.
+%
+One could argue that those concurrency bugs are not a threat because
+it may take too long time, or even impossible to exploit.
+%
+However, a recent study, ExpRace~\cite{exprace}, reveals that an
+attacker can affect the kernel's scheduler using inter-processor
+interrupts (IPI), and exploit even such concurrency bugs.
+
+% Want to say: there are race conditions that cannot be detected using
+% a data race detector. Need to effectively explore the interleaving
+% space to observe the outcome caused by various interleavings.
+
+
+\PP{Existing works' limitation}
+%
+As most race conditions manifest with at most four memory accesses, a
+fuzzer's interest could be to tests such partial orders as many as
+possible.
+%
+In this regard, instruction scheduling methods and coverage metrics
+proposed by previous studies fall shorts.
+
+
+\dr{TODO: rewrite this paragraph. not understandable}
+%
+Approaches that adopt a randomized scheduler~\cite{krace, ski, muzz}
+suffer from the inherent randomness.
+%
+When the randomness comes to concurrency bugs, this could become a
+significant drawback.
+%
+Although interleavings are affected by a fuzzer, a fuzzer cannot fully
+control how interleaving takes place. Thus, a fuzzer may need to
+indiscriminately execute the same input until its coverage is
+saturated.
+%
+Furthermore, it is almost impossible for randomized schedulers to
+expose concurrency bugs requiring an extreme interleaving such that
+\dr{TODO: explain:}non-inclusive race conditions~\cite{exprace} or ones that
+require a very small race window.
+
+
+In contrast, approaches with a hint-directed scheduler is able to
+explore all interelavings including even ones that hardly occur if a
+proper scheduling hint is given. Therfore, they are able to find out
+such race conditions.
+%
+However, existing approaches~\cite{razzer, snowboard} are not suitable
+of diversifying interleavings. \ie, they change very small part of
+interleaving across runs.
+%
+Even with a single input, they require a large number of execution to
+test the input enough.
+
+Last but not least, none of existing approaches incorporate a proper
+coverage for concurrency bugs. Suggested coverages are not suitable as
+they do not capture partial orders of a small instruction group, and
+bugs may not be exposed even after the coverages are saturated.
+Consequently, existing approaches have difficulty in distinguishing a
+given input will exhibit a more interesting behavior, \ie, race
+conditions.
+
+
+\PP{Our goal}
+%
+Our goal is to design a fuzzer to effectively explore partial orders
+of a small number (\eg, four) of memory accesses.
+%
+Considering characteristics of concurrency bugs mentioned above, it
+will increase the probabilty of finding more concurrency bugs if we
+diversify interleavings to experience such partial orders as many as
+possible.
+
+To this end, we organize subgoals as follows:
+%
+% - coverage metric
+%   - not to waste the computing power
+%   - not to de-prioritize inputs
+1) We first design a coverage metric to capture such partial orders.
+By this coverage metric, we do not waste the computing power for
+uninteresting inputs, and not de-prioritize inputs in which there are
+more unexplored interleavings.
+%
+% - scheudling
+%   - to explore partial orders faster than previous approaches
+%   - not to miss extreme interleaving
+2) Based on the coverage metric, we design an instruction scheduling
+mechanism directed towards unexplored coverage.
+%
+This scheduling mechanism not only makes the investigation of such
+partial orders faster, but also does not miss concurrency bugs caused
+by an ``extreme'' interleaving (\ie, ones that hardly occur with the
+kernel scheduler).
+%
+% - observe an outcome
+%   - not to miss race conditions
+3) While scheduling instructions, we detect concurrency bugs through
+abnormal behaviors instead of relying on data race detectors.
+%
+Although data race detectors are useful development tools, they are
+inherently limited in detecting race conditions.
+%
+We thus choose to observe the direct evidence of manifestation of
+concurrency bugs, an abnormal behavior.
+%
+Incorporating a data race detector will be discussed in
+\autoref{s:discussion}.
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "p"
+%%% End:

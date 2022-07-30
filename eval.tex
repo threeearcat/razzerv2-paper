@@ -1,0 +1,66 @@
+\section{Evaluation}
+\label{s:eval}
+
+To verify the effectiveness of our approach, we evaluate \sys to
+answer the following questions
+\begin{itemize}
+\item Is \sys able to find real-world concurrency
+  bugs~(\autoref{ss:realworldbugs})
+\item Is \sys able to capture concurrency coverage faster than
+  previous approaches~(\autoref{ss:coveragegrowth})
+\item Is \XXX{} suitable to capture interesting
+  behaviors~(\autoref{ss:suitability}).
+\end{itemize}
+
+\PP{Experimental setup.}
+%
+All of our evaluations were performed on an Intel(R) Xeon(R) CPU
+E5-4655 v4 @ 2.50GHz (30MB cache) with 512GB of RAM.
+
+
+\subsection{Finding Real-world Concurrency Bugs}
+\label{ss:realworldbugs}
+
+\begin{table}[t]
+  \input{table/newbugs.tex}
+  \centering
+  \caption{}
+  \label{table:newbugs}
+\end{table}
+
+In order to prove the practicality of \sys, we ran \sys on latest
+versions of the Linux kernel ranging from \XXX{} to \XXX{}.  We ran
+\sys for approximately two months.
+
+\autoref{table:newbugs} summarizes crashes found by \sys. During our
+experiment, \totalbugs crashes are newly found.
+%
+
+
+
+
+\subsection{Coverage Growth in the Concurrency Dimension}
+\label{ss:coveragegrowth}
+
+\begin{table}[t]
+  \input{table/knownbugs.tex}
+  \centering
+  \caption{}
+  \label{table:knownbugs}
+\end{table}
+
+
+As the coverage growth is the important performance metric, we compare
+\sys with prior works.
+
+
+
+
+\subsection{Suitability of Coverage Metric}
+\label{ss:suitability}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "p"
+%%% End:

@@ -1,0 +1,51 @@
+\documentclass[conference,compsoc]{IEEEtran}
+
+% conference specific style
+\usepackage[11pt,nocopyright]{sigmin}
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+
+% common packages
+\include{pkgs}
+
+\newcommand{\sys}{\mbox{\textsc{C2Fuzz}}\xspace}
+
+% ref. http://en.wikibooks.org/wiki/LaTeX/Colors
+\newcommand{\BL}[1]{\textcolor{LimeGreen}{BL: #1}}
+\newcommand{\yj}[1]{\textcolor{cyan}{YJ: #1}}
+\newcommand{\dr}[1]{\textcolor{red}{DR: #1}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\XX}[0]{\textcolor{red}{XXX}}
+\newcommand{\XXX}[1]{\textcolor{red}{XXX: #1}}
+\newcommand{\TODO}[1]{\textcolor{Melon}{TODO: #1}}
+
+\input{cmds}
+\input{rev}
+
+\begin{document}
+
+\input{hdr}
+\date{}
+\maketitle
+
+\input{abstract}
+\input{intro}
+\input{background}
+\input{design}
+\input{impl}
+\input{eval}
+\input{discussion}
+\input{relwk}
+\input{conclusion}
+% \input{ack}
+
+\balance
+\bibliographystyle{abbrvnat}
+\footnotesize
+\setlength{\bibsep}{3pt}
+\bibliography{p,sslab,conf}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "p"
+%%% End:
