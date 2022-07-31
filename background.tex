@@ -146,22 +146,27 @@ This paper focuses on finding race conditions instead of data races.
 \subsection{Concurrency Fuzzing}
 \label{ss:concurrencyfuzzing}
 
-\dr{keep in mind: concurrency fuzzing to expose erroneous behaviors}
 
-Since fuzzing has proved its effectiveness in finding bugs, several
-attempts~\cite{razzer, krace, snowboard, muzz} have been made to
-improve fuzzing techniques specifically in exposing concurrency bugs.
+% During fuzzing, a fuzzer determines that interleavings of given
+% concurrent jobs are tested enough if a concurrency coverage is
+% saturated while a customized scheduler is introduced to tailor the
+% non-deterministic behavior.
+
+
+In spite of enormous efforts, finding concurrency bugs is still a
+daunting task.
 %
-These approaches make different choices in various aspects depending
-on their own purposes; some of these approaches~\cite{krace,
-  snowboard} adopt a data race detector to find out data races, while
-others~\cite{razzer, muzz} rely on existing sanitizers to observe
-erroneous behaviors (\ie, race conditions).
+It is mainly due to two challenges such that 1) the number of possible
+interleavings grows exponentially to the number of memory access
+operations. and 2) concurrency bugs are inherently caused
+non-deterministically.
+
+Recently, several studies~\cite{razzer, krace, snowboard, muzz} have
+been proposed to improve fuzzing techniques specifically in exposing
+concurrency bugs.
 %
-Aside from the use of data race detectors, they take different
-strategies for the sake of two objectives, namely scheduling
-instructions and capturing interesting behaviors (\ie, coverage) in
-the concurrency dimension.
+These studies generally adopt two strategies, namely customized
+scheduler and coverage metric in the concurrency dimension.
 
 % \PP{Coverage-guided fuzzing}
 % %
@@ -192,7 +197,7 @@ the concurrency dimension.
 
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 
-\PP{Instruction scheduling.}
+\PP{Customized scheduler.}
 %
 Instead of relying on the uncontrollable kernel scheduler, concurrency
 fuzzing generally consists of a customized scheduler to increase the
@@ -272,37 +277,19 @@ abnormal behavior.
 \subsection{Motivation}
 \label{ss:motivation}
 
-In spite of enormous efforts, finding concurrency bugs is still a
-daunting task.
+Even though prior works achieve their own success, we found that none
+of them is tailored towards the root cause of concurrency bugs.
 %
-It is mainly due to two challenges: 1) the number of possible
-interleavings grows exponentially according to the number of memory
-access operations, making exhaustively exploring the interleaving
-space is an intractable problem, 2) concurrency bugs inherently stem
-from the non-deterministic behavior.
-
-In the perspective of fuzzing, the two challenges are addressed by a
-concurrency coverage metric and a customized scheduler respectively.
-%
-During fuzzing, a fuzzer determines that interleavings of given
-concurrent jobs are tested enough if a concurrency coverage is
-saturated while a customized scheduler is introduced to tailor the
-non-deterministic behavior.
-
-However, we found that prior works fall short in finding concurrency
-bugs mainly due to that they do not consider when concurrency bugs
-manifest.
-%
-In other words, a coverage metric of prior works do not answer the
+Especially, a coverage metric of prior works do not answer the
 question of whether there are remaining interleavings that potentially
-causes concurrency bugs, and a customized scheduler .
+causes concurrency bugs, and proposed customized schedulers are not
+designed to exhaust such interleavings.
+
+This work is motivated to design a fuzzer that effectively tests
+interleavings that potentially causes a concurrency bug.
 %
-
-
-
-%
-To better find concurreny bugs, we first study when and how
-concurrency bugs manifest.
+To understand which interleavings can be the root cause, we first
+describe when and how concurrency bugs manifest.
 %
 Afterwards, we identify characteristics of concurrency bugs that have
 not been tackled in prior approaches, and clarify our goals for
@@ -322,6 +309,9 @@ memory accesses is enforced.
 %
 For all other memory accesses, their execution orders and values
 written and read by them do not affect bugs's manifestation.
+
+
+This implication opens a chance of
 
 
 One of the factors that makes it difficult to find concurrency bugs is
@@ -355,9 +345,6 @@ However, a recent study, ExpRace~\cite{exprace}, reveals that an
 attacker can affect the kernel's scheduler using inter-processor
 interrupts (IPI), and exploit even such concurrency bugs.
 
-% Want to say: there are race conditions that cannot be detected using
-% a data race detector. Need to effectively explore the interleaving
-% space to observe the outcome caused by various interleavings.
 
 
 \PP{Existing works' limitation}
