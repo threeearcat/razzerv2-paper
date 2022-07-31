@@ -275,6 +275,27 @@ abnormal behavior.
 In spite of enormous efforts, finding concurrency bugs is still a
 daunting task.
 %
+It is mainly due to that the number of possible interleavings grows
+exponentially according to the number of memory access operations,
+making exhaustively exploring the interleaving space is an intractable
+problem.
+
+% 그래서 일부분만 테스팅 한다.
+
+
+%
+Therefore, fuzzing techniques inevitably eliminate redundant
+interleavings.
+
+
+% 근데 selection of 일부분이 bug manifestation이랑 맞지 않는다.
+
+% 그리고 느림 왜냐면 bug manifestation이 언제 일어나는지 모르니까 뭘
+% 실행해야 할 지 모름
+
+
+
+%
 To better find concurreny bugs, we first study when and how
 concurrency bugs manifest.
 %
