@@ -1,4 +1,4 @@
-\section{Background and Motivation}
+\section{Background}
 \label{s:background}
 
 While concurrency has been a cornerstone of performance benefits in
@@ -271,18 +271,19 @@ hint-directed scheduler, they do not make use of a concurrency
 coverage metric. Therefore they do not distinguish whether two inputs
 exhibit different behaviors. Instead, they concentrate on less
 frequent inter-thread data flow based on an idea that those
-inter-thread data flow is less likely tested and more likley causes an
+inter-thread data flow is less likely tested and more likely causes an
 abnormal behavior.
 
-\subsection{Motivation}
+\section{Motivation}
 \label{ss:motivation}
+\yj{Drive readers to focus on coverage in the concurrency dimension.}
 
-This work is motivated by an observation that prior approaches mostly
-focus on the execution order of single pair of conflicting
-instructions, but race conditions mostly are caused by multiple pairs
-of conflicting accesses.
+This work is motivated by an observation that prior approaches
+focus on the execution order of a single pair of conflicting
+instructions, but race conditions mostly are caused by 
+\textit{multiple pairs} of conflicting accesses.
 %
-We found that because of this mismatch, prior approaches shows
+Because of this mismatch\yj{xx}, prior approaches shows
 inefficiency in finding race conditions.
 
 In this section, we first describe when and how concurrency bugs
@@ -370,7 +371,7 @@ conditions has been tested,
 
 
 
-\PP{Existing works' limitation}
+\PP{Limitation of existing approaches}
 %
 First of all, none of existing approaches incorporate a proper
 coverage for concurrency bugs.
@@ -382,7 +383,7 @@ Consequently, existing approaches have difficulty in distinguishing a
 given input will exhibit a more interesting behavior, \ie, race
 conditions.
 
-
+\yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
 As most race conditions manifest with at most four memory accesses, a
 fuzzer's interest could be to tests such partial orders as many as
 possible.
