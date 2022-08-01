@@ -317,8 +317,8 @@ written and read by them do not affect bugs's manifestation.
 \end{figure}  
 
 \autoref{fig:racecondition} explains the above survey. An example
-execution scenario that a use-after-free bug manifests is that
-instructions are executed in the order of \dr{TODO}.
+execution scenario causing a use-after-free bug is that instructions
+are executed in the order of \dr{TODO}.
 %
 In this example, all other memory accesses do not affect the
 manifestation of the race condition. They do not change the control
@@ -327,10 +327,14 @@ manifest.
 %
 In detail, the condition \dr{TODO} is satisfied, the use-after-free bug always manifests.
 
-In the perspective of fuzzer, all interleavings that satisfy the above
-condition are equivalent in terms of the manifestation of the race
-condition.
-%
+In terms of the manifestation of the race condition, all interleavings
+that satisfy the above condition are equivalent. As soon as the above
+condition is satisfied in any interleaving, the race condition can be
+detected.
+
+
+In the perspective of fuzzer, it is important that which of those
+conditions has been tested,
 
 
 % One of the factors that makes it difficult to find concurrency bugs is
