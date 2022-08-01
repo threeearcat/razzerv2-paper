@@ -156,10 +156,10 @@ This paper focuses on finding race conditions instead of data races.
 In spite of enormous efforts, finding concurrency bugs is still a
 daunting task.
 %
-It is mainly due to two challenges such that 1) the number of possible
+It is mainly due to two challenges such that 1) concurrency bugs are
+inherently caused non-deterministically, and 2) the number of possible
 interleavings grows exponentially to the number of memory access
-operations. and 2) concurrency bugs are inherently caused
-non-deterministically.
+operations.
 
 Recently, several studies~\cite{razzer, krace, snowboard, muzz} have
 been proposed to improve fuzzing techniques specifically in exposing
@@ -277,23 +277,22 @@ abnormal behavior.
 \subsection{Motivation}
 \label{ss:motivation}
 
-Even though prior works achieve their own success, we found that none
-of them is tailored towards the root cause of concurrency bugs.
+This work is motivated by an observation that prior approaches mostly
+focus on the execution order of single pair of conflicting
+instructions, but race conditions mostly are caused by multiple pairs
+of conflicting accesses.
 %
-Especially, a coverage metric of prior works do not answer the
-question of whether there are remaining interleavings that potentially
-causes concurrency bugs, and proposed customized schedulers are not
-designed to exhaust such interleavings.
+We found that because of this mismatch, prior approaches shows
+inefficiency in finding race conditions.
 
-This work is motivated to design a fuzzer that effectively tests
-interleavings that potentially causes a concurrency bug.
+In this section, we first describe when and how concurrency bugs
+manifest to comprehend what interleavings should be tested to find
+race conditions.
 %
-To understand which interleavings can be the root cause, we first
-describe when and how concurrency bugs manifest.
-%
-Afterwards, we identify characteristics of concurrency bugs that have
-not been tackled in prior approaches, and clarify our goals for
-solving them at the end of this section.
+Afterwards, we identify why prior approaches fall short in finding
+race conditions, and clarify our goals to better find them at the end
+of this section.
+
 
 
 
@@ -310,45 +309,76 @@ memory accesses is enforced.
 For all other memory accesses, their execution orders and values
 written and read by them do not affect bugs's manifestation.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/racecondition.pdf}
+  \caption{CVE-2019-6974}
+  \label{fig:racecondition}
+\end{figure}  
 
-This implication opens a chance of
+\autoref{fig:racecondition} explains the above survey. An example
+execution scenario that a use-after-free bug manifests is that
+instructions are executed in the order of \dr{TODO}.
+%
+In this example, all other memory accesses do not affect the
+manifestation of the race condition. They do not change the control
+flow of both threads nor data flow necessary for the race condition to
+manifest.
+%
+In detail, the condition \dr{TODO} is satisfied, the use-after-free bug always manifests.
+
+In the perspective of fuzzer, all interleavings that satisfy the above
+condition are equivalent in terms of the manifestation of the race
+condition.
+%
 
 
-One of the factors that makes it difficult to find concurrency bugs is
-that, they may be detected only when a program shows an abnormal
-behavior.
-%
-\autoref{subfig:racecondition} is the example of such concurrency bug.
-%
-In this example, the timing of accesses are not correctly
-contemplated. When instructions are executed in the order of
-\dr{TODO:}..., the program runs differently than the developer
-intention, causing a use-after-free bug.
-%
-However there are no plain accesses (\ie, all accesses are annotated),
-and therefore, there is no data race.
-%
-By the definition, data race detectors~\cite{tsan, kcsan, krace,
-  prorace, txrace, crsampler} are not applicable to detect this kind
-of race conditions.
+% One of the factors that makes it difficult to find concurrency bugs is
+% that, they may be detected only when a program shows an abnormal
+% behavior.
+% %
+% \autoref{subfig:racecondition} is the example of such concurrency bug.
+% %
+% In this example, the timing of accesses are not correctly
+% contemplated. When instructions are executed in the order of
+% \dr{TODO:}..., the program runs differently than the developer
+% intention, causing a use-after-free bug.
+% %
+% However there are no plain accesses (\ie, all accesses are annotated),
+% and therefore, there is no data race.
+% %
+% By the definition, data race detectors~\cite{tsan, kcsan, krace,
+%   prorace, txrace, crsampler} are not applicable to detect this kind
+% of race conditions.
 
 
-In worse cases, race conditions hardly manifest with the kernel
-scheduler. In detail, a race condition may manifest only when one
-thread stalls for a long time while another thread executes numerous
-instructions.
-%
-One could argue that those concurrency bugs are not a threat because
-it may take too long time, or even impossible to exploit.
-%
-However, a recent study, ExpRace~\cite{exprace}, reveals that an
-attacker can affect the kernel's scheduler using inter-processor
-interrupts (IPI), and exploit even such concurrency bugs.
+% In worse cases, race conditions hardly manifest with the kernel
+% scheduler. In detail, a race condition may manifest only when one
+% thread stalls for a long time while another thread executes numerous
+% instructions.
+% %
+% One could argue that those concurrency bugs are not a threat because
+% it may take too long time, or even impossible to exploit.
+% %
+% However, a recent study, ExpRace~\cite{exprace}, reveals that an
+% attacker can affect the kernel's scheduler using inter-processor
+% interrupts (IPI), and exploit even such concurrency bugs.
 
 
 
 \PP{Existing works' limitation}
 %
+First of all, none of existing approaches incorporate a proper
+coverage for concurrency bugs.
+%
+Suggested coverages are not suitable as
+they do not capture partial orders of a small instruction group, and
+bugs may not be exposed even after the coverages are saturated.
+Consequently, existing approaches have difficulty in distinguishing a
+given input will exhibit a more interesting behavior, \ie, race
+conditions.
+
+
 As most race conditions manifest with at most four memory accesses, a
 fuzzer's interest could be to tests such partial orders as many as
 possible.
@@ -387,14 +417,6 @@ interleaving across runs.
 %
 Even with a single input, they require a large number of execution to
 test the input enough.
-
-Last but not least, none of existing approaches incorporate a proper
-coverage for concurrency bugs. Suggested coverages are not suitable as
-they do not capture partial orders of a small instruction group, and
-bugs may not be exposed even after the coverages are saturated.
-Consequently, existing approaches have difficulty in distinguishing a
-given input will exhibit a more interesting behavior, \ie, race
-conditions.
 
 
 \PP{Our goal}
