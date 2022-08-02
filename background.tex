@@ -280,8 +280,8 @@ abnormal behavior.
 
 This work is motivated by an observation that prior approaches
 focus on the execution order of a single pair of conflicting
-instructions, but race conditions mostly are caused by 
-\textit{multiple pairs} of conflicting accesses.
+instructions, but race conditions mostly are \textit{combinatorial results of multiple pairs}
+of conflicting accesses.
 %
 Because of this mismatch\yj{xx}, prior approaches shows
 inefficiency in finding race conditions.
@@ -339,8 +339,8 @@ In the perspective of fuzzer, it is important to track whether any
 interleaving satisfying the above problematic condition about
 \texttt{ctx->might_cancel}, namely
 $(\texttt{A1} \rightarrow \texttt{B2}) \wedge (\texttt{B1} \rightarrow
-\texttt{A2})$, is executed, since all interleavings satisfying the
-above condition are equivalently causes the race condition.
+\texttt{A2})$, is executed. All interleavings satisfying the above
+condition are equivalently causes the race condition.
 
 \dr{TODO: how to say we want to say such conditions as many as
   possible}
@@ -381,15 +381,20 @@ above condition are equivalently causes the race condition.
 
 \PP{Limitation of existing approaches}
 %
-First of all, none of existing approaches incorporate a proper
+We observe that none of existing approaches incorporate a proper
 coverage for concurrency bugs.
 %
-Suggested coverages are not suitable as
-they do not capture partial orders of a small instruction group, and
-bugs may not be exposed even after the coverages are saturated.
-Consequently, existing approaches have difficulty in distinguishing a
-given input will exhibit a more interesting behavior, \ie, race
-conditions.
+Existing approaches fall into two groups.
+%
+Some of them~\cite{snowboard, razzer} do not adopt a coverage in the
+concurrency dimension at all. Therefore, they cannot make a decision
+on whether a given input is worth executing.
+%
+Other approaches~\cite{krace, muzz} adopt coverage metrics that are
+not suitable for race conditions as they do not consider a combination
+of multiple conflicting accesses, and bugs may not be exposed even
+after the coverages are saturated.
+%
 
 \begin{figure}
   \centering
@@ -400,10 +405,6 @@ conditions.
 \end{figure}
 
 \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
-%
-\dr{At this point, I'm worrying that one could argue that this bug can
-  be found with a data race detector even if the race condition does
-  not manifest.}
 %
 Taking the example of alias coverage, \autoref{fig:alias-coverage}
 shows two interleavings that capture all alias coverage, but the race
@@ -422,10 +423,12 @@ This is due to that the manifestation of race conditions is \textit{a
   combinatorial result of multiple inter-thread data flow}, not caused
 by just a single inter-thread data flow that alias coverage captures.
 
+Consequently, existing approaches have
+difficulty in distinguishing a given input will exhibit a more
+interesting behavior, \ie, race conditions.
 
 
-\dr{TODO: rewrite this paragraph. not understandable}
-%
+\cut{
 Approaches that adopt a randomized scheduler~\cite{krace, ski, muzz}
 suffer from the inherent randomness.
 %
@@ -441,8 +444,7 @@ Furthermore, it is almost impossible for randomized schedulers to
 expose concurrency bugs requiring an extreme interleaving such that
 \dr{TODO: explain:}non-inclusive race conditions~\cite{exprace} or ones that
 require a very small race window.
-
-
+%
 In contrast, approaches with a hint-directed scheduler is able to
 explore all interelavings including even ones that hardly occur if a
 proper scheduling hint is given. Therfore, they are able to find out
@@ -454,6 +456,8 @@ interleaving across runs.
 %
 Even with a single input, they require a large number of execution to
 test the input enough.
+}
+
 
 
 \PP{Our goal}
