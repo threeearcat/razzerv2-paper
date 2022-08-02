@@ -312,21 +312,28 @@ written and read by them do not affect bugs's manifestation.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/racecondition.pdf}
-  \caption{CVE-2019-6974}
+  \includegraphics[width=0.9\linewidth]{fig/cve-2017-2636.pdf}
+  \caption{CVE-2017-2636}
   \label{fig:racecondition}
 \end{figure}  
 
-\autoref{fig:racecondition} explains the above survey. An example
-execution scenario causing a use-after-free bug is that instructions
-are executed in the order of \dr{TODO}.
+\autoref{fig:racecondition} explains the above survey. In this example
+the use-after-free bug is triggered if two execution orders are
+conjunctively fulfilled such that 1) \texttt{A1} $\rightarrow$
+\texttt{B4}, and 2) \texttt{B1} $\rightarrow$ \texttt{A3}.
+%
+Assuming \texttt{n_hdlc->tbuf} is not \texttt{NULL} before the
+execution, thread A always executes \texttt{A2} if \texttt{A1} is
+executed before \texttt{B4}. Similarly, thread B always executes
+\texttt{B3} if \texttt{B1} is executed before \texttt{A3}. Therefore,
+if the two conditions are met, \texttt{n_hdlc->tbuf} is inserted into
+a linked list \texttt{free_list} at both \texttt{A2} and \texttt{B3},
+causing a list corruption.
 %
 In this example, all other memory accesses do not affect the
 manifestation of the race condition. They do not change the control
 flow of both threads nor data flow necessary for the race condition to
 manifest.
-%
-In detail, the condition \dr{TODO} is satisfied, the use-after-free bug always manifests.
 
 In terms of the manifestation of the race condition, all interleavings
 that satisfy the above condition are equivalent. As soon as the above
