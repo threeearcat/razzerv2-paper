@@ -312,14 +312,14 @@ written and read by them do not affect bugs's manifestation.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/cve-2017-2636.pdf}
-  \caption{CVE-2017-2636}
-  \label{fig:racecondition}
-\end{figure}  
+  \includegraphics[width=0.9\linewidth]{fig/racecondition.pdf}
+  \caption{CVE-2017-10661}
+  \label{fig:cve-2017-10661}
+\end{figure}
 
-\autoref{fig:racecondition} explains the above survey. In this example
-the use-after-free bug is triggered if two execution orders are
-conjunctively fulfilled such that 1) \texttt{A1} $\rightarrow$
+\autoref{fig:cve-2017-10661} explains the above survey. In this
+example the use-after-free bug is triggered if two execution orders
+are conjunctively fulfilled such that 1) \texttt{A1} $\rightarrow$
 \texttt{B2}, and 2) \texttt{B1} $\rightarrow$ \texttt{A2}.
 %
 Assuming \texttt{ctx->might_cancel} is initially \texttt{False},
@@ -391,28 +391,39 @@ Consequently, existing approaches have difficulty in distinguishing a
 given input will exhibit a more interesting behavior, \ie, race
 conditions.
 
-\yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
-%
-Taking the example of alias coverage, \autoref{fig:alias-coverage}
-shows two interleavings that capture all alias coverage, but the race
-condition does not manifest.
-%
-If we execute the two threads \texttt{sequentially}, we can observe
-inter-thread data flow from \texttt{B2} to \texttt{A1}, and
-\texttt{A2} to \texttt{B1}.
-%
-According to Krace, a fuzzer tracks all possible alias coverage in
-regard to \texttt{ctx->might_cancel}, and de-prioritizes the two
-threads as it thinks there will be no more interesting behavior.
-%
-Consequently, the race condition may be missed.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/alias-coverage.pdf}
+  \caption{Two interleaivng examples that track all alias coverage of
+    \autoref{fig:cve-2017-10661}.}
+  \label{fig:alias-coverage}
+\end{figure}
 
+\yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
 %
 \dr{At this point, I'm worrying that one could argue that this bug can
   be found with a data race detector even if the race condition does
   not manifest. That is why I keep thinking about saying the
   difference between data race and race condition and then use
-  cve-2019-6974 as an example.}
+  cve-2019-6974 as an example. I want to discuss about this.}
+%
+Taking the example of alias coverage, \autoref{fig:alias-coverage}
+shows two interleavings that capture all alias coverage, but the race
+condition does not manifest.
+%
+If we execute the two threads \textit{sequentially}, we can observe
+inter-thread data flow from \texttt{B2} to \texttt{A1}, and
+\texttt{A2} to \texttt{B1}.
+%
+After executing these two interleavings, as Krace states, a fuzzer may
+de-prioritize the two threads as it tracks all possible alias coverage
+in regard to \texttt{ctx->might_cancel}, and consequently, the race
+condition may be missed.
+%
+This is due to that the manifestation of race conditions is \textit{a
+  combinatorial result of inter-thread data flow}, not just a single
+inter-thread data flow that alias coverage captures.
+
 
 
 \dr{TODO: rewrite this paragraph. not understandable}
