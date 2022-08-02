@@ -460,54 +460,53 @@ Even with a single input, they require a large number of execution to
 test the input enough.
 }
 
-\dr{Now I change my mind. It would be better to say that our goal is
-  to focus on combinations of multiple conflicting accesse. I will not
-  say previous approaches' scheduling mechanism is a limitation}
-
 \PP{Our goal}
 %
-Our goal is to design a fuzzer to effectively explore partial orders
-of a small number (\eg, four) of memory accesses.
+Our goal is to design a fuzzer to effectively explore the interleaving
+space while testing combinations of multiple conflicting accesses as
+many as possible.
 %
-Considering characteristics of concurrency bugs mentioned above, it
-will increase the probabilty of finding more concurrency bugs if we
-diversify interleavings to experience such partial orders as many as
-possible.
+% Considering characteristics of concurrency bugs mentioned above, it
+% will increase the probabilty of finding more concurrency bugs if we
+% diversify interleavings to experience such partial orders as many as
+% possible.
 
 To this end, we organize subgoals as follows:
 %
-% - coverage metric
-%   - not to waste the computing power
-%   - not to de-prioritize inputs
-1) We first design a coverage metric to capture such partial orders.
+1) We first design a coverage metric to capture such combinations.
 By this coverage metric, we do not waste the computing power for
 uninteresting inputs, and not de-prioritize inputs in which there are
 more unexplored interleavings.
 %
-% - scheudling
-%   - to explore partial orders faster than previous approaches
-%   - not to miss extreme interleaving
-2) Based on the coverage metric, we design an instruction scheduling
-mechanism directed towards unexplored coverage.
+2) Based on the coverage metric, we design an interleaving mutation
+mechanism that effectively searches the coverage metric.
 %
-This scheduling mechanism not only makes the investigation of such
-partial orders faster, but also does not miss concurrency bugs caused
-by an ``extreme'' interleaving (\ie, ones that hardly occur with the
-kernel scheduler).
+3) Lastly, we combine the coverage metric and the scheduling mechanism
+into Syzkaller~\cite{syzkaller} to find out race conditions in the
+Linux kernel.
+
+
+
+
 %
-% - observe an outcome
-%   - not to miss race conditions
-3) While scheduling instructions, we detect concurrency bugs through
-abnormal behaviors instead of relying on data race detectors.
-%
-Although data race detectors are useful development tools, they are
-inherently limited in detecting race conditions.
-%
-We thus choose to observe the direct evidence of manifestation of
-concurrency bugs, an abnormal behavior.
-%
-Incorporating a data race detector will be discussed in
-\autoref{s:discussion}.
+% This scheduling mechanism not only makes the investigation of such
+% partial orders faster, but also does not miss concurrency bugs caused
+% by an ``extreme'' interleaving (\ie, ones that hardly occur with the
+% kernel scheduler).
+% %
+% % - observe an outcome
+% %   - not to miss race conditions
+% 3) While scheduling instructions, we detect concurrency bugs through
+% abnormal behaviors instead of relying on data race detectors.
+% %
+% Although data race detectors are useful development tools, they are
+% inherently limited in detecting race conditions.
+% %
+% We thus choose to observe the direct evidence of manifestation of
+% concurrency bugs, an abnormal behavior.
+% %
+% Incorporating a data race detector will be discussed in
+% \autoref{s:discussion}.
 
 
 
