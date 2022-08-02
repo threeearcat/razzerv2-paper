@@ -254,8 +254,8 @@ fuzzer should keep paying attention to the input.
 To capture unique behaviors in the concurrency dimension, Krace
 proposes a coverage metric called alias coverage.
 %
-Alias coverage tracks inter-thread reads-from relation between a pair
-of instructions. In other words, alias coverage tracks
+Alias coverage tracks inter-thread data flow between a pair of
+instructions. In other words, alias coverage tracks
 \texttt{$I_S \rightarrow I_L$} if a load instruction \texttt{$I_L$}
 reads a value written by a store instruction \texttt{$I_S$} and they
 are executed in different threads.
@@ -322,27 +322,28 @@ the use-after-free bug is triggered if two execution orders are
 conjunctively fulfilled such that 1) \texttt{A1} $\rightarrow$
 \texttt{B2}, and 2) \texttt{B1} $\rightarrow$ \texttt{A2}.
 %
-Assuming \texttt{ctx->might_cancel} is \texttt{False} before the
-execution, thread A always executes \texttt{A3} if \texttt{A1} is
-executed before \texttt{B2}. Similarly, thread B always executes
-\texttt{B3} if \texttt{B1} is executed before \texttt{A2}. Therefore,
-if the two conditions are met, the object \texttt{ctx} is inserted
-into a linked list \texttt{cancel_list} at both \texttt{A3} and
-\texttt{B3}, causing a list corruption.
+Assuming \texttt{ctx->might_cancel} is initially \texttt{False},
+thread A always executes \texttt{A3} if \texttt{A1} is executed before
+\texttt{B2}. Similarly, thread B always executes \texttt{B3} if
+\texttt{B1} is executed before \texttt{A2}. Therefore, if the two
+conditions are met, the object \texttt{ctx} is inserted into a linked
+list \texttt{cancel_list} at both \texttt{A3} and \texttt{B3}, causing
+a list corruption.
 %
 In this example, all other memory accesses do not affect the
 manifestation of the race condition. They do not change the control
 flow of both threads nor data flow necessary for the race condition to
 manifest.
 
-In terms of the manifestation of the race condition, all interleavings
-that satisfy the above condition are equivalent. As soon as the above
-condition is satisfied in any interleaving, the race condition can be
-detected.
+In the perspective of fuzzer, it is important to track whether any
+interleaving satisfying the above problematic condition about
+\texttt{ctx->might_cancel}, namely
+$(\texttt{A1} \rightarrow \texttt{B2}) \wedge (\texttt{B1} \rightarrow
+\texttt{A2})$, is executed, since all interleavings satisfying the
+above condition are equivalently causes the race condition.
 
-
-In the perspective of fuzzer, it is important that which of those
-conditions has been tested,
+\dr{TODO: how to say we want to say such conditions as many as
+  possible}
 
 
 % One of the factors that makes it difficult to find concurrency bugs is
@@ -391,12 +392,27 @@ given input will exhibit a more interesting behavior, \ie, race
 conditions.
 
 \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
-As most race conditions manifest with at most four memory accesses, a
-fuzzer's interest could be to tests such partial orders as many as
-possible.
 %
-In this regard, instruction scheduling methods and coverage metrics
-proposed by previous studies fall shorts.
+Taking the example of alias coverage, \autoref{fig:alias-coverage}
+shows two interleavings that capture all alias coverage, but the race
+condition does not manifest.
+%
+If we execute the two threads \texttt{sequentially}, we can observe
+inter-thread data flow from \texttt{B2} to \texttt{A1}, and
+\texttt{A2} to \texttt{B1}.
+%
+According to Krace, a fuzzer tracks all possible alias coverage in
+regard to \texttt{ctx->might_cancel}, and de-prioritizes the two
+threads as it thinks there will be no more interesting behavior.
+%
+Consequently, the race condition may be missed.
+
+%
+\dr{At this point, I'm worrying that one could argue that this bug can
+  be found with a data race detector even if the race condition does
+  not manifest. That is why I keep thinking about saying the
+  difference between data race and race condition and then use
+  cve-2019-6974 as an example.}
 
 
 \dr{TODO: rewrite this paragraph. not understandable}
