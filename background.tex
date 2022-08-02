@@ -412,8 +412,8 @@ shows two interleavings that capture all alias coverage, but the race
 condition does not manifest.
 %
 If we execute the two threads \textit{sequentially}, we can observe
-inter-thread data flow from \texttt{B2} to \texttt{A1}, and
-\texttt{A2} to \texttt{B1}.
+inter-thread data flow $\texttt{B2} \rightarrow \texttt{A1}$, and
+$\texttt{A2} \rightarrow \texttt{B1}$.
 %
 After executing these two interleavings, as Krace states, a fuzzer may
 de-prioritize the two threads as it tracks all possible alias coverage
