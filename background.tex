@@ -312,7 +312,7 @@ written and read by them do not affect bugs's manifestation.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/racecondition.pdf}
+  \includegraphics[width=0.9\linewidth]{fig/cve-2017-10661.pdf}
   \caption{CVE-2017-10661}
   \label{fig:cve-2017-10661}
 \end{figure}
@@ -421,8 +421,8 @@ in regard to \texttt{ctx->might_cancel}, and consequently, the race
 condition may be missed.
 %
 This is due to that the manifestation of race conditions is \textit{a
-  combinatorial result of inter-thread data flow}, not just a single
-inter-thread data flow that alias coverage captures.
+  combinatorial result of multiple inter-thread data flow}, not caused
+by just a single inter-thread data flow that alias coverage captures.
 
 
 
