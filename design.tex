@@ -29,18 +29,13 @@ coverage~(\autoref{ss:scheduler}).
 
 \PP{Challenges}
 %
-Even though exploring combinations of multiple conflicting accesses
-provides a good diagnosis, one could argue that it may 
+Even though testing combinations of multiple conflicting accesses
+provides a good diagnosis capability, one could argue that it may
+require too many execution as the number of such combination is too
+large.
 
+\dr{wip.}
 
-\begin{figure*}[t]
-  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
-  \caption{Key idea to explore the interleaving space. Each circle
-    represents a memory access intruction. Annotations $R_x$ and $W_x$
-    mean that the instruction reads from or writes to a memory
-    location $x$ respectively.}
-  \label{fig:intuition}
-\end{figure*}
 
 Our intuition comes from an observation that even a non-failing
 interleaving bears hints on which interleavings require further
@@ -57,6 +52,16 @@ not.
 %
 Our approach to explore the interleaving space realizes this
 intuition.
+
+
+\begin{figure*}[t]
+  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
+  \caption{Key idea to explore the interleaving space. Each circle
+    represents a memory access intruction. Annotations $R_x$ and $W_x$
+    mean that the instruction reads from or writes to a memory
+    location $x$ respectively.}
+  \label{fig:intuition}
+\end{figure*}
 
 
 \PP{Overall steps}
