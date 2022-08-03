@@ -278,12 +278,16 @@ abnormal behavior.
 
 \section{Motivation}
 \label{ss:motivation}
-\yj{Drive readers to focus on coverage in the concurrency dimension.}
+
+- Coverage-guide fuzzing is important
+- How to define coverage in concurrency dimension is 
+challenging and important
+- Limitation of previous work: does not reflect 
+the nature of manifestation of race condition.
 
 This work is motivated by an observation that prior approaches
 focus on the execution order of a single pair of conflicting
-instructions, but race conditions mostly are \textit{combinatorial results of multiple pairs}
-of conflicting accesses.
+instructions, but race conditions mostly are \textit{combined results of multiple pairs} of conflicting accesses.
 %
 Because of this mismatch\yj{xx}, prior approaches shows
 inefficiency in finding race conditions.
@@ -297,13 +301,11 @@ race conditions, and clarify our goals to better find them at the end
 of this section.
 
 
-
-
 \PP{Manifestation of race conditions}
 %
 According to an extensive survey of concurrency
 bugs~\cite{learningfrommistakes}, most race conditions manifest
-depending on a partial order of a few memory accesses.
+depending on a partial order of a few memory accesses\yj{how to understand this sentence}.
 %
 Specifically, 92\% of race conditions the authors studied are
 guaranteed to manifest if a specific partial order among at most 4
