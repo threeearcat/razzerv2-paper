@@ -178,12 +178,12 @@ various software layers including the userprogram space~\cite{qsym,
 space~\cite{fuzzusb, syzkaller, hfl, cabfuzz, razzer, krace, janus,
   hydra, healer}.
 %
-A primary task of fuzzing is to generate and mutate different inputs
+A primary task of fuzzing is to synthesize and mutate various inputs
 of a target program.
 %
 When running the inputs, a fuzzer monitors a program's behavior, and
-observes malfunctions with a help of various sanitizers~\cite{asan,
-  kasan, meds}.
+observes malfunctions with a help of various developer
+tools~\cite{asan, kasan, meds}.
 
 A coverage-guided fuzzer adopts a coverage metric to abstract
 program's interesting behaviors.
@@ -279,18 +279,18 @@ abnormal behavior.
 \section{Motivation}
 \label{ss:motivation}
 
-- Coverage-guide fuzzing is important
-- How to define coverage in concurrency dimension is 
-challenging and important
-- Limitation of previous work: does not reflect 
-the nature of manifestation of race condition.
+% - Coverage-guide fuzzing is important
+% - How to define coverage in concurrency dimension is 
+% challenging and important
+% - Limitation of previous work: does not reflect 
+% the nature of manifestation of race condition.
 
 This work is motivated by an observation that prior approaches
 focus on the execution order of a single pair of conflicting
-instructions, but race conditions mostly are \textit{combined results of multiple pairs} of conflicting accesses.
+accesses, but race conditions mostly are \textit{combined results of multiple pairs} of conflicting accesses.
 %
-Because of this mismatch\yj{xx}, prior approaches shows
-inefficiency in finding race conditions.
+Because of this gap\yj{xx}, prior approaches shows inefficiency in finding race
+conditions.
 
 In this section, we first describe when and how concurrency bugs
 manifest to comprehend what interleavings should be tested to find
@@ -304,12 +304,13 @@ of this section.
 \PP{Manifestation of race conditions}
 %
 According to an extensive survey of concurrency
-bugs~\cite{learningfrommistakes}, most race conditions manifest
-depending on a partial order of a few memory accesses\yj{how to understand this sentence}.
+bugs~\cite{learningfrommistakes}, most race conditions manifest only
+depending on the execution order of the four memory accesses. \yj{how
+  to understand this sentence}.
 %
 Specifically, 92\% of race conditions the authors studied are
-guaranteed to manifest if a specific partial order among at most 4
-memory accesses is enforced.
+guaranteed to manifest if at most four memory accesses are executed in
+a specific condition.
 %
 For all other memory accesses, their execution orders and values
 written and read by them do not affect bugs's manifestation.
@@ -322,9 +323,10 @@ written and read by them do not affect bugs's manifestation.
 \end{figure}
 
 \autoref{fig:cve-2017-10661} explains the above survey. In this
-example the use-after-free bug is triggered if two execution orders
-are conjunctively fulfilled such that 1) \texttt{A1} $\rightarrow$
-\texttt{B2}, and 2) \texttt{B1} $\rightarrow$ \texttt{A2}.
+example the use-after-free bug is triggered if the execution order of
+four memory access operations satisfies the certain condition such
+that \texttt{A1} is executed before \texttt{B2} and \texttt{B1} is
+executed before \texttt{A2}.
 %
 Assuming \texttt{ctx->might_cancel} is initially \texttt{False},
 thread A always executes \texttt{A3} if \texttt{A1} is executed before
@@ -338,14 +340,6 @@ In this example, all other memory accesses do not affect the
 manifestation of the race condition. They do not change the control
 flow of both threads nor data flow necessary for the race condition to
 manifest.
-
-In the perspective of fuzzer, it is important to track whether any
-interleaving satisfying the above problematic condition about
-\texttt{ctx->might_cancel}, namely
-$(\texttt{A1} \rightarrow \texttt{B2}) \wedge (\texttt{B1} \rightarrow
-\texttt{A2})$, is executed. All interleavings satisfying the above
-condition are equivalently causes the race condition.
-
 
 % One of the factors that makes it difficult to find concurrency bugs is
 % that, they may be detected only when a program shows an abnormal
@@ -382,20 +376,39 @@ condition are equivalently causes the race condition.
 
 \PP{Limitation of existing approaches}
 %
-We observe that none of existing approaches incorporate a proper
-coverage for concurrency bugs.
+In the perspective of fuzzing, a coverage metric is a paramount gear
+to determine whether a given input is worthy of further mutation.
 %
-Existing approaches fall into two groups.
+If a coverage metric does not capture whether an input has a potential
+to trigger a race condition, a fuzzer may ignore inputs in which there
+are unexplored interleavings, or waste the computing power to
+valueless inputs.
 %
-Some of them~\cite{snowboard, razzer} do not adopt a coverage in the
-concurrency dimension at all. Therefore, they cannot make a decision
-on whether a given input is worth executing.
+In this regard, our primary question is whether existing coverage
+metrics in the concurrency dimension are suitable to track
+interleavings potentially causing a race condition, for example,
+$(\texttt{A1} \rightarrow \texttt{B2}) \wedge (\texttt{B1} \rightarrow
+\texttt{A2})$ in \autoref{fig:cve-2017-10661}.
+
+
+
+Unfortunately, we observe that none of existing approaches incorporate
+a proper coverage metric for race conditions.
+%
+A few of existing approaches~\cite{snowboard, razzer} do not adopt a
+coverage in the concurrency dimension at all. Therefore, they do not
+make a decision as to whether a given input is worth further testing.
 %
 Other approaches~\cite{krace, muzz} adopt coverage metrics that are
-not suitable for race conditions as they do not consider a combination
-of multiple conflicting accesses, and bugs may not be exposed even
-after the coverages are saturated.
+not suitable for race conditions as they do not consider a combined
+result of multiple pairs of conflicting accesses. As a consequence,
+race conditions may not be exposed even after the coverages are
+saturated.
 %
+Consequently, existing approaches have difficulty in distinguishing a
+given input has a potential to cause an interesting behavior, \ie,
+a race condition.
+
 
 \begin{figure}
   \centering
@@ -407,26 +420,23 @@ after the coverages are saturated.
 
 \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
 %
-Taking the example of alias coverage, \autoref{fig:alias-coverage}
-shows two interleavings that capture all alias coverage, but the race
-condition does not manifest.
+Taking alias coverage as an example, \autoref{fig:alias-coverage}
+shows two interleavings of \autoref{fig:cve-2017-10661} that capture
+all alias coverage, but the race condition does not manifest.
 %
-If we execute the two threads \textit{sequentially}, we can observe
-inter-thread data flow $\texttt{B2} \rightarrow \texttt{A1}$, and
+As the figure describes, if we execute the two threads
+\textit{sequentially}, a fuzzer is able to track inter-thread data
+flow (\ie, alias coverage) $\texttt{B2} \rightarrow \texttt{A1}$ and
 $\texttt{A2} \rightarrow \texttt{B1}$.
 %
 After executing these two interleavings, as Krace states, a fuzzer may
-de-prioritize the two threads as it tracks all possible alias coverage
-in regard to \texttt{ctx->might_cancel}, and consequently, the race
+de-prioritize this input as it tracks all possible alias coverage in
+regard to \texttt{ctx->might_cancel}, and consequently, the race
 condition may be missed.
 %
 This is due to that the manifestation of race conditions is \textit{a
-  combinatorial result of multiple inter-thread data flow}, not caused
-by just a single inter-thread data flow that alias coverage captures.
-
-Consequently, existing approaches have
-difficulty in distinguishing a given input will exhibit a more
-interesting behavior, \ie, race conditions.
+  combined result of multiple inter-thread data flow}, not caused by
+just a single inter-thread data flow that alias coverage captures.
 
 
 \cut{
@@ -462,28 +472,28 @@ test the input enough.
 \PP{Our goal}
 %
 Our goal is to design a fuzzer to effectively explore the interleaving
-space while testing combinations of multiple conflicting accesses as
-many as possible.
+space with a purpose of testing combinations of multiple pairs of
+conflicting accesses as many as possible.
 %
 % Considering characteristics of concurrency bugs mentioned above, it
 % will increase the probabilty of finding more concurrency bugs if we
 % diversify interleavings to experience such partial orders as many as
 % possible.
-
+%
 To this end, we organize subgoals as follows:
 %
-1) We first design a coverage metric to capture such combinations.
-By this coverage metric, we do not waste the computing power for
-uninteresting inputs, and not de-prioritize inputs in which there are
-more unexplored interleavings.
+1) We first design a coverage metric to track combinations of pairs of
+conflicting accesses,
+% By this coverage metric, we do not waste the
+% computing power for uninteresting inputs, and not de-prioritize inputs
+% in which there are more unexplored interleavings.
 %
 2) Based on the coverage metric, we design an interleaving mutation
-mechanism that effectively searches the coverage metric.
+mechanism that quickly saturate the coverage metric, and
 %
-3) Lastly, we combine the coverage metric and the scheduling mechanism
-into Syzkaller~\cite{syzkaller} to find out race conditions in the
-Linux kernel.
-
+3) Lastly, we combine the coverage metric and the interleaving
+mutation mechanism into Syzkaller~\cite{syzkaller} to find out race
+conditions in the Linux kernel.
 
 
 
