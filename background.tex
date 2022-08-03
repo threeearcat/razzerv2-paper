@@ -304,42 +304,64 @@ of this section.
 \PP{Manifestation of race conditions}
 %
 According to an extensive survey of concurrency
-bugs~\cite{learningfrommistakes}, most race conditions manifest only
-depending on the execution order of the four memory accesses. \yj{how
-  to understand this sentence}.
+bugs~\cite{learningfrommistakes}, most race conditions manifest
+depending on the execution order of a few memory access operations.
+\yj{how to understand this sentence}.
 %
-Specifically, 92\% of race conditions the authors studied are
-guaranteed to manifest if at most four memory accesses are executed in
-a specific condition.
+Specifically, 92\% of race conditions the authors studied manifest if
+at most four memory accesses operations are executed in a specific
+order.
 %
-For all other memory accesses, their execution orders and values
-written and read by them do not affect bugs's manifestation.
+% For all other memory accesses, their execution orders and values
+% written and read by them do not affect bugs's manifestation.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/cve-2017-10661.pdf}
-  \caption{CVE-2017-10661}
-  \label{fig:cve-2017-10661}
+  \includegraphics[width=0.95\linewidth]{fig/cve-2017-10661.pdf}
+  \caption{Simplified code snippet of CVE-2019-6974. A \texttt{BUG()}
+    is executed if \texttt{A1} is executed before \texttt{B1} and
+    \texttt{B4} is executed before
+    \texttt{A2}. \texttt{atomic_fetch_add()} atomically increases the
+    value by 1 and returns an old
+    value. \texttt{atomic_dec_and_test()} atomically decreases the
+    value by 1 and tests the result is 0.}
+  \label{fig:cve-2019-6974}
 \end{figure}
 
-\autoref{fig:cve-2017-10661} explains the above survey. In this
-example the use-after-free bug is triggered if the execution order of
-four memory access operations satisfies the certain condition such
-that \texttt{A1} is executed before \texttt{B2} and \texttt{B1} is
-executed before \texttt{A2}.
+\autoref{fig:cve-2019-6974} explains the above survey.  In this
+example, a race condition manifests when two system calls are executed
+concurrently: \texttt{ioctl()} to create a virtual device in a virtual
+machine and \texttt{close()} to shutdown the virtual device.
 %
-Assuming \texttt{ctx->might_cancel} is initially \texttt{False},
-thread A always executes \texttt{A3} if \texttt{A1} is executed before
-\texttt{B2}. Similarly, thread B always executes \texttt{B3} if
-\texttt{B1} is executed before \texttt{A2}. Therefore, if the two
-conditions are met, the object \texttt{ctx} is inserted into a linked
-list \texttt{cancel_list} at both \texttt{A3} and \texttt{B3}, causing
-a list corruption.
+As a result of concurrent execution, a reference counter may be
+incorrectly managed to increment from \texttt{0}. In Linux, this
+indiates a use-after-free bug because if a reference count hits
+\texttt{0}, the corresponding object is going to be freed.
+
+The race condition happens as follows.  Suppose the initial value of
+\texttt{kvm->refcnt} is \texttt{1}. During the creation of the virtual
+device, thread~A erroneously makes the \texttt{file} object globally
+visible (at \texttt{A1}) before it manipulates the reference counter
+of \texttt{kvm} (at \texttt{A2}).
 %
-In this example, all other memory accesses do not affect the
-manifestation of the race condition. They do not change the control
-flow of both threads nor data flow necessary for the race condition to
-manifest.
+Therefore, thread~B reads non-NULL \texttt{file} at \texttt{B1} while
+\texttt{kvm->refcnt} still remains \texttt{1}, and decreases
+\texttt{kvm->refcnt} to \texttt{0} at \texttt{B4}.
+%
+After that, when thread~A increases \texttt{kvm->refcnt}, it executes
+\texttt{BUG()} at \texttt{A3} because \texttt{kvm->refcnt} already
+hits \texttt{0}.
+%
+In summary, the manifestation of the race condition depends on whether
+the execution order of four memory accesses meets a certain condition,
+namely
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+\texttt{A2})$.
+
+% , and all other memory accesses do not affect the
+% manifestation of the race condition. They do not change the control
+% flow of both threads nor data flow necessary for the race condition to
+% manifest.
 
 % One of the factors that makes it difficult to find concurrency bugs is
 % that, they may be detected only when a program shows an abnormal
@@ -379,16 +401,16 @@ manifest.
 In the perspective of fuzzing, a coverage metric is a paramount gear
 to determine whether a given input is worthy of further mutation.
 %
-If a coverage metric does not capture whether an input has a potential
-to trigger a race condition, a fuzzer may ignore inputs in which there
-are unexplored interleavings, or waste the computing power to
-valueless inputs.
+If a coverage metric does not represent whether an input has a
+potential to trigger a race condition, a fuzzer may ignore inputs in
+which there are unexplored interleavings, or waste the computing power
+to valueless inputs.
 %
 In this regard, our primary question is whether existing coverage
-metrics in the concurrency dimension are suitable to track
+metrics in the concurrency dimension are suitable to apprehend
 interleavings potentially causing a race condition, for example,
-$(\texttt{A1} \rightarrow \texttt{B2}) \wedge (\texttt{B1} \rightarrow
-\texttt{A2})$ in \autoref{fig:cve-2017-10661}.
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+\texttt{A2})$ in \autoref{fig:cve-2019-6974}.
 
 
 
@@ -405,34 +427,54 @@ result of multiple pairs of conflicting accesses. As a consequence,
 race conditions may not be exposed even after the coverages are
 saturated.
 %
-Consequently, existing approaches have difficulty in distinguishing a
-given input has a potential to cause an interesting behavior, \ie,
-a race condition.
+% Consequently, existing approaches have difficulty in distinguishing a
+% given input has a potential to cause an interesting behavior, \ie,
+% a race condition.
 
 
-\begin{figure}
+\begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/alias-coverage.pdf}
-  \caption{Two interleaivng examples that track all alias coverage of
-    \autoref{fig:cve-2017-10661}.}
+  \includegraphics[width=0.98\linewidth]{fig/alias-coverage.pdf}
+  \caption{Two inputs that are not distinguishable using alias
+    coverage. For each input, a fuzzer executes two syscalls
+    concurrently.}
   \label{fig:alias-coverage}
 \end{figure}
 
 \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
 %
-Taking alias coverage as an example, \autoref{fig:alias-coverage}
-shows two interleavings of \autoref{fig:cve-2017-10661} that capture
-all alias coverage, but the race condition does not manifest.
+We take alias coverage as an example to show why comprehending
+multiple pairs of conflicting accesses is important.
 %
-As the figure describes, if we execute the two threads
-\textit{sequentially}, a fuzzer is able to track inter-thread data
-flow (\ie, alias coverage) $\texttt{B2} \rightarrow \texttt{A1}$ and
-$\texttt{A2} \rightarrow \texttt{B1}$.
+Let us suppose we have two similar inputs consisting of two concurrent
+syscalls.
 %
+As described in \autoref{fig:alias-coverage}, \texttt{Input \#1}
+consists of \texttt{ioctl(CREATE_VCPU)} creating a virtual CPU and
+\texttt{close()} closing the virtual CPU, and \texttt{Input \#2}
+consists of \texttt{ioctl(CREATE_DEVICE)} creating a virtual device
+and \texttt{close()} closing the virtual device.
+%
+Although they look similar, \texttt{Input \#1} is benign because the
+logic to create the virtual CPU is correct (\ie, \texttt{kvm->refcnt}
+is manipulated before making \texttt{file} globally visible) while
+\texttt{Input \#2} causes the race condition (\ie, CVE-2019-6974) as
+explained before.
+
+
+However, if we adopt alias coverage as the coverage metric in the
+concurrency dimension, the two inputs are not distinguishable.
+%
+After a fuzzer runs \texttt{Input \#1} with various interleavings,
+a fuzzer observes all inter-thread data flow
+
+\texttt{Input \#2} does not reveal new alias coverage
+
+
+
 After executing these two interleavings, as Krace states, a fuzzer may
-de-prioritize this input as it tracks all possible alias coverage in
-regard to \texttt{ctx->might_cancel}, and consequently, the race
-condition may be missed.
+de-prioritize the offending input as it tracks all possible alias
+coverage, and consequently, the race condition may be missed.
 %
 This is due to that the manifestation of race conditions is \textit{a
   combined result of multiple inter-thread data flow}, not caused by
