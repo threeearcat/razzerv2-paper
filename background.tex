@@ -170,32 +170,32 @@ scheduler to tail the non-determinism, and coverage metric in the
 concurrency dimension to capture interesting interleavings among all
 possible interleavings.
 
-% \PP{Coverage-guided fuzzing}
-% %
-% Throughout decades, a fuzzing has shown its ability to find bugs in
-% various software layers including the userprogram space~\cite{qsym,
-%   driller, symsan, crfuzz, r2z2, cafl, fuzzorigin} and the kernel
-% space~\cite{fuzzusb, syzkaller, hfl, cabfuzz, razzer, krace, janus,
-%   hydra, healer}.
-% %
-% A primary task of fuzzing is to generate and mutate different inputs
-% of a target program.
-% %
-% When running the inputs, a fuzzer monitors a program's behavior, and
-% observes malfunctions with a help of various sanitizers~\cite{asan,
-%   kasan, meds}.
+\PP{Coverage-guided fuzzing}
+%
+Throughout decades, a fuzzing has shown its ability to find bugs in
+various software layers including the userprogram space~\cite{qsym,
+  driller, symsan, crfuzz, r2z2, cafl, fuzzorigin} and the kernel
+space~\cite{fuzzusb, syzkaller, hfl, cabfuzz, razzer, krace, janus,
+  hydra, healer}.
+%
+A primary task of fuzzing is to generate and mutate different inputs
+of a target program.
+%
+When running the inputs, a fuzzer monitors a program's behavior, and
+observes malfunctions with a help of various sanitizers~\cite{asan,
+  kasan, meds}.
 
-% A coverage-guided fuzzer adopts a coverage metric to abstract
-% program's interesting behaviors.
-% %
-% During fuzzing, a fuzzer accumulates all experienced coverage as the
-% abstraction of tested behaviors of a program.
-% %
-% When a new input is given, a fuzzer compares coverage of the input
-% with the accumulated coverage to determine whether the input exposes a
-% new interesting behavior. If it does, a fuzzer keeps and mutates the
-% input to generate another input that potentially exhibits unknown
-% coverage.
+A coverage-guided fuzzer adopts a coverage metric to abstract
+program's interesting behaviors.
+%
+During fuzzing, a fuzzer accumulates all experienced coverage as the
+abstraction of tested behaviors of a program.
+%
+When a new input is given, a fuzzer compares coverage of the input
+with the accumulated coverage to determine whether the input exposes a
+new interesting behavior. If it does, a fuzzer keeps and mutates the
+input to generate another input that potentially exhibits unknown
+coverage.
 
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 
@@ -345,9 +345,6 @@ interleaving satisfying the above problematic condition about
 $(\texttt{A1} \rightarrow \texttt{B2}) \wedge (\texttt{B1} \rightarrow
 \texttt{A2})$, is executed. All interleavings satisfying the above
 condition are equivalently causes the race condition.
-
-\dr{TODO: how to say we want to say such conditions as many as
-  possible}
 
 
 % One of the factors that makes it difficult to find concurrency bugs is
