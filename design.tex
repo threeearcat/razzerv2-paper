@@ -14,12 +14,12 @@
 
 As described in \autoref{s:motivation}, our goal is 1) to define a
 coverage metric in the concurrency dimesion to track multiple pairs of
-conflicting accesses, and 2) to desisn an interleaving mutation
+conflicting accesses, and 2) to design an interleaving mutation
 algorithm for quickly saturating the coverage.
 
 
-In this section, we briefly describe the key idea of our approach to
-achieve our goals~(\autoref{ss:keyidea}). Based on the key idea, we
+In this section, we first describe the key idea of our approach to
+achieve the goals~(\autoref{ss:keyidea}). Based on the key idea, we
 propose a \textit{\coverage} that tracks multiple pairs of conflicting
 accesses~(\autoref{ss:coverage}), and a \textit{coverage-directed
   interleaving mutation} algorithm that mutates an interleaving
@@ -55,6 +55,17 @@ large.
 \dr{wip.}
 
 \begin{itemize}
+\item what do we do to explore the interleaving space?
+  \begin{itemize}
+  \item We take an interleaving (= a totally ordered instruction sequence as an input)
+  \item mutate an interleaving to generate another interleaving
+  \item how?
+    \begin{itemize}
+    \item collect {C1, C2, ...} from the interleaving
+    \item infer $U$, the universal set of coverage
+    \item consume $U$ until it is empty
+    \end{itemize}
+  \end{itemize}
 \item an intuition for a coverage
   \begin{itemize}
     \item observations
