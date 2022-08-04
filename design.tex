@@ -41,12 +41,25 @@ large.
 \begin{itemize}
 \item an intuition for a coverage
   \begin{itemize}
-    \item
+    \item observations
+      \begin{itemize}
+      \item interleavings are directed acyclic graph
+      \item multiple pairs of conflicting accesses are a subgraph of an interleaving
+      \end{itemize}
+  \item we represent a coverage using a graph (?)
   \end{itemize}
 
 \item an intuition for an interleaving mutation 
   \begin{itemize}
-    \item
+  \item two observatrions
+    \begin{itemize}
+      \item many coverages can be executed together
+      \item we can infer what coverages should be further tested
+      \end{itemize}
+  \item step 1: collect coverage
+  \item step 2: inference of coverages to test
+  \item step 3: collect coverages that can be tested together
+  \item step 4: generate an interleaving to test
   \end{itemize}
 \end{itemize}
 
