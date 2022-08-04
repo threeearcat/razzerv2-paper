@@ -437,11 +437,10 @@ saturated.
 
 \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
 %
-We take alias coverage as an example to show why comprehending
-multiple pairs of conflicting accesses is important.
-%
-Let us suppose we have three inputs that consists of two concurrent
-syscalls as described in \autoref{fig:alias-coverage}.
+In order to show why comprehending multiple pairs of conflicting
+accesses is important, let us suppose we have three inputs that
+consists of two concurrent syscalls as described in
+\autoref{fig:alias-coverage}.
 %
 For all inputs, thread~A executes a \texttt{mmap()} syscall to map the
 binder driver to a user address space while thread~B handles different
