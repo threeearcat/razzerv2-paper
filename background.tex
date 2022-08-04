@@ -287,7 +287,8 @@ abnormal behavior.
 
 This work is motivated by an observation that prior approaches
 focus on the execution order of a single pair of conflicting
-accesses, but race conditions mostly are \textit{combined results of multiple pairs} of conflicting accesses.
+accesses, but race conditions mostly are \textit{combined results of multiple pairs} 
+of conflicting accesses.
 %
 Because of this gap\yj{xx}, prior approaches shows inefficiency in finding race
 conditions.
@@ -296,20 +297,18 @@ In this section, we first describe when and how concurrency bugs
 manifest to comprehend what interleavings should be tested to find
 race conditions.
 %
-Afterwards, we identify why prior approaches fall short in finding
-race conditions, and clarify our goals to better find them at the end
-of this section.
+Afterwards, we identify why prior approaches are limited in finding
+race conditions, and clarify our goals to address the limitations.
 
 
 \PP{Manifestation of race conditions}
 %
 According to an extensive survey of concurrency
 bugs~\cite{learningfrommistakes}, most race conditions manifest
-depending on the execution order of a few memory access operations.
-\yj{how to understand this sentence}.
+depending on the execution order of multiple memory access operations.
 %
-Specifically, 92\% of race conditions the authors studied manifest if
-at most four memory accesses operations are executed in a specific
+Specifically, the study identifies that 92\% of race conditions manifest 
+when at most four memory accesses operations are executed in a specific
 order.
 %
 % For all other memory accesses, their execution orders and values
@@ -324,20 +323,21 @@ order.
     \texttt{A2}. \texttt{atomic_fetch_add()} atomically increases the
     value by 1 and returns an old
     value. \texttt{atomic_dec_and_test()} atomically decreases the
-    value by 1 and tests the result is 0.}
+    value by 1 and tests the result is 0.\yj{Where is B4? where is the \texttt{atomic_dec_and_test()}?}}
   \label{fig:cve-2019-6974}
 \end{figure}
 
-\autoref{fig:cve-2019-6974} explains the above survey.  In this
+\autoref{fig:cve-2019-6974} explains a case.  In this
 example, a race condition manifests when two system calls are executed
 concurrently: \texttt{ioctl()} to create a virtual device in a virtual
 machine and \texttt{close()} to shutdown the virtual device.
 %
 As a result of concurrent execution, a reference counter may be
 incorrectly managed to increment from \texttt{0}. In Linux, this
-indiates a use-after-free bug because if a reference count hits
-\texttt{0}, the corresponding object is going to be freed.
+causes a use-after-free bug because the object would be freed,
+if a reference count hits \texttt{0}, 
 
+\yj{Are you talking about \autoref{fig:alias-coverage}?}
 The race condition happens as follows.  Suppose the initial value of
 \texttt{kvm->refcnt} is \texttt{1}. During the creation of the virtual
 device, thread~A erroneously makes the \texttt{file} object globally
