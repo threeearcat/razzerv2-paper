@@ -428,7 +428,10 @@ saturated.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.98\linewidth]{fig/alias-coverage.pdf}
-  \caption{}
+  \caption{Three inputs that consist of two concurrent syscalls. For
+    all inputs, thread~A executes the same \texttt{mmap()} syscall
+    while thread~B handles different ioctl requests. For brevity, we
+    describe only conflicting instructions.}
   \label{fig:alias-coverage}
 \end{figure}
 
@@ -439,52 +442,53 @@ saturated.
 We take alias coverage as an example to show why comprehending
 multiple pairs of conflicting accesses is important.
 %
-Let us suppose we have two similar inputs consisting of two concurrent
-syscalls.
+Let us suppose we have three inputs that consists of two concurrent
+syscalls as described in \autoref{fig:alias-coverage}.
 %
-As described in \autoref{fig:alias-coverage}, \texttt{Input 1}
-consists of \texttt{ioctl(CREATE_VCPU)} creating a virtual CPU and
-\texttt{close()} closing the virtual CPU, and \texttt{Input 2}
-consists of \texttt{ioctl(CREATE_DEVICE)} creating a virtual device
-and \texttt{close()} closing the virtual device.
+For all inputs, thread~A executes a \texttt{mmap()} syscall to map the
+binder driver to a user address space while thread~B handles different
+ioctl requests such that \texttt{ioctl(FREE_BUFFER)},
+\texttt{ioctl(REPLY)}, and \texttt{ioctl(TRANSACTION)} for
+\texttt{Input 1}, \texttt{Input 2}, and \texttt{Input 3} respectively.
 %
-It is worth noting that the only difference between the two inputs is
-that in \texttt{Input 1}, \texttt{ioctl(CREATE_VCPU)} executes
-\texttt{A1} at last while \texttt{ioctl(CREATE_DEVICE)} in
-\texttt{Input 2} executes \texttt{A1} at first. In both inputs,
-thread~B conducts the same task.
-%
-Although they look similar, \texttt{Input 1} is benign because the
-logic to create the virtual CPU is correct (\ie, \texttt{kvm->refcnt}
-is manipulated before making \texttt{file} globally visible) while
-\texttt{Input 2} causes the race condition (\ie, CVE-2019-6974) as
-explained before.
+It is worth noting that in \texttt{Input 1} and \texttt{Input 2},
+there is only one pair of conflicting accesses; in \texttt{Input 1},
+the two threads conflict on \texttt{alloc->vma}, and in \texttt{Input
+  2}, the two threads conflict on \texttt{alloc->mm}.
+
 
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.8\linewidth]{fig/alias-coverage-interleaving.pdf}
-  \caption{}
+  \includegraphics[width=0.9\linewidth]{fig/alias-coverage-interleaving.pdf}
+  \caption{Four interleavings }
   \label{fig:alias-coverage-interleaving}
 \end{figure}
 
-However, if we adopt alias coverage as the coverage metric in the
-concurrency dimension, a fuzzer may not recognize that their
-interleavings exhibit different behaviors.
+In this example, if we adopt a coverage metric that focuses on a
+single pair of conflicting accesses (\eg, alias coverage), a fuzzer
+may not recognize that \texttt{Input 3} may exhibit a behavior
+different than \texttt{Input 1} and \texttt{Input 2}~(\ie, a
+NULL-dereference bug).
 %
-If a fuzzer executes \texttt{Input 1} with various interleavings as
-described \autoref{fig:alias-coverage-interleaving}, a fuzzer observes
-all execution order of single pair of conflicting accesses. In other
-words, a fuzzer observes $\texttt{A1} \rightarrow \texttt{B1}$,
-$\texttt{A2} \rightarrow \texttt{B4}$ (in run 1),
-$\texttt{B1} \rightarrow \texttt{A1}$ (in run 2), and
-$\texttt{B4} \rightarrow \texttt{A2}$ (in run 3).
+\autoref{fig:alias-coverage-interleaving} shows four interleavings
+that exhibits all execution order of a single pair of conflicting
+accesses. If a fuzzer executes \texttt{Input 1} with interleavings in
+\texttt{Run 1} and \texttt{Run 2}, a fuzzer observes execution orders
+such as $\texttt{A1} \rightarrow \texttt{B1}$ (in \texttt{Run 1}) and
+$\texttt{B1} \rightarrow \texttt{A1}$ (in \texttt{Run 2}).
 %
-Therefore, when executing \texttt{Input 2} (in run 4), a fuzzer may
-not collect new alias coverage, and as Krace states, a fuzzer may
-de-prioritize \texttt{Input 2}. Consequently, a fuzzer may miss the
-race condition.
+Similary, if a fuzzer executes \texttt{Input 2} with interleavings in
+\texttt{Run 3} and \texttt{Run 4}, it observes execution orders of
+$\texttt{A2} \rightarrow \texttt{B3}$ (in \texttt{Run 3}) and
+$\texttt{B3} \rightarrow \texttt{A2}$ (in \texttt{Run 4}).
 %
+After executing these four interleavings, \texttt{Input 3} does not
+reveal a new execution order of a single conflicting
+accesses. Therfore, as a Krace state, a fuzzer may de-prioritize
+\texttt{Input 3}, and the race condition may not be found.
+
+% 
 This is due to that the manifestation of race conditions is \textit{a
   combined result of multiple inter-thread data flow}, not caused by
 just a single inter-thread data flow that alias coverage captures.
