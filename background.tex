@@ -317,51 +317,44 @@ order.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/cve-2017-10661.pdf}
-  \caption{Simplified code snippet of CVE-2019-6974. A \texttt{BUG()}
-    is executed if \texttt{A1} is executed before \texttt{B1} and
-    \texttt{B4} is executed before
-    \texttt{A2}. \texttt{atomic_fetch_add()} atomically increases the
-    value by 1 and returns an old
-    value. \texttt{atomic_dec_and_test()} atomically decreases the
-    value by 1 and tests the result is 0.\yj{Where is B4? where is the \texttt{atomic_dec_and_test()}?}}
+  \caption{Simplified code snippet of a NULL-dereference bug in the
+    binder driver.}
   \label{fig:cve-2019-6974}
 \end{figure}
 
-\autoref{fig:cve-2019-6974} explains a case.  In this
-example, a race condition manifests when two system calls are executed
-concurrently: \texttt{ioctl()} to create a virtual device in a virtual
-machine and \texttt{close()} to shutdown the virtual device.
-%
-As a result of concurrent execution, a reference counter may be
-incorrectly managed to increment from \texttt{0}. In Linux, this
-causes a use-after-free bug because the object would be freed,
-if a reference count hits \texttt{0}, 
+\autoref{fig:cve-2019-6974} explains the above survey. In this
+example, a race condition occurs in the binder device driver, which is
+an IPC framework for Android. Specifically, a NULL-dereference bug
+manifests when two system calls are executed concurrently:
+\texttt{mmap()} to map the device driver into a user address space and
+\texttt{ioctl(TRANSACTION)} to send an IPC message.
+
 
 \yj{Are you talking about \autoref{fig:alias-coverage}?}
-The race condition happens as follows.  Suppose the initial value of
-\texttt{kvm->refcnt} is \texttt{1}. During the creation of the virtual
-device, thread~A erroneously makes the \texttt{file} object globally
-visible (at \texttt{A1}) before it manipulates the reference counter
-of \texttt{kvm} (at \texttt{A2}).
+The race condition happens as follows. Let us suppose
+\texttt{alloc->vma} and \texttt{alloc->mm} are initially
+\texttt{NULL}.
 %
-Therefore, thread~B reads non-NULL \texttt{file} at \texttt{B1} while
-\texttt{kvm->refcnt} still remains \texttt{1}, and decreases
-\texttt{kvm->refcnt} to \texttt{0} at \texttt{B4}.
+During mapping the device driver into a user address space, thread~A
+sets \texttt{alloc->vma} and \texttt{alloc->mm} to non-NULL pointers
+at \texttt{A1} and \texttt{A2}.
 %
-After that, when thread~A increases \texttt{kvm->refcnt}, it executes
-\texttt{BUG()} at \texttt{A3} because \texttt{kvm->refcnt} already
-hits \texttt{0}.
+However, since these two store operations are not atomically executed,
+thread~B may intervene in the middle of these two instructions.
+%
+In that case, \texttt{alloc->vma} is not \texttt{NULL} when thread~B
+executes \texttt{B1} while \texttt{alloc->mm} is \texttt{NULL} at
+\texttt{B3}.
+%
+As a consequnce, a NULL-dereference manifests when thread~B increments
+the reference counter of \texttt{alloc->mm} at \texttt{B3}.
 %
 In summary, the manifestation of the race condition depends on whether
 the execution order of four memory accesses meets a certain condition,
 namely
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$.
-
-% , and all other memory accesses do not affect the
-% manifestation of the race condition. They do not change the control
-% flow of both threads nor data flow necessary for the race condition to
-% manifest.
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B3} \rightarrow
+\texttt{A2})$~\footnote{In this paper, $X \rightarrow Y$ indicates that $X$
+  is executed before $Y$}.
 
 % One of the factors that makes it difficult to find concurrency bugs is
 % that, they may be detected only when a program shows an abnormal
@@ -409,7 +402,7 @@ to valueless inputs.
 In this regard, our primary question is whether existing coverage
 metrics in the concurrency dimension are suitable to apprehend
 interleavings potentially causing a race condition, for example,
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B3} \rightarrow
 \texttt{A2})$ in \autoref{fig:cve-2019-6974}.
 
 
@@ -435,9 +428,7 @@ saturated.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.98\linewidth]{fig/alias-coverage.pdf}
-  \caption{Two inputs that are not distinguishable using alias
-    coverage. For each input, a fuzzer executes two syscalls
-    concurrently.}
+  \caption{}
   \label{fig:alias-coverage}
 \end{figure}
 
@@ -449,32 +440,48 @@ multiple pairs of conflicting accesses is important.
 Let us suppose we have two similar inputs consisting of two concurrent
 syscalls.
 %
-As described in \autoref{fig:alias-coverage}, \texttt{Input \#1}
+As described in \autoref{fig:alias-coverage}, \texttt{Input 1}
 consists of \texttt{ioctl(CREATE_VCPU)} creating a virtual CPU and
-\texttt{close()} closing the virtual CPU, and \texttt{Input \#2}
+\texttt{close()} closing the virtual CPU, and \texttt{Input 2}
 consists of \texttt{ioctl(CREATE_DEVICE)} creating a virtual device
 and \texttt{close()} closing the virtual device.
 %
-Although they look similar, \texttt{Input \#1} is benign because the
+It is worth noting that the only difference between the two inputs is
+that in \texttt{Input 1}, \texttt{ioctl(CREATE_VCPU)} executes
+\texttt{A1} at last while \texttt{ioctl(CREATE_DEVICE)} in
+\texttt{Input 2} executes \texttt{A1} at first. In both inputs,
+thread~B conducts the same task.
+%
+Although they look similar, \texttt{Input 1} is benign because the
 logic to create the virtual CPU is correct (\ie, \texttt{kvm->refcnt}
 is manipulated before making \texttt{file} globally visible) while
-\texttt{Input \#2} causes the race condition (\ie, CVE-2019-6974) as
+\texttt{Input 2} causes the race condition (\ie, CVE-2019-6974) as
 explained before.
 
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{fig/alias-coverage-interleaving.pdf}
+  \caption{}
+  \label{fig:alias-coverage-interleaving}
+\end{figure}
+
 However, if we adopt alias coverage as the coverage metric in the
-concurrency dimension, the two inputs are not distinguishable.
+concurrency dimension, a fuzzer may not recognize that their
+interleavings exhibit different behaviors.
 %
-After a fuzzer runs \texttt{Input \#1} with various interleavings,
-a fuzzer observes all inter-thread data flow
-
-\texttt{Input \#2} does not reveal new alias coverage
-
-
-
-After executing these two interleavings, as Krace states, a fuzzer may
-de-prioritize the offending input as it tracks all possible alias
-coverage, and consequently, the race condition may be missed.
+If a fuzzer executes \texttt{Input 1} with various interleavings as
+described \autoref{fig:alias-coverage-interleaving}, a fuzzer observes
+all execution order of single pair of conflicting accesses. In other
+words, a fuzzer observes $\texttt{A1} \rightarrow \texttt{B1}$,
+$\texttt{A2} \rightarrow \texttt{B4}$ (in run 1),
+$\texttt{B1} \rightarrow \texttt{A1}$ (in run 2), and
+$\texttt{B4} \rightarrow \texttt{A2}$ (in run 3).
+%
+Therefore, when executing \texttt{Input 2} (in run 4), a fuzzer may
+not collect new alias coverage, and as Krace states, a fuzzer may
+de-prioritize \texttt{Input 2}. Consequently, a fuzzer may miss the
+race condition.
 %
 This is due to that the manifestation of race conditions is \textit{a
   combined result of multiple inter-thread data flow}, not caused by
