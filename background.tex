@@ -322,11 +322,11 @@ order.
   \label{fig:cve-2019-6974}
 \end{figure}
 
-\autoref{fig:cve-2019-6974} explains the above survey. In this
-example, a race condition occurs in the binder device driver, which is
-an IPC framework for Android. Specifically, a NULL-dereference bug
-manifests when two system calls are executed concurrently:
-\texttt{mmap()} to map the device driver into a user address space and
+\autoref{fig:cve-2019-6974} explains a case. In this example, a race
+condition occurs in the binder device driver, which is an IPC
+framework for Android. Specifically, a NULL-dereference bug manifests
+when two system calls are executed concurrently: \texttt{mmap()} to
+map the device driver into a user address space and
 \texttt{ioctl(TRANSACTION)} to send an IPC message.
 
 
@@ -342,9 +342,9 @@ at \texttt{A1} and \texttt{A2}.
 However, since these two store operations are not atomically executed,
 thread~B may intervene in the middle of these two instructions.
 %
-In that case, \texttt{alloc->vma} is not \texttt{NULL} when thread~B
-executes \texttt{B1} while \texttt{alloc->mm} is \texttt{NULL} at
-\texttt{B3}.
+In that case, it is possible that \texttt{alloc->vma} is not
+\texttt{NULL} when thread~B executes \texttt{B1} while
+\texttt{alloc->mm} is \texttt{NULL} at \texttt{B3}.
 %
 As a consequnce, a NULL-dereference manifests when thread~B increments
 the reference counter of \texttt{alloc->mm} at \texttt{B3}.
@@ -433,6 +433,8 @@ saturated.
 \end{figure}
 
 \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
+%
+\dr{wip:}
 %
 We take alias coverage as an example to show why comprehending
 multiple pairs of conflicting accesses is important.
