@@ -1,6 +1,8 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
+\newcommand{\coverage}{XXX coverage\xspace}
+
 \newcommand{\segment}{segment graph\xspace}
 \newcommand{\segments}{segment graphs\xspace}
 \newcommand{\Segments}{Segment graphs\xspace}
@@ -10,19 +12,33 @@
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
 
+As described in \autoref{s:motivation}, our goal is 1) to define a
+coverage metric in the concurrency dimesion to track multiple pairs of
+conflicting accesses, and 2) to desisn an interleaving mutation
+algorithm for quickly saturating the coverage.
 
-The essence of a concurrency fuzzing relies on how to explore the
-interleaving space.
-%
-In this section, we describe our approach to effectively explore the
-interleaving space.
-%
-We first introduce the key idea of our
-approach~(\autoref{ss:keyidea}), and then based on the key idea, we
-propose a novel coverage concept in the concurrency
-dimension~(\autoref{ss:coverage}) and an instruction scheduling
-mechanism (\ie, interleaving mutation) to unveil undisclosed
-coverage~(\autoref{ss:scheduler}).
+
+In this section, we briefly describe the key idea of our approach to
+achieve our goals~(\autoref{ss:keyidea}). Based on the key idea, we
+propose a \textit{\coverage} that tracks multiple pairs of conflicting
+accesses~(\autoref{ss:coverage}), and a \textit{coverage-directed
+  interleaving mutation} algorithm that mutates an interleaving
+towards undiscovered coverage~(\autoref{ss:scheduler}).
+
+
+
+% The essence of a concurrency fuzzing relies on how to explore the
+% interleaving space.
+% %
+% In this section, we describe our approach to effectively explore the
+% interleaving space.
+% %
+% We first introduce the key idea of our
+% approach~(\autoref{ss:keyidea}), and then based on the key idea, we
+% propose a novel coverage concept in the concurrency
+% dimension~(\autoref{ss:coverage}) and an instruction scheduling
+% mechanism (\ie, interleaving mutation) to unveil undisclosed
+% coverage~(\autoref{ss:scheduler}).
 
 \subsection{Key Idea}
 \label{ss:keyidea}
@@ -238,6 +254,41 @@ interleaving, and then provide details of the interleaving mutation.
 % Knowing which segments are not tested can significantly help for these
 % cases. With a help of a scheduling hint-drected scheduler, we can
 % force execution to experience segments that are not yet tested.
+
+
+\subsection{Key Idea}
+\label{ss:keyidea}
+
+
+
+\PP{Interleaving in a graph form}
+%
+Assuming memory access operations in an interleaving are totally
+ordered, the interleaving can be transformed into a directed acyclic
+graph where vertices represent memory access operations, and edges
+connect two vertices \texttt{v1} and \texttt{v2} if the \texttt{v1}
+and \texttt{v2} correspond to a pair of conflicting accesses or
+\texttt{v1} and \texttt{v2} are executed in the same thread. Each edge
+is directed from \texttt{v1} to \texttt{v2} if \texttt{v1} is executed
+before \texttt{v2}.
+
+
+\autoref{fig:intuition} shows a directed acyclic graph representing a
+totally ordered memory access operations,
+$\texttt{A1} \rightarrow \texttt{B1} \rightarrow \texttt{B2}
+\rightarrow \texttt{B4} \rightarrow \texttt{A2}$, that causes a
+NULL-dereference bug in \autoref{fig:cve-2019-6974}.
+%
+In this graph, an edge \texttt{A1} and \texttt{B1}
+
+as \texttt{A1} and \texttt{B1} conflict on \texttt{alloc->vma},
+
+and 
+
+
+\PP{Coverage-directed interleaving mutation}
+
+
 
 
 
