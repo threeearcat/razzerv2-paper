@@ -488,10 +488,10 @@ reveal a new execution order of a single conflicting
 accesses. Therfore, as a Krace state, a fuzzer may de-prioritize
 \texttt{Input 3}, and the race condition may not be found.
 
-% 
-This is due to that the manifestation of race conditions is \textit{a
-  combined result of multiple inter-thread data flow}, not caused by
-just a single inter-thread data flow that alias coverage captures.
+In summary, in order to determine whether an input shows interesting
+behaviors or not, a fuzzer needs to comprehend \textit{a combined
+  result of multiple pairs of conflicting accesses} as it is the
+primary reason of race conditions.
 
 
 \cut{
