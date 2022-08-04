@@ -344,15 +344,15 @@ thread~B may intervene in the middle of these two instructions.
 %
 In that case, it is possible that \texttt{alloc->vma} is not
 \texttt{NULL} when thread~B executes \texttt{B1} while
-\texttt{alloc->mm} is \texttt{NULL} at \texttt{B3}.
+\texttt{alloc->mm} is \texttt{NULL} at \texttt{B4}.
 %
 As a consequnce, a NULL-dereference manifests when thread~B increments
-the reference counter of \texttt{alloc->mm} at \texttt{B3}.
+the reference counter of \texttt{alloc->mm} at \texttt{B4}.
 %
 In summary, the manifestation of the race condition depends on whether
 the execution order of four memory accesses meets a certain condition,
 namely
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B3} \rightarrow
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 \texttt{A2})$~\footnote{In this paper, $X \rightarrow Y$ indicates that $X$
   is executed before $Y$}.
 
@@ -402,7 +402,7 @@ to valueless inputs.
 In this regard, our primary question is whether existing coverage
 metrics in the concurrency dimension are suitable to apprehend
 interleavings potentially causing a race condition, for example,
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B3} \rightarrow
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 \texttt{A2})$ in \autoref{fig:cve-2019-6974}.
 
 
@@ -478,8 +478,8 @@ $\texttt{B1} \rightarrow \texttt{A1}$ (in \texttt{Run 2}).
 %
 Similary, if a fuzzer executes \texttt{Input 2} with interleavings in
 \texttt{Run 3} and \texttt{Run 4}, it observes execution orders of
-$\texttt{A2} \rightarrow \texttt{B3}$ (in \texttt{Run 3}) and
-$\texttt{B3} \rightarrow \texttt{A2}$ (in \texttt{Run 4}).
+$\texttt{A2} \rightarrow \texttt{B4}$ (in \texttt{Run 3}) and
+$\texttt{B4} \rightarrow \texttt{A2}$ (in \texttt{Run 4}).
 %
 After executing these four interleavings, \texttt{Input 3} does not
 reveal a new execution order of a single conflicting
