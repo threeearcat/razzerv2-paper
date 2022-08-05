@@ -330,7 +330,7 @@ map the device driver into a user address space and
 \texttt{ioctl(TRANSACTION)} to send an IPC message.
 
 
-\yj{Are you talking about \autoref{fig:alias-coverage}?}
+% \yj{Are you talking about \autoref{fig:alias-coverage}?}
 The race condition happens as follows. Let us suppose
 \texttt{alloc->vma} and \texttt{alloc->mm} are initially
 \texttt{NULL}.
@@ -340,21 +340,22 @@ sets \texttt{alloc->vma} and \texttt{alloc->mm} to non-NULL pointers
 at \texttt{A1} and \texttt{A2}.
 %
 However, since these two store operations are not atomically executed,
-thread~B may intervene in the middle of these two instructions.
+thread~B may intervene in the middle of these two operations.
 %
 In that case, it is possible that \texttt{alloc->vma} is not
 \texttt{NULL} when thread~B executes \texttt{B1} while
 \texttt{alloc->mm} is \texttt{NULL} at \texttt{B4}.
 %
-As a consequnce, a NULL-dereference manifests when thread~B increments
-the reference counter of \texttt{alloc->mm} at \texttt{B4}.
+As a consequnce, thread~B does not return at \texttt{B3} and a
+NULL-dereference manifests when thread~B increments the reference
+counter of \texttt{alloc->mm} at \texttt{B4}.
 %
 In summary, the manifestation of the race condition depends on whether
-the execution order of four memory accesses meets a certain condition,
-namely
+the execution order of four memory access operations meet a certain
+condition, namely
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$~\footnote{In this paper, $X \rightarrow Y$ indicates that $X$
-  is executed before $Y$}.
+\texttt{A2})$~\footnote{In this paper, $X \rightarrow Y$ indicates
+  that $X$ is executed before $Y$}.
 
 % One of the factors that makes it difficult to find concurrency bugs is
 % that, they may be detected only when a program shows an abnormal
