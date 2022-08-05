@@ -7,23 +7,13 @@
 \newcommand{\segments}{segment graphs\xspace}
 \newcommand{\Segments}{Segment graphs\xspace}
 
-\newcommand{\mutable}{mutable edge\xspace}
-\newcommand{\mutables}{mutable edges\xspace}
-\newcommand{\immutable}{immutable edge\xspace}
-\newcommand{\immutables}{immutable edges\xspace}
-
-% As described in \autoref{s:motivation}, our goal is 1) to define a
-% coverage metric in the concurrency dimesion to track multiple pairs of
-% conflicting accesses, and 2) to design an interleaving mutation
-% algorithm for quickly saturating the coverage.
-
-
 \begin{itemize}
-\item our approach in one sentence: definine the universal set $U$
-  using a coverage metric, and directing execution to consume the universal set
+\item our approach in one sentence: defining the universal set $U$
+  using a coverage metric, and directing execution to consume the
+  universal set
 \item approach overview
+  \item input: concurrent jobs and initial interleaving
   \begin{itemize}
-    \item assumption: we have an input (i.e., concurrent jobs and its interleaving)
     \item what are we going to do
       \begin{itemize}
       \item coverage
@@ -48,28 +38,32 @@
 In this section, we describe our approach to explore the interleaving
 space.
 %
-The key idea of our approach is in directing execution torwards
-undiscovered coverage.
+Our approach assumes that concurrent jobs (\eg, syscalls) and an
+initial interleaving (= seed interleaving) of the concurrent job are
+given as an input.
 %
-In particular, 
+With the given input, our approach \textit{mutates the interleaving}
+to produce other interleavings for exploring the interleaving space.
 
-to adopt a coverage metric to 
-
-from the
-
-
+The key improvement of our approach is in adopting a novel coverage
+metric to track multiple pairs of conflicting accesses (\eg,
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+\texttt{A2})$ in \autoref{fig:cve-2019-6974}).
 %
-We first describe the approach overview~(\autoref{ss:overview}), and
-then details of our coverage metric~(\autoref{ss:coverage}) and the
-interleaving mutation
+In particular, after collecting coverages from the given interleaving
+using the coverage metric, we \textit{estimates the universal coverage
+  set $U$}, a set of coverages that the given concurrent jobs possibly
+execute.
+%
+And then, to produce other interleavings, our interleaving mutation is
+\textit{directed towards undisclosed coverages in $U$} until $U$ is
+exhausted.
 
-
-we first describe the key idea of our approach to
-achieve the goals~(\autoref{ss:keyidea}). Based on the key idea, we
-propose a \textit{\coverage} that tracks multiple pairs of conflicting
-accesses~(\autoref{ss:coverage}), and a \textit{coverage-directed
-  interleaving mutation} algorithm that mutates an interleaving
-towards undiscovered coverage~(\autoref{ss:scheduler}).
+In the following paragraphs, \autoref{ss:overview} first provides the
+overview of our approach. Then, \autoref{ss:coverage} describes our
+coverage metric in the concurrency dimension. Lastly,
+\autoref{ss:scheduler} illustrates the interleaving mutation algorithm
+that quickly saturates the coverage.
 
 
 
@@ -109,7 +103,7 @@ large.
   \item we represent a coverage using a graph (?)
   \end{itemize}
 
-\item an intuition for an interleaving mutation 
+\item an intuition for an interleaving mutation
   \begin{itemize}
   \item two observatrions
     \begin{itemize}
@@ -335,7 +329,7 @@ In this graph, an edge \texttt{A1} and \texttt{B1}
 
 as \texttt{A1} and \texttt{B1} conflict on \texttt{alloc->vma},
 
-and 
+and
 
 
 \PP{Coverage-directed interleaving mutation}
@@ -346,6 +340,12 @@ and
 
 \subsection{Interleaving Graph}
 \label{ss:coverage}
+
+\newcommand{\mutable}{mutable edge\xspace}
+\newcommand{\mutables}{mutable edges\xspace}
+\newcommand{\immutable}{immutable edge\xspace}
+\newcommand{\immutables}{immutable edges\xspace}
+
 
 \begin{figure}[t]
   \caption{interleaving graph}
@@ -449,7 +449,7 @@ jobs during fuzzing. Details are described later in \autoref{s:impl}.
 
 Our interleaving mutation is designed in a different way from previous
 studies.
-% 
+%
 Instead of randomly selecting scheduling points~\cite{krace, ski} or
 changing the execution order of a few instructions~\cite{razzer,
   snowboard}, we draw a whole hypothetical interleaving directed
