@@ -11,15 +11,6 @@
 \item our approach in one sentence: defining the universal set $U$
   using a coverage metric, and directing execution to consume the
   universal set
-\item approach overview
-  \item input: concurrent jobs and initial interleaving
-  \begin{itemize}
-    \item what are we going to do
-      \begin{itemize}
-      \item coverage
-      \item interleaving mutation
-      \end{itemize}
-    \end{itemize}
 \item coverage
   \begin{itemize}
   \item rationale:
@@ -50,10 +41,9 @@ metric to track multiple pairs of conflicting accesses (\eg,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 \texttt{A2})$ in \autoref{fig:cve-2019-6974}).
 %
-In particular, after collecting coverages from the given interleaving
-using the coverage metric, we \textit{estimates the universal coverage
-  set $U$}, a set of coverages that the given concurrent jobs possibly
-execute.
+In particular, after collecting coverages from the seed interleaving,
+we \textit{estimates the universal coverage set $U$}, a set of
+coverages that the given concurrent jobs possibly execute.
 %
 And then, to produce other interleavings, our interleaving mutation is
 \textit{directed towards undisclosed coverages in $U$} until $U$ is
@@ -292,49 +282,6 @@ interleaving, and then provide details of the interleaving mutation.
 % Knowing which segments are not tested can significantly help for these
 % cases. With a help of a scheduling hint-drected scheduler, we can
 % force execution to experience segments that are not yet tested.
-
-
-\subsection{Approach Overview}
-\label{ss:overview}
-
-Let us assume we have an input that consists of concurrent jobs.
-%
-While all possible interleavings of the concurrent jobs grows
-exponentially to the number of memory access operations,
-
-
-
-
-
-
-\PP{Interleaving in a graph form}
-%
-Assuming memory access operations in an interleaving are totally
-ordered, the interleaving can be transformed into a directed acyclic
-graph where vertices represent memory access operations, and edges
-connect two vertices \texttt{v1} and \texttt{v2} if the \texttt{v1}
-and \texttt{v2} correspond to a pair of conflicting accesses or
-\texttt{v1} and \texttt{v2} are executed in the same thread. Each edge
-is directed from \texttt{v1} to \texttt{v2} if \texttt{v1} is executed
-before \texttt{v2}.
-
-
-\autoref{fig:intuition} shows a directed acyclic graph representing a
-totally ordered memory access operations,
-$\texttt{A1} \rightarrow \texttt{B1} \rightarrow \texttt{B2}
-\rightarrow \texttt{B4} \rightarrow \texttt{A2}$, that causes a
-NULL-dereference bug in \autoref{fig:cve-2019-6974}.
-%
-In this graph, an edge \texttt{A1} and \texttt{B1}
-
-as \texttt{A1} and \texttt{B1} conflict on \texttt{alloc->vma},
-
-and
-
-
-\PP{Coverage-directed interleaving mutation}
-
-
 
 
 
