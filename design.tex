@@ -12,13 +12,56 @@
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
 
-As described in \autoref{s:motivation}, our goal is 1) to define a
-coverage metric in the concurrency dimesion to track multiple pairs of
-conflicting accesses, and 2) to design an interleaving mutation
-algorithm for quickly saturating the coverage.
+% As described in \autoref{s:motivation}, our goal is 1) to define a
+% coverage metric in the concurrency dimesion to track multiple pairs of
+% conflicting accesses, and 2) to design an interleaving mutation
+% algorithm for quickly saturating the coverage.
 
 
-In this section, we first describe the key idea of our approach to
+\begin{itemize}
+\item our approach in one sentence: definine the universal set $U$
+  using a coverage metric, and directing execution to consume the universal set
+\item assumption: we have an input (i.e., concurrent jobs and its interleaving)
+\item what are we going to do
+  \begin{itemize}
+  \item coverage
+  \item interleaving mutation
+  \end{itemize}
+\item coverage
+  \begin{itemize}
+  \item rationale:
+  \item challenges:
+  \item solution:
+  \end{itemize}
+  \item interleaving mutation
+    \begin{itemize}
+    \item rationale:
+    \item challenges:
+    \item solution:
+    \end{itemize}
+\end{itemize}
+
+
+In this section, we describe our approach to explore the interleaving
+space.
+%
+The key idea of our approach is in directing execution torwards
+undiscovered coverage.
+%
+In particular, 
+
+to adopt a coverage metric to 
+
+from the
+
+
+%
+We first describe the approach overview~(\autoref{ss:overview}), and
+then details of our coverage metric~(\autoref{ss:coverage}) and the
+interleaving mutation
+
+
+we first describe the key idea of our approach to
 achieve the goals~(\autoref{ss:keyidea}). Based on the key idea, we
 propose a \textit{\coverage} that tracks multiple pairs of conflicting
 accesses~(\autoref{ss:coverage}), and a \textit{coverage-directed
@@ -26,19 +69,6 @@ accesses~(\autoref{ss:coverage}), and a \textit{coverage-directed
 towards undiscovered coverage~(\autoref{ss:scheduler}).
 
 
-
-% The essence of a concurrency fuzzing relies on how to explore the
-% interleaving space.
-% %
-% In this section, we describe our approach to effectively explore the
-% interleaving space.
-% %
-% We first introduce the key idea of our
-% approach~(\autoref{ss:keyidea}), and then based on the key idea, we
-% propose a novel coverage concept in the concurrency
-% dimension~(\autoref{ss:coverage}) and an instruction scheduling
-% mechanism (\ie, interleaving mutation) to unveil undisclosed
-% coverage~(\autoref{ss:scheduler}).
 
 \subsection{Key Idea}
 \label{ss:keyidea}
@@ -267,8 +297,16 @@ interleaving, and then provide details of the interleaving mutation.
 % force execution to experience segments that are not yet tested.
 
 
-\subsection{Key Idea}
-\label{ss:keyidea}
+\subsection{Approach Overview}
+\label{ss:overview}
+
+Let us assume we have an input that consists of concurrent jobs.
+%
+While all possible interleavings of the concurrent jobs grows
+exponentially to the number of memory access operations,
+
+
+
 
 
 

@@ -392,6 +392,9 @@ $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 
 \PP{Limitation of existing approaches}
 %
+\dr{Existing coverage mertircs are not suitable. so they cannot drive
+  a fuzzer to meagningful inputs}
+%
 In the perspective of fuzzing, a coverage metric is a paramount gear
 to determine whether a given input is worthy of further mutation.
 %
@@ -536,7 +539,7 @@ conflicting accesses as many as possible.
 % will increase the probabilty of finding more concurrency bugs if we
 % diversify interleavings to experience such partial orders as many as
 % possible.
-%
+
 To this end, we organize subgoals as follows:
 %
 1) We first design a coverage metric to track combinations of pairs of
