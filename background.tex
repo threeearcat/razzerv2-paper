@@ -536,7 +536,7 @@ test the input enough.
 %
 Our goal is to design a fuzzer to effectively explore the interleaving
 space with a purpose of testing combinations of multiple pairs of
-conflicting accesses as many as possible.
+conflicting access operations as many as possible.
 %
 % Considering characteristics of concurrency bugs mentioned above, it
 % will increase the probabilty of finding more concurrency bugs if we
@@ -551,35 +551,12 @@ conflicting accesses,
 % computing power for uninteresting inputs, and not de-prioritize inputs
 % in which there are more unexplored interleavings.
 %
-2) based on the coverage metric, we design an interleaving mutation
-\dr{interleaving mutation?}  mechanism that quickly saturate the
-coverage metric, and lastly,
+2) based on the coverage metric, we design an instruction scheduling
+algorithm that quickly saturate the coverage metric, and lastly,
 %
-3) we combine the coverage metric and the interleaving mutation
-mechanism into Syzkaller~\cite{syzkaller} to find out race conditions
+3) we combine the coverage metric and the instruction scheduling
+algorithm into Syzkaller~\cite{syzkaller} to find out race conditions
 in the Linux kernel.
-
-
-
-%
-% This scheduling mechanism not only makes the investigation of such
-% partial orders faster, but also does not miss concurrency bugs caused
-% by an ``extreme'' interleaving (\ie, ones that hardly occur with the
-% kernel scheduler).
-% %
-% % - observe an outcome
-% %   - not to miss race conditions
-% 3) While scheduling instructions, we detect concurrency bugs through
-% abnormal behaviors instead of relying on data race detectors.
-% %
-% Although data race detectors are useful development tools, they are
-% inherently limited in detecting race conditions.
-% %
-% We thus choose to observe the direct evidence of manifestation of
-% concurrency bugs, an abnormal behavior.
-% %
-% Incorporating a data race detector will be discussed in
-% \autoref{s:discussion}.
 
 
 

@@ -23,54 +23,9 @@
     \item challenges:
     \item solution:
     \end{itemize}
-\end{itemize}
+  \end{itemize}
 
-
-In this section, we describe our approach to explore the interleaving
-space.
-%
-Our approach assumes that concurrent jobs (\eg, syscalls) and an
-initial interleaving (= seed interleaving) of the concurrent job are
-given as an input.
-%
-With the given input, our approach \textit{mutates the interleaving}
-to produce other interleavings for exploring the interleaving space.
-
-The key improvement of our approach is in adopting a novel coverage
-metric to track multiple pairs of conflicting accesses (\eg,
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$ in \autoref{fig:cve-2019-6974}).
-%
-In particular, after collecting coverages from the seed interleaving,
-we \textit{estimates the universal coverage set $U$}, a set of
-coverages that the given concurrent jobs possibly execute.
-%
-And then, to produce other interleavings, our interleaving mutation is
-\textit{directed towards undisclosed coverages in $U$} until $U$ is
-exhausted.
-
-In the following paragraphs, \autoref{ss:overview} first provides the
-overview of our approach. Then, \autoref{ss:coverage} describes our
-coverage metric in the concurrency dimension. Lastly,
-\autoref{ss:scheduler} illustrates the interleaving mutation algorithm
-that quickly saturates the coverage.
-
-
-
-\subsection{Key Idea}
-\label{ss:keyidea}
-
-\cut{
-\PP{Challenges}
-%
-Even though testing combinations of multiple conflicting accesses
-provides a good bug-finding capability, one could argue that it may
-require too many execution as the number of such combination is too
-large.
-}
-
-\dr{wip.}
-
+  
 \begin{itemize}
 \item what do we do to explore the interleaving space?
   \begin{itemize}
@@ -108,6 +63,97 @@ large.
 \end{itemize}
 
 
+
+In this section, we describe our approach to explore the interleaving
+space.
+%
+We first provide the overview of our
+approach~(\autoref{ss:overview}). Then, we illustrate our coverage
+metric in the concurrency dimension~(\autoref{ss:coverage}), and the
+instruction scheduling algorithm to quickly saturate the
+coverage~(\autoref{ss:scheduler}).
+
+\subsection{Approach Overview}
+\label{ss:overview}
+
+\begin{figure*}[t]
+  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
+  \caption{Key idea to explore the interleaving space. Each circle
+    represents a memory access intruction. Annotations $R_x$ and $W_x$
+    mean that the instruction reads from or writes to a memory
+    location $x$ respectively.}
+  \label{fig:overview}
+\end{figure*}
+
+
+Our approach assumes that concurrent jobs (\eg, syscalls) and an
+initial interleaving (\eg, a seed interleaving) of the concurrent jobs
+are given as an input.
+%
+With the given input, we deal with an interleaving as a subject of
+mutation. In other words, we first track coverage in the concurrency
+dimension (shortly, concurrency coverage) from the given interleaving,
+and generate other interleavings by rescheduling instructions to find
+new concurrency coverage.
+%
+As a result, we generate various interleavings until concurrency
+coverage is saturated.
+
+
+To this end, we first propose a coverage metric, called \coverage, to
+track multiple pairs of conflicting accesses.
+%
+\autoref{fig:overview} shows an example of how to track \coverage from
+\autoref{fig:cve-2019-6974}.
+
+
+
+After tracking \coverage from the given interleaving, we determine
+whether the interleaving is worth further mutation.
+%
+Most coverage-guided fuzzing techniques determine that an input is a
+subject of mutation if it exhibits new coverage. In the context of
+concurrency fuzzing, an interleaving is a subject of mutation if new
+concurrency coverage (\ie, \coverage) is observed.
+%
+We however adopt a different strategy. We \textit{infer which
+  \coverage may be newly discovered} if we mutate an interleaving.
+
+\autoref{fig:overview}
+  
+we \textit{estimates the universal coverage set $U$}, a set of
+\coverage that the given concurrent jobs possibly execute.
+%
+Therefore, if the universal coverage set $U$ contains coverage that
+are not yet observed, we determine that the interleaving is worthy of
+further mutating.
+
+
+
+
+
+
+
+If an interleaving is worth further testing, we \textit{mutate the
+  interleaving} by rescheduling memory access operations in the given
+interleaving.
+
+And then, to produce other interleavings, our interleaving mutation is
+\textit{directed towards undisclosed coverages in $U$}.
+
+
+
+
+
+
+
+
+
+
+\subsection{Key Idea}
+\label{ss:keyidea}
+
+\dr{wip.}
 Our intuition comes from an observation that even a non-failing
 interleaving bears hints on which interleavings require further
 testing.
@@ -124,15 +170,6 @@ not.
 Our approach to explore the interleaving space realizes this
 intuition.
 
-
-\begin{figure*}[t]
-  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
-  \caption{Key idea to explore the interleaving space. Each circle
-    represents a memory access intruction. Annotations $R_x$ and $W_x$
-    mean that the instruction reads from or writes to a memory
-    location $x$ respectively.}
-  \label{fig:intuition}
-\end{figure*}
 
 
 \PP{Overall steps}
@@ -241,48 +278,6 @@ In the rest of this section, we define the graph form of an
 interleaving, and then provide details of the interleaving mutation.
 
 
-% Dealing with an instruction sequence in this perspective has the
-% following advantages:
-% %
-% First, it reduces the complexity of the interleaving space from
-% exponential to polynomial to the number of instructions.
-% %
-% It is well known that the number of possible interleaving
-% exponentially grows to the length of an instruction
-% sequence~\cite{sctbench}. The intractable number of possible
-% interleavings has been known as the paramount challenge for finding
-% race conditions.
-% %
-% However, if we restrict our focus on a small number (\eg, four) of
-% instructions, testing possible orders of small segments becomes a
-% tractable problem with a polynomial complexity.
-% %
-% Second, given a concurrent jobs, it is able to know whether the
-% concurrent jobs are worth further testing.
-% %
-% Because of the nondeterministic nature of race conditions, some race
-% conditions hardly manifests even after a long period of
-% testing~\cite{exprace}.
-% %
-% Without a proper metric, a fuzzer is forced to choose to repeatedly
-% test a single input that does not causes a race condition, or to throw
-% away an input that actually causes race condition when a very specific
-% condition is satisfied.
-% %
-% Lastly, we can infer which segments are tested and which are not.
-% %
-% As mentioned before, some race conditions hardly manifests. These race
-% conditions requires a very small race window sized for a few assembly
-% instructions~\cite{afpacket}, or a thread stalling for a long
-% time~\cite{noninclusive1, noninclusive2}. Although the probability of
-% hitting the condition of them is not zero, without directing an
-% interleaving, a fuzzer likely wastes a computing power until the
-% condition is met.
-% %
-% Knowing which segments are not tested can significantly help for these
-% cases. With a help of a scheduling hint-drected scheduler, we can
-% force execution to experience segments that are not yet tested.
-
 
 
 \subsection{Interleaving Graph}
@@ -292,6 +287,25 @@ interleaving, and then provide details of the interleaving mutation.
 \newcommand{\mutables}{mutable edges\xspace}
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
+
+\begin{itemize}
+\item how?
+  \begin{itemize}
+  \item collect {C1, C2, ...} from the interleaving
+  \item infer $U$, the universal set of coverage
+  \item consume $U$ until it is empty
+  \end{itemize}
+\item an intuition for a coverage
+  \begin{itemize}
+  \item observations
+    \begin{itemize}
+    \item interleavings are directed acyclic graph
+    \item multiple pairs of conflicting accesses are a subgraph of an interleaving
+    \end{itemize}
+  \item we represent a coverage using a graph (?)
+  \end{itemize}
+\end{itemize}
+
 
 
 \begin{figure}[t]
@@ -389,6 +403,23 @@ jobs during fuzzing. Details are described later in \autoref{s:impl}.
 
 \subsection{Interleaving Mutation}
 \label{ss:scheduler}
+
+\begin{itemize}
+\item an intuition for an interleaving mutation
+  \begin{itemize}
+  \item two observatrions
+    \begin{itemize}
+      \item many coverages can be executed together
+      \item we can infer what coverages should be further tested
+      \end{itemize}
+  \item step 1: collect coverage
+  \item step 2: inference of coverages to test
+  \item step 3: collect coverages that can be tested together
+  \item step 4: generate an interleaving to test
+  \end{itemize}
+\end{itemize}
+
+
 
 % Since concurrent jobs may reveal different behaviors depending on an
 % interleaving, a concurrency fuzzer adopt additional mutation strategy
