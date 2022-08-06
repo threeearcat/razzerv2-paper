@@ -1,7 +1,7 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
-\newcommand{\coverage}{XXX coverage\xspace}
+\newcommand{\coverage}{biconflict coverage\xspace}
 
 \newcommand{\segment}{segment graph\xspace}
 \newcommand{\segments}{segment graphs\xspace}
@@ -86,10 +86,11 @@ initial interleaving (\eg, a seed interleaving) of the concurrent jobs
 are given as an input.
 %
 With the given input, we deal with the interleaving as a subject of
-mutation. In other words, we first track coverage in the concurrency
-dimension (shortly, concurrency coverage) from the given interleaving,
-and generate other interleavings by rescheduling instructions for
-finding new concurrency coverage.
+mutation. In other words, from the given interleaving, we first track
+coverage in the concurrency dimension (shortly, concurrency coverage)
+that tracks multiple pairs of conflicting accesses. After that, we
+generate other interleavings by rescheduling instructions for finding
+new concurrency coverage.
 %
 As a result, we generate various interleavings of the given concurrent
 jobs that disclose different concurrency coverage.
@@ -108,6 +109,7 @@ One could argue that testing multiple pairs of conflicting access
 operations is intractable since the size of the search space is too
 large.
 %
+
 
 
 
@@ -138,17 +140,19 @@ After tracking \coverage from the given interleaving, we determine
 whether the interleaving is worth further mutation.
 %
 Most coverage-guided fuzzing techniques determine that an input is a
-subject of mutation if the input exhibits new coverage. In the context
-of concurrency fuzzing, an interleaving is a subject of mutation if
-new concurrency coverage (\eg, \coverage) is observed.
+subject of mutation if the input exhibits new coverage. In our
+context, an interleaving could be a subject of mutation if new
+concurrency coverage (\eg, \coverage) is observed.
 %
 We however adopt a different strategy. We \textit{hypothesize which
   \coverage may be newly discovered} if we mutate an interleaving.
 %
-Since the execution order of conflicting accesses may affect an
-outcome of a program, for each coverage, changing the execution order
-of conflicting accesses yields \coverage that is possibly observed
-with other interleavings, called \coverage candidate.
+Our intuition comes from an observation that the execution order of
+conflicting accesses may affect an outcome of a program.
+%
+Based on the observation, for each coverage, we change the execution
+order of conflicting accesses to construct new \coverage that is
+possibly observed by another interleaving, called \coverage candidate.
 
 we \textit{estimates the universal coverage set $U$}, a set of
 \coverage that the given concurrent jobs possibly execute.
@@ -324,7 +328,7 @@ And then, to produce other interleavings, our interleaving mutation is
 
 
 
-\subsection{\coverage}
+\subsection{Biconflict Coverage}
 \label{ss:coverage}
 
 \newcommand{\mutable}{mutable edge\xspace}
