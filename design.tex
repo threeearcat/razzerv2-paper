@@ -161,6 +161,7 @@ $\texttt{A1} \rightarrow \texttt{B1}$,
 $\texttt{A2} \rightarrow \texttt{B4}$, and
 $\texttt{B5} \rightarrow \texttt{A3}$.
 %
+\dr{}
 As described in \autoref{fig:overview}-(b), we compute biconflict
 coverage consisting of three segments,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{A2} \wedge
@@ -204,13 +205,17 @@ $U*$.
 
 
 
+Lastly, given $U^*$, we mutate the interleaving \textit{directed
+  towards undisclosed coverages in $U*$}.
+%
+Since we know
 
-Lastly, given $U^*$, we mutate the interleaving by rescheduling memory
+by rescheduling memory
 access operations in the given interleaving.
 %
 Since we compute  universal coverage set $U$ 
 
-Our mutation is \textit{directed towards undisclosed coverages in $U$}.
+Our mutation is 
 
 %
 And then, to produce other interleavings, our interleaving mutation is
