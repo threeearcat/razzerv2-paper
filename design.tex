@@ -105,6 +105,17 @@ memory accesses are executed in a specific order.
 \dr{TODO: why and how we translate four memory accesses to two
   conflicts?}
 
+\begin{itemize}
+\item race conditions manifest depending on four memory accesses
+\item the four memory accesses are channels of communications between
+  multiple threads
+\item 
+\item commucations are established when a write operation of thread A
+  is observable to another thread B
+  
+\end{itemize}
+
+
 
 \PP{Challenge}
 %
@@ -366,6 +377,8 @@ And then, to produce other interleavings, our interleaving mutation is
 \newcommand{\mutables}{mutable edges\xspace}
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
+
+\dr{rewrite all}
 
 \begin{itemize}
 \item how?
