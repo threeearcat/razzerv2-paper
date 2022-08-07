@@ -79,11 +79,11 @@ coverage~(\autoref{ss:scheduler}).
   \label{fig:overview}
 \end{figure*}
 
-
-Our approach assumes that a concurrent job (\eg, a set of syscalls)
-and an initial interleaving (\eg, a seed interleaving) of the
-concurrent job are given as an input. We also assume that all memory
-access operations are totally ordered.
+Our approach to explore the interleaving space assumes that a
+concurrent job (\eg, a set of syscalls) and an initial interleaving
+(\eg, a seed interleaving) of the concurrent job are given as an
+input. We also assume that all memory access operations are totally
+ordered.
 
 With the given input, we deal with the interleaving as a subject of
 mutation. In other words, from the given interleaving, we first track
@@ -157,11 +157,13 @@ When we execute a concurrent job once yielding an interleaving of
 memory access operations, we can observe many interleaving fragments
 simultaneously in the interleaving.
 %
-Based on the observation, we can schedule instructions in a
+Based on the observation, we can generate instructions in a
 \textit{smart} way.
 %
-In other words, if we know which fragments are not yet observed from a
-universal fragment set $U$, 
+In other words, if we know which fragments are not yet disclosed from
+a universal fragment set $U$, we can schedule instructions to
+experience undisclosed fragments.
+
 
 
 

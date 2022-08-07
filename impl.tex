@@ -55,6 +55,44 @@ implementation of each components.
 
 
 
+\subsection{Userspace Fuzzer}
+\label{ss:fuzzer}
+
+A userspace fuzzer implmenets the interleaving mutation algorithm
+described in \autoref{s:design}.
+%
+We choose to implement \sys based on Syzkaller~\cite{syzkaller} which
+is a grammar-based grey-box fuzzer since Syzkaller has been found many
+bugs for a few years.
+%
+
+\PP{Sequential fuzzing}
+%
+\sys's sequential fuzzing is similar with Syzkaller.
+
+In the first phase fuzzing, \sys make use of branch coverage for the
+sequential dimension
+
+
+KCOV~\cite{kcov}
+
+\PP{Concurrent fuzzing}
+
+%
+In order to use interleaving graph as interleaving coverage, we need a
+method to store them, and compare them to a new interleaving graph.
+%
+We choose to use a hash value of
+
+the FNV-1~\cite{fnv, fnv-go}, non-cryptographic hash function,
+
+\PP{Schedule}
+
+A schedule is an outcome of the interleaving mutation.
+
+A schedule contains an initial thread, and a set of scheduling points
+indicating an instruction on which preemption occurs.
+
 \subsection{Target Kernel Preparation}
 \label{ss:instrumentation}
 
@@ -96,43 +134,7 @@ used to suspend and resume a running thread. Details about the
 trampoline are described in \autoref{ss:engine}
 
 
-\subsection{Userspace Fuzzer}
-\label{ss:fuzzer}
 
-A userspace fuzzer implmenets the interleaving mutation algorithm
-described in \autoref{s:design}.
-%
-We choose to implement \sys based on Syzkaller~\cite{syzkaller} which
-is a grammar-based grey-box fuzzer since Syzkaller has been found many
-bugs for a few years.
-%
-
-\PP{Sequential fuzzing}
-%
-\sys's sequential fuzzing is similar with Syzkaller.
-
-In the first phase fuzzing, \sys make use of branch coverage for the
-sequential dimension
-
-
-KCOV~\cite{kcov}
-
-\PP{Concurrent fuzzing}
-
-%
-In order to use interleaving graph as interleaving coverage, we need a
-method to store them, and compare them to a new interleaving graph.
-%
-We choose to use a hash value of
-
-the FNV-1~\cite{fnv, fnv-go}, non-cryptographic hash function,
-
-\PP{Schedule}
-
-A schedule is an outcome of the interleaving mutation.
-
-A schedule contains an initial thread, and a set of scheduling points
-indicating an instruction on which preemption occurs.
 
 \subsection{Execution Engine}
 \label{ss:engine}
