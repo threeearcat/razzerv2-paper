@@ -80,10 +80,9 @@ coverage~(\autoref{ss:scheduler}).
 \end{figure*}
 
 
-
-Our approach assumes that concurrent jobs (\eg, syscalls) and an
-initial interleaving (\eg, a seed interleaving) of the concurrent jobs
-are given as an input.
+Our approach assumes that a concurrent job (\eg, a set of syscalls)
+and an initial interleaving (\eg, a seed interleaving) of the
+concurrent job are given as an input.
 %
 With the given input, we deal with the interleaving as a subject of
 mutation. In other words, from the given interleaving, we first track
@@ -93,27 +92,30 @@ generate other interleavings by rescheduling instructions for finding
 new concurrency coverage.
 %
 As a result, we generate various interleavings of the given concurrent
-jobs that disclose different concurrency coverage.
+job that disclose different concurrency coverage.
 
 \PP{Biconflict coverage}
 %
-As described 
-According to the survey~\cite{learningfrommistakes} described in
-\autoref{s:motivation}, most race conditions manifest depending on a
-specific execution order of at most four memory access operations.
+We design a concurrency coverage metric to track \textit{an emprical
+  aspects of race conditions}.
 %
-% Considering a thread (thread~A) affects the execution of another
-% thread (thread~B) if thread~B reads a value written by thread~A, the
-% memory accesses causing a race condition should conflict with each
-% others.
+To recap, as described in \autoref{s:motivation}, most race conditions
+manifest if at most \textit{two} scheduling constraints on at most
+\textit{four} memory access operations are fulfilled.
 %
-\dr{Why and how we translate four memory accesses to two conflicts}
-%
-\dr{keywords: requirement of interactions}
-%
-Therefore, 
+Furthermore, considering a thread (thread~A) may affect execution of
+another thread (thread~B) only if thread~B reads a value written by
+thread~A, scheduling constraints should be established on conflicting
+memory access operations.
 
-
+Therefore, we propose a novel coverage metric, called biconflict
+coverage, that tracks the execution order of two pairs of conflicting
+memory access operations.
+%
+As biconflict coverage tracks the sufficient condition for most race
+conditions to manifest, if we find all biconflict coverage in the
+given concurrent job, we have a strong confidence that the concurrent
+job does not reveal a race condition.
 
 
 \PP{Challenge}
@@ -137,7 +139,7 @@ However, it is worth noting that many XXX are not exclusive.
 %
 In ..., XXX and XXX can be executed in one interleaving.
 %
-Therefore, we can drastically reduce the number of execution to test
+Therefore, we can drastically reduce the number execution to test
 all XXX.
 
 
