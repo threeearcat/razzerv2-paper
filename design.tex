@@ -96,7 +96,7 @@ job that disclose different concurrency coverage.
 
 \PP{Biconflict coverage}
 %
-We design a concurrency coverage metric to track \textit{an emprical
+We design a concurrency coverage metric to address \textit{an emprical
   aspects of race conditions}.
 %
 To recap, as described in \autoref{s:motivation}, most race conditions
@@ -117,6 +117,12 @@ conditions to manifest, if we find all biconflict coverage in the
 given concurrent job, we have a strong confidence that the concurrent
 job does not reveal a race condition.
 
+Throughout the rest of this paper, we denote an interleaving fragment
+as a subpart of an interleaving that contains four memory access
+operations, \dr{}
+%
+
+
 
 \PP{Challenge}
 %
@@ -135,23 +141,22 @@ If two concurrent jobs conflict on $N$ pairs of accesses, the number
 of two pairs of conflicting accesses is propotional to $N^2$, which is
 possibly too large to test one-by-one.
 
-However, it is worth noting that many XXX are not exclusive.
+However, it is worth noting that many fragments are not exclusive.
 %
 In ..., XXX and XXX can be executed in one interleaving.
-%
-Therefore, we can drastically reduce the number execution to test
-all XXX.
+
+If we select an interleaving to test in a \textit{smart} way, we can
+quickly consume a universal fragment set $U$.  Therefore, we can
+drastically reduce the number execution to find all biconflict coverage.
 
 
 
 \PP{Overall steps}
 %
-\dr{interelaving segment of four instructions?}
-%
-Let us suppose we have concurrent jobs consisting of \texttt{mmap()}
+Let us suppose we have a concurrent job consisting of \texttt{mmap()}
 and \texttt{ioctl(TRANSACTION)} in \autoref{fig:cve-2019-6974}, and
 \autoref{fig:overview}-(a) represents an initial interleaving of the
-concurrent jobs.
+concurrent job.
 %
 As described the figure, the initial interleaving is provided with an
 execution order of
@@ -159,17 +164,14 @@ $\texttt{A1} \rightarrow \texttt{A2} \rightarrow \texttt{B1}
 \rightarrow \texttt{B4} \rightarrow \texttt{B5} \rightarrow
 \texttt{A3}$.
 %
-To recap, the race condition manifests if a condition on the execution
-order (\ie,
+In the given interleaving, the race condition does not manifest since
+its scheduling constraints are
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$) is satisfied. In the given interleaving, the race
-condition does not manifest since \texttt{A2} is executed before
-\texttt{B4}.
+\texttt{A2})$, but \texttt{A2} is executed before \texttt{B4}.
 
-
-With the given input, we first track biconflict coverage.  In the
-given interleaving of \autoref{fig:overview}-(a), there are three
-individual pairs conflicting accesses,
+With the given input, the first task is to track biconflict coverage.
+In the given interleaving of \autoref{fig:overview}-(a), there are
+three individual pairs conflicting accesses,
 $\texttt{A1} \rightarrow \texttt{B1}$,
 $\texttt{A2} \rightarrow \texttt{B4}$, and
 $\texttt{B5} \rightarrow \texttt{A3}$.
