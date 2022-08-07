@@ -100,8 +100,10 @@ jobs that disclose different concurrency coverage.
 According to the survey~\cite{learningfrommistakes} described in
 \autoref{s:motivation}, most race conditions manifest depending on a
 specific execution order of at most four memory access operations.
-%
-\dr{I want to say: we track how a thread affects another thread. }
+
+
+
+\dr{I want to say: we track the visibility of store operations}
 
 %
 Considering a thread (thread~A) affects the execution of another
