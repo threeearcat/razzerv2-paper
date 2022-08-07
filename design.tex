@@ -98,21 +98,31 @@ jobs that disclose different concurrency coverage.
 \PP{Biconflict coverage}
 %
 According to the survey~\cite{learningfrommistakes} described in
-\autoref{s:motivation}, most race conditions manifest if at most four
-memory accesses are executed in a specific order.
+\autoref{s:motivation}, most race conditions manifest depending on a
+specific execution order of at most four memory access operations.
 %
+\dr{I want to say: we track how a thread affects another thread. }
+
+%
+Considering a thread (thread~A) affects the execution of another
+thread (thread~B) if thread~B reads a value written by thread~B, the
+memory accesses causing a race condition conflict with each others.
+
+
+% 
+For example, to manifest the race condition in
+\autoref{fig:cve-2019-6974}, 
+
 
 \dr{TODO: why and how we translate four memory accesses to two
   conflicts?}
 
 \begin{itemize}
-\item race conditions manifest depending on four memory accesses
-\item the four memory accesses are channels of communications between
-  multiple threads
-\item 
-\item commucations are established when a write operation of thread A
-  is observable to another thread B
-  
+\item race conditions manifest
+  \begin{itemize}
+  \item depending on the timing of memory access operations
+  \item 
+  \end{itemize}
 \end{itemize}
 
 
@@ -130,15 +140,16 @@ memory accesses are executed in a specific order.
 One could argue that tracking biconflict coverage is intractable since
 the size of the search space is too large.
 %
-If there are $N$ individual pairs of conflicting accesses, the number
+If two concurrent jobs conflict on $N$ pairs of accesses, the number
 of two pairs of conflicting accesses is propotional to $N^2$, which is
 possibly too large to test one-by-one.
+
+However, it is worth noting that many XXX are not exclusive.
 %
-
-
-\dr{Solution}
-
-
+In ..., XXX and XXX can be executed in one interleaving.
+%
+Therefore, we can drastically reduce the number of execution to test
+all XXX.
 
 
 
