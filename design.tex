@@ -82,8 +82,9 @@ coverage~(\autoref{ss:scheduler}).
 
 Our approach assumes that a concurrent job (\eg, a set of syscalls)
 and an initial interleaving (\eg, a seed interleaving) of the
-concurrent job are given as an input.
-%
+concurrent job are given as an input. We also assume that all memory
+access operations are totally ordered.
+
 With the given input, we deal with the interleaving as a subject of
 mutation. In other words, from the given interleaving, we first track
 coverage in the concurrency dimension (shortly, concurrency coverage)
@@ -93,6 +94,8 @@ new concurrency coverage.
 %
 As a result, we generate various interleavings of the given concurrent
 job that disclose different concurrency coverage.
+%
+\dr{This does not mention the race-steered control flow.}
 
 \PP{Biconflict coverage}
 %
@@ -117,10 +120,16 @@ conditions to manifest, if we find all biconflict coverage in the
 given concurrent job, we have a strong confidence that the concurrent
 job does not reveal a race condition.
 
-Throughout the rest of this paper, we denote an interleaving fragment
-as a subpart of an interleaving that contains four memory access
-operations, \dr{}
-%
+Throughout the rest of this paper, we name an interleaving fragment as
+a subpart of an interleaving that represents two scheduling
+contraints. For example, the race condition in
+\autoref{fig:cve-2019-6974} is caused by an interleaving fragment
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+\texttt{A2})$.
+
+
+\dr{univeral fragment set U}
+
 
 
 
@@ -137,17 +146,22 @@ operations, \dr{}
 One could argue that tracking biconflict coverage is intractable since
 the size of the search space is too large.
 %
-If two concurrent jobs conflict on $N$ pairs of accesses, the number
-of two pairs of conflicting accesses is propotional to $N^2$, which is
+If two threads conflict on $N$ pairs of accesses, the number of two
+pairs of conflicting accesses is propotional to $N^2$, which is
 possibly too large to test one-by-one.
 
-However, it is worth noting that many fragments are not exclusive.
+However, it is worth noting that many interleaving fragments are not
+exclusive.
 %
-In ..., XXX and XXX can be executed in one interleaving.
-
-If we select an interleaving to test in a \textit{smart} way, we can
-quickly consume a universal fragment set $U$.  Therefore, we can
-drastically reduce the number execution to find all biconflict coverage.
+When we execute a concurrent job once yielding an interleaving of
+memory access operations, we can observe many interleaving fragments
+simultaneously in the interleaving.
+%
+Based on the observation, we can schedule instructions in a
+\textit{smart} way.
+%
+In other words, if we know which fragments are not yet observed from a
+universal fragment set $U$, 
 
 
 
