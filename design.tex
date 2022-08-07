@@ -97,35 +97,22 @@ jobs that disclose different concurrency coverage.
 
 \PP{Biconflict coverage}
 %
+As described 
 According to the survey~\cite{learningfrommistakes} described in
 \autoref{s:motivation}, most race conditions manifest depending on a
 specific execution order of at most four memory access operations.
-
-
-
-\dr{I want to say: we track the visibility of store operations}
-
 %
-Considering a thread (thread~A) affects the execution of another
-thread (thread~B) if thread~B reads a value written by thread~B, the
-memory accesses causing a race condition conflict with each others.
+% Considering a thread (thread~A) affects the execution of another
+% thread (thread~B) if thread~B reads a value written by thread~A, the
+% memory accesses causing a race condition should conflict with each
+% others.
+%
+\dr{Why and how we translate four memory accesses to two conflicts}
+%
+\dr{keywords: requirement of interactions}
+%
+Therefore, 
 
-
-% 
-For example, to manifest the race condition in
-\autoref{fig:cve-2019-6974}, 
-
-
-\dr{TODO: why and how we translate four memory accesses to two
-  conflicts?}
-
-\begin{itemize}
-\item race conditions manifest
-  \begin{itemize}
-  \item depending on the timing of memory access operations
-  \item 
-  \end{itemize}
-\end{itemize}
 
 
 

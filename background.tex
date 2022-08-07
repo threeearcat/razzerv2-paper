@@ -12,6 +12,8 @@ concurrency bugs.
 \subsection{Concurrency Bug}
 \label{ss:concurrencybugs}
 
+\dr{TODO: define conflicting accesses somewhere}
+
 A concurrency bug can be classified into two categories according to
 how it adversely affects a program.
 
@@ -279,9 +281,6 @@ abnormal behavior.
 \section{Motivation}
 \label{s:motivation}
 
-\dr{TODO: define conflicting accesses somewhere in the concurrency bug
-  section}
-
 % - Coverage-guide fuzzing is important
 % - How to define coverage in concurrency dimension is 
 % challenging and important
@@ -313,9 +312,26 @@ depending on the execution order of multiple memory access operations.
 Specifically, the study identifies that 92\% of race conditions manifest 
 when at most four memory accesses operations are executed in a specific
 order.
+
+Furthermore, a few literatures~\cite{pctalgorithm, ski, snorlax,
+  failuresketching} imply that the number of \textit{scheduling
+  constraints} for most race conditions is small.
 %
-% For all other memory accesses, their execution orders and values
-% written and read by them do not affect bugs's manifestation.
+A scheduling constraint indicates an ordering constraint between a
+single pair of instructions, such that thread~A executes an
+instruction \texttt{X} before thread~B executes another instruction
+\texttt{Y}.
+%
+In terms of scheduling constraint, a race condition manifests if a
+\textit{conjunction of a small number of scheduling constraints} are
+simultaneously satisfied.
+%
+\dr{}
+%
+Specifically, race conditions that the above literatures study
+manifest with at most two scheduling constraints.
+
+
 
 \begin{figure}[t]
   \centering
@@ -325,18 +341,20 @@ order.
   \label{fig:cve-2019-6974}
 \end{figure}
 
-\autoref{fig:cve-2019-6974} explains a case. In this example, a race
-condition occurs in the binder device driver, which is an IPC
-framework for Android. Specifically, a NULL-dereference bug manifests
-when two system calls are executed concurrently: \texttt{mmap()} to
-map the device driver into a user address space and
+To illustrate the manifestation of race conditions,
+\autoref{fig:cve-2019-6974} describes a race condition occured in the
+binder device driver, which is an IPC framework for
+Android. Specifically, a NULL-dereference bug manifests when two
+system calls are executed concurrently: \texttt{mmap()} to map the
+device driver into a user address space and
 \texttt{ioctl(TRANSACTION)} to send an IPC message.
-
+ 
 
 % \yj{Are you talking about \autoref{fig:alias-coverage}?}
-The race condition happens as follows. Let us suppose
-\texttt{alloc->vma} and \texttt{alloc->mm} are initially
-\texttt{NULL}.
+The race condition manifests depending on four memory accesses,
+\texttt{A1} and \texttt{A2} in thread~A, and \texttt{B1} and
+\texttt{B4} in thread~B. Let us suppose \texttt{alloc->vma} and
+\texttt{alloc->mm} are initially \texttt{NULL}.
 %
 During mapping the device driver into a user address space, thread~A
 sets \texttt{alloc->vma} and \texttt{alloc->mm} to non-NULL pointers
@@ -345,20 +363,23 @@ at \texttt{A1} and \texttt{A2}.
 However, since these two store operations are not atomically executed,
 thread~B may intervene in the middle of these two operations.
 %
-In that case, it is possible that \texttt{alloc->vma} is not
-\texttt{NULL} when thread~B executes \texttt{B1} while
-\texttt{alloc->mm} is \texttt{NULL} at \texttt{B4}.
+In that case, if \texttt{A1} is executed before \texttt{B1}, thread~B
+does not return at \texttt{B3} because thread~B reads a non-NULL
+pointer value through \texttt{alloc->vma}.
 %
-As a consequnce, thread~B does not return at \texttt{B3} and a
-NULL-dereference manifests when thread~B increments the reference
-counter of \texttt{alloc->mm} at \texttt{B4}.
-%
-In summary, the manifestation of the race condition depends on whether
-the execution order of four memory access operations meet a certain
-condition, namely
+And then if \texttt{B4} is executed before \texttt{A2},
+\texttt{alloc->mm} still remains \texttt{NULL} when thread~B
+increments the reference counter of \texttt{alloc->mm} at \texttt{B4},
+causing a NULL-dereference bug.
+
+In this example, we can confirm that the manifestation of the race
+condition follows the implications of previous studies; the race
+condition manifests if \textit{two} scheduling constraints on
+\textit{four} memory access operations are met (\ie,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 \texttt{A2})$~\footnote{In this paper, $X \rightarrow Y$ indicates
-  that $X$ is executed before $Y$}.
+  that $X$ is executed before $Y$.}).
+
 
 % One of the factors that makes it difficult to find concurrency bugs is
 % that, they may be detected only when a program shows an abnormal
@@ -397,6 +418,8 @@ $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 %
 \dr{Existing coverage mertircs are not suitable. so they cannot drive
   a fuzzer to meagningful inputs}
+%
+\dr{think about the scheduling constraints}
 %
 In the perspective of fuzzing, a coverage metric is a paramount gear
 to determine whether a given input is worthy of further mutation.
