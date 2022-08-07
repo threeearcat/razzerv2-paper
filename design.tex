@@ -1,7 +1,6 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
-\newcommand{\coverage}{biconflict coverage\xspace}
 
 \newcommand{\segment}{segment graph\xspace}
 \newcommand{\segments}{segment graphs\xspace}
@@ -73,12 +72,13 @@ coverage~(\autoref{ss:scheduler}).
 \subsection{Approach Overview}
 \label{ss:overview}
 
-\begin{figure*}[t]
+\begin{figure*}[ht]
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
   \caption{Approach overview to explore the interleaving
     space. \dr{TODO: describe who conflicts with who}}
   \label{fig:overview}
 \end{figure*}
+
 
 
 Our approach assumes that concurrent jobs (\eg, syscalls) and an
@@ -95,99 +95,125 @@ new concurrency coverage.
 As a result, we generate various interleavings of the given concurrent
 jobs that disclose different concurrency coverage.
 
+\PP{Biconflict coverage}
+%
+According to the survey~\cite{learningfrommistakes} described in
+\autoref{s:motivation}, most race conditions manifest if at most four
+memory accesses are executed in a specific order.
+%
+
+\dr{TODO: why and how we translate four memory accesses to two
+  conflicts?}
+
+
 \PP{Challenge}
 %
-\dr{
-\begin{itemize}
-\item rationale: we need to test muliple pairs of conflicting accesse
-\item challenges: the search space is too large
-\item solution: infer the universal set $U$ and direct the interleaving mutation towards undisclosed coverage
-\end{itemize}
-}
+% \dr{
+% \begin{itemize}
+% \item rationale: we need to test muliple pairs of conflicting accesse
+% \item challenges: the search space is too large
+% \item solution: infer the universal set $U$ and direct the interleaving mutation towards undisclosed coverage
+% \end{itemize}
+% }
 %
-One could argue that testing multiple pairs of conflicting access
-operations is intractable since the size of the search space is too
-large.
+One could argue that tracking biconflict coverage is intractable since
+the size of the search space is too large.
 %
+If there are $N$ individual pairs of conflicting accesses, the number
+of two pairs of conflicting accesses is propotional to $N^2$, which is
+possibly too large to test one-by-one.
+%
+
+
+\dr{Solution}
+
 
 
 
 
 \PP{Overall steps}
 %
-We first propose a coverage metric, called \coverage, to
-track multiple pairs of conflicting accesses.
+\dr{interelaving segment of four instructions?}
 %
-\dr{explain \coverage}
+Let us suppose we have concurrent jobs consisting of \texttt{mmap()}
+and \texttt{ioctl(TRANSACTION)} in \autoref{fig:cve-2019-6974}, and
+\autoref{fig:overview}-(a) represents an initial interleaving of the
+concurrent jobs.
 %
-\autoref{fig:overview} shows an example of how to track \coverage from
-\autoref{fig:cve-2019-6974}.
-%
-As described \autoref{fig:overview}-(a), an interleaivng is given with
-the execution order of
+As described the figure, the initial interleaving is provided with an
+execution order of
 $\texttt{A1} \rightarrow \texttt{A2} \rightarrow \texttt{B1}
 \rightarrow \texttt{B4} \rightarrow \texttt{B5} \rightarrow
-\texttt{A3}$, and there are three pairs of conflicting accesses such
-that $\texttt{A1} \rightarrow \texttt{B1}$,
+\texttt{A3}$.
+%
+To recap, the race condition manifests if a condition on the execution
+order (\ie,
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+\texttt{A2})$) is satisfied. In the given interleaving, the race
+condition does not manifest since \texttt{A2} is executed before
+\texttt{B4}.
+
+
+With the given input, we first track biconflict coverage.  In the
+given interleaving of \autoref{fig:overview}-(a), there are three
+individual pairs conflicting accesses,
+$\texttt{A1} \rightarrow \texttt{B1}$,
 $\texttt{A2} \rightarrow \texttt{B4}$, and
 $\texttt{B5} \rightarrow \texttt{A3}$.
-
-
-
-
-
-After tracking \coverage from the given interleaving, we determine
-whether the interleaving is worth further mutation.
 %
-Most coverage-guided fuzzing techniques determine that an input is a
-subject of mutation if the input exhibits new coverage. In our
-context, an interleaving could be a subject of mutation if new
-concurrency coverage (\eg, \coverage) is observed.
+As described in \autoref{fig:overview}-(b), we compute biconflict
+coverage consisting of three segments,
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{A2} \wedge
+\texttt{B4})$,
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B5} \wedge
+\texttt{A3})$, and
+$(\texttt{A2} \rightarrow \texttt{B4}) \wedge (\texttt{B5} \wedge
+\texttt{A3})$.
 %
-We however adopt a different strategy. We \textit{hypothesize which
-  \coverage may be newly discovered} if we mutate an interleaving.
-%
-Our intuition comes from an observation that the execution order of
-conflicting accesses may affect an outcome of a program.
-%
-Based on the observation, for each coverage, we change the execution
-order of conflicting accesses to construct new \coverage that is
-possibly observed by another interleaving, called \coverage candidate.
-
-we \textit{estimates the universal coverage set $U$}, a set of
-\coverage that the given concurrent jobs possibly execute.
-%
-Therefore, if the universal coverage set $U$ contains coverage that
-are not yet observed, we determine that the interleaving is worthy of
-further mutating.
+Assuming we initially have empty biconflict coverage, the three
+segments are recorded as new coverage of the given interleaivng.
 
 
 
-
-\autoref{fig:overview}-(c) describes a subset of inferred \coverage
-candidate $U$.
+After tracking biconflict coverage from the given interleaving, we
+determine whether the interleaving is worth further mutation.
 %
-Taking the example of \texttt{Segment 1}, we infer \texttt{Segment 1'}
-as a \coverage candidate by flipping the execution order of
-$\texttt{A2} \rightarrow \texttt{B4}$ to
+To this end, we adopt a strategy to \textit{predict coverage that is
+  likley found when the interleaving is mutated}.
+%
+Taking the example of \autoref{fig:overview}-(c), we can derive
+\texttt{Segment 1'} from \texttt{Segment 1} by flipping the execution
+order of $\texttt{A2} \rightarrow \texttt{B4}$ to
 $\texttt{B4} \rightarrow \texttt{A2}$.
 %
-\dr{}
+Since \texttt{Segment 1'} has not been observed yet, if we run an
+interleaving that $\texttt{A1} \rightarrow \texttt{B1}$ and
+$\texttt{B4} \rightarrow \texttt{A2}$, we can expand biconflict
+coverage with \texttt{Segment 1'}.
 %
-Similary, we generate \texttt{Segment 2'}
+Similarily, \texttt{Segment 2'} and \texttt{Segment 3'} can be derived
+from \texttt{Segment 2} and \texttt{Segment 3}.
+%
+We denote $U^*$ as a set of segment that are likely covered by
+mutations of the interleaving. In this example, \texttt{Segment 1'},
+\texttt{Segment 2'}, and \texttt{Segment 3'} are a subset of $U^*$.
+%%
+If $U^*$ is not empty, we mutate the interleaving toward segments in
+$U*$.
 
 
 
 
 
+Lastly, given $U^*$, we mutate the interleaving by rescheduling memory
+access operations in the given interleaving.
+%
+Since we compute  universal coverage set $U$ 
 
+Our mutation is \textit{directed towards undisclosed coverages in $U$}.
 
-If an interleaving is worth further testing, we \textit{mutate the
-  interleaving} by rescheduling memory access operations in the given
-interleaving.
-
+%
 And then, to produce other interleavings, our interleaving mutation is
-\textit{directed towards undisclosed coverages in $U$}.
 
 
 
@@ -249,7 +275,7 @@ And then, to produce other interleavings, our interleaving mutation is
 % %
 % As the execution order of memory accesses in each group are already
 % determined, each group explains a part of the interleaving, therefore,
-% we call each group a segment of interleaving, or shortly a segment.
+
 % %
 % During fuzzing, we keep tracking segments as the signal of new
 % interelavings of concurrent jobs.
@@ -451,6 +477,16 @@ jobs during fuzzing. Details are described later in \autoref{s:impl}.
 
 \subsection{Interleaving Mutation}
 \label{ss:scheduler}
+
+
+% \textit{estimates
+%   the universal coverage set $U$}, a set of fragment that the given
+% concurrent jobs possibly execute.
+
+% If the universal coverage set $U$ contains coverage that are not yet
+% observed, we determine that the interleaving is worthy of further
+% mutating.
+
 
 \begin{itemize}
 \item an intuition for an interleaving mutation
