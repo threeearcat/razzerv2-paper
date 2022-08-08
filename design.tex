@@ -228,29 +228,32 @@ likely covered by mutations of the interleaving. In this example,
 \texttt{Segment 1'}, \texttt{Segment 2'}, and \texttt{Segment 3'} are
 elements of $U^*$.
 %%
-If $U^*$ is not empty, we mutate the interleaving toward scheduling
-constraint pairs in $U^*$.
+If $U^*$ is not empty, we decide to mutate the interleaving. 
 
 
-Lastly, we mutate the interleaving \textit{directed towards scheduling
-  constraint pairs in $U^*$}.
+The last step is to mutate the interleaving to find new
+coverage. Since $U^*$ contains scheduling constraint pairs that are
+likely found, our interleaving mutation is \textit{directed to expose
+  scheduling constraint pairs contained in $U^*$}.
 %
-
-Since scheduling constraint pairs in $U^*$
-
-In \autoref{fig:overview}-(c), \texttt{Segment 1'} and
-\texttt{Segment 2'} are exclusive with each other; a single
-interleaivng cannot fulfill these two scheduling constraint pairs as
-they make a contradiction on the executin order of \texttt{A1} and
-\texttt{B1}.
+Given $U^*$, we select scheduling constraint pairs that are not
+exclusive with each other for a single mutation.
 %
-However, \texttt{Segment 1'} \texttt{Segment 3'} are not exclusive to
-each other; we can imagine an instrucion sequence
+In \autoref{fig:overview}-(c), \texttt{Segment 1'} \texttt{Segment 3'}
+are not exclusive to each other; as described in
+\autoref{fig:overview}-(d), we can imagine an instrucion sequence that
+cover the two scheduling constraint pairs,
 $\texttt{A1} \rightarrow \texttt{B1} \rightarrow \texttt{B4}
 \rightarrow \texttt{A2} \rightarrow \texttt{A3} \rightarrow
 \texttt{B5}$.
 %
-
+However, \texttt{Segment 1'} and \texttt{Segment 2'} are exclusive; a
+single interleaivng cannot fulfill these two scheduling constraint
+pairs as they make a contradiction on the executin order of
+\texttt{A1} and \texttt{B1}.
+%
+Therefore, we repeat selecting scheduling constraint pairs and
+generating an interleaving until $U^*$ is empty.
 
 
 
