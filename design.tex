@@ -1,11 +1,6 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
-
-\newcommand{\segment}{segment graph\xspace}
-\newcommand{\segments}{segment graphs\xspace}
-\newcommand{\Segments}{Segment graphs\xspace}
-
 \cut{
 \begin{itemize}
 \item our approach in one sentence: defining the universal set $U$
@@ -111,7 +106,7 @@ another thread (thread~B) only if thread~B reads a value written by
 thread~A, scheduling constraints should be established on a pair of
 conflicting memory access operations.
 
-To reflect the nature of race conditions, we propose a novel coverage
+To reflect this nature of race conditions, we propose a novel coverage
 metric, called biconflict coverage, that tracks the execution order of
 two pairs of conflicting memory access operations.
 %
@@ -149,9 +144,11 @@ However, it is worth noting that many scheduling constraint pairs are
 not exclusive.
 %
 When a concurrent job is executed conforming with an interleaving, we
-can observe that the interleaving follows many scheduling constraint
-pairs simultaneously. \dr{example?}
+can observe that the interleaving obeys many scheduling constraint
+pairs simultaneously.
 %
+\dr{example}
+
 Our intuition to explore the interleaivng space is based on the
 observation.
 %
@@ -183,25 +180,27 @@ offending scheduling constraint pair,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 \texttt{A2})$.
 
-With the given input, the first task is to track biconflict coverage.
-In the given interleaving of \autoref{fig:overview}-(a), there are
-three individual pairs conflicting accesses,
-$\texttt{A1} \rightarrow \texttt{B1}$,
+With the given input, the first step is to track biconflict coverage.
+In the given interleaving of \autoref{fig:overview}-(a), three
+scheduling constraints (\ie, $\texttt{A1} \rightarrow \texttt{B1}$,
 $\texttt{A2} \rightarrow \texttt{B4}$, and
-$\texttt{B5} \rightarrow \texttt{A3}$.
+$\texttt{B5} \rightarrow \texttt{A3}$) are fulfilled.
 %
-\dr{}
-As described in \autoref{fig:overview}-(b), we compute biconflict
-coverage consisting of three segments,
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{A2} \wedge
+By pairing these scheduling constraints, we construct three scheduling
+contraint pairs, namely
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{A2} \rightarrow
 \texttt{B4})$,
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B5} \wedge
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B5} \rightarrow
 \texttt{A3})$, and
-$(\texttt{A2} \rightarrow \texttt{B4}) \wedge (\texttt{B5} \wedge
+$(\texttt{A2} \rightarrow \texttt{B4}) \wedge (\texttt{B5} \rightarrow
 \texttt{A3})$.
 %
+\autoref{fig:overview}-(b) represents the three scheduling constraint
+pairs.
+%
 Assuming we initially have empty biconflict coverage, the three
-segments are recorded as new coverage of the given interleaivng.
+scheduling constraint pairs are recorded as new coverage of the given
+interleaivng.
 
 
 
@@ -211,43 +210,47 @@ determine whether the interleaving is worth further mutation.
 To this end, we adopt a strategy to \textit{predict coverage that is
   likley found when the interleaving is mutated}.
 %
-Taking the example of \autoref{fig:overview}-(c), we can derive
-\texttt{Segment 1'} from \texttt{Segment 1} by flipping the execution
-order of $\texttt{A2} \rightarrow \texttt{B4}$ to
+Taking the example of \autoref{fig:overview}-(c), we can derive a
+scheduling constraint pair \texttt{Segment 1'} from \texttt{Segment 1}
+by flipping the execution order of
+$\texttt{A2} \rightarrow \texttt{B4}$ to
 $\texttt{B4} \rightarrow \texttt{A2}$.
 %
-Since \texttt{Segment 1'} has not been observed yet, if we run an
-interleaving that $\texttt{A1} \rightarrow \texttt{B1}$ and
-$\texttt{B4} \rightarrow \texttt{A2}$, we can expand biconflict
-coverage with \texttt{Segment 1'}.
-%
 Similarily, \texttt{Segment 2'} and \texttt{Segment 3'} can be derived
-from \texttt{Segment 2} and \texttt{Segment 3}.
+from \texttt{Segment 2} and \texttt{Segment 3} respectively.
 %
-We denote $U^*$ as a set of segment that are likely covered by
-mutations of the interleaving. In this example, \texttt{Segment 1'},
-\texttt{Segment 2'}, and \texttt{Segment 3'} are a subset of $U^*$.
+Since the three derived scheduling constraint pairs have not been
+observed yet, we can expect other interleavings that cover the derived
+scheduling constraints.
+%
+We denote $U^*$ as a set of scheduling constraint pairs that are
+likely covered by mutations of the interleaving. In this example,
+\texttt{Segment 1'}, \texttt{Segment 2'}, and \texttt{Segment 3'} are
+elements of $U^*$.
 %%
-If $U^*$ is not empty, we mutate the interleaving toward segments in
-$U*$.
+If $U^*$ is not empty, we mutate the interleaving toward scheduling
+constraint pairs in $U^*$.
 
 
-
-
-Lastly, given $U^*$, we mutate the interleaving \textit{directed
-  towards undisclosed coverages in $U*$}.
+Lastly, we mutate the interleaving \textit{directed towards scheduling
+  constraint pairs in $U^*$}.
 %
-Since we know
 
-by rescheduling memory
-access operations in the given interleaving.
+Since scheduling constraint pairs in $U^*$
+
+In \autoref{fig:overview}-(c), \texttt{Segment 1'} and
+\texttt{Segment 2'} are exclusive with each other; a single
+interleaivng cannot fulfill these two scheduling constraint pairs as
+they make a contradiction on the executin order of \texttt{A1} and
+\texttt{B1}.
 %
-Since we compute  universal coverage set $U$ 
-
-Our mutation is 
-
+However, \texttt{Segment 1'} \texttt{Segment 3'} are not exclusive to
+each other; we can imagine an instrucion sequence
+$\texttt{A1} \rightarrow \texttt{B1} \rightarrow \texttt{B4}
+\rightarrow \texttt{A2} \rightarrow \texttt{A3} \rightarrow
+\texttt{B5}$.
 %
-And then, to produce other interleavings, our interleaving mutation is
+
 
 
 
@@ -422,6 +425,9 @@ And then, to produce other interleavings, our interleaving mutation is
   \caption{interleaving graph}
   \label{fig:interleaving-graph}
 \end{figure}
+\newcommand{\segment}{segment graph\xspace}
+\newcommand{\segments}{segment graphs\xspace}
+\newcommand{\Segments}{Segment graphs\xspace}
 
 In order to represent a partial order of memory accesses, we propose a
 form of directed acyclic graph (DAG) called interleaving graph.
