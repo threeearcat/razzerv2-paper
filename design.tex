@@ -91,6 +91,8 @@ As a result, we generate various interleavings of the given concurrent
 job that disclose different concurrency coverage.
 %
 \dr{This does not mention the race-steered control flow.}
+%
+\dr{what about sequential coverage and mutations?}
 
 \PP{Biconflict coverage}
 %
@@ -402,8 +404,7 @@ generating an interleaving until $U^*$ is empty.
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
 
-\dr{rewrite all}
-
+\cut{
 \begin{itemize}
 \item how?
   \begin{itemize}
@@ -421,103 +422,122 @@ generating an interleaving until $U^*$ is empty.
   \item we represent a coverage using a graph (?)
   \end{itemize}
 \end{itemize}
+}
 
 
-
-\begin{figure}[t]
-  \caption{interleaving graph}
-  \label{fig:interleaving-graph}
-\end{figure}
 \newcommand{\segment}{segment graph\xspace}
 \newcommand{\segments}{segment graphs\xspace}
 \newcommand{\Segments}{Segment graphs\xspace}
 
-In order to represent a partial order of memory accesses, we propose a
-form of directed acyclic graph (DAG) called interleaving graph.
-%
-An interleaving graph describes an interleaving of concurrent jobs,
-and represents partial orders between instructions.
-%
-In an interleaving graph, vertices indicate memory access operations,
-and edges represent partial orders between these operations.
-%
-If there is a path from a vertex from another vertex, then the
-execution order of two operations is established.
-
-We categorize edges into two types, called \immutables and \mutables.
-%
-A \immutable corresponds to a program order in which instructions
-appear on a thread~\cite{frightening, lkmm}. As a program order is
-defined between instructions executed by the same thread, all
-\immutables connect instructions from the same thread.
-%
-On the other hand, a \mutable is responsible to connect conflicting
-instructions that 1) are executed by different threads, 2) access the
-same memory location, and 3) at least one of them is write.
-%
-Therefore, the execution order of instructions connected by a \mutable
-may directly affect the behavior of a program.
-
-
-\autoref{fig:interleaving-graph} shows an example of an interleaving
-graph.
-%
-\dr{TODO:}
-
-
-\dr{TODO: imprecise description}
-%
-In terms of interleaving, \immutables and \mutables have different
-properties. Let us suppose we have two interleaving graphs derived
-from different interleavings of the same concurrent jobs.
-%
-As \immutables represent program orders, direction of \immutables does
-not differ in the two interleaving graphs.
-%
-Whereas, a direction of \mutables may be different in the two
-interleaving graphs.
-%
-It is worth noting that an edge may appear in only one interleaving
-graph regardless of its type. This is because the control flow may be
-changed according to the change of the data flow.
-
-
-\PP{Segment of interleaving graph as coverage}
-%
-Although all execution order of conflicting instructions (\ie,
-\mutables) in an interleaving graph may affect an outcome, we
-concentrate on a small number of instructions because a few
-instructions are enough to cause most ``interesting'' behaviors, \ie,
+As described in \autoref{ss:overview}, we propose a novel coverage
+metric, called biconflict coverage, to address the empirical nature of
 race conditions.
+%
+Biconflict converage is designed to track conjunctions of scheduling
+constraints, and if per-input biconflict coverage is saturated, we
+confidently conclude that the input does not cause a race condition.
 
-\dr{divide?}
-%
-We thus divide the interleaving graph into a set of subgraphs called
-interleaving segment graphs, short for \segments.
-%
-While the interleaving graph represents a whole interleaving, an
-\segment is a subgraph of the given interleaving graph that contains
-two \mutables and at most four vertices. In addition, vertices in a
-\segment are connected by at least one \mutable.
+\PP{Definition of biconflict coverage}
 
-We capture \segments as coverage of a given interleaving of concurrent
-jobs.
+\PP{Tracking biconflict coverage}
 %
-If a new \segment is not found while continuing to run the concurrent
-jobs with different interleavings, the concurrent jobs unlikely expose
-a race condition. In other words, if we collect all \segments of
-concurrent jobs, we can lower the priority of the concurrent jobs.
-%
-It is worth noting that we select four as the maximum number of
-vertices in a \segment because not only it is enough for most race
-conditions, but also \dr{}...
+In order to track biconflict coverage for a given interleaving, we
+first transform an interleaving into a directed acyclic graph (DAG).
 
-In order to identify \segments from execution, we need to know the
-total order of memory accesses. Otherwise, we may miss the execution
-order between instructions so cannot faithfully capture \segments.
+
+Therefore, each scheduling constraint pair is represented as a small
+subgraph which contains two edges connecting at most four vertices. 
+
+\PP{Feedback mechanism}
 %
-Therefore, our scheduling mechanism serializes execution of concurrent
-jobs during fuzzing. Details are described later in \autoref{s:impl}.
+
+
+% a partial order of memory accesses, we propose a
+% form of directed acyclic graph (DAG) called interleaving graph.
+% %
+% An interleaving graph describes an interleaving of concurrent jobs,
+% and represents partial orders between instructions.
+% %
+% In an interleaving graph, vertices indicate memory access operations,
+% and edges represent partial orders between these operations.
+% %
+% If there is a path from a vertex from another vertex, then the
+% execution order of two operations is established.
+
+% We categorize edges into two types, called \immutables and \mutables.
+% %
+% A \immutable corresponds to a program order in which instructions
+% appear on a thread~\cite{frightening, lkmm}. As a program order is
+% defined between instructions executed by the same thread, all
+% \immutables connect instructions from the same thread.
+% %
+% On the other hand, a \mutable is responsible to connect conflicting
+% instructions that 1) are executed by different threads, 2) access the
+% same memory location, and 3) at least one of them is write.
+% %
+% Therefore, the execution order of instructions connected by a \mutable
+% may directly affect the behavior of a program.
+
+
+% \autoref{fig:interleaving-graph} shows an example of an interleaving
+% graph.
+% %
+% \dr{TODO:}
+
+
+% \dr{TODO: imprecise description}
+% %
+% In terms of interleaving, \immutables and \mutables have different
+% properties. Let us suppose we have two interleaving graphs derived
+% from different interleavings of the same concurrent jobs.
+% %
+% As \immutables represent program orders, direction of \immutables does
+% not differ in the two interleaving graphs.
+% %
+% Whereas, a direction of \mutables may be different in the two
+% interleaving graphs.
+% %
+% It is worth noting that an edge may appear in only one interleaving
+% graph regardless of its type. This is because the control flow may be
+% changed according to the change of the data flow.
+
+
+% \PP{Segment of interleaving graph as coverage}
+% %
+% Although all execution order of conflicting instructions (\ie,
+% \mutables) in an interleaving graph may affect an outcome, we
+% concentrate on a small number of instructions because a few
+% instructions are enough to cause most ``interesting'' behaviors, \ie,
+% race conditions.
+
+% \dr{divide?}
+% %
+% We thus divide the interleaving graph into a set of subgraphs called
+% interleaving segment graphs, short for \segments.
+% %
+% While the interleaving graph represents a whole interleaving, an
+% \segment is a subgraph of the given interleaving graph that contains
+% two \mutables and at most four vertices. In addition, vertices in a
+% \segment are connected by at least one \mutable.
+
+% We capture \segments as coverage of a given interleaving of concurrent
+% jobs.
+% %
+% If a new \segment is not found while continuing to run the concurrent
+% jobs with different interleavings, the concurrent jobs unlikely expose
+% a race condition. In other words, if we collect all \segments of
+% concurrent jobs, we can lower the priority of the concurrent jobs.
+% %
+% It is worth noting that we select four as the maximum number of
+% vertices in a \segment because not only it is enough for most race
+% conditions, but also \dr{}...
+
+% In order to identify \segments from execution, we need to know the
+% total order of memory accesses. Otherwise, we may miss the execution
+% order between instructions so cannot faithfully capture \segments.
+% %
+% Therefore, our scheduling mechanism serializes execution of concurrent
+% jobs during fuzzing. Details are described later in \autoref{s:impl}.
 
 
 \subsection{Interleaving Mutation}
@@ -532,7 +552,7 @@ jobs during fuzzing. Details are described later in \autoref{s:impl}.
 % observed, we determine that the interleaving is worthy of further
 % mutating.
 
-
+\cut{
 \begin{itemize}
 \item an intuition for an interleaving mutation
   \begin{itemize}
@@ -547,6 +567,7 @@ jobs during fuzzing. Details are described later in \autoref{s:impl}.
   \item step 4: generate an interleaving to test
   \end{itemize}
 \end{itemize}
+}
 
 
 
@@ -560,15 +581,16 @@ studies.
 Instead of randomly selecting scheduling points~\cite{krace, ski} or
 changing the execution order of a few instructions~\cite{razzer,
   snowboard}, we draw a whole hypothetical interleaving directed
-towards uncaptured \segments.
+towards undisclosed scheduling constraint pairs.
 %
 To this end, our interleaving mutation consists of three steps:
 %
-1) identifying uncaptured \segments, 2) selecting \textit{harmonious}
-\segments, and 3) generating scheduling points to test the selected
-\segments.
+1) identifying undisclosed scheduling constraint pairs, 2) selecting
+undisclosed scheduling constraint pairs that are not exclusive, and 3)
+generating scheduling points to test the selected scheduling
+constraint pairs.
 
-\PP{Identifying uncaptured segment graphs}
+\PP{Identifying undisclosed scheduling constraint pairs}
 %
 Given \segments derived from an interleaving, identifying uncaptured
 \segments is the first step of interleaving mutation for generating

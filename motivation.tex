@@ -69,16 +69,16 @@ device driver into a user address space and
  
 
 % \yj{Are you talking about \autoref{fig:alias-coverage}?}
-The race condition manifests depending on four memory accesses,
-\texttt{A1} and \texttt{A2} in thread~A, and \texttt{B1} and
-\texttt{B4} in thread~B. Let us suppose \texttt{alloc->vma} and
-\texttt{alloc->mm} are initially \texttt{NULL}.
+Assuming \texttt{alloc->vma} and \texttt{alloc->mm} are initially
+\texttt{NULL}, the race condition manifests depending on the execution
+order of four memory accesses, \texttt{A1} and \texttt{A2} in
+thread~A, and \texttt{B1} and \texttt{B4} in thread~B.
 %
 During mapping the device driver into a user address space, thread~A
 sets \texttt{alloc->vma} and \texttt{alloc->mm} to non-NULL pointers
 at \texttt{A1} and \texttt{A2}.
 %
-However, since these two store operations are not atomically executed,
+However, since these store operations are not atomically executed,
 thread~B may intervene in the middle of these two operations.
 %
 In that case, if \texttt{A1} is executed before \texttt{B1}, thread~B
@@ -210,8 +210,8 @@ the two threads conflict on \texttt{alloc->vma}, and in \texttt{Input
 
 In this example, if we adopt a coverage metric that focuses on a
 single pair of conflicting accesses (\eg, alias coverage), a fuzzer
-may not recognize that \texttt{Input 3} may exhibit a behavior
-different than \texttt{Input 1} and \texttt{Input 2}~(\ie, a
+may not recognize that \texttt{Input 3} may exhibit a different
+behavior than \texttt{Input 1} and \texttt{Input 2}~(\ie, a
 NULL-dereference bug).
 %
 \autoref{fig:alias-coverage-interleaving} shows four interleavings
