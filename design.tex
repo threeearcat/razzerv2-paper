@@ -427,32 +427,73 @@ generating an interleaving until $U^*$ is empty.
 \end{itemize}
 }
 
-
-\newcommand{\segment}{segment graph\xspace}
-\newcommand{\segments}{segment graphs\xspace}
-\newcommand{\Segments}{Segment graphs\xspace}
-
 As described in \autoref{ss:overview}, we propose a novel coverage
 metric, called biconflict coverage, to address the empirical nature of
 race conditions.
 %
 Biconflict converage is designed to track conjunctions of scheduling
 constraints, and if per-input biconflict coverage is saturated, we
-confidently conclude that the input does not cause a race condition.
+confidently conclude that the concurrent job unlikely cause a race
+condition.
+
+We track biconflict coverage \textit{offline}. During the runtime, we
+only collect memory access operations conducted by the conrrent job,
+and after executing the concurrent job, we measure biconflict coverage
+of the concurrent job.
 
 \PP{Definition of biconflict coverage}
+%
+Let us represent a memory access operation $M$ as four tuples,
+$(tid, addr, op, timestamp)$ where $tid$ is the identity of a thread,
+$addr$ is the address of the memory location, $op$ is the type of the
+memory access operation (\ie, store or load), and $timestamp$
+indicates the point of time when the memory access operation is taken.
+%
+Also let us suppose all memory access operations are totally
+ordered. \ie, there are no two memory access operations that have the
+same $timestamp$.
+
+For all pair of memory access operations $M_i$ and $M_j$, we define a
+scheduling constraint $SC = (M_i, M_j)$ if 1)
+$tid(M_i) \neq tid(M_j)$, 2) $op(M_i) = store$ or $op(M_j) = store$
+and 3) $timestamp(M_i) < timestamp(M_j)$.
+
+Then, we define a scheduling constraint pair $SCPair = (SC_i, SC_j)$
+if ...
+
+
+
+
+
 
 \PP{Tracking biconflict coverage}
 %
 In order to track biconflict coverage for a given interleaving, we
-first transform an interleaving into a directed acyclic graph (DAG).
+first transform an interleaving into a directed acyclic graph (DAG),
+called an interleaving graph.
+%
+In an interleaving graph, vertices indicate memory access operations,
+and edges represent partial orders between these operations.
+%
 
+\autoref{fig:interleaving-graph} shows an interelaving graph
+corresponding to an interleaving described in
+\autoref{fig:overview}-(a).
 
 Therefore, each scheduling constraint pair is represented as a small
 subgraph which contains two edges connecting at most four vertices. 
 
 \PP{Feedback mechanism}
 %
+
+\newcommand{\segment}{segment graph\xspace}
+\newcommand{\segments}{segment graphs\xspace}
+\newcommand{\Segments}{Segment graphs\xspace}
+
+%
+
+
+
 
 
 % a partial order of memory accesses, we propose a
@@ -585,31 +626,12 @@ Instead of randomly selecting scheduling points~\cite{krace, ski} or
 changing the execution order of a few instructions~\cite{razzer,
   snowboard}, we draw a whole hypothetical interleaving directed
 towards undisclosed scheduling constraint pairs.
+
+To this end, our interleaving mutation consists of two steps:
 %
-To this end, our interleaving mutation consists of three steps:
-%
-1) identifying undisclosed scheduling constraint pairs, 2) selecting
-undisclosed scheduling constraint pairs that are not exclusive, and 3)
-generating scheduling points to test the selected scheduling
-constraint pairs.
-
-\PP{Identifying undisclosed scheduling constraint pairs}
-%
-Given \segments derived from an interleaving, identifying uncaptured
-\segments is the first step of interleaving mutation for generating
-another interleaving.
-%
-For each \segment, we change directions of \mutables to infer
-uncaptured \segments.
-%
-As each \segment contains two \mutables, at most four uncaptured
-\segments are derived for one \segment.
-
-\dr{TODO:}...
-
-
-
-
+1) selecting undisclosed scheduling constraint pairs that are not
+exclusive, and 2) generating scheduling points to test the selected
+scheduling constraint pairs.
 
 
 \PP{Selecting interleaving segments to direct}
