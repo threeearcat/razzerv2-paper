@@ -9,7 +9,7 @@ of conflicting accesses.
 Because of this gap\yj{xx}, prior approaches shows inefficiency in finding race
 conditions.
 
-In this section, we first describe when and how concurrency bugs
+In this section, we first describe when and how race conditions
 manifest to comprehend what interleavings should be tested to find
 race conditions.
 %
@@ -33,9 +33,9 @@ Furthermore, a few literatures~\cite{pctalgorithm, ski, snorlax,
   constraints} for most race conditions is small.
 %
 A scheduling constraint indicates an ordering constraint between a
-single pair of instructions, such that thread~A executes an
-instruction \texttt{X} before thread~B executes another instruction
-\texttt{Y}.
+single pair of instructions executed different threads, such that an
+instruction \texttt{X} is executed before \texttt{Y} (denoted as
+$\texttt{X} \rightarrow \texttt{Y}$).
 %
 In terms of scheduling constraint, a race condition manifests if a
 \textit{conjunction of a small number of scheduling constraints} are
@@ -90,10 +90,9 @@ causing a NULL-dereference bug.
 In this example, we can confirm that the manifestation of the race
 condition follows the implications of previous studies; the race
 condition manifests if \textit{two} scheduling constraints on
-\textit{four} memory access operations are met (\ie,
+\textit{four} memory access operations (\ie,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$~\footnote{In this paper, $X \rightarrow Y$ indicates
-  that $X$ is executed before $Y$.}).
+\texttt{A2})$) are conjunctively satisfied.
 
 
 % One of the factors that makes it difficult to find concurrency bugs is
@@ -267,9 +266,9 @@ test the input enough.
 
 \PP{Our goal}
 %
-Our goal is to design a fuzzer to effectively explore the interleaving
-space with a purpose of testing combinations of multiple pairs of
-conflicting access operations as many as possible.
+Our goal is to design a fuzzer to explore the interleaving space with
+a purpose of effectively testing conjunctions of scheduling
+constraints.
 %
 % Considering characteristics of concurrency bugs mentioned above, it
 % will increase the probabilty of finding more concurrency bugs if we
@@ -278,11 +277,8 @@ conflicting access operations as many as possible.
 
 To this end, we organize subgoals as follows:
 %
-1) We first design a coverage metric to track combinations of pairs of
-conflicting accesses,
-% By this coverage metric, we do not waste the
-% computing power for uninteresting inputs, and not de-prioritize inputs
-% in which there are more unexplored interleavings.
+1) We first design a coverage metric to track conjunctions of
+scheduling constraints,
 %
 2) based on the coverage metric, we design an instruction scheduling
 algorithm that quickly saturate the coverage metric, and lastly,

@@ -81,16 +81,16 @@ coverage~(\autoref{ss:scheduler}).
 
 Our approach to explore the interleaving space assumes that a
 concurrent job (\eg, a set of syscalls) and an initial interleaving
-(\eg, a seed interleaving) of the concurrent job are given as an
-input. We also assume that all memory access operations are totally
-ordered.
+(\ie, a seed interleaving) of the concurrent job are given as an
+input. We also assume that all memory access operations in a seed
+interleaving are totally ordered.
 
 With the given input, we deal with the interleaving as a subject of
-mutation. In other words, from the given interleaving, we first track
-coverage in the concurrency dimension (shortly, concurrency coverage)
-that tracks multiple pairs of conflicting accesses. After that, we
-generate other interleavings by rescheduling instructions for finding
-new concurrency coverage.
+mutation. In other words, from the given seed interleaving, we first
+track coverage in the concurrency dimension (shortly, concurrency
+coverage) that tracks conjunctions of scheduling constraints. After
+that, we generate other interleavings by rescheduling instructions for
+finding new concurrency coverage.
 %
 As a result, we generate various interleavings of the given concurrent
 job that disclose different concurrency coverage.
@@ -108,30 +108,25 @@ manifest if at most \textit{two} scheduling constraints on at most
 %
 Furthermore, considering a thread (thread~A) may affect execution of
 another thread (thread~B) only if thread~B reads a value written by
-thread~A, scheduling constraints should be established on conflicting
-memory access operations.
+thread~A, scheduling constraints should be established on a pair of
+conflicting memory access operations.
 
-Therefore, we propose a novel coverage metric, called biconflict
-coverage, that tracks the execution order of two pairs of conflicting
-memory access operations.
+To reflect the nature of race conditions, we propose a novel coverage
+metric, called biconflict coverage, that tracks the execution order of
+two pairs of conflicting memory access operations.
 %
 As biconflict coverage tracks the sufficient condition for most race
 conditions to manifest, if we find all biconflict coverage in the
 given concurrent job, we have a strong confidence that the concurrent
 job does not reveal a race condition.
 
-Throughout the rest of this paper, we name an interleaving fragment as
-a subpart of an interleaving that represents two scheduling
-contraints. For example, the race condition in
-\autoref{fig:cve-2019-6974} is caused by an interleaving fragment
+Throughout the rest of this paper, a term ``scheduling constraint
+pair'' denotes a conjunction of two scheduling constraints, and a term
+``offending scheduling constraint pair'' denotes a scheduling
+constraint pair that causes a race condition.  For example,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$.
-
-
-\dr{univeral fragment set U}
-
-
-
+\texttt{A2})$ is an offending scheduling constraint pair of the race
+condition in \autoref{fig:cve-2019-6974}.
 
 \PP{Challenge}
 %
@@ -146,25 +141,27 @@ $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 One could argue that tracking biconflict coverage is intractable since
 the size of the search space is too large.
 %
-If two threads conflict on $N$ pairs of accesses, the number of two
-pairs of conflicting accesses is propotional to $N^2$, which is
-possibly too large to test one-by-one.
+If two threads conflict on $N$ pairs of memory accesses, the number of
+scheduling constraint pairs is propotional to $N^2$, which is possibly
+too large to test one-by-one.
 
-However, it is worth noting that many interleaving fragments are not
-exclusive.
+However, it is worth noting that many scheduling constraint pairs are
+not exclusive.
 %
-When we execute a concurrent job once yielding an interleaving of
-memory access operations, we can observe many interleaving fragments
-simultaneously in the interleaving.
+When a concurrent job is executed conforming with an interleaving, we
+can observe that the interleaving follows many scheduling constraint
+pairs simultaneously. \dr{example?}
 %
-Based on the observation, we can generate instructions in a
-\textit{smart} way.
+Our intuition to explore the interleaivng space is based on the
+observation.
 %
-In other words, if we know which fragments are not yet disclosed from
-a universal fragment set $U$, we can schedule instructions to
-experience undisclosed fragments.
-
-
+Let us suppose we know which scheduling constraint pairs are
+undisclosed. Among undisclosed scheduling constraint pairs, we can
+select scheduling constraint pairs that are not exclusive with each
+other, and schedule instructions to experience the selected
+scheduling constraint pairs.
+%
+\dr{TODO: define univeral set U of scheduling constraints}
 
 
 \PP{Overall steps}
@@ -181,9 +178,10 @@ $\texttt{A1} \rightarrow \texttt{A2} \rightarrow \texttt{B1}
 \texttt{A3}$.
 %
 In the given interleaving, the race condition does not manifest since
-its scheduling constraints are
+\texttt{A2} is executed before \texttt{B4}, which violates the
+offending scheduling constraint pair,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$, but \texttt{A2} is executed before \texttt{B4}.
+\texttt{A2})$.
 
 With the given input, the first task is to track biconflict coverage.
 In the given interleaving of \autoref{fig:overview}-(a), there are
