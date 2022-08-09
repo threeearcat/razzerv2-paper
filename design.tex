@@ -482,15 +482,13 @@ access operation sequence.
 
 
 
-\PP{Feedback mechanism}
-%
-\dr{TODO: rename this paragraph}
+\PP{Predicting potential coverage}
 %
 An interleaving finding new biconflict coverage likely exposes a
 behavior that was unrevealed before.
 %
-Therefore, if new biconflict coverage is found, the fuzzer mutates the
-interleaving to discover more interesting behaviors. \ie, the fuzzer
+To discover more interesting behaviors, if new biconflict coverage is
+found, the fuzzer mutates the interleaving. \ie, the fuzzer
 reschedules instructions to conform with other interleavings.
 
 Before mutating an interleaving, the fuzzer predicts \textit{XXX}, a
