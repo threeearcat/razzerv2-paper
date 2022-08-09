@@ -467,17 +467,18 @@ ordered. \ie, there are no two memory access operations that have the
 same $timestamp$.
 
 For all pair of memory access operations $M_i$ and $M_j$, we define a
-scheduling constraint $SC = (M_i, M_j$) if $M_i(tid) \neq M_j(tid)$,
-$M_i(addr) = M_j(addr)$, $M_i(op) = store\; or\; M_j(op) = store$, and
+scheduling constraint $SC$ as a tuple $(M_i, M_j)$ if
+$M_i(tid) \neq M_j(tid)$, $M_i(addr) = M_j(addr)$,
+$M_i(op) = store \vee M_j(op) = store$, and
 $M_i(timestamp) < M_j(timestamp)$.
 %
 Informally, $M_i$ and $M_j$ are conflicting memory acceess operations
 that are executed in other threads, and $M_i$ was taken place before
 $M_j$.
 %
-For two scheduling constraint $SC_1(=(M_{1i}, M_{1j}))$ and
-$SC_2(=(M_{2i}, M_{2j}))$, $SC_1 = SC_2$ if
-$M_{1i} = M_{2i} \wedge M_{1j} = M_{2j}$.
+For two scheduling constraint $SC_1(M_{1i}, M_{1j})$ and
+$SC_2(M_{2i}, M_{2j})$, $SC_1 = SC_2$ if
+$(M_{1i} = M_{2i}) \wedge (M_{1j} = M_{2j})$.
 %
 Then, we define a scheduling constraint pair $SCPair = (SC_i, SC_j)$
 for two scheduling constraints if $i < j$, $SC_i \neq SC_j$.
