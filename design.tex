@@ -437,7 +437,7 @@ race conditions.
 %
 Biconflict converage is designed to track conjunctions of scheduling
 constraints, and if per-input biconflict coverage is saturated, we
-confidently conclude that the concurrent job unlikely cause a race
+confidently conclude that the concurrent job unlikely causes a race
 condition.
 
 We track biconflict coverage \textit{offline}. During the runtime, we
@@ -484,12 +484,18 @@ operation sequence.
 
 
 
-
-
 \PP{Feedback mechanism}
 %
 \dr{TODO: rename this paragraph}
 %
+Finding new biconflict coverage indicates a new interleaivng is
+executed.
+%
+
+The concurrent job is worth further execution with different
+linterleavings.
+
+
 Instead of following previous approaches that
 
 
