@@ -210,6 +210,9 @@ interleaivng.
 
 
 
+\dr{change this step into two?: feedback from new coverage ->
+  pridicting undisclosed coverage}
+%
 After tracking biconflict coverage from the given interleaving, we
 determine whether the interleaving is worth further mutation.
 %
@@ -483,33 +486,11 @@ operation sequence.
 
 
 
-\cut{
-\PP{Tracking biconflict coverage}
+\PP{Feedback mechanism}
 %
-In order to track biconflict coverage for a given interleaving, we
-first transform an interleaving into a directed acyclic graph (DAG),
-called an interleaving graph.
+\dr{TODO: rename this paragraph}
 %
-In an interleaving graph, vertices indicate memory access operations,
-and edges represent partial orders between these operations.
-%
-
-\autoref{fig:interleaving-graph} shows an interelaving graph
-corresponding to an interleaving described in
-\autoref{fig:overview}-(a).
-
-Therefore, each scheduling constraint pair is represented as a small
-subgraph which contains two edges connecting at most four vertices.
-}
-
-\PP{Predicting ...}
-%
-
-\newcommand{\segment}{segment graph\xspace}
-\newcommand{\segments}{segment graphs\xspace}
-\newcommand{\Segments}{Segment graphs\xspace}
-
-%
+Instead of following previous approaches that
 
 
 
@@ -606,6 +587,11 @@ subgraph which contains two edges connecting at most four vertices.
 \subsection{Interleaving Mutation}
 \label{ss:scheduler}
 
+\newcommand{\segment}{segment graph\xspace}
+\newcommand{\segments}{segment graphs\xspace}
+\newcommand{\Segments}{Segment graphs\xspace}
+
+%
 
 % \textit{estimates
 %   the universal coverage set $U$}, a set of fragment that the given
