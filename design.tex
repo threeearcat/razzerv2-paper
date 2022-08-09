@@ -149,7 +149,8 @@ When a concurrent job is executed conforming with an interleaving, we
 can observe that the interleaving obeys many scheduling constraint
 pairs simultaneously.
 %
-\dr{example}
+\dr{TODO: fix figure 2 to represent failure-oblivious instructions and
+  use the instructions as an example of this case}
 
 Our intuition to explore the interleaivng space is based on the
 observation.
@@ -446,21 +447,37 @@ of the concurrent job.
 Let us represent a memory access operation $M$ as four tuples,
 $(tid, addr, op, timestamp)$ where $tid$ is the identity of a thread,
 $addr$ is the address of the memory location, $op$ is the type of the
-memory access operation (\ie, store or load), and $timestamp$
+memory access operation (\ie, $store$ or $load$), and $timestamp$
 indicates the point of time when the memory access operation is taken.
+%
+$M(x)$ detnoes a field $x$ of $M$. For example, $M(tid)$ is a $tid$
+field of a memory access operation $M$.
 %
 Also let us suppose all memory access operations are totally
 ordered. \ie, there are no two memory access operations that have the
 same $timestamp$.
 
 For all pair of memory access operations $M_i$ and $M_j$, we define a
-scheduling constraint $SC = (M_i, M_j)$ if 1)
-$tid(M_i) \neq tid(M_j)$, 2) $op(M_i) = store$ or $op(M_j) = store$
-and 3) $timestamp(M_i) < timestamp(M_j)$.
-
+scheduling constraint $SC$ as a \textit{directed} pair
+($M_i \Rightarrow M_j$) if $M_i(tid) \neq M_j(tid)$,
+$M_i(addr) = M_j(addr)$, $M_i(op) = store\; or\; M_j(op) = store$, and
+$M_i(timestamp) < M_j(timestamp)$.
+%
+Informally, $M_i$ and $M_j$ are conflicting memory acceess operations
+that are executed in other threads, and $M_i$ was taken place before
+$M_j$.
+%
 Then, we define a scheduling constraint pair $SCPair = (SC_i, SC_j)$
-if ...
-
+for two scheduling constraints if $i < j$, $SC_i \neq SC_j$.
+%
+\dr{i < j is to eliminate duplicates. (SC_i, SC_j) and (SC_j, SC_i)}
+%
+\dr{TODO: explain what $SC_i \neq SC_j$ means}
+%
+Lastly, biconflict coverage of the concurrent job is defined as a set
+of all scheduling constraint pairs,
+$\{SCPair_1, SCPair_2, ..., SCPair_n\}$, defined from its memory access
+operation sequence.
 
 
 
