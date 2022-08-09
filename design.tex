@@ -488,15 +488,19 @@ operation sequence.
 %
 \dr{TODO: rename this paragraph}
 %
-Finding new biconflict coverage indicates a new interleaivng is
-executed.
+An interleaving finding new biconflict coverage may expose a behavior
+that was unrevealed before.
 %
+If new biconflict coverage is found, we mutate the interleaving to
+discover more interesting behaviors.
 
-The concurrent job is worth further execution with different
-linterleavings.
 
+Instead of blindly mutating the interleaving, we adopt a mutation
+strategy \textit{directed} by \textit{XXX}.
+%
+A \textit{XXX} is a scheduling constraint pair that has not been
+observed, but is expected to occur when mutating the interleaving.
 
-Instead of following previous approaches that
 
 
 
