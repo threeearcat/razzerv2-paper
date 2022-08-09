@@ -482,7 +482,7 @@ access operation sequence.
 
 
 
-\PP{Predicting potential coverage}
+\PP{Predicting potential biconflict coverage}
 %
 An interleaving finding new biconflict coverage likely exposes a
 behavior that was unrevealed before.
@@ -491,20 +491,22 @@ To discover more interesting behaviors, if new biconflict coverage is
 found, the fuzzer mutates the interleaving. \ie, the fuzzer
 reschedules instructions to conform with other interleavings.
 
-Before mutating an interleaving, the fuzzer predicts \textit{XXX}, a
-set of scheduling constraint pairs that has not been observed but is
-expected to occur when mutating the interleaving.
+Before mutating an interleaving, the fuzzer predicts \textit{potential
+  biconflict coverage}, $BC\mbox{-}Cov^*$, a set of scheduling
+constraint pairs that \textit{has not been observed but is expected to
+  occur with other interleavings}.
 %
-A \textit{XXX} will be used to direct the interleaving mutation. \ie,
-the fuzzer will try to generate interleaivngs to expose undisclosed
-scheduling constraint pairs instead of blindly mutating an
-interleaving.
-%
+Potential binconflict coverage will be used to direct the interleaving
+mutation. \ie, the fuzzer will try to generate interleaivngs to expose
+undisclosed scheduling constraint pairs contained in
+$BC\mbox{-}Cov^*$, instead of blindly mutating an interleaving.
 
-\textit{XXX} is derived from biconflict coverage $BC\mbox{-}cov$,
+
+$BC\mbox{-}Cov^*$ is derived from biconflict coverage $BC\mbox{-}cov$,
 $\{SCPair_1, SCPair_2, ..., SCPair_n\}$.
 %
 For each $SCPair_i$ composed of $(SC_x, SC_y)$, the fuzzer derives
+
 
 % a partial order of memory accesses, we propose a
 % form of directed acyclic graph (DAG) called interleaving graph.
