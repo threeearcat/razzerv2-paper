@@ -446,10 +446,10 @@ constraints, and if per-input biconflict coverage is saturated, we
 confidently conclude that the concurrent job unlikely causes a race
 condition.
 
-We track biconflict coverage \textit{offline}. During the runtime, we
-only collect memory access operations conducted by the concurrent job,
-and after executing the concurrent job, we measure biconflict coverage
-of the concurrent job.
+We track biconflict coverage \textit{offline}. During the runtime of a
+kernel, the fuzzer only collects memory access operations conducted by
+the concurrent job (\eg, syscalls), and after executing the concurrent
+job, the fuzzer measures biconflict coverage of the concurrent job.
 
 \PP{Definition of biconflict coverage}
 %
@@ -503,7 +503,7 @@ constraint pairs that \textit{has not been observed but is expected to
   occur with other interleavings}.
 %
 Potential binconflict coverage will be used to direct the interleaving
-mutation. \ie, the fuzzer will try to generate interleaivngs to expose
+mutation. \ie, the fuzzer will try to generate interleavings to expose
 undisclosed scheduling constraint pairs contained in
 $BC\mbox{-}Cov^*$, instead of blindly mutating an interleaving.
 
@@ -511,7 +511,7 @@ $BC\mbox{-}Cov^*$, instead of blindly mutating an interleaving.
 $BC\mbox{-}Cov^*$ is derived from biconflict coverage $BC\mbox{-}cov$,
 $\{SCPair_1, SCPair_2, ..., SCPair_n\}$.
 %
-For each $SCPair_i$ composed of $(SC_x, SC_y)$, the fuzzer derives
+For each $SCPair_i$ composed of $(SC_x, SC_y)$, the fuzzer derives ...
 
 
 % a partial order of memory accesses, we propose a
