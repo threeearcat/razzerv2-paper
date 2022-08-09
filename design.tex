@@ -455,7 +455,7 @@ job, the fuzzer measures biconflict coverage of the concurrent job.
 %
 Let us represent a memory access operation $M$ as four tuples,
 $(tid, addr, op, timestamp)$ where $tid$ is the identity of a thread,
-$addr$ is the address of the memory location, $op$ is the type of the
+$addr$ is the address of a memory location, $op$ is the type of the
 memory access operation (\ie, $store$ or $load$), and $timestamp$
 indicates the point of time when the memory access operation is taken.
 %
@@ -467,19 +467,20 @@ ordered. \ie, there are no two memory access operations that have the
 same $timestamp$.
 
 For all pair of memory access operations $M_i$ and $M_j$, we define a
-scheduling constraint $SC$ as a directed pair ($M_i, M_j$) if
-$M_i(tid) \neq M_j(tid)$, $M_i(addr) = M_j(addr)$,
-$M_i(op) = store\; or\; M_j(op) = store$, and
+scheduling constraint $SC = (M_i, M_j$) if $M_i(tid) \neq M_j(tid)$,
+$M_i(addr) = M_j(addr)$, $M_i(op) = store\; or\; M_j(op) = store$, and
 $M_i(timestamp) < M_j(timestamp)$.
 %
 Informally, $M_i$ and $M_j$ are conflicting memory acceess operations
 that are executed in other threads, and $M_i$ was taken place before
 $M_j$.
 %
+For two scheduling constraint $SC_1(=(M_{1i}, M_{1j}))$ and
+$SC_2(=(M_{2i}, M_{2j}))$, $SC_1 = SC_2$ if
+$M_{1i} = M_{2i} \wedge M_{1j} = M_{2j}$.
+%
 Then, we define a scheduling constraint pair $SCPair = (SC_i, SC_j)$
 for two scheduling constraints if $i < j$, $SC_i \neq SC_j$.
-%
-\dr{TODO: explain what $SC_i \neq SC_j$ means}
 %
 Lastly, biconflict coverage of the concurrent job $BC\mbox{-}Cov$ is
 defined as a set of all scheduling constraint pairs,
@@ -511,7 +512,8 @@ $BC\mbox{-}Cov^*$, instead of blindly mutating an interleaving.
 $BC\mbox{-}Cov^*$ is derived from biconflict coverage $BC\mbox{-}cov$,
 $\{SCPair_1, SCPair_2, ..., SCPair_n\}$.
 %
-For each $SCPair_i$ composed of $(SC_x, SC_y)$, the fuzzer derives ...
+For each $SCPair_i$ composed of $(SC_x, SC_y)$ in $BC\mbox{-}cov$, the
+fuzzer derives \dr{TODO}...
 
 
 % a partial order of memory accesses, we propose a
@@ -657,7 +659,7 @@ exclusive, and 2) generating scheduling points to test the selected
 scheduling constraint pairs.
 
 
-\PP{Selecting interleaving segments to direct}
+\PP{Selecting scheduling constraints to direct}
 %
 Given all uncaptured \segments, it is unlikely that all \segments can
 be tested at once.
