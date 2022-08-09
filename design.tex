@@ -106,7 +106,7 @@ manifest if at most \textit{two} scheduling constraints on at most
 Furthermore, considering a thread (thread~A) may affect execution of
 another thread (thread~B) only if thread~B reads a value written by
 thread~A, scheduling constraints should be established on a pair of
-conflicting memory access operations.
+conflicting memory access operations.\yj{I do not understand the sentence.}
 
 To reflect this nature of race conditions, we propose a novel coverage
 metric, called biconflict coverage, that tracks the execution order of
@@ -139,8 +139,8 @@ One could argue that tracking biconflict coverage is intractable since
 the size of the search space is too large.
 %
 If two threads conflict on $N$ pairs of memory accesses, the number of
-scheduling constraint pairs is propotional to $N^2$, which is possibly
-too large to test one-by-one.
+scheduling constraint pairs is proportional to $N^2$, which is possibly
+too large to test one-by-one.\yj{According to text, it does seem too large.}
 
 However, it is worth noting that many scheduling constraint pairs are
 not exclusive.
