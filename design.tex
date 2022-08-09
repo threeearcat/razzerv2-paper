@@ -461,9 +461,9 @@ ordered. \ie, there are no two memory access operations that have the
 same $timestamp$.
 
 For all pair of memory access operations $M_i$ and $M_j$, we define a
-scheduling constraint $SC$ as a \textit{directed} pair
-($M_i \Rightarrow M_j$) if $M_i(tid) \neq M_j(tid)$,
-$M_i(addr) = M_j(addr)$, $M_i(op) = store\; or\; M_j(op) = store$, and
+scheduling constraint $SC$ as a directed pair ($M_i, M_j$) if
+$M_i(tid) \neq M_j(tid)$, $M_i(addr) = M_j(addr)$,
+$M_i(op) = store\; or\; M_j(op) = store$, and
 $M_i(timestamp) < M_j(timestamp)$.
 %
 Informally, $M_i$ and $M_j$ are conflicting memory acceess operations
@@ -477,10 +477,10 @@ for two scheduling constraints if $i < j$, $SC_i \neq SC_j$.
 %
 \dr{TODO: explain what $SC_i \neq SC_j$ means}
 %
-Lastly, biconflict coverage of the concurrent job is defined as a set
-of all scheduling constraint pairs,
-$\{SCPair_1, SCPair_2, ..., SCPair_n\}$, defined from its memory access
-operation sequence.
+Lastly, biconflict coverage of the concurrent job $BC\mbox{-}Cov$ is
+defined as a set of all scheduling constraint pairs,
+$\{SCPair_1, SCPair_2, ..., SCPair_n\}$, defined from its memory
+access operation sequence.
 
 
 
@@ -491,16 +491,16 @@ operation sequence.
 An interleaving finding new biconflict coverage may expose a behavior
 that was unrevealed before.
 %
-If new biconflict coverage is found, we mutate the interleaving to
-discover more interesting behaviors.
+Therefore, if new biconflict coverage is found, we mutate the
+interleaving to discover more interesting behaviors.
 
 
-Instead of blindly mutating the interleaving, we adopt a mutation
-strategy \textit{directed} by \textit{XXX}.
+To this end, we adopt a mutation strategy \textit{directed} by
+\textit{XXX}.
 %
 A \textit{XXX} is a scheduling constraint pair that has not been
 observed, but is expected to occur when mutating the interleaving.
-
+%
 
 
 
