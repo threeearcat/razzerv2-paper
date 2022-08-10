@@ -440,7 +440,7 @@ generating an interleaving until $U^*$ is empty.
 }
 
 As described in \autoref{ss:overview}, we propose a novel coverage
-metric, called biconflict coverage,\yj{} to address the empirical nature of
+metric, called biconflict coverage,\yj{This is the first place define biconflict coverage} to address the empirical nature of
 race conditions.
 %
 Biconflict converage is designed to track conjunctions of scheduling
@@ -448,7 +448,7 @@ constraints, and if per-input biconflict coverage is saturated, we
 confidently conclude that the concurrent job unlikely causes a race
 condition.
 
-We track biconflict coverage \textit{offline}. During the runtime of a
+We track biconflict coverage \textit{offline}\yj{I do not get it}. During the runtime of a
 kernel, the fuzzer only collects memory access operations conducted by
 the concurrent job (\eg, syscalls), and after executing the concurrent
 job, the fuzzer measures biconflict coverage of the concurrent job.
