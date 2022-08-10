@@ -437,6 +437,8 @@ generating an interleaving until $U^*$ is empty.
 \end{itemize}
 }
 
+\dr{be clear about concurrent job/input}
+
 As described in \autoref{ss:overview}, we propose a novel coverage
 metric, called biconflict coverage, to address the empirical nature of
 race conditions.
@@ -641,41 +643,40 @@ fuzzer derives \dr{TODO}...
 
 
 
-% Since concurrent jobs may reveal different behaviors depending on an
-% interleaving, a concurrency fuzzer adopt additional mutation strategy
-% called interleaving mutation.
-
-Our interleaving mutation is designed in a different way from previous
-studies.
+After tracking biconflict coverage of an interleaving, our
+interleaving mutation takes potential biconflict coverage
+$BC\mbox{-}Cov^*$ as a hint for further mutation.
 %
-Instead of randomly selecting scheduling points~\cite{krace, ski} or
-changing the execution order of a few instructions~\cite{razzer,
-  snowboard}, we draw a whole hypothetical interleaving directed
-towards undisclosed scheduling constraint pairs.
-
-To this end, our interleaving mutation consists of two steps:
+The goal of the interleaving mutation is to generate other
+interleavings that may cover scheduling constraint pairs in
+$BC\mbox{-}Cov^*$.
 %
-1) selecting undisclosed scheduling constraint pairs that are not
-exclusive, and 2) generating scheduling points to test the selected
-scheduling constraint pairs.
-
-
-\PP{Selecting scheduling constraints to direct}
+Until $BC\mbox{-}Cov^*$ is not empty, the fuzzer repeats two steps of
+the interleaving mutation:
 %
-Given all uncaptured \segments, it is unlikely that all \segments can
-be tested at once.
+1) selecting scheduling constraint pairs to test, and
+2) generating scheduling points to test the selected scheduling
+constraint pairs.
+
+
+\PP{Selecting scheduling constraints to ...}
 %
-Our approach is to find out a subset of \segments that are
-\textit{harmonious}. \Segments are harmonious if they do not form a
-cycle in an imaginary graph.
+Among scheduling constraint pairs in $BC\mbox{-}Cov^*$, some of them
+may be conflict with each other.
+%
+For example, 
+we obviously cannot obey the two scheduling constraints.
 
 
-It may require heavy computation to identify the largest subset that
-are all harmonious to each other.
+
+It may require heavy computation to identify the largest subset of
+$BC\mbox{-}Cov^*$ that are all harmonious to each other.
 %
 Instead of finding the optimal solution, we choose to use a greedy
 algorithm.
 %
+
+
 Especially, given uncaptured \segments extracted from an interleaving
 graph, our interleaving mutation starts by selecting a random
 \segment.

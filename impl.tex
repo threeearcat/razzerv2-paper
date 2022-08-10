@@ -1,6 +1,7 @@
 \section{Design of \sys}
 \label{s:impl}
 
+
 In this section, we describe design details of \sys, a
 coverage-directed concurrency fuzzer to effectively find race
 conditions.
@@ -9,54 +10,52 @@ The key improvement of \sys lies in adopting biconflict coverage and
 the coverage-directed interleaving mutation algorithgm described in
 \autoref{s:design}.
 %
-% \subsection{Overall Architecture}
-% \label{ss:architecture}
-
-\begin{figure}
-  \includegraphics[width=0.9\linewidth]{fig/architecture.pdf}
-  \caption{Overall architecture of \sys}
-  \label{fig:architecture}
-\end{figure}
-%
-\autoref{fig:architecture} shows an overall architecture of \sys.
-%
-\sys consists of the target kernel preparation step at compile time,
-and two-stage pipelined fuzzing at runtime.
-%
-The target kernel preparation step~(\autoref{ss:instrumentation}) is
-introduced to provide two functionalities required by our scheduling
-mechanism, namely tracking memory access operations and controlling
-thread execution.
-%
-\sys instruments a target kernel binary for tracking memory access
-operations, and provides a loadable module called trampoline used to
-suspend and resume a guest kernel thread.
-
-With the instrumented kernel binary and the trampoline module, \sys
-conducts two stage pipelined fuzzing~(\autoref{ss:fuzzer}).
-%
-The first stage involves a single-thread fuzzing, which focuses on
-expanding code coverage. In addition, the first stage fuzzing also
-finds sequential inputs that potentially exhibits new biconflict
-coverage (without considering whether the inputs actually find new
-biconflict coverage).
-
-The second stage is to explore the interleaving space. It takes
-sequential inputs from the first stage fuzzing. From the sequential
-inputs, the second stage fuzzing consturcts concurrent tests and runs
-the concurrent tests with different interleavings.
-%
-During exploring the interleaving space, \sys enforces an interleaving
-with a support of the dedicated hypervisor~(\autoref{ss:engine}).
+To this end, \sys implements three components, the userspace fuzzer,
+target kernel instrumentation, and the execution engine.
 %
 In the following of subsections, we describe design details and
 implementation of each components.
 
 
-
-
 \subsection{Userspace Fuzzer}
 \label{ss:fuzzer}
+
+
+
+\begin{figure}
+  \includegraphics[width=0.9\linewidth]{fig/architecture.pdf}
+  \caption{Workflow of \sys}
+  \label{fig:workflow}
+\end{figure}
+
+
+The \sys's userspace fuzzer conducts two-stage pipelined fuzzing.
+%
+The first stage is single-thread fuzzing which generates a
+\textit{single-thread} input program, \ie, a sequence of system calls.
+%
+While the first stage fuzzing generates and runs sequential inputs to
+expand brach coverage, it also finds sequential inputs that include
+system calls, called XXX, that may expose new biconflict coverage when
+executed concurrently.
+
+\autoref{fig:workflow} describes the workflow of the \sys's userspace
+fuzzer.
+%
+
+
+%
+The second stage is to explore the interleaving. Given a sequential
+input program from the first stage, it constructs a
+\textit{multi-thread} input program that executes the XXX syscalls
+concurrently.
+%
+During the second stage fuzzing, the fuzzer keeps generating
+interleavings of the XXX syscalls and tracks biconflict coverage for
+the concurrent dimension.
+
+
+
 
 A userspace fuzzer implmenets the interleaving mutation algorithm
 described in \autoref{s:design}.
