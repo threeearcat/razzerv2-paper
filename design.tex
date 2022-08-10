@@ -155,8 +155,7 @@ When a concurrent job is executed conforming with an interleaving, we
 can observe that the interleaving obeys many scheduling constraint
 pairs simultaneously.
 %
-\dr{TODO: fix figure 2 to represent failure-oblivious instructions and
-  use the instructions as an example of this case}
+\dr{TODO: example}
 
 Our intuition to explore the interleaivng space is based on the
 observation.
@@ -167,13 +166,9 @@ select scheduling constraint pairs that are not exclusive with each
 other, and schedule instructions to experience the selected
 scheduling constraint pairs.
 %
-\dr{TODO: define univeral set U of scheduling constraints}
 
 
 \PP{Overall steps}
-%
-\dr{Assume $U$ is a universal set of all scheduling constraint pairs
-  of the given concurrent job}
 %
 Let us suppose we have a concurrent job consisting of \texttt{mmap()}
 and \texttt{ioctl(TRANSACTION)} in \autoref{fig:cve-2019-6974}, and
@@ -216,14 +211,12 @@ interleaivng.
 
 
 
-\dr{change this step into two?: feedback from new coverage ->
-  pridicting undisclosed coverage}
+After new biconflict coverage are found from the given interleaving,
+we further mutate the interleaving for more biconflict coverage .
 %
-After tracking biconflict coverage from the given interleaving, we
-determine whether the interleaving is worth further mutation.
-%
-To this end, we adopt a strategy to \textit{predict coverage that is
-  likley found when the interleaving is mutated}.
+Unlike most coverage-guided fuzzing, we \textit{predict biconflict
+  coverage that is not yet observed, but is expected to occur with
+  other interleavings}.
 %
 Taking the example of \autoref{fig:overview}-(c), we can derive a
 scheduling constraint pair \texttt{Segment 1'} from \texttt{Segment 1}
@@ -234,16 +227,14 @@ $\texttt{B4} \rightarrow \texttt{A2}$.
 Similarily, \texttt{Segment 2'} and \texttt{Segment 3'} can be derived
 from \texttt{Segment 2} and \texttt{Segment 3} respectively.
 %
-Since the three derived scheduling constraint pairs have not been
-observed yet, we can expect other interleavings that cover the derived
-scheduling constraints.
+These derived scheduling constraint pairs are hints of mutation. Our
+interleaving mutation will try to generate interleavings that cover
+the derived scheduling constraint pairs.
 %
 We denote $U^*$ as a set of scheduling constraint pairs that are
 likely covered by mutations of the interleaving. In this example,
 \texttt{Segment 1'}, \texttt{Segment 2'}, and \texttt{Segment 3'} are
 elements of $U^*$.
-%%
-If $U^*$ is not empty, we decide to mutate the interleaving. 
 
 
 The last step is to mutate the interleaving to find new
