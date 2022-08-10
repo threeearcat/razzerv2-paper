@@ -124,7 +124,7 @@ given concurrent job, we have a strong confidence that the concurrent
 job does not reveal a race condition.
 
 Throughout the rest of this paper, a term ``scheduling constraint
-pair'' denotes a conjunction of two scheduling constraints, and a term
+pair''\yj{I do not like the term.} denotes a conjunction of two scheduling constraints, and a term
 ``offending scheduling constraint pair'' denotes a scheduling
 constraint pair that causes a race condition.  For example,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
@@ -148,6 +148,7 @@ If two threads conflict on $N$ pairs of memory accesses, the number of
 scheduling constraint pairs is proportional to $N^2$, which is possibly
 too large to test one-by-one.\yj{According to text, it does seem too large.}
 
+\yj{Followings are the key insight. TODO: clarify the sentences}
 However, it is worth noting that many scheduling constraint pairs are
 not exclusive.
 %
@@ -157,9 +158,10 @@ pairs simultaneously.
 %
 \dr{TODO: example}
 
-Our intuition to explore the interleaivng space is based on the
+Our approach to explore the interleaving space is based on the
 observation.
 %
+\yj{Clarify this paragraph and connect with the previous paragraph.}
 Let us suppose we know which scheduling constraint pairs are
 undisclosed. Among undisclosed scheduling constraint pairs, we can
 select scheduling constraint pairs that are not exclusive with each
@@ -173,7 +175,7 @@ scheduling constraint pairs.
 Let us suppose we have a concurrent job consisting of \texttt{mmap()}
 and \texttt{ioctl(TRANSACTION)} in \autoref{fig:cve-2019-6974}, and
 \autoref{fig:overview}-(a) represents an initial interleaving of the
-concurrent job.
+concurrent job.\yj{Need to say how to get the initial interleaving.}
 %
 As described the figure, the initial interleaving is provided with an
 execution order of
@@ -212,11 +214,11 @@ interleaivng.
 
 
 After new biconflict coverage are found from the given interleaving,
-we further mutate the interleaving for more biconflict coverage .
+we further mutate the interleaving to increase biconflict coverage.
 %
 Unlike most coverage-guided fuzzing, we \textit{predict biconflict
   coverage that is not yet observed, but is expected to occur with
-  other interleavings}.
+  other interleavings}\yj{Revise this sentence}.
 %
 Taking the example of \autoref{fig:overview}-(c), we can derive a
 scheduling constraint pair \texttt{Segment 1'} from \texttt{Segment 1}
