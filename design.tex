@@ -80,6 +80,9 @@ coverage~(\autoref{ss:scheduler}).
   \label{fig:overview}
 \end{figure*}
 
+\dr{be clear about concurrent job/input}
+
+
 Our approach to explore the interleaving space assumes that a
 concurrent job (\eg, a set of syscalls) and an initial interleaving
 (\ie, a seed interleaving) of the concurrent job are given as an
@@ -213,6 +216,8 @@ interleaivng.
 
 
 
+\dr{Segment -> SCPair}
+%
 After new biconflict coverage are found from the given interleaving,
 we further mutate the interleaving to increase biconflict coverage.
 %
@@ -429,8 +434,6 @@ generating an interleaving until $U^*$ is empty.
   \end{itemize}
 \end{itemize}
 }
-
-\dr{be clear about concurrent job/input}
 
 As described in \autoref{ss:overview}, we propose a novel coverage
 metric, called biconflict coverage, to address the empirical nature of
@@ -655,11 +658,14 @@ constraint pairs.
 \PP{Selecting scheduling constraints to ...}
 %
 Among scheduling constraint pairs in $BC\mbox{-}Cov^*$, some of them
-may be conflict with each other.
+cannot be obeyed simultaneously.
 %
-For example, 
-we obviously cannot obey the two scheduling constraints.
-
+For example, an interleaivng obviously cannot obey the two scheduling
+constraints $(X \rightarrow Y)\wedge (Z \rightarrow W)$ and
+$(Y \rightarrow X)\wedge (Z \rightarrow W)$ because of the
+contradiction on the execution order of $X$ and $Y$.
+%
+We thus 
 
 
 It may require heavy computation to identify the largest subset of
@@ -680,8 +686,6 @@ selected \segment is harmonious.
 Determining a given \segment is harmonious is conducted by checking a
 loop in an accumulated interleaving graph.
 
-\dr{TODO: describe an algorithm to check a loop. }
-Its time complexity is $O(V)$.
 
 
 \PP{Generating scheduling points}
