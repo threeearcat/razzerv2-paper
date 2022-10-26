@@ -2,38 +2,87 @@
 \label{s:eval}
 
 To verify the effectiveness of our approach, we evaluate \sys in
-various aspects. Specifically, we 1) demonstrate the practicality of
+various aspects.
+%
+Specifically, we 1) demonstrate the practicality of
 \sys by providing newly found concurrency
-bugs~(\autoref{ss:realworldbugs}), 2) comprehensive \sys's performance
-characteristics (\eg, throughput and
-overheads)~(\autoref{ss:characteristics}), and comparison studies
-against state-of-the-art concurrency fuzzing~(\autoref{ss:comparison}).
+bugs~(\autoref{ss:realworldbugs}),
+%
+2) provide comprehensive performance characteristics of \sys (\eg,
+throughput and overheads)~(\autoref{ss:characteristics}), and
+%
+3) compare \sys against prior concurrency fuzzing
+techniques~(\autoref{ss:comparison}).
 
 \subsection{Finding Real-world Concurrency Bugs}
 \label{ss:realworldbugs}
 
+In order to demonstrate the practicality of \sys, we 
+
 \begin{table*}[t]
   \input{table/newbugs.tex}
   \centering
-  \caption{List of concurrency bugs newly discovered by \sys.}
+  \caption{List of concurrency bugs newly discovered by \sys. The
+    \texttt{Recurrent} column denotes that a crash was previously
+    addressed but reoccurs even after its patch is applied.}
   \label{table:newbugs}
 \end{table*}
 
-In order to demonstrate the practicality of \sys, we ran \sys on
-latest versions of the Linux kernel ranging from \XXX{} to \XXX{}.  We
-ran \sys for approximately two months.
-
 \PP{Experimental setup.}
 %
-All of our evaluations were performed on an Intel(R) Xeon(R) CPU
-E5-4655 v4 @ 2.50GHz (30MB cache) with 512GB of RAM.
+To discover new concurrency bugs, we evaluate \sys on a two-socket
+machine equipped with Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz (40MT
+cache) and 512\GB of RAM.
+%
+This machine provides 32 total cores and 64 total threads, and runs
+Ubuntu Server 20.04.4 LTS on Linux 5.4.143 as a host operating system.
+%
+To build a guest kernel, we use a kernel configuration used by
+\texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
+\sys search for bugs in similar kernel modules/subsystems.
+%
+We run \sys for approximately two monts on latest versions of the
+Linux kernel ranging from 5.19-rc2 to 6.0-rc7.
 
 
 \PP{Newly found concurrency bugs.}
 %
-\autoref{table:newbugs} summarizes crashes found by \sys. During our
-experiment, \totalbugs crashes are newly found.
+During our evaluation, \sys discovers 83 unique crash titles including
+ones that \texttt{Syzkaller} also finds. Among them, \totalbugs are
+newly identified as harmful concurrency bugs as summarized in
+\autoref{table:newbugs}.
 %
+This table shows that \sys is able to find bugs across the entire
+kernel from specific device drivers~(\eg, \texttt{\#1}, and
+\texttt{\#6}) to various network subsystems (\eg, \texttt{\#2},
+\texttt{\#16}, and \texttt{\#17}); Since \sys is not tailored to
+specific subsystems, \sys entails the \textit{generality} and is
+applicable to various subsystems.
+
+\sys is also able to find not only less-harmful bugs such as warnings
+(\eg, \texttt{\#12}) but also critical bugs such as memory corruptions
+(\eg, \texttt{\#2}, \texttt{\#6}, and \texttt{\#14}).
+%
+It is worth noting that in our evaluation, unlike previous
+works~\cite{snowboard, krace} that rely on data race
+detectors~\cite{kcsan, tsan}, all concurrency bugs are found by
+observable and harmful incidents such as kernel panics or KASAN
+reports.
+%
+We believe data race detectors and our approach are complementary in
+finding concurrency bugs. We discuss this in the discussion
+section(~\autoref{s:discussion}).
+
+Interestingly, we find that many of bugs was previously found and
+addressed, but they reoccur possibly because of their incomplete
+fixes~\cite{learningfrommistakes}.
+%
+In \autoref{table:newbugs}, three that are marked in the
+\texttt{Recurrent} column are cases that reoccur long time (\eg,
+hundreds days) after their fixes are applied.
+%
+These cases emphasize the importance of effective testing even after
+bugs are exposed and fixed accordingly.
 
 
 

@@ -1,56 +1,57 @@
 \resizebox{\linewidth}{!}{
-  \begin{tabular}{r l l l l}
+  \begin{tabular}{r l l l l c}
   \toprule
-    Crash ID & Kernel Version (Commit) & Subsystem & Crash Type & Crash Summary \\
+    \textbf{Crash ID} & \textbf{Kernel Version} & \textbf{Subsystem} & \textbf{Crash Type} & \textbf{Crash Summary} & \textbf{Recurrent} \\
   \midrule
-  1 & XXX & drivers/misc/vmw_vmci & general protection fault & general protection fault in vmci_host_poll \\
+  \#1 & 6.0-rc7 & drivers/misc/vmw_vmci & general protection fault & general protection fault in vmci_host_poll \\
   \midrule
-  2 & XXX & net/caif & use-after-free access & use-after-free Read in cfusbl_device_notify \\
+  \#2 & 6.0-rc7 & net/caif & use-after-free access & KASAN: use-after-free Read in cfusbl_device_notify \\
   \midrule
-  3 & XXX & kernel/trace & task hung & INFO: task hung in blk_trace_remove \\
+  \#3 & 5.19-rc3 & kernel/trace & task hung & INFO: task hung in blk_trace_remove \\
   \midrule
-  4 & XXX & kernel/trace & task hung & INFO: task hung in blk_trace_setup \\
+  \#4 & 5.19-rc3 & kernel/trace & task hung & INFO: task hung in blk_trace_setup \\
   \midrule
-  5 & XXX & fs/ntfs & assertion violation & kernel BUG in ntfs_read_block \\
+  \#5 & 5.19-rc3 & fs/ntfs & assertion violation & kernel BUG in ntfs_read_block \\
   \midrule
-  6 & XXX & drivers/net/can/slcan & use-after-free access & KASAN: use-after-free Read in slcan_receive_buf \\
+  \#6 & 5.19-rc2 & drivers/net/can/slcan & use-after-free access & KASAN: use-after-free Read in slcan_receive_buf \\
   \midrule
-  7 & XXX & kernel/sched & general protection fault & general protection fault in add_wait_queue_exclusive \\
+  \#7 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue_exclusive \\
   \midrule
-  8 & XXX & kernel/sched & general protection fault & general protection fault in add_wait_queue \\
+  \#8 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue \\
   \midrule
-  9 & XXX & net/netfilter & general protection fault & general protection fault in cttimeout_net_exit \\
+  \#9 & 5.19-rc2 & net/netfilter & general protection fault & general protection fault in cttimeout_net_exit \\
   \midrule
-  10 & XXX & arch/x86/kernel & stack-out-of-bounds access & KASAN: stack-out-of-bounds Read in unwind_next_frame\\
+  \#10 & 6.0-rc7 & arch/x86/kernel & stack-out-of-bounds access & KASAN: stack-out-of-bounds Read in unwind_next_frame\\
   \midrule
-  11 & XXX & drivers/usb/core & task hung & INFO: task hung in usb_get_descriptor\\
+  \#11 & 6.0-rc7 & drivers/usb/core & task hung & INFO: task hung in usb_get_descriptor & \checkmark~\cite{usbgetdescriptor} \\
   \midrule
-  12 & XXX & net/can & warning & WARNING in isotp_tx_timer_handler \\
+  \#12 & 6.0-rc7 & net/can & warning & WARNING in isotp_tx_timer_handler & \checkmark~\cite{isotptxtimerhandler} \\
   \midrule
-  13 & XXX & fs/btfs & assertion violation& kernel BUG in assertfail\\
+  \#13 & 5.19-rc3 & fs/btfs & assertion violation& kernel BUG in assertfail & \checkmark~\cite{assertfail} \\
+  \midrule
+  \#14 & 6.0-rc7 & drivers/net/slip & use-after-free access & KASAN: use-after-free Read in slip_ioctl \\
+  \midrule
+  \#15 & 6.0-rc7 & sound/core/oss & use-after-free access & KASAN: use-after-free Read in snd_pcm_plug_read_transfer \\
+  \midrule
+  \#16 & 5.19-rc3 & net/key & assertion violation & kernel BUG in pfkey_send_acquire \\
+  \midrule
+  \#17 & 5.19-rc3 & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
+  \bottomrule
+  \end{tabular}
+}
+
   % \midrule
   % 14 & XXX & net/9p & deadlock & possible deadlock in p9_req_put \\
   % \midrule
   % 15 & XXX & fs/kernfs & use-after-free access & KASAN: use-after-free Read in __kernfs_remove\\
   % \midrule
   % 16 & XXX & net/core & warning & WARNING in __dev_queue_xmit\\
-  \midrule
-  14 & XXX & drivers/net/slip & use-after-free & KASAN: use-after-free Read in slip_ioctl \\
   % \midrule
   % 18 & XXX & drivers/usr/core & task hung & INFO: task hung in hub_port_init\\
-  \midrule
-  15 & XXX & fs/ntfs/ & slab-out-of-bound access & KASAN: slab-out-of-bounds Read in ntfs_attr_find \\
   % \midrule
   % 20 & XXX & net/ipv6 & task hung & INFO: task hung in addrconf_verify_work \\
-  \midrule
-  16 & XXX & sound/core/oss & use-after-free & KASAN: use-after-free Read in snd_pcm_plug_read_transfer \\
-  \midrule
-  17 & XXX & net/key & assertion violation & kernel BUG in pfkey_send_acquire \\
-  \midrule
-  18 & XXX & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
-  \bottomrule
-  \end{tabular}
-}
+  % \#15 & 5.19-rc3 & fs/ntfs/ & slab-out-of-bound access & KASAN: slab-out-of-bounds Read in ntfs_attr_find & \checkmark \\
+  % \midrule
 
 %%% Local Variables:
 %%% mode: latex
