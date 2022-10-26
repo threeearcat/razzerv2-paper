@@ -12,12 +12,12 @@ against state-of-the-art concurrency fuzzing~(\autoref{ss:comparison}).
 \subsection{Finding Real-world Concurrency Bugs}
 \label{ss:realworldbugs}
 
-\begin{table}[t]
+\begin{table*}[t]
   \input{table/newbugs.tex}
   \centering
   \caption{List of concurrency bugs newly discovered by \sys.}
   \label{table:newbugs}
-\end{table}
+\end{table*}
 
 In order to demonstrate the practicality of \sys, we ran \sys on
 latest versions of the Linux kernel ranging from \XXX{} to \XXX{}.  We
@@ -59,17 +59,33 @@ As the coverage growth is the important performance metric, we compare
   \label{table:knownbugs}
 \end{table}
 
-In this subsection, we compare \sys against various prior approaches
-to provide a .
+We compare \sys against various prior approaches to provide a .
 
 \PP{Bug selection}
 %
 \autoref{table:knownbugs} represents concurrency bugs we use for the
 comparison study.
 %
-For fair comparisons, we select concurrency bugs according to follow
-criteria: 1) 
+For fair comparisons, among all kernel concurrency bugs that are used
+to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
+  razzer, snowboard, krace}, we select ones that their exploits are
+publicly available such that we can make use of them for our evaluation.
 %
+In particular, the exploit of
+\texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
+we successfully reproduce the concurrency bug from the description in
+the Snowboard~\cite{snowboard} paper.
+%
+Also, even though KRace~\cite{krace} studies kernel concurrency bugs
+(\ie, data races), we do not have access to concurrency bugs that the
+authors use to evaluate KRace.
+
+\PP{Overall }
+%
+
+
+
+
 
 
 

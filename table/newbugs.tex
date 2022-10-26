@@ -3,47 +3,51 @@
   \toprule
     Crash ID & Kernel Version (Commit) & Subsystem & Crash Type & Crash Summary \\
   \midrule
-  1 \\
+  1 & XXX & drivers/misc/vmw_vmci & general protection fault & general protection fault in vmci_host_poll \\
   \midrule
-  2 \\ 
+  2 & XXX & net/caif & use-after-free access & use-after-free Read in cfusbl_device_notify \\
   \midrule
-  3 \\
+  3 & XXX & kernel/trace & task hung & INFO: task hung in blk_trace_remove \\
   \midrule
-  4 \\
+  4 & XXX & kernel/trace & task hung & INFO: task hung in blk_trace_setup \\
   \midrule
-  5 \\
+  5 & XXX & fs/ntfs & assertion violation & kernel BUG in ntfs_read_block \\
   \midrule
-  6 \\
+  6 & XXX & drivers/net/can/slcan & use-after-free access & KASAN: use-after-free Read in slcan_receive_buf \\
   \midrule
-  7 \\
+  7 & XXX & kernel/sched & general protection fault & general protection fault in add_wait_queue_exclusive \\
   \midrule
-  8 \\
+  8 & XXX & kernel/sched & general protection fault & general protection fault in add_wait_queue \\
   \midrule
-  9 \\
+  9 & XXX & net/netfilter & general protection fault & general protection fault in cttimeout_net_exit \\
   \midrule
-  10 \\
+  10 & XXX & arch/x86/kernel & stack-out-of-bounds access & KASAN: stack-out-of-bounds Read in unwind_next_frame\\
   \midrule
-  11 \\
+  11 & XXX & drivers/usb/core & task hung & INFO: task hung in usb_get_descriptor\\
   \midrule
-  12 \\
+  12 & XXX & net/can & warning & WARNING in isotp_tx_timer_handler \\
   \midrule
-  13 \\
+  13 & XXX & fs/btfs & assertion violation& kernel BUG in assertfail\\
+  % \midrule
+  % 14 & XXX & net/9p & deadlock & possible deadlock in p9_req_put \\
+  % \midrule
+  % 15 & XXX & fs/kernfs & use-after-free access & KASAN: use-after-free Read in __kernfs_remove\\
+  % \midrule
+  % 16 & XXX & net/core & warning & WARNING in __dev_queue_xmit\\
   \midrule
-  14 \\
+  14 & XXX & drivers/net/slip & use-after-free & KASAN: use-after-free Read in slip_ioctl \\
+  % \midrule
+  % 18 & XXX & drivers/usr/core & task hung & INFO: task hung in hub_port_init\\
   \midrule
-  15 \\
+  15 & XXX & fs/ntfs/ & slab-out-of-bound access & KASAN: slab-out-of-bounds Read in ntfs_attr_find \\
+  % \midrule
+  % 20 & XXX & net/ipv6 & task hung & INFO: task hung in addrconf_verify_work \\
   \midrule
-  16 \\
+  16 & XXX & sound/core/oss & use-after-free & KASAN: use-after-free Read in snd_pcm_plug_read_transfer \\
   \midrule
-  17 \\
+  17 & XXX & net/key & assertion violation & kernel BUG in pfkey_send_acquire \\
   \midrule
-  18 \\
-  \midrule
-  19 \\
-  \midrule
-  20 \\
-  \midrule
-  21 \\
+  18 & XXX & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
   \bottomrule
   \end{tabular}
 }
