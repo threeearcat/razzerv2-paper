@@ -17,7 +17,8 @@ techniques~(\autoref{ss:comparison}).
 \subsection{Finding Real-world Concurrency Bugs}
 \label{ss:realworldbugs}
 
-In order to demonstrate the practicality of \sys, we 
+In order to demonstrate the practicality of \sys, we run \sys to
+discover concurrency bugs in the latest Linux kernel.
 
 \begin{table*}[t]
   \input{table/newbugs.tex}
@@ -71,7 +72,7 @@ reports.
 %
 We believe data race detectors and our approach are complementary in
 finding concurrency bugs. We discuss this in the discussion
-section(~\autoref{s:discussion}).
+section~(\autoref{s:discussion}).
 
 Interestingly, we find that many of bugs was previously found and
 addressed, but they reoccur possibly because of their incomplete
@@ -89,11 +90,20 @@ bugs are exposed and fixed accordingly.
 
 
 
-\subsection{Fuzzing Characteristics}
+\subsection{Performance characteristics of \sys}
 \label{ss:characteristics}
+
+
+\PP{Coverage growth.}
+
+
+\PP{Fuzzing throughput.}
 
 As the coverage growth is the important performance metric, we compare
 \sys with prior works.
+
+
+\PP{Overhead of something}
 
 
 
