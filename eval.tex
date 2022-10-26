@@ -1,22 +1,13 @@
 \section{Evaluation}
 \label{s:eval}
 
-To verify the effectiveness of our approach, we evaluate \sys to
-answer the following questions
-\begin{itemize}
-\item Is \sys able to find real-world concurrency
-  bugs~(\autoref{ss:realworldbugs})
-\item Is \sys able to capture concurrency coverage faster than
-  previous approaches~(\autoref{ss:coveragegrowth})
-\item Is \XXX{} suitable to capture interesting
-  behaviors~(\autoref{ss:suitability}).
-\end{itemize}
-
-\PP{Experimental setup.}
-%
-All of our evaluations were performed on an Intel(R) Xeon(R) CPU
-E5-4655 v4 @ 2.50GHz (30MB cache) with 512GB of RAM.
-
+To verify the effectiveness of our approach, we evaluate \sys in
+various aspects. Specifically, we 1) demonstrate the practicality of
+\sys by providing newly found concurrency
+bugs~(\autoref{ss:realworldbugs}), 2) comprehensive \sys's performance
+characteristics (\eg, throughput and
+overheads)~(\autoref{ss:characteristics}), and comparison studies
+against state-of-the-art concurrency fuzzing~(\autoref{ss:comparison}).
 
 \subsection{Finding Real-world Concurrency Bugs}
 \label{ss:realworldbugs}
@@ -24,14 +15,22 @@ E5-4655 v4 @ 2.50GHz (30MB cache) with 512GB of RAM.
 \begin{table}[t]
   \input{table/newbugs.tex}
   \centering
-  \caption{}
+  \caption{List of concurrency bugs newly discovered by \sys.}
   \label{table:newbugs}
 \end{table}
 
-In order to prove the practicality of \sys, we ran \sys on latest
-versions of the Linux kernel ranging from \XXX{} to \XXX{}.  We ran
-\sys for approximately two months.
+In order to demonstrate the practicality of \sys, we ran \sys on
+latest versions of the Linux kernel ranging from \XXX{} to \XXX{}.  We
+ran \sys for approximately two months.
 
+\PP{Experimental setup.}
+%
+All of our evaluations were performed on an Intel(R) Xeon(R) CPU
+E5-4655 v4 @ 2.50GHz (30MB cache) with 512GB of RAM.
+
+
+\PP{Newly found concurrency bugs.}
+%
 \autoref{table:newbugs} summarizes crashes found by \sys. During our
 experiment, \totalbugs crashes are newly found.
 %
@@ -39,16 +38,10 @@ experiment, \totalbugs crashes are newly found.
 
 
 
-\subsection{Coverage Growth in the Concurrency Dimension}
-\label{ss:coveragegrowth}
 
-\begin{table}[t]
-  \input{table/knownbugs.tex}
-  \centering
-  \caption{}
-  \label{table:knownbugs}
-\end{table}
 
+\subsection{Fuzzing Characteristics}
+\label{ss:characteristics}
 
 As the coverage growth is the important performance metric, we compare
 \sys with prior works.
@@ -56,8 +49,28 @@ As the coverage growth is the important performance metric, we compare
 
 
 
-\subsection{Suitability of Coverage Metric}
-\label{ss:suitability}
+\subsection{Comparison with prior approaches}
+\label{ss:comparison}
+
+\begin{table}[t]
+  \input{table/knownbugs.tex}
+  \centering
+  \caption{Known CVEs caused by kernel concurrency bugs.}
+  \label{table:knownbugs}
+\end{table}
+
+In this subsection, we compare \sys against various prior approaches
+to provide a .
+
+\PP{Bug selection}
+%
+\autoref{table:knownbugs} represents concurrency bugs we use for the
+comparison study.
+%
+For fair comparisons, we select concurrency bugs according to follow
+criteria: 1) 
+%
+
 
 
 %%% Local Variables:

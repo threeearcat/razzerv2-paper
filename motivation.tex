@@ -1,54 +1,49 @@
 \section{Motivation}
 \label{s:motivation}
 
-This work is motivated by an observation that prior approaches
-focus on the execution order of a single pair of conflicting
-accesses, but race conditions mostly are \textit{combined results of multiple pairs} 
-of conflicting accesses.
-%
-Because of this gap\yj{xx}, prior approaches shows inefficiency in finding race
-conditions.
+\dr{
+  \begin{itemize}
+  \item Primary observation
+    \begin{itemize}
+      \item concurrency bugs are combinatorial problems
+    \end{itemize}
+  \item Design requirements:
+    \begin{itemize}
+    \item 1) 엄청 큰 interleaving space에서 흥미로운 interleaving이 더
+      있는지 fuzzer는 판단할 수 있어야 함
+    \item 2) Efficient하게 thread interleaving을 테스트 해야함
+    \end{itemize}
+  \item Requirement study
+    \begin{itemize}
+    \item alias coverage --> cannot track interesting interleaving
+    \item razzer\&snowboard --> redundant execution, krace -->
+      ineffcient?
+    \end{itemize}
+  \end{itemize}
+}
 
-In this section, we first describe when and how race conditions
-manifest to comprehend what interleavings should be tested to find
-race conditions.
+In this section, we first describe how concurrency bugs manifest
+depending on thread interleaving.
 %
-Afterwards, we identify why prior approaches are limited in finding
-race conditions, and clarify our goals to address the limitations.
+And then, we define design requirements to discover concurrency bugs
+in the kernel.
+%
+Lastly, we summarize why existing approaches do not satisfy the design
+requirements.
 
 
-\PP{Manifestation of race conditions}
-%
-According to an extensive survey of concurrency
-bugs~\cite{learningfrommistakes}, most race conditions manifest
-depending on the execution order of multiple memory access operations.
-%
-Specifically, the study identifies that 92\% of race conditions manifest 
-when at most four memory accesses operations are executed in a specific
-order.
 
-\dr{need to more emphasize this throughout the motivation section:}
+\PP{Manifestation of concurrency bugs}
 %
-\dr{TODO: need more evidence}
+A concurrency bug indicates a type of bugs that manifest depending on
+the timing of concurrent events (\eg, memory accesses).
 %
-Furthermore, a few literatures~\cite{pctalgorithm, ski, snorlax,
-  failuresketching} imply that the number of \textit{scheduling
-  constraints} for most race conditions is small.
+Specifically, if kernel developers do not take consider of all
+possible instances of thread interleaving, the kernel may execute an
+erroneous instance of thread interleaving.
 %
-A scheduling constraint indicates an ordering constraint between a
-single pair of instructions executed different threads, such that an
-instruction \texttt{X} is executed before \texttt{Y} (denoted as
-$\texttt{X} \rightarrow \texttt{Y}$).
-%
-In terms of scheduling constraint, a race condition manifests if a
-\textit{conjunction of a small number of scheduling constraints} are
-simultaneously satisfied.
-%
-\dr{}
-%
-Specifically, race conditions that the above literatures study
-manifest with at most two scheduling constraints.
-
+Consequently, concurrency bugs such as memory corruption, memory leak,
+or deadlock, may occur.
 
 
 \begin{figure}[t]
@@ -59,16 +54,15 @@ manifest with at most two scheduling constraints.
   \label{fig:cve-2019-6974}
 \end{figure}
 
-To illustrate the manifestation of race conditions,
-\autoref{fig:cve-2019-6974} describes a race condition occured in the
-binder device driver, which is an IPC framework for
-Android. Specifically, a NULL-dereference bug manifests when two
-system calls are executed concurrently: \texttt{mmap()} to map the
-device driver into a user address space and
-\texttt{ioctl(TRANSACTION)} to send an IPC message.
- 
+\autoref{fig:cve-2019-6974} describes how an erroneous instance of
+thread interleaving causes a concurrency bug.
+%
+In this example, a NULL-dereference bug may manifest when two system
+calls are executed concurrently: \texttt{mmap()} to map the device
+driver into a user address space and \texttt{ioctl(TRANSACTION)} to
+send an IPC message.
 
-% \yj{Are you talking about \autoref{fig:alias-coverage}?}
+
 Assuming \texttt{alloc->vma} and \texttt{alloc->mm} are initially
 \texttt{NULL}, the race condition manifests depending on the execution
 order of four memory accesses, \texttt{A1} and \texttt{A2} in
@@ -90,12 +84,36 @@ And then if \texttt{B4} is executed before \texttt{A2},
 increments the reference counter of \texttt{alloc->mm} at \texttt{B4},
 causing a NULL-dereference bug.
 
-In this example, we can confirm that the manifestation of the race
-condition follows the implications of previous studies; the race
-condition manifests if \textit{two} scheduling constraints on
-\textit{four} memory access operations (\ie,
+
+
+It is noteworthy that the manifestation of a concurrency bug is
+\textit{a combined result of a few conditions on the execution order
+  of instruction pairs that access shared data.}
+%
+In this example, since \texttt{A1} and \texttt{B1} access shared data
+called \texttt{alloc->vma}, the execution order of these two accesses
+may change the kernel's execution. Among the two possible execution
+order of \texttt{A1} and \texttt{B1},
+$\texttt{A1} \rightarrow \texttt{B1}$ is required for the
+NULL-dereference to manifest.
+%
+Similary, the execution order of \texttt{A2} and \texttt{B4} also
+affects the kernel's execution, and
+$\texttt{B4} \rightarrow \texttt{A2}$ is necessary to cause the
+concurrency bug.
+%
+In summary, among all possible conditions on the execution order of
+these instructions, \textit{only}
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$) are conjunctively satisfied.
+\texttt{A2})$ causes the NULL-dereference bug.
+
+
+% In this example, we can confirm that the manifestation of the race
+% condition follows the implications of previous studies; the race
+% condition manifests if \textit{two} scheduling constraints on
+% \textit{four} memory access operations (\ie,
+% $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+% \texttt{A2})$) are conjunctively satisfied.
 
 
 % One of the factors that makes it difficult to find concurrency bugs is
@@ -130,12 +148,37 @@ $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
 % interrupts (IPI), and exploit even such concurrency bugs.
 
 
+\PP{Design requirements}
+%
+The main goal of this paper is to effectively find out concurrency
+bugs through fuzzing.
+%
+Considering the numerous number of possible instances of thread
+interleaving, we identify two design requirements to explore the
+search space of thread interleaving as follows:
 
-\PP{Limitation of existing approaches}
-%
-\dr{This describes only Krace. Razzer and Snowboard also focus on a
-  single pair of instructions}
-%
+\begin{itemize}
+\item A fuzzer needs a coverage metric in the concurrency dimension to
+  determine if any interesting interleaving remains
+\item 
+\end{itemize}
+
+
+In other words,
+
+
+\subsection{Limitation of prior approaches}
+\label{ss:existingapproaches}
+
+Even though prior approaches achieved their own successes, none of
+them satisfy the two design requirements.
+
+\PP{}
+
+
+\PP{}
+
+
 In the perspective of fuzzing, a coverage metric is a paramount gear
 to determine whether a given input is worthy of further mutation.
 %
@@ -269,29 +312,6 @@ interleaving across runs.
 Even with a single input, they require a large number of execution to
 test the input enough.
 }
-
-\PP{Our goal}
-%
-Our goal is to design a fuzzer to explore the interleaving space with
-a purpose of effectively testing conjunctions of scheduling
-constraints.
-%
-% Considering characteristics of concurrency bugs mentioned above, it
-% will increase the probabilty of finding more concurrency bugs if we
-% diversify interleavings to experience such partial orders as many as
-% possible.
-
-To this end, we organize subgoals as follows:
-%
-1) We first design a coverage metric to track conjunctions of
-scheduling constraints,
-%
-2) based on the coverage metric, we design an instruction scheduling
-algorithm that quickly saturate the coverage metric, and lastly,
-%
-3) we combine the coverage metric and the instruction scheduling
-algorithm into Syzkaller~\cite{syzkaller} to find out race conditions
-in the Linux kernel.
 
 
 

@@ -1,66 +1,6 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
-\dr{Confusing points for me: 1) this section does not mention our
-  fuzzer is two-staged so readers possibly don't know this section is
-  about the second stage. 2) this section does not say how we handle a
-  case that a generated schedule cannot be enforced (i.e., missing
-  scheduling points, lock...)}
-
-\cut{
-\begin{itemize}
-\item our approach in one sentence: defining the universal set $U$
-  using a coverage metric, and directing execution to consume the
-  universal set
-\item coverage
-  \begin{itemize}
-  \item rationale:
-  \item challenges:
-  \item solution:
-  \end{itemize}
-\item interleaving mutation
-  \begin{itemize}
-  \item rationale:
-  \item challenges:
-  \item solution:
-  \end{itemize}
-\item what do we do to explore the interleaving space?
-  \begin{itemize}
-  \item We take an interleaving (= a totally ordered instruction sequence as an input)
-  \item mutate an interleaving to generate another interleaving
-  \item how?
-    \begin{itemize}
-    \item collect {C1, C2, ...} from the interleaving
-    \item infer $U$, the universal set of coverage
-    \item consume $U$ until it is empty
-    \end{itemize}
-  \end{itemize}
-\item an intuition for a coverage
-  \begin{itemize}
-    \item observations
-      \begin{itemize}
-      \item interleavings are directed acyclic graph
-      \item multiple pairs of conflicting accesses are a subgraph of an interleaving
-      \end{itemize}
-  \item we represent a coverage using a graph (?)
-  \end{itemize}
-
-\item an intuition for an interleaving mutation
-  \begin{itemize}
-  \item two observatrions
-    \begin{itemize}
-      \item many coverages can be executed together
-      \item we can infer what coverages should be further tested
-      \end{itemize}
-  \item step 1: collect coverage
-  \item step 2: inference of coverages to test
-  \item step 3: collect coverages that can be tested together
-  \item step 4: generate an interleaving to test
-  \end{itemize}
-\end{itemize}
-}
-
-
 In this section, we describe our approach to explore the interleaving
 space.
 %
