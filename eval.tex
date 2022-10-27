@@ -4,12 +4,12 @@
 To verify the effectiveness of our approach, we evaluate \sys in
 various aspects.
 %
-Specifically, we 1) demonstrate the practicality of
-\sys by providing newly found concurrency
-bugs~(\autoref{ss:realworldbugs}),
+Specifically, we 1) demonstrate the practicality of \sys by providing
+newly found concurrency bugs in the Linux
+kernel~(\autoref{ss:realworldbugs}),
 %
 2) provide comprehensive performance characteristics of \sys (\eg,
-throughput and overheads)~(\autoref{ss:characteristics}), and
+throughput and overheads)~(\autoref{ss:characteristics}) and,
 %
 3) compare \sys against prior concurrency fuzzing
 techniques~(\autoref{ss:comparison}).
@@ -70,6 +70,7 @@ detectors~\cite{kcsan, tsan}, all concurrency bugs are found by
 observable and harmful incidents such as kernel panics or KASAN
 reports.
 %
+\dr{}
 We believe data race detectors and our approach are complementary in
 finding concurrency bugs. We discuss this in the discussion
 section~(\autoref{s:discussion}).
@@ -79,8 +80,8 @@ addressed, but they reoccur possibly because of their incomplete
 fixes~\cite{learningfrommistakes}.
 %
 In \autoref{table:newbugs}, three that are marked in the
-\texttt{Recurrent} column are cases that reoccur long time (\eg,
-hundreds days) after their fixes are applied.
+\texttt{Recurrent} column are cases that concurrency bugs reoccur even
+after their fixes are applied.
 %
 These cases emphasize the importance of effective testing even after
 bugs are exposed and fixed accordingly.
@@ -93,17 +94,58 @@ bugs are exposed and fixed accordingly.
 \subsection{Performance characteristics of \sys}
 \label{ss:characteristics}
 
-
 \PP{Coverage growth.}
 
 
 \PP{Fuzzing throughput.}
+%
+\begin{table}[t]
+  \small
+  \centering
+  \input{table/throughput}
+  \caption{Fuzzing throughput (\# of exec/s) of \sys and \texttt{Syzkaller}.}
+  \label{table:throughput}
+\end{table}
+%
+All \sys's mechanisms entail the trade-off; they provide benefits in
+finding concurrency bugs with a cost of additional overheads and
+throughput degradation.
+%
+To comprehend the trade-off, we measure the fuzzing throughput of \sys
+and compare it with the \texttt{Syzkaller}'s throughput.
+%
+Since fuzzing throughput is highly affected by initial seeds, we
+measure throughput with an empty set of seed. And because both
+\texttt{Syzkaller} and \sys restart VMs after an hour of fuzzing, we
+run them for an hour and measure throughput in order to eliminate
+noises caused by, for example, VM rebooting or kernel crashes.
 
-As the coverage growth is the important performance metric, we compare
-\sys with prior works.
+\autoref{table:throughput} shows the result. As expected, \sys shows
+the lower throughput than \texttt{Syzkaller}. In particular, the
+\sys's throughput is about 54\% of the \texttt{Syzkaller}'s
+throughput.
+%
+To further understand why the \sys's throughput is degraded, we
+additionally measure throughput of \texttt{Syzkaller} with memory
+access tracing enabled (but not making use of it).
+%
+As shown in the \texttt{Syzkaller-memtrace} column in
+\autoref{table:throughput}, it shows the throughput similar to that of
+\sys; the \texttt{Syzkaller-memtrace}'s throughput is 4.1\% higher
+than the throughput of \sys.
 
 
-\PP{Overhead of something}
+These results indicate that the throughput of \sys is mainly caused
+by the heavy instrumentation to trace memory accesses.
+%
+\dr{TODO:}
+
+
+
+
+\PP{Per-input overhead measurment}
+%
+To further breakdown the 
 
 
 
