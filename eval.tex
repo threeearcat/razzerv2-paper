@@ -42,8 +42,8 @@ To build a guest kernel, we use a kernel configuration used by
 \texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
 \sys search for bugs in similar kernel modules/subsystems.
 %
-We run \sys for approximately two monts on latest versions of the
-Linux kernel ranging from 5.19-rc2 to 6.0-rc7.
+We run intermittently \sys for approximately two monts on latest
+versions of the Linux kernel ranging from 5.19-rc2 to 6.0-rc7.
 
 
 \PP{Newly found concurrency bugs.}
@@ -134,18 +134,32 @@ As shown in the \texttt{Syzkaller-memtrace} column in
 \sys; the \texttt{Syzkaller-memtrace}'s throughput is 4.1\% higher
 than the throughput of \sys.
 
-
-These results indicate that the throughput of \sys is mainly caused
-by the heavy instrumentation to trace memory accesses.
+\dr{This is similar argument with KRace:}
+These results indicate that the throughput of \sys is mainly degraded
+By the heavy instrumentation to trace memory accesses.
 %
-\dr{TODO:}
+However, as KRace~\cite{krace} states, it can be understandable as a
+trade-off between throughput and seed quality.
+%
+In the fuzzer's perspective, while instrumentation at memory access
+instructions has negative impacts on throughput, it provides a higher
+chance for a fuzzer to execute more interesting inputs (\ie,
+interesting thread interleaving) and not to waste computing resources.
 
 
 
 
 \PP{Per-input overhead measurment}
 %
-To further breakdown the 
+\begin{table}[t]
+  \input{table/knownbugs.tex}
+  \centering
+  \caption{Known CVEs caused by kernel concurrency bugs.}
+  \label{table:knownbugs}
+\end{table}
+%
+To closely examine \sys's overheads, we measure the elapsed time
+required to execute one input that .
 
 
 
