@@ -94,6 +94,10 @@ bugs are exposed and fixed accordingly.
 \subsection{Performance characteristics of \sys}
 \label{ss:characteristics}
 
+In this subsection, we analyze various performance characteristics of
+\sys to comprehend how the \sys's approach affects the fuzzing
+process.
+
 \PP{Coverage growth.}
 
 
@@ -103,7 +107,10 @@ bugs are exposed and fixed accordingly.
   \small
   \centering
   \input{table/throughput}
-  \caption{Fuzzing throughput (\# of exec/s) of \sys and \texttt{Syzkaller}.}
+  \caption{Fuzzing throughput (\# of exec/s) of \sys and
+    \texttt{Syzkaller}. \texttt{Syzkaller-memtrace} indicates
+    throughput of \texttt{Syzkaller} with memory access tracing
+    enabled.}
   \label{table:throughput}
 \end{table}
 %
@@ -141,25 +148,25 @@ By the heavy instrumentation to trace memory accesses.
 However, as KRace~\cite{krace} states, it can be understandable as a
 trade-off between throughput and seed quality.
 %
-In the fuzzer's perspective, while instrumentation at memory access
-instructions has negative impacts on throughput, it provides a higher
-chance for a fuzzer to execute more interesting inputs (\ie,
-interesting thread interleaving) and not to waste computing resources.
+In the fuzzer's perspective, while tracking memory accesses has
+negative impacts on throughput, it provides a higher chance for a
+fuzzer to execute more interesting inputs (\ie, interesting thread
+interleaving) and not to waste computing resources.
 
 
 
 
-\PP{Per-input overhead measurment}
+\PP{Per-input overhead}
 %
 \begin{table}[t]
-  \input{table/knownbugs.tex}
   \centering
-  \caption{Known CVEs caused by kernel concurrency bugs.}
-  \label{table:knownbugs}
+  \input{table/elapsedtime.tex}
+  \caption{}
+  \label{table:elapsedtime}
 \end{table}
 %
-To closely examine \sys's overheads, we measure the elapsed time
-required to execute one input that .
+To closely examine \sys's overheads, we measure the elapsed time for
+executing one input.
 
 
 
@@ -170,7 +177,9 @@ required to execute one input that .
 \begin{table}[t]
   \input{table/knownbugs.tex}
   \centering
-  \caption{Known CVEs caused by kernel concurrency bugs.}
+  \caption{Known concurrency bugs that are studied by previous
+    studies, Razzer~\cite{razzer}, ExpRace~\cite{exprace}, or
+    Snowboard~\cite{snowboard}.}
   \label{table:knownbugs}
 \end{table}
 
@@ -181,15 +190,15 @@ We compare \sys against various prior approaches to provide a .
 \autoref{table:knownbugs} represents concurrency bugs we use for the
 comparison study.
 %
-For fair comparisons, among all kernel concurrency bugs that are used
+For fair comparisons, we select kernel concurrency bugs that are used
 to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
-  razzer, snowboard, krace}, we select ones that their exploits are
-publicly available such that we can make use of them for our evaluation.
+  razzer, snowboard, krace}. Specifically, among concurrency bugs used
+in previous studies, we select ones that their exploits are publicly
+available such that we can make use of them for our evaluation.
 %
-In particular, the exploit of
-\texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
-we successfully reproduce the concurrency bug from the description in
-the Snowboard~\cite{snowboard} paper.
+The exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is not
+publicly available, we successfully reproduce the concurrency bug from
+the description in the Snowboard~\cite{snowboard} paper.
 %
 Also, even though KRace~\cite{krace} studies kernel concurrency bugs
 (\ie, data races), we do not have access to concurrency bugs that the
