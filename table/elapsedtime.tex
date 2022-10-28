@@ -1,21 +1,23 @@
-\resizebox{0.9\linewidth}{!}{
+\resizebox{\linewidth}{!}{
   \begin{tabular}{l l l l l l}
     \toprule
-    \multicolumn{4}{c}{\sys} & \multicolumn{2}{c}{\texttt{Syzkaller}} \\
-    Total & Mutation & Exec. & Coverage & Baseline & Memtrace \\
+    \multirow{2}{*}{Total} & \multicolumn{2}{c}{Computation} & \multicolumn{3}{c}{Runtime} \\
+    \cmidrule(lr){2-3}
+    \cmidrule(lr){4-6}
+     & Mutation & Coverage & Exec. & w/o XXX & w/o XXX \\
     \midrule
-    241.1 & 17.2 & 8.9 & XXX & XXX & XXX \\
+    267.2 & 17.2 & 8.9 & 241.1 & 198.3 & 107.6 \\
     \bottomrule
   \end{tabular}
 }
 
 % temporary
 % c2fuzz
-%  execute  241116156.29326048
-%  mutate    17231640.620481927
-%  post       8858728.732142856
-% syzkaller
-% syzkaller-memtrace
+%  execute            241116156.29326048
+%  mutate             17231640.620481927
+%  post               8858728.732142856
+% syzkaller           107640966.51956181
+% syzkaller-memtrace  198337534.77521613
 
 %%% Local Variables:
 %%% mode: latex

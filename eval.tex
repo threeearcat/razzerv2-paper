@@ -143,7 +143,7 @@ than the throughput of \sys.
 
 \dr{This is similar argument with KRace:}
 These results indicate that the throughput of \sys is mainly degraded
-By the heavy instrumentation to trace memory accesses.
+by the heavy instrumentation to trace memory accesses.
 %
 However, as KRace~\cite{krace} states, it can be understandable as a
 trade-off between throughput and seed quality.
@@ -156,18 +156,33 @@ interleaving) and not to waste computing resources.
 
 
 
-\PP{Per-input overhead}
+\PP{Per-input execution time}
 %
 \begin{table}[t]
   \centering
   \input{table/elapsedtime.tex}
-  \caption{}
+  \caption{\dr{rewrite:} Elapsed time (ms) for executing one input.}
   \label{table:elapsedtime}
 \end{table}
 %
+\dr{Rewrite}
+%
 To closely examine \sys's overheads, we measure the elapsed time for
-executing one input.
+an iteration of a fuzzing loop, and break down the elapsed time into
+time taken by computation (\ie, incurred by generating a schedule and
+checking new coverage) and execution of an input.
+%
+It is worth noting that executing an input entails two overheads for
+controling thread interleaving and tracing memory accesses. To
+identify how much each overhead occupies, we disable XXX and YYY, and
+again measure elapsed times.
+%
+For each measurement, we run 10 thousands times and take an average.
 
+\autoref{table:elapsedtime} shows the result. When executing the
+input, the computational overhead is approximately 9\% of the total
+elapsed time. In contrast, executing an input takes the longest time
+out of the total elapsed time.
 
 
 
