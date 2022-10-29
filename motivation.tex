@@ -4,25 +4,16 @@
 In this section, we first describe how concurrency bugs manifest
 depending on thread interleaving.
 %
-And then, we define design requirements to discover concurrency bugs
-in the kernel.
-%
-Lastly, we summarize why existing approaches do not satisfy the design
-requirements.
-
+We then define design requirements to effectively discover concurrency
+bugs in the kernel and summarize why existing approaches do not
+satisfy the design requirements.
 
 
 \PP{Manifestation of concurrency bugs}
 %
-A concurrency bug indicates a type of bugs that manifest depending on
-the timing of concurrent events (\eg, memory accesses).
-%
-Specifically, if kernel developers do not take consider of all
-possible instances of thread interleaving, the kernel may execute an
-erroneous instance of thread interleaving.
-%
-Consequently, concurrency bugs such as memory corruption, memory leak,
-or deadlock, may occur.
+A concurrency bug manifests as \textit{a combined result of a few
+  conditions on the execution order of instruction pairs that access
+  shared data.}
 
 
 \begin{figure}[t]
