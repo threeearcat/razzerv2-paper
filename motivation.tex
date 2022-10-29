@@ -1,27 +1,6 @@
 \section{Motivation}
 \label{s:motivation}
 
-\dr{
-  \begin{itemize}
-  \item Primary observation
-    \begin{itemize}
-      \item concurrency bugs are combinatorial problems
-    \end{itemize}
-  \item Design requirements:
-    \begin{itemize}
-    \item 1) 엄청 큰 interleaving space에서 흥미로운 interleaving이 더
-      있는지 fuzzer는 판단할 수 있어야 함
-    \item 2) Efficient하게 thread interleaving을 테스트 해야함
-    \end{itemize}
-  \item Requirement study
-    \begin{itemize}
-    \item alias coverage --> cannot track interesting interleaving
-    \item razzer\&snowboard --> redundant execution, krace -->
-      ineffcient?
-    \end{itemize}
-  \end{itemize}
-}
-
 In this section, we first describe how concurrency bugs manifest
 depending on thread interleaving.
 %
