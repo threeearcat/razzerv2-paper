@@ -12,8 +12,10 @@ satisfy the design requirements.
 \PP{Manifestation of concurrency bugs}
 %
 A concurrency bug manifests as \textit{a combined result of a few
-  conditions on the execution order of instruction pairs that access
-  shared data.}
+  interleaving order of 
+  XXX.}
+  % conditions on the execution order of instruction pairs that access
+  % shared data.}
 
 
 \begin{figure}[t]
@@ -25,6 +27,8 @@ A concurrency bug manifests as \textit{a combined result of a few
     on \texttt{rfv}, and an attacker may gain root privileges.}
   \label{fig:cve-2019-6974}
 \end{figure}
+
+\dr{I'm rewriting all belows}
 
 \autoref{fig:cve-2019-6974} describes how an erroneous instance of
 thread interleaving causes a concurrency bug.
