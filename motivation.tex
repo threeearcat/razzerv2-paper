@@ -124,6 +124,16 @@ them satisfy the two design requirements.
 
 \PP{Coverage metric}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
+  \caption{Two instances of thread interleaving between thread~A and
+    thread~B described in \autoref{fig:cve-2019-6974}. Regarding
+    \texttt{inet->hdrincl}, alias coverage is saturated but the
+    concurrency bug doest not manifest.}
+  \label{fig:alias-coverage}
+\end{figure}
+
 \dr{say: existing coverage metrics either are coarse-grained (e.g.,
   Conzzer) or consider only a part of scheduling constraints (e.g.,
   KRace).}
