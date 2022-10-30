@@ -1,21 +1,26 @@
 \section{Motivation}
 \label{s:motivation}
 
-% - what is concurrency bugs
 % - characteristics of concurrency bugs
 % - challenges / design requirements
 % - limitations of existing approaches
 
-Despite recent improvements in discovering concurrency bugs, recent approaches either 
+This work is motivated by an observation that none of previous works
+leverages a coverage metric that properly reflects
+\textit{characteristics of offending thread interleaving} (\ie, one
+that causes concurrency bugs).
+%
+As a consequence, previous works either \textbf{1)} may use a
+too-simplified coverage metric and do not identify there are more
+interesting instances of thread interleaving that can cause a
+concurrency bug~\cite{krace}, or \textbf{2)} may execute too many
+redundant instances of thread interleaving~\cite{snowboard, razzer}
+and waste the computing power.
 
-1) are not suitable to cause concurrency bugs
-2) redundnat execution
 
-
-
-
-In this section, we first describe how concurrency bugs manifest
-depending on thread interleaving.
+In this section, we first clarify why concurrency bugs manifest
+depending on thread interleaving through an example of a real-world
+concurrency bug.
 %
 We then define design requirements to effectively discover concurrency
 bugs in the kernel and summarize why existing approaches do not
@@ -24,78 +29,6 @@ satisfy the design requirements.
 
 \PP{Manifestation of concurrency bugs}
 %
-This paper focuses on finding concurrency bugs in system softwares
-such as the kernel.
-%
-A concurrency bug is a bug that manifests depending on the timing of
-concurrent events (\eg, memory accesses) that access shared data.
-%
-More specifically, two instructions \textit{conflict} if \textbf{1)}
-they access the same memory location, \textbf{2)} at least one of them
-is a store operation, and \textbf{3)} they are executed concurrently.
-%
-Then, a concurrency bug manifests 
-
-
-A concurrency bug manifests as \textit{a combined result of
-  interleaving of a small number of instructions.}
-
-
-
-
-According to the extensive survey conducted by Shan Lu
-\etal~\cite{learningfrommistakes}, most (\ie, more than 90\%)
-concurrency bugs manifest depending on the execution order of a small
-number (mostly, four) of memory accesses.
-
-
-
-
-% This paper aims to identify data races in system software.
-% A data race is behavior in which the output is dependent on
-% the sequence or the timing of other non-deterministic events.
-% More specifically, a data race occurs when two memory access
-% instructions in a target program meet the following three
-% conditions: (i) they access the same memory location. (ii)
-% at least one is a write instruction. and (iii) they are executed
-% concurrently.
-% If all above three conditions above are met, the memory
-% accesses performed by the two memory instructions can be non-
-% deterministic, rendering computational result to vary depending
-% on the execution order. Throughout this paper, we use the
-% term RacePaircand to denote two memory access instructions
-% that may satisfy the three conditions described above (i.e., a
-% candidate race pair), and we use RacePairtrue for those that are
-% confirmed to meet the three conditions (i.e., a true race pair,
-% which is a subset of RacePaircand).
-% Data races can be further classified into two groups: benign
-% and harmful. A benign race is an expected (or intentional)
-% data race by developers, tolerating a potential deviation in the
-% computational results. For example, it is common to allow
-% data races in maintaining performance counters, as doing so
-% can avoid sluggish data contentions on a performance counter
-% variable (while tolerating a small error of a counter value). We
-% use the term RacePairbenign to refer to two memory instructions
-% raising such a benign race.
-% A harmful race is a data race that negatively impacts a run-
-% time behavior of a program, and we use the term RacePairharm
-% for this case. Due to the non-deterministic computational result,
-% there can be various aftermaths of a harmful race, including
-% deadlocks, raising safety assertions in the kernel, and memory
-% safety violations (including stack/heap buffer overflows, use-
-% after-free, and double-free), etc. We note that these aftermaths
-% are critical to kernel’s reliability and security: deadlocks may
-% make the kernel unresponsive, violating safety assertions may
-% cause a reboot the kernel, and memory safety violations allow
-% a privilege escalation attack. We use the term RacePairharm to
-% refer to two memory instructions in this case.
-% Summarizing the terminology, RacePaircand refers to two
-% memory access instructions that may cause a race, and
-% RacePairtrue refers to two instructions that are confirmed to
-% cause a race. RacePairtrue can be further classified into two
-% groups: RacePairbenign and RacePairharm.
-
-
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/cve-2017-10661.pdf}
@@ -105,133 +38,95 @@ number (mostly, four) of memory accesses.
     on \texttt{rfv}, and an attacker may gain root privileges.}
   \label{fig:cve-2019-6974}
 \end{figure}
-
-\dr{I'm rewriting all belows}
-
-% \autoref{fig:cve-2019-6974} describes how an erroneous instance of
-% thread interleaving causes a concurrency bug.
-% %
-% In this example, a NULL-dereference bug may manifest when two system
-% calls are executed concurrently: \texttt{mmap()} to map the device
-% driver into a user address space and \texttt{ioctl(TRANSACTION)} to
-% send an IPC message.
-
-
-% Assuming \texttt{alloc->vma} and \texttt{alloc->mm} are initially
-% \texttt{NULL}, the race condition manifests depending on the execution
-% order of four memory accesses, \texttt{A1} and \texttt{A2} in
-% thread~A, and \texttt{B1} and \texttt{B4} in thread~B.
-% %
-% During mapping the device driver into a user address space, thread~A
-% sets \texttt{alloc->vma} and \texttt{alloc->mm} to non-NULL pointers
-% at \texttt{A1} and \texttt{A2}.
-% %
-% However, since these store operations are not atomically executed,
-% thread~B may intervene in the middle of these two operations.
-% %
-% In that case, if \texttt{A1} is executed before \texttt{B1}, thread~B
-% does not return at \texttt{B3} because thread~B reads a non-NULL
-% pointer value through \texttt{alloc->vma}.
-% %
-% And then if \texttt{B4} is executed before \texttt{A2},
-% \texttt{alloc->mm} still remains \texttt{NULL} when thread~B
-% increments the reference counter of \texttt{alloc->mm} at \texttt{B4},
-% causing a NULL-dereference bug.
+%
+\autoref{fig:cve-2019-6974} describes how an erroneous instance of
+thread interleaving causes a concurrency bug.
+%
+In this example, an uninitialized access bug may manifest when two
+system calls are executed concurrently: \texttt{sendmsg()} to send a
+message through an ipv4 socket, and \texttt{setsockopt()} to modify an
+option of the ipv4 socket.
+%
+As a result of the uninitialized access, an attacker may be able to
+gain root privileges.
 
 
 
-% It is noteworthy that the manifestation of a concurrency bug is
-% \textit{a combined result of a few conditions on the execution order
-%   of instruction pairs that access shared data.}
-% %
-% In this example, since \texttt{A1} and \texttt{B1} access shared data
-% called \texttt{alloc->vma}, the execution order of these two accesses
-% may change the kernel's execution. Among the two possible execution
-% order of \texttt{A1} and \texttt{B1},
-% $\texttt{A1} \rightarrow \texttt{B1}$ is required for the
-% NULL-dereference to manifest.
-% %
-% Similary, the execution order of \texttt{A2} and \texttt{B4} also
-% affects the kernel's execution, and
-% $\texttt{B4} \rightarrow \texttt{A2}$ is necessary to cause the
-% concurrency bug.
-% %
-% In summary, among all possible conditions on the execution order of
-% these instructions, \textit{only}
-% $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-% \texttt{A2})$ causes the NULL-dereference bug.
+
+Assuming \texttt{inet->hdrincl} is initially \texttt{1}, the race
+condition manifests depending on the execution order of three memory
+accesses, \texttt{A2} and \texttt{A4} in thread~A, and \texttt{B1} and
+in thread~B.
+%
+During sending a message through the ipv4 socket, thread~A reads a
+value of \texttt{inet->hdrincl} twice at \texttt{A2} and \texttt{A4}.
+%
+However, since these two read operations are not atomically executed,
+thread~B may intervene in the middle of these two read operations.
+%
+In that case, if \texttt{B1} is executed between \texttt{A2} and
+\texttt{A4}, thread~A may read different values of
+\texttt{inet->hdrincl} at \texttt{A2} and \texttt{A4}, and use
+\texttt{rfv} without initializing it.
 
 
-% % In this example, we can confirm that the manifestation of the race
-% % condition follows the implications of previous studies; the race
-% % condition manifests if \textit{two} scheduling constraints on
-% % \textit{four} memory access operations (\ie,
-% % $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-% % \texttt{A2})$) are conjunctively satisfied.
+
+As can seen in this example, the manifestation of a concurrency bug is
+\textit{a combined result of a few scheduling constraints on
+  instructions pairs.}
+%
+In this example, \texttt{rfv} is not initialized only if \texttt{A2}
+is executed before \texttt{B1}. Thus, the uninitialized access
+requires a scheduling constraint
+$\texttt{A1} \rightarrow \texttt{B1}$~\footnote{In this paper,
+  $\texttt{X} \rightarrow \texttt{Y}$ denotes that \texttt{X} is
+  executed before \texttt{Y}}.
+%
+Similary, a scheduling constraint on \texttt{B1} and \texttt{A4} also
+is required for the concurrency bug to manifest since thread~A uses
+the uninitialized \texttt{rfv} only if
+$\texttt{B1} \rightarrow \texttt{A4}$.
+%
+In summary, among all possible instances of thread interleaving, the
+concurrency bug manifests \textit{only if} the two scheduling
+constraints are conjunctively satisfied (\ie,
+$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+\texttt{A2})$).
 
 
-% % One of the factors that makes it difficult to find concurrency bugs is
-% % that, they may be detected only when a program shows an abnormal
-% % behavior.
-% % %
-% % \autoref{subfig:racecondition} is the example of such concurrency bug.
-% % %
-% % In this example, the timing of accesses are not correctly
-% % contemplated. When instructions are executed in the order of
-% % \dr{TODO:}..., the program runs differently than the developer
-% % intention, causing a use-after-free bug.
-% % %
-% % However there are no plain accesses (\ie, all accesses are annotated),
-% % and therefore, there is no data race.
-% % %
-% % By the definition, data race detectors~\cite{tsan, kcsan, krace,
-% %   prorace, txrace, crsampler} are not applicable to detect this kind
-% % of race conditions.
+\PP{Design requirements}
+%
+The main goal of this paper is to effectively find out concurrency
+bugs through fuzzing.
+%
+Considering the numerous number of possible instances of thread
+interleaving, we identify two design requirements to explore the
+search space of thread interleaving as follows:
+
+\vspace{0.4em}
+\textbf{R1}: \emph{A fuzzer needs a coverage metric in the concurrency dimension to
+  determine if any interesting interleaving remains.}
+
+\textbf{R2}: \emph{\dr{sature the coverage metric quickly}}.
 
 
-% % In worse cases, race conditions hardly manifest with the kernel
-% % scheduler. In detail, a race condition may manifest only when one
-% % thread stalls for a long time while another thread executes numerous
-% % instructions.
-% % %
-% % One could argue that those concurrency bugs are not a threat because
-% % it may take too long time, or even impossible to exploit.
-% % %
-% % However, a recent study, ExpRace~\cite{exprace}, reveals that an
-% % attacker can affect the kernel's scheduler using inter-processor
-% % interrupts (IPI), and exploit even such concurrency bugs.
+
+\subsection{Limitation of prior approaches}
+\label{ss:existingapproaches}
+
+Even though prior approaches achieved their own successes, none of
+them satisfy the two design requirements.
+
+\PP{Coverage metric}
+
+\dr{say: existing coverage metrics either are coarse-grained (e.g.,
+  Conzzer) or consider only a part of scheduling constraints (e.g.,
+  KRace).}
 
 
-% \PP{Design requirements}
-% %
-% The main goal of this paper is to effectively find out concurrency
-% bugs through fuzzing.
-% %
-% Considering the numerous number of possible instances of thread
-% interleaving, we identify two design requirements to explore the
-% search space of thread interleaving as follows:
+\PP{Ineffective scheduling mechanism}
 
-% \begin{itemize}
-% \item A fuzzer needs a coverage metric in the concurrency dimension to
-%   determine if any interesting interleaving remains
-% \item A fuzzer 
-% \end{itemize}
-
-
-% In other words,
-
-
-% \subsection{Limitation of prior approaches}
-% \label{ss:existingapproaches}
-
-% Even though prior approaches achieved their own successes, none of
-% them satisfy the two design requirements.
-
-% \PP{}
-
-
-% \PP{}
-
+\dr{say: redundanct iterations of Razzer and Snowboard}
 
 % In the perspective of fuzzing, a coverage metric is a paramount gear
 % to determine whether a given input is worthy of further mutation.
@@ -335,37 +230,6 @@ number (mostly, four) of memory accesses.
 % behaviors or not, a fuzzer needs to comprehend \textit{a combined
 %   result of multiple pairs of conflicting accesses} as it is the
 % primary reason of race conditions.
-
-
-% \cut{
-% Approaches that adopt a randomized scheduler~\cite{krace, ski, muzz}
-% suffer from the inherent randomness.
-% %
-% When the randomness comes to concurrency bugs, this could become a
-% significant drawback.
-% %
-% Although interleavings are affected by a fuzzer, a fuzzer cannot fully
-% control how interleaving takes place. Thus, a fuzzer may need to
-% indiscriminately execute the same input until its coverage is
-% saturated.
-% %
-% Furthermore, it is almost impossible for randomized schedulers to
-% expose concurrency bugs requiring an extreme interleaving such that
-% \dr{TODO: explain:}non-inclusive race conditions~\cite{exprace} or ones that
-% require a very small race window.
-% %
-% In contrast, approaches with a hint-directed scheduler is able to
-% explore all interelavings including even ones that hardly occur if a
-% proper scheduling hint is given. Therfore, they are able to find out
-% such race conditions.
-% %
-% However, existing approaches~\cite{razzer, snowboard} are not suitable
-% of diversifying interleavings. \ie, they change very small part of
-% interleaving across runs.
-% %
-% Even with a single input, they require a large number of execution to
-% test the input enough.
-% }
 
 
 

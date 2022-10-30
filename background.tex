@@ -5,12 +5,28 @@ While concurrency has been a cornerstone of performance benefits in
 the multicore era, it leaves a risk of malfunction, \ie, concurrency
 bug, caused by insufficient thought of concurrent events.
 %
-In this section, we describe two types of concurrency bug, data race
-and race condition, and introduce prior approaches to spot out
-concurrency bugs.
+In this section, we clarify a concurrency bug, and introduce prior
+approaches to discover concurrency bugs with their limitations.
 
-% \subsection{Concurrency Bug}
-% \label{ss:concurrencybugs}
+\subsection{Concurrency Bug}
+\label{ss:concurrencybugs}
+
+
+This paper focuses on finding concurrency bugs in system softwares
+such as the kernel.
+%
+A concurrency bug is a bug that manifests depending on the timing of
+concurrent events (\eg, memory accesses) that access shared data.
+%
+More specifically, two instructions \textit{conflict} if \textbf{1)}
+they access the same memory location, \textbf{2)} at least one of them
+is a store operation, and \textbf{3)} they are executed concurrently.
+%
+Then, a concurrency bug manifests depending on interleaving order of a
+set of conflicting instructions.
+
+A concurrency bug is
+
 
 % \dr{TODO: define conflicting accesses somewhere}
 
@@ -28,7 +44,7 @@ concurrency bugs.
 %   }
 %   \caption{Two types of concurrency bugs.}
 %   \label{fig:concurrencybugs}
-% \end{figure}  
+% \end{figure}
 
 
 % \PP{Data race.}
@@ -126,7 +142,7 @@ concurrency bugs.
 % %   \caption{Relation between data race and race condition. This paper
 % %     focuses on the striped region. \dr{I don't think we need this.}}
 % %   \label{fig:venndiagram}
-% % \end{figure}  
+% % \end{figure}
 % %
 % Lastly, they are not a subset or a superset of one another. Although
 % there are race conditions that occur with data races, neither one is
@@ -172,32 +188,32 @@ scheduler to tail the non-determinism, and coverage metric in the
 concurrency dimension to capture interesting interleavings among all
 possible interleavings.
 
-\PP{Coverage-guided fuzzing}
-%
-Throughout decades, a fuzzing has shown its ability to find bugs in
-various software layers including the userprogram space~\cite{qsym,
-  driller, crfuzz, r2z2, cafl, fuzzorigin} and the kernel
-space~\cite{fuzzusb, syzkaller, hfl, cabfuzz, razzer, krace, janus,
-  hydra, healer}.
-%
-A primary task of fuzzing is to synthesize and mutate various inputs
-of a target program.
-%
-When running the inputs, a fuzzer monitors a program's behavior, and
-observes malfunctions with a help of various developer
-tools~\cite{asan, kasan, meds}.
+% \PP{Coverage-guided fuzzing}
+% %
+% Throughout decades, a fuzzing has shown its ability to find bugs in
+% various software layers including the userprogram space~\cite{qsym,
+%   driller, crfuzz, r2z2, cafl, fuzzorigin} and the kernel
+% space~\cite{fuzzusb, syzkaller, hfl, cabfuzz, razzer, krace, janus,
+%   hydra, healer}.
+% %
+% A primary task of fuzzing is to synthesize and mutate various inputs
+% of a target program.
+% %
+% When running the inputs, a fuzzer monitors a program's behavior, and
+% observes malfunctions with a help of various developer
+% tools~\cite{asan, kasan, meds}.
 
-A coverage-guided fuzzer adopts a coverage metric to abstract
-program's interesting behaviors.
-%
-During fuzzing, a fuzzer accumulates all experienced coverage as the
-abstraction of tested behaviors of a program.
-%
-When a new input is given, a fuzzer compares coverage of the input
-with the accumulated coverage to determine whether the input exposes a
-new interesting behavior. If it does, a fuzzer keeps and mutates the
-input to generate another input that potentially exhibits unknown
-coverage.
+% A coverage-guided fuzzer adopts a coverage metric to abstract
+% program's interesting behaviors.
+% %
+% During fuzzing, a fuzzer accumulates all experienced coverage as the
+% abstraction of tested behaviors of a program.
+% %
+% When a new input is given, a fuzzer compares coverage of the input
+% with the accumulated coverage to determine whether the input exposes a
+% new interesting behavior. If it does, a fuzzer keeps and mutates the
+% input to generate another input that potentially exhibits unknown
+% coverage.
 
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 

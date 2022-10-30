@@ -1,6 +1,21 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
+% A concurrency bug manifests as \textit{a combined result of
+%   interleaving of a small number of instructions.}
+
+
+
+
+% According to the extensive survey conducted by Shan Lu
+% \etal~\cite{learningfrommistakes}, most (\ie, more than 90\%)
+% concurrency bugs manifest depending on the execution order of a small
+% number (mostly, four) of memory accesses.
+
+
+
+
+
 In order to test whether threads cause a concurrency bug or not, the
 straightforward method is to run the threads iteratively while
 \textit{diversifying thread interleaving across iterations} until the
@@ -77,7 +92,6 @@ This approach provides two remarkable benefits.
 \textbf{i)} Tracking interleaving segments is a befitting choice to
 determine if any \textit{interesting} thread interleaving remains.
 %
-\dr{}
 According to the extensive survey conducted by Shan Lu
 \etal~\cite{learningfrommistakes}, most (\ie, more than 90\%)
 concurrency bugs manifest depending on the execution order of a small
@@ -88,14 +102,6 @@ concurrency bug depends on whether a problematic segment is contained
 in the instance of thread interleaving.
 %
 
-\textbf{ii)} interleaving segments contained in an iteration gives
-promising hints for diversifying thread interleaving in future
-iterations.
-%
-In other words, with a given interleaving segment, we can rearrange
-instructions in the interleaving segment to derive \textit{unobserved}
-interleaving segment.
-
 \begin{figure}[t]
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
   \caption{Approach overview to explore the interleaving
@@ -103,7 +109,19 @@ interleaving segment.
   \label{fig:hint}
 \end{figure}
 %
-\autoref{fig:hint} 
+\textbf{ii)} interleaving segments contained in an interleaving
+instance gives promising hints for diversifying thread interleaving in
+future iterations.
+%
+In other words, Given an interleaving segment, we can rearrange
+instructions in the interleaving segment to derive \textit{unobserved}
+interleaving segment.
+%
+\autoref{fig:hint} demonstrates how an observed interleaving segment
+can be helpful for future iterations.
+%
+\dr{}
+
 
 
 \subsection{Interleaving Segment Coverage}
@@ -199,6 +217,99 @@ fuzzer derives \dr{TODO}...
 
 \subsection{Coverage-directed Interleaving Mutation}
 \label{ss:scheduler}
+
+\cut{
+\begin{itemize}
+\item an intuition for an interleaving mutation
+  \begin{itemize}
+  \item two observatrions
+    \begin{itemize}
+      \item many coverages can be executed together
+      \item we can infer what coverages should be further tested
+      \end{itemize}
+  \item step 1: collect coverage
+  \item step 2: inference of coverages to test
+  \item step 3: collect coverages that can be tested together
+  \item step 4: generate an interleaving to test
+  \end{itemize}
+\end{itemize}
+}
+
+
+\newcommand{\segment}{segment graph\xspace}
+\newcommand{\segments}{segment graphs\xspace}
+\newcommand{\Segments}{Segment graphs\xspace}
+
+
+After tracking biconflict coverage of an interleaving, our
+interleaving mutation takes potential biconflict coverage
+$BC\mbox{-}Cov^*$ as a hint for further mutation.
+%
+The goal of the interleaving mutation is to generate other
+interleavings that may cover scheduling constraint pairs in
+$BC\mbox{-}Cov^*$.
+%
+Until $BC\mbox{-}Cov^*$ is not empty, the fuzzer repeats two steps of
+the interleaving mutation:
+%
+1) selecting scheduling constraint pairs to test, and
+2) generating scheduling points to test the selected scheduling
+constraint pairs.
+
+\dr{wip.}
+
+\PP{Selecting scheduling constraints to ...}
+%
+Among scheduling constraint pairs in $BC\mbox{-}Cov^*$, some of them
+cannot be obeyed simultaneously.
+%
+For example, an interleaivng obviously cannot obey the two scheduling
+constraints $(X \rightarrow Y)\wedge (Z \rightarrow W)$ and
+$(Y \rightarrow X)\wedge (Z \rightarrow W)$ because of the
+contradiction on the execution order of $X$ and $Y$.
+%
+We thus 
+
+
+It may require heavy computation to identify the largest subset of
+$BC\mbox{-}Cov^*$ that are all harmonious to each other.
+%
+Instead of finding the optimal solution, we choose to use a greedy
+algorithm.
+%
+
+
+Especially, given uncaptured \segments extracted from an interleaving
+graph, our interleaving mutation starts by selecting a random
+\segment.
+%
+And then it iteratively selects a \segment while confirming that the
+selected \segment is harmonious.
+%
+Determining a given \segment is harmonious is conducted by checking a
+loop in an accumulated interleaving graph.
+
+
+
+\PP{Generating scheduling points}
+%
+After selecting harmonious \segments, generating scheduling points can
+be easily done by conducting a topological
+sort~\cite{topologicalsort}.
+%
+Since an imaginary interleaving graph is acyclic, a topological sort
+always returns a sequence of vertices (\ie, instructions) that does
+not violate a program order.
+%
+It is well known that the time complexity of a topological sort is
+$O(V+E)$. Considering that the graph is sparse, $E$ is a small value
+so the time complexity can be asymptotically considered as $O(V)$.
+%
+In this sequence, scheduling points are just instructions that the
+preemption should happen; \ie, the next instruction is executed by a
+different thread.
+%
+
 
 
 %%% Local Variables:
