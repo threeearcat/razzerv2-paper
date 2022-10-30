@@ -11,18 +11,18 @@ of \textit{offending thread interleaving} (\ie, one that causes a
 concurrency bug).
 %
 As a consequence, previous works either \textbf{1)} may use a
-too-simplified coverage metric and do not identify whether offending
-thread interleaving remains untested~\cite{krace}, or \textbf{2)} may
-waste the computing power by executing too many redundant instances of
-thread interleaving~\cite{snowboard, razzer}.
+too-simplified coverage metric, and not be able to identify whether
+offending thread interleaving remains untested~\cite{krace}, or
+\textbf{2)} may waste the computing power by executing too many
+redundant instances of thread interleaving~\cite{snowboard, razzer}.
 
 
 In this section, we first comprehend why concurrency bugs manifest
-depending on thread interleaving through an example of a real-world
-concurrency bug.
+depending on thread interleaving through a real-world concurrency bug
+example.
 %
 We then define design requirements to effectively discover concurrency
-bugs in the kernel and summarize why existing approaches do not
+bugs in the kernel, and summarize why existing approaches do not
 satisfy the design requirements.
 
 
@@ -41,11 +41,11 @@ satisfy the design requirements.
 \autoref{fig:cve-2019-6974} describes how an erroneous instance of
 thread interleaving causes a concurrency bug.
 %
-In this example, an uninitialized access bug may manifest, and an
-attacker may gain root privileges when two system calls are executed
-concurrently: \texttt{sendmsg()} to send a message through an ipv4
-socket, and \texttt{setsockopt()} to modify an option of the ipv4
-socket.
+In this example, an uninitialized access bug may manifest when two
+system calls are executed concurrently: \texttt{sendmsg()} to send a
+message through an ipv4 socket, and \texttt{setsockopt()} to modify an
+option of the ipv4 socket. As a consequence of the uninitialized
+access bug, an attacker may gain root privileges.
 
 
 
@@ -62,7 +62,7 @@ thread~B may intervene in the middle of these two read operations.
 %
 In that case, if \texttt{B1} is executed between \texttt{A2} and
 \texttt{A4}, thread~A may read different values of
-\texttt{inet->hdrincl} at \texttt{A2} and \texttt{A4}, and use
+\texttt{inet->hdrincl} at \texttt{A2} and \texttt{A4}, and dereference
 \texttt{rfv} without initializing it.
 
 
@@ -109,10 +109,10 @@ design requirements of a concurrency fuzzer as follows:
 %
 \vspace{0.4em}
 
-In other words, a fuzzer should adopt a peroper concurrency coverage
+In other words, a fuzzer should adopt a peroper interleaving coverage
 metric that can be used to determine whether further iterations are
 required (\textbf{R1}), and a scheduling mechanism to quickly saturate
-the concurrency coverage metric (\textbf{R2}).
+the interleaving coverage metric (\textbf{R2}).
 
 
 
