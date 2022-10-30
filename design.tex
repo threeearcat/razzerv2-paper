@@ -1,26 +1,6 @@
 \section{Exploring Interleaving Space}
 \label{s:design}
 
-% A concurrency bug manifests as \textit{a combined result of
-%   interleaving of a small number of instructions.}
-
-
-
-
-% According to the extensive survey conducted by Shan Lu
-% \etal~\cite{learningfrommistakes}, most (\ie, more than 90\%)
-% concurrency bugs manifest depending on the execution order of a small
-% number (mostly, four) of memory accesses.
-
-
-
-
-
-In order to test whether threads cause a concurrency bug or not, the
-straightforward method is to run the threads iteratively while
-\textit{diversifying thread interleaving across iterations} until the
-threads \textit{do not expose new interesting thread interleaving}.
-
 
 In this section, we describe our approach to effectively explore the
 search space of thread interleaving.
@@ -39,9 +19,38 @@ whole design of \sys for expanding both code coverage and interleaving
 coverage.
 
 
-\subsection{Key Idea}
+\subsection{Key Idea: Segmentizing thread interleaving}
 \label{ss:overview}
 
+% Overall 1 2 3 4 5
+% 74 0 22 33 12 7
+
+Our key idea starts from an extensive survey conducted by Shan Lu
+\etal~\cite{learningfrommistakes}.
+%
+According to the survey, 92.4\% (97 out of 105) of concurrency bugs
+they study manifest if a partial order of at most four memory accesses
+are enforced;
+%
+Specifically, out of 105 concurrency bugs, 7 depend on one memory
+access~\footnote{this case can happen only for deadlock bugs that a
+  thread waits for a lock already acquired by itself.}, 25 depend on
+two memory accesses, 53 depend on three memory accesses, and 12 depend
+on four memory accesses.
+%
+The example described in \autoref{fig:cve-2019-6974} also follows this
+survey since the uninitialized access is triggered depending on the
+execution order of three memory accesses.
+
+
+This survey suggests a balance point of a trade-off between the
+completeness of the bug-finding capability and the complexity of
+exploring the search space.
+
+
+
+\PP{Segmentizing thread interleaving}
+%
 \begin{figure}[t]
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
   \caption{Approach overview to explore the interleaving
@@ -49,10 +58,10 @@ coverage.
   \label{fig:keyidea}
 \end{figure}
 %
-The key idea of our approach is to consider an instance of thread
-interleaving as \textit{a composition of interleaving segments}, where
-each interleaving segment represents the execution order of a small
-number of memory accesses.
+Based on the survey, The key idea of our approach is to consider an
+instance of thread interleaving as \textit{a composition of
+  interleaving segments}, where each interleaving segment represents
+the execution order of a small number of memory accesses.
 %
 In particular, after executing threads concurrently, we firstly model
 an execution of these threads as a totally-ordered instruction
@@ -60,7 +69,7 @@ sequence.
 %
 And then, we group a small number of instructions (\eg, four
 instructions) as a segment to track which segments are contained in
-the execution and search for other segments in future iterations.
+the execution and search for unobserved segments in future iterations.
 
 
 \autoref{fig:keyidea} visualizes our key idea.
@@ -85,7 +94,7 @@ It is worth noting that segments can be overlapped; in this example,
 
 
 
-\PP{Benefits}
+\PP{Benefits of thread interleaving segmentization}
 %
 This approach provides two remarkable benefits.
 %

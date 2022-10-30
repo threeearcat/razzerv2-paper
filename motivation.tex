@@ -6,19 +6,18 @@
 % - limitations of existing approaches
 
 This work is motivated by an observation that none of previous works
-leverages a coverage metric that properly reflects
-\textit{characteristics of offending thread interleaving} (\ie, one
-that causes concurrency bugs).
+incorporates a coverage metric that properly addresses characteristics
+of \textit{offending thread interleaving} (\ie, one that causes a
+concurrency bug).
 %
 As a consequence, previous works either \textbf{1)} may use a
-too-simplified coverage metric and do not identify there are more
-interesting instances of thread interleaving that can cause a
-concurrency bug~\cite{krace}, or \textbf{2)} may execute too many
-redundant instances of thread interleaving~\cite{snowboard, razzer}
-and waste the computing power.
+too-simplified coverage metric and do not identify whether offending
+thread interleaving remains untested~\cite{krace}, or \textbf{2)} may
+waste the computing power by executing too many redundant instances of
+thread interleaving~\cite{snowboard, razzer}.
 
 
-In this section, we first clarify why concurrency bugs manifest
+In this section, we first comprehend why concurrency bugs manifest
 depending on thread interleaving through an example of a real-world
 concurrency bug.
 %
@@ -42,14 +41,11 @@ satisfy the design requirements.
 \autoref{fig:cve-2019-6974} describes how an erroneous instance of
 thread interleaving causes a concurrency bug.
 %
-In this example, an uninitialized access bug may manifest when two
-system calls are executed concurrently: \texttt{sendmsg()} to send a
-message through an ipv4 socket, and \texttt{setsockopt()} to modify an
-option of the ipv4 socket.
-%
-As a result of the uninitialized access, an attacker may be able to
-gain root privileges.
-
+In this example, an uninitialized access bug may manifest, and an
+attacker may gain root privileges when two system calls are executed
+concurrently: \texttt{sendmsg()} to send a message through an ipv4
+socket, and \texttt{setsockopt()} to modify an option of the ipv4
+socket.
 
 
 
@@ -72,8 +68,8 @@ In that case, if \texttt{B1} is executed between \texttt{A2} and
 
 
 As can seen in this example, the manifestation of a concurrency bug is
-\textit{a combined result of a few scheduling constraints on
-  instructions pairs.}
+\textit{a combined result of a few scheduling constraints}, where each
+scheduling constraint is established on a pair of instructions.
 %
 In this example, \texttt{rfv} is not initialized only if \texttt{A2}
 is executed before \texttt{B1}. Thus, the uninitialized access
@@ -83,31 +79,40 @@ $\texttt{A1} \rightarrow \texttt{B1}$~\footnote{In this paper,
   executed before \texttt{Y}}.
 %
 Similary, a scheduling constraint on \texttt{B1} and \texttt{A4} also
-is required for the concurrency bug to manifest since thread~A uses
-the uninitialized \texttt{rfv} only if
+is required for the concurrency bug to manifest since thread~A
+dereferences uninitialized \texttt{rfv} only if
 $\texttt{B1} \rightarrow \texttt{A4}$.
 %
 In summary, among all possible instances of thread interleaving, the
 concurrency bug manifests \textit{only if} the two scheduling
-constraints are conjunctively satisfied (\ie,
+constraints are conjunctively satisfied, \ie,
 $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$).
+\texttt{A2})$.
 
 
 \PP{Design requirements}
 %
-The main goal of this paper is to effectively find out concurrency
-bugs through fuzzing.
+\dr{This part looks too similar with Razzer}
 %
-Considering the numerous number of possible instances of thread
-interleaving, we identify two design requirements to explore the
-search space of thread interleaving as follows:
+The main goal of this paper is to design a fuzzing technique to
+effectively discover kernel concurrency bugs. To this end, we elicit
+design requirements of a concurrency fuzzer as follows:
 
 \vspace{0.4em}
-\textbf{R1}: \emph{A fuzzer needs a coverage metric in the concurrency dimension to
-  determine if any interesting interleaving remains.}
+%
+\textbf{R1}: \emph{A fuzzer should be able to determine that offending
+  thread interleaving remains untested.}
 
-\textbf{R2}: \emph{\dr{sature the coverage metric quickly}}.
+\textbf{R2}: \emph{A fuzzer should be able to diversify thread
+  interleaving across iterations to quickly trigger a concurrency
+  bug.}
+%
+\vspace{0.4em}
+
+In other words, a fuzzer should adopt a peroper concurrency coverage
+metric that can be used to determine whether further iterations are
+required (\textbf{R1}), and a scheduling mechanism to quickly saturate
+the concurrency coverage metric (\textbf{R2}).
 
 
 
