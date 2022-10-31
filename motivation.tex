@@ -5,16 +5,18 @@
 % - challenges / design requirements
 % - limitations of existing approaches
 
-This work is motivated by an observation that none of previous works
-incorporates a coverage metric that properly addresses characteristics
-of \textit{offending thread interleaving} (\ie, one that causes a
-concurrency bug).
+
+\dr{TODO: muzz, conzzer}
 %
-As a consequence, previous works either \textbf{1)} may use a
-too-simplified coverage metric, and not be able to identify whether
-offending thread interleaving remains untested~\cite{krace}, or
-\textbf{2)} may waste the computing power by executing too many
-redundant instances of thread interleaving~\cite{snowboard, razzer}.
+This work is motivated by an observation that none of previous works
+properly addresses characteristics of \textit{offending thread
+  interleaving} (\ie, one that causes a concurrency bug).
+%
+As a consequence, previous works either \textbf{1)} are not able to
+identify whether offending thread interleaving remains untested
+because of adopting an insufficient coverage metric~\cite{krace}, or
+\textbf{2)} waste the computing power by executing too many redundant
+instances of thread interleaving~\cite{snowboard, razzer}.
 
 
 In this section, we first comprehend why concurrency bugs manifest
@@ -66,7 +68,8 @@ In that case, if \texttt{B1} is executed between \texttt{A2} and
 \texttt{rfv} without initializing it.
 
 
-
+\dr{TODO: rewording; scheduling constraint --> ???}
+%
 As can seen in this example, the manifestation of a concurrency bug is
 \textit{a combined result of a few scheduling constraints}, where each
 scheduling constraint is established on a pair of instructions.
@@ -83,16 +86,17 @@ is required for the concurrency bug to manifest since thread~A
 dereferences uninitialized \texttt{rfv} only if
 $\texttt{B1} \rightarrow \texttt{A4}$.
 %
-In summary, among all possible instances of thread interleaving, the
-concurrency bug manifests \textit{only if} the two scheduling
-constraints are conjunctively satisfied, \ie,
-$(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
-\texttt{A2})$.
-
+In summary, among all possible instances of thread interleaving, only
+ones that \textit{conjunctively satisfy the two scheduling constraints
+  (\ie,
+  $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4}
+  \rightarrow \texttt{A2})$)} can cause the concurrency bug.
 
 \PP{Design requirements}
 %
 \dr{This part looks too similar with Razzer}
+%
+\dr{TODO: design requirements --> design goals}
 %
 The main goal of this paper is to design a fuzzing technique to
 effectively discover kernel concurrency bugs. To this end, we elicit
@@ -107,7 +111,7 @@ design requirements of a concurrency fuzzer as follows:
   interleaving across iterations to quickly trigger a concurrency
   bug.}
 %
-\vspace{0.4em}
+\vspace{0.2em}
 
 In other words, a fuzzer should adopt a peroper interleaving coverage
 metric that can be used to determine whether further iterations are
@@ -119,11 +123,13 @@ the interleaving coverage metric (\textbf{R2}).
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
 
-Even though prior approaches achieved their own successes, none of
-them satisfy the two design requirements.
+Even though prior approaches achieve their own successes, none of them
+satisfy the two design requirements, \textbf{R1} and \textbf{R2}.
 
-\PP{Coverage metric}
-
+\PP{Insufficient coverage metric}
+%
+\dr{TODO: mention this is about R1}
+%
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
@@ -133,15 +139,57 @@ them satisfy the two design requirements.
     concurrency bug doest not manifest.}
   \label{fig:alias-coverage}
 \end{figure}
+%
+To the best of our knowledge, existing concurrency coverage metrics
+are not sufficient to determine whether interesting (\ie, offending)
+thread interleaving remains untested.
+%
+After KRace~\cite{krace} first emphasizes the necessity of a coverage
+metric in the concurrency dimension, different concurrency coverage
+metrics are proposed such as \textit{alias coverage}~\cite{krace},
+\textit{concurrent call pair}~\cite{conzzer}, and
+\textit{\dr{XXX}}~\cite{muzz}.
+%
+However, they are not applicable to track behavioral changes according
+to a combination of a few scheduling constraints, mainly because they
+track only a single scheduling constraint~\cite{krace, muzz} or
+coarser-grained information such as a pair of two
+concurrently-executed functions~\cite{conzzer}.
 
-\dr{say: existing coverage metrics either are coarse-grained (e.g.,
-  Conzzer) or consider only a part of scheduling constraints (e.g.,
-  KRace).}
+Taking the example of alias covarege, \autoref{fig:alias-coverage}
+describes two interleaving instances that sature alias coverage found
+between two system calls in \autoref{fig:cve-2019-6974}.
+%
+In these example interleaving scenarios, the uninitialized access does
+not manifest even after alias coverage is satured, and a fuzzer may
+decide to stop searching for new interleaving instances in the two
+system calls.
 
 
 \PP{Ineffective scheduling mechanism}
+%
+\dr{TODO: mention this is about R2}
+%%
+\dr{need to revisit after evaluation}
+%
+In addition, existing approaches are not effective in exploring the
+search space of thread interleaving.
+%
+As described in \autoref{s:motivation}, scheduling mechanisms adopted
+by prior approaches are largely categorized into two: a randomized
+scheduler and a hint-directed scheduler.
+%
+A randomized scheduler inherently relines on the randomness, and
+suffers from triggering concurrency bugs that require extreme thread
+interleaving~\cite{cve20196974, cve20191999, cve201911486}.
+%
+Whereas, approaches adopting a hint-directed scheduler~\cite{razzer,
+  snowboard} are not capable of diversifying thread interleaving
+across iterations because in each iteration, they flip the execution
+order of a single pair of instructions while others are not touched.
+%
+According to our evaluation~\autoref{s:eval}, ...
 
-\dr{say: redundanct iterations of Razzer and Snowboard}
 
 % In the perspective of fuzzing, a coverage metric is a paramount gear
 % to determine whether a given input is worthy of further mutation.

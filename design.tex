@@ -44,16 +44,26 @@ execution order of three memory accesses.
 
 
 This survey suggests a balance point of a trade-off between the
-completeness of the bug-finding capability and the complexity of
-exploring the search space.
-\dr{}
+completeness of the bug-finding functionality and the complexity of
+exploring the search space of thread interleaving;
+%
+If one searches for all interleaving instances, he or she is able to
+discover all concurrency bugs with a cost of astronomical time, and
+if one focuses on the execution order of at most two instructions, he
+or she quickly gets his job done with a risk of a high chance of
+missing many (\eg, about 70\%) concurrency bugs.
+%
+Whereas, this paper sits between these two extremes. We track and
+search for execution orders of at most four memory accesses to make
+the problem tractable while maintaining a strong bug-finding
+capability.
 
 
 
 \PP{Segmentizing thread interleaving}
 %
 \begin{figure}[t]
-  \subfloat[Interleaving instance of \autoref{fig:cve-2019-6974}]{
+  \subfloat[Interleaving instance]{
     \includegraphics[width=0.35\linewidth]{fig/intuition-a.pdf}
   }
   \hfill
@@ -75,7 +85,8 @@ sequence.
 %
 And then, we group a small number of instructions (\eg, four
 instructions) as a segment to track which segments are contained in
-the execution and search for unobserved segments in future iterations.
+the execution and to search for unobserved segments in future
+iterations.
 
 
 \autoref{fig:keyidea} visualizes our key idea.
@@ -108,15 +119,16 @@ This approach provides two remarkable benefits.
 \textbf{i)} Tracking interleaving segments is a befitting choice to
 determine if any \textit{interesting} thread interleaving remains.
 %
-According to the extensive survey conducted by Shan Lu
-\etal~\cite{learningfrommistakes}, most (\ie, more than 90\%)
-concurrency bugs manifest depending on the execution order of a small
-number (mostly, four) of memory accesse.
+As mentioned above, most concurrency bugs manifest depending on the
+execution order of four memory accesses.
 %
 In this perspective, whether or not an interleaving instance causes a
 concurrency bug depends on whether a problematic segment is contained
 in the instance of thread interleaving.
 %
+\dr{}
+
+
 
 \begin{figure}[t]
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
