@@ -1,4 +1,4 @@
-\section{Exploring Interleaving Space}
+\section{Exploring Thread Interleaving Space}
 \label{s:design}
 
 
@@ -44,7 +44,7 @@ execution order of three memory accesses.
 
 
 This survey suggests a balance point of a trade-off between the
-completeness of the bug-finding functionality and the complexity of
+completeness of the bug-finding capability and the complexity of
 exploring the search space of thread interleaving;
 %
 If one searches for all interleaving instances, he or she is able to
@@ -63,11 +63,11 @@ capability.
 \PP{Segmentizing thread interleaving}
 %
 \begin{figure}[t]
-  \subfloat[Interleaving instance]{
+  \subfloat[Interleaving instance\label{fig:keyidea-a}]{
     \includegraphics[width=0.35\linewidth]{fig/intuition-a.pdf}
   }
   \hfill
-  \subfloat[Interleaving segments]{
+  \subfloat[Interleaving segments\label{fig:keyidea-b}]{
     \includegraphics[width=0.55\linewidth]{fig/intuition-b.pdf}
   }
   \caption{}
@@ -98,10 +98,14 @@ with timestamps.
 %
 With traced memory access operations, we construct a totally-ordered
 instruction sequence as described in \autoref{fig:keyidea}-(a).
-
-we can decompose the interleaving instance into three interleaving
+%
+Then, to track execution orders of a small number of memory
+instructions, we decompose the interleaving instance into interleaving
 segments as described in \autoref{fig:keyidea}-(b).
-
+%
+In this example interleaving scenario, three interleaving segments,
+\texttt{Segment \#1}, \texttt{Segment \#2}, and \texttt{Segment \#3}
+are contained in the interleaving instance.
 
 It is worth noting that instructions in a segment \dr{}
 
@@ -109,46 +113,72 @@ can be overlapped; in this example,
 \texttt{Segment \#1} and \texttt{Segment \#2} are overlapped over XXX.
 
 
-
+\dr{mention fig3a does not cause the concurrency bug }
 
 
 \PP{Benefits of thread interleaving segmentization}
 %
-This approach provides two remarkable benefits.
+This approach provides two remarkable benefits:
 %
 \textbf{i)} Tracking interleaving segments is a befitting choice to
-determine if any \textit{interesting} thread interleaving remains.
+determine if any interesting thread interleaving remains untested.
 %
 As mentioned above, most concurrency bugs manifest depending on the
-execution order of four memory accesses.
+execution order of a few memory accesses.
 %
 In this perspective, whether or not an interleaving instance causes a
-concurrency bug depends on whether a problematic segment is contained
-in the instance of thread interleaving.
+concurrency bug depends on whether or not an erroneous segment (\ie,
+one describing errorneous thread interleaving) is contained in the
+instance of thread interleaving.
 %
-\dr{}
-
+From a \dr{?}multi-thread seed, if a fuzzer observed all possible
+interleaving segments that contain at most four memory access
+instructions, it can confidently conclude that the multi-thread seed
+will not expose a concurrency bug.
+%
 
 
 \begin{figure}[t]
-  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
-  \caption{Approach overview to explore the interleaving
-    space.}
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/hint.pdf}
+  \caption{}
   \label{fig:hint}
 \end{figure}
 %
-\textbf{ii)} interleaving segments contained in an interleaving
+\textbf{ii)} Interleaving segments contained in an interleaving
 instance gives promising hints for diversifying thread interleaving in
 future iterations.
 %
-In other words, Given an interleaving segment, we can rearrange
+In other words, given an interleaving segment, we can rearrange
 instructions in the interleaving segment to derive \textit{unobserved}
 interleaving segment.
-%
+
 \autoref{fig:hint} demonstrates how an observed interleaving segment
 can be helpful for future iterations.
 %
-\dr{}
+\texttt{Segment \#1} is an interleaving segment described in
+\autoref{fig:keyidea-b}.
+%
+In \texttt{Segment \#1}, \texttt{B1} is executed after \texttt{A4},
+and the uninitialized bug is not triggered in \autoref{fig:keyidea-a}
+because \texttt{B1} should be executed between \texttt{A2} and
+\texttt{A4} to trigger the uninitialized access bug in
+\autoref{fig:cve-2019-6974}.
+%
+Even in this case, we can still make use of \texttt{Segment \#1} not
+only to track which segments are executed, but also to \textit{derive
+  unobserved interleaving segments}.
+%
+As illustrated in \autoref{fig:hint}, we can adjust the execution
+order of three instructions, \texttt{A2}, \texttt{A4} and \texttt{B1}
+in \texttt{Segment \#1}, and derive two unobserved interleaving
+segments \texttt{Segment \#1-a} and \texttt{Segment \#1-b}.
+%
+These two derived interleaving segments can be indicators that teach a
+fuzzer what to search for in future iterations, and if a fuzzer
+executes \texttt{Segment \#1-b}, it will discover the uninitialized
+bug.
+
 
 
 
