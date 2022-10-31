@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib import rc
 from matplotlib.ticker import FuncFormatter
 
-font = {"size": 14}
+font = {"size": 33}
 
 rc("font", **font)
 
@@ -45,7 +45,7 @@ def kilos(x, pos):
 
 
 def draw():
-    fig = plt.figure()
+    fig = plt.figure(figsize=(16, 9))
 
     mformatter = FuncFormatter(millions)
     kformatter = FuncFormatter(kilos)
@@ -55,13 +55,31 @@ def draw():
 
     ax = fig.add_subplot(111)
     ax.yaxis.set_major_formatter(kformatter)
-    lns1 = ax.plot(xaxis, y1, "-", label="# of branches")
+    lns1 = ax.plot(
+        xaxis,
+        y1,
+        "-",
+        label="# of branches",
+        linewidth="3",
+        marker="X",
+        markersize="15",
+        markevery=5,
+    )
     # lns2 = ax.plot(xaxis, Rn, "-", label="Rn")
 
     ax2 = ax.twinx()
     ax2.yaxis.set_major_formatter(mformatter)
     y3 = get_data(sys.argv[1], xaxis, 5)
-    lns3 = ax2.plot(xaxis, y3, "-r", label="# of segments")
+    lns3 = ax2.plot(
+        xaxis,
+        y3,
+        "-r",
+        label="# of segments",
+        linewidth="3",
+        marker="s",
+        markersize="15",
+        markevery=5,
+    )
 
     # added these three lines
     lns = lns1  # + lns2
@@ -76,7 +94,7 @@ def draw():
     ax2.set_ylabel("Interleaving coverage")
 
     # plt.show()
-    plt.savefig("coverage_graph.pdf", dpi=300, bbox_inches="tight")
+    plt.savefig("coverage_graph.pdf", dpi=200, bbox_inches="tight")
 
 
 draw()

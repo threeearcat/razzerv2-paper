@@ -46,15 +46,21 @@ execution order of three memory accesses.
 This survey suggests a balance point of a trade-off between the
 completeness of the bug-finding capability and the complexity of
 exploring the search space.
+\dr{}
 
 
 
 \PP{Segmentizing thread interleaving}
 %
 \begin{figure}[t]
-  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
-  \caption{Approach overview to explore the interleaving
-    space.}
+  \subfloat[Interleaving instance of \autoref{fig:cve-2019-6974}]{
+    \includegraphics[width=0.35\linewidth]{fig/intuition-a.pdf}
+  }
+  \hfill
+  \subfloat[Interleaving segments]{
+    \includegraphics[width=0.55\linewidth]{fig/intuition-b.pdf}
+  }
+  \caption{}
   \label{fig:keyidea}
 \end{figure}
 %
@@ -74,20 +80,21 @@ the execution and search for unobserved segments in future iterations.
 
 \autoref{fig:keyidea} visualizes our key idea.
 %
-In this example, let us assume we are testing whether thread
-interleaving of the two system calls, \texttt{Syscall A} and
-\texttt{Syscall B}, causes a concurrency bug.
+Let us assume we execute the two system calls in
+\autoref{fig:cve-2019-6974}, and while executing the two system calls,
+we track memory access operations conducted by the two system calls
+with timestamps.
 %
-While executing the two system calls, we track memory access
-operations conducted by the two system calls with timestamps, and
-construct a totally-ordered instruction sequence as described in
-\autoref{fig:keyidea}-(a).
+With traced memory access operations, we construct a totally-ordered
+instruction sequence as described in \autoref{fig:keyidea}-(a).
 
 we can decompose the interleaving instance into three interleaving
 segments as described in \autoref{fig:keyidea}-(b).
 
 
-It is worth noting that segments can be overlapped; in this example,
+It is worth noting that instructions in a segment \dr{}
+
+can be overlapped; in this example,
 \texttt{Segment \#1} and \texttt{Segment \#2} are overlapped over XXX.
 
 
@@ -136,8 +143,8 @@ can be helpful for future iterations.
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-Based on the key idea, we propose a novel coverage in the concurrency
-dimension called interleaving segment coverage.
+Based on the key idea, we propose a novel concurrency coverage metric
+called interleaving segment coverage.
 %
 
 

@@ -177,16 +177,6 @@ them satisfy the two design requirements.
 % % a race condition.
 
 
-% \begin{figure}[t]
-%   \centering
-%   \includegraphics[width=0.98\linewidth]{fig/alias-coverage.pdf}
-%   \caption{Three inputs that consist of two concurrent syscalls. For
-%     all inputs, thread~A executes the same \texttt{mmap()} syscall
-%     while thread~B handles different ioctl requests. For brevity, we
-%     describe only conflicting instructions.\dr{Change the name of two
-%       ioctls in input 1 and 2}}
-%   \label{fig:alias-coverage}
-% \end{figure}
 
 % \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
 % %
