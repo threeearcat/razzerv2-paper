@@ -12,7 +12,8 @@ instruction scheduling algorithm to quickly saturate the
 coverage~(\autoref{ss:scheduler}).
 
 
-
+\dr{TODO: define a term ``multi-thread seed''}
+%
 While this section focuses only on exploring the search space of
 thread interleaivng of a given multi-thread seed, \autoref{s:impl}
 describes the whole design of \sys for expanding both code coverage
@@ -25,19 +26,22 @@ and interleaving coverage.
 % Overall 1 2 3 4 5
 % 74 0 22 33 12 7
 
+\begin{table}[t]
+  \centering
+  \input{table/learningfrommistakes.tex}
+  \caption{Statistics provided by Shan Lu
+    \etal~\cite{learningfrommistakes}, stating the number of
+    concurrency bugs according to the number of memory accesses
+    involved in the manifestation of a concurrency bug.}
+  \label{table:learningfrommistakes}
+\end{table}
+
 Our key idea starts from an extensive survey conducted by Shan Lu
 \etal~\cite{learningfrommistakes}.
 %
 According to the survey, 92.4\% (97 out of 105) of concurrency bugs
 they study manifest if a partial order of at most four memory accesses
-are enforced;
-%
-\dr{make this as a table?}
-Specifically, out of 105 concurrency bugs, 7 depend on one memory
-access~\footnote{this case can happen only for deadlock bugs that a
-  thread waits for a lock already acquired by itself.}, 25 depend on
-two memory accesses, 53 depend on three memory accesses, and 12 depend
-on four memory accesses.
+are enforced.
 %
 The example described in \autoref{fig:cve-2019-6974} also follows this
 survey since the uninitialized access is triggered depending on the
@@ -132,7 +136,7 @@ concurrency bug depends on whether or not an erroneous segment (\ie,
 one describing errorneous thread interleaving) is contained in the
 instance of thread interleaving.
 %
-From a \dr{?}multi-thread seed, if a fuzzer observed all possible
+From a multi-thread seed, if a fuzzer observed all possible
 interleaving segments that contain at most four memory access
 instructions, it can confidently conclude that the multi-thread seed
 will not expose a concurrency bug.

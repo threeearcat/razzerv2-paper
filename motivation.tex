@@ -13,10 +13,10 @@ properly addresses characteristics of \textit{offending thread
   interleaving} (\ie, one that causes a concurrency bug).
 %
 As a consequence, previous works either \textbf{1)} are not able to
-identify whether offending thread interleaving remains untested
-because of adopting an insufficient coverage metric~\cite{krace}, or
-\textbf{2)} waste the computing power by executing too many redundant
-instances of thread interleaving~\cite{snowboard, razzer}.
+identify whether offending thread interleaving remains
+untested~\cite{krace}, or \textbf{2)} waste the computing power by
+executing too many redundant instances of thread
+interleaving~\cite{snowboard, razzer}.
 
 
 In this section, we first comprehend why concurrency bugs manifest
@@ -195,7 +195,7 @@ thread interleaving satisfies an extreme condition.
 %
 Unfortunately, this kind of concurrency bugs are equally threatening
 the security of the kernel, but randomized schedulers hardly satisfy
-extreme conditions to trigger thus concurrency bugs.
+extreme conditions that trigger thus concurrency bugs.
 
 Whereas, hint-directed schedulers~\cite{razzer, snowboard} enforce
 thread interleaving, and thus, are able to deterministically trigger
