@@ -71,24 +71,25 @@ initializing it.
 This example indicates that the manifestation of a concurrency bug
 depends on the execution order of multiple memory
 accesses. Specifically, a concurrency bug is \textit{a combined result
-  of a few scheduling constraints}, where each scheduling constraint
-is established on a pair of memory accesses.
+  of a few interleaving orders}, where each interleaving order is
+established on a pair of memory accesses that access the same memory
+object.
 %
 In this example, \texttt{rfv} is not initialized only if \texttt{A2}
 is executed before \texttt{B1}. Thus, the uninitialized access
-requires a scheduling constraint
+requires an interleaving order
 $\texttt{A2} \Rightarrow \texttt{B1}$~\footnote{In this paper,
   $\texttt{X} \Rightarrow \texttt{Y}$ denotes that \texttt{X} is
   executed before \texttt{Y}}.
 %
-Similary, a scheduling constraint on \texttt{B1} and \texttt{A4} is
-also required for the concurrency bug to manifest since thread~A
+Similary, an interleaving order on \texttt{B1} and \texttt{A4} is also
+required for the concurrency bug to manifest since thread~A
 dereferences uninitialized \texttt{rfv} only if
 $\texttt{B1} \Rightarrow \texttt{A4}$.
 %
 In summary, among all possible instances of thread interleaving, only
-ones that \textit{conjunctively satisfy the two scheduling
-  constraints, \ie,
+ones that \textit{conjunctively satisfy the two interleaving orders,
+  \ie,
   $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1}
   \Rightarrow \texttt{A4})$}, cause the concurrency bug while and all
 other interleaving instances cannot.
@@ -99,6 +100,7 @@ The main goal of this paper is to design a fuzzing technique to
 effectively discover kernel concurrency bugs. To this end, we identify
 two design goals of a concurrency fuzzer as follows:
 
+\vspace{0.4em}
 \begin{enumerate}[label=\textbf{R\arabic*:}]
 %
 \item \emph{A fuzzer should be able to determine that offending
@@ -150,9 +152,9 @@ concurrency coverage metrics are proposed such as \textit{alias
     coverage}}~\cite{muzz}.
 %
 However, they are not applicable to track behavioral changes according
-to a combination of scheduling constraints, mainly because they either
-track only a \textit{single} scheduling constraint~\cite{krace, muzz}
-or \textit{coarse-grained information} such as a pair of two
+to a combination of interleaving orders, mainly because they either
+track only a \textit{single} interleaving order~\cite{krace, muzz} or
+\textit{coarse-grained information} such as a pair of two
 concurrently-executed functions~\cite{conzzer}.
 
 Taking the example of alias covarege, \autoref{fig:alias-coverage}

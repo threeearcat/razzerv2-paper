@@ -66,6 +66,20 @@ capability.
 
 \PP{Segmentizing thread interleaving}
 %
+Based on the survey, the key idea of our approach is to consider an
+instance of thread interleaving as \textit{a composition of
+  interleaving segments}, where each interleaving segment represents
+interleaving orders between a small number of memory accesses.
+%
+In particular, after executing threads concurrently, we firstly model
+an execution of these threads as a totally-ordered instruction
+sequence.
+%
+And then, we group a small number of instructions (\eg, four
+instructions), as a segment to track which segments are contained in
+the execution and to search for unobserved segments in future
+iterations.
+
 \begin{figure}[t]
   \subfloat[Interleaving instance\label{fig:keyidea-a}]{
     \includegraphics[width=0.35\linewidth]{fig/intuition-a.pdf}
@@ -82,26 +96,6 @@ capability.
   \label{fig:keyidea}
 \end{figure}
 %
-Based on the survey, The key idea of our approach is to consider an
-instance of thread interleaving as \textit{a composition of
-  interleaving segments}, where each interleaving segment represents
-interleaving order of a small number of memory accesses.
-%
-In particular, after executing threads concurrently, we firstly model
-an execution of these threads as a totally-ordered instruction
-sequence.
-%
-And then, we group a small number of instructions (\eg, four
-instructions), and form interleaving segments
-
-as a segment to track which segments are contained in
-the execution and to search for unobserved segments in future
-iterations.
-
-
-An interleaving segment 
-
-
 \autoref{fig:keyidea} visualizes our key idea.
 %
 Let us assume we execute the two system calls in
@@ -109,22 +103,18 @@ Let us assume we execute the two system calls in
 described in \autoref{fig:keyidea-a}.
 %
 We then decompose the interleaving intance into several interleaving
-segments, where each segment satisfies the following conditions:
-%
-1) an interleaving segment contain no more than four memory accesses,
-%
-2) 
-
-where each segment has at most four memory accesses.
+segments where each interleaving segment describes interleaving orders
+of memory accesses that access either \texttt{iner->hdrincl} or
+\texttt{sk->owned}.
 %
 \autoref{fig:keyidea}-(b) describes three interleaving segments with
 size of 3 and 4, \texttt{Segment \#1}, \texttt{Segment \#2}, and
 \texttt{Segment \#3}.
-
-
-
-can be overlapped; in this example,
-\texttt{Segment \#1} and \texttt{Segment \#2} are overlapped over XXX.
+%
+It is worth noting that interleaving segments can be overlapped; in
+this example, \texttt{Segment \#1} and \texttt{Segment \#3} are
+overlapped over an interleaving order
+$\texttt{A4} \Rightarrow \texttt{B1}$.
 
 
 
@@ -133,54 +123,44 @@ can be overlapped; in this example,
 %
 This approach provides two remarkable benefits:
 %
-\textbf{i)} Tracking interleaving segments is a befitting choice to
+First, tracking interleaving segments is a befitting choice to
 determine if any interesting thread interleaving remains untested.
 %
-As mentioned above, most concurrency bugs manifest depending on the
-execution order of a few memory accesses.
+As mentioned above, most concurrency bugs manifest depending only on
+the execution order of a few memory accesses.
 %
 In this perspective, whether or not an interleaving instance causes a
-concurrency bug depends on whether or not an erroneous segment (\ie,
-one describing errorneous thread interleaving) is contained in the
-instance of thread interleaving.
+concurrency bug depends on whether or not an erroneous interleaving
+segment (\ie, one describing errorneous thread interleaving) is
+contained in the instance of thread interleaving.
 %
-From a multi-thread seed, if a fuzzer observed all possible
-interleaving segments that contain at most four memory access
-instructions, it can confidently conclude that the multi-thread seed
-will not expose a concurrency bug.
+Therefore, from a multi-thread seed, if a fuzzer observed all possible
+interleaving segments with size of four, it can confidently conclude
+that the multi-thread seed will not expose a concurrency bug.
 %
+
 
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/hint.pdf}
-  \caption{}
+  \caption{Observed interleaving segment \texttt{Segment \#1}, and its
+    derivations \texttt{Segment \#1--a} and \texttt{Segment \#1}--b.}
   \label{fig:hint}
 \end{figure}
 %
-\textbf{ii)} Interleaving segments contained in an interleaving
-instance gives promising hints for diversifying thread interleaving in
-future iterations.
+Second, observed interleaving segments can be used to direct a fuzzer
+which interleaving instances should be tested in future iterations.
 %
-In other words, given an interleaving segment, we can rearrange
-instructions in the interleaving segment to derive \textit{unobserved}
-interleaving segment.
-
 \autoref{fig:hint} demonstrates how an observed interleaving segment
 can be helpful for future iterations.
 %
 \texttt{Segment \#1} is an interleaving segment described in
 \autoref{fig:keyidea-b}.
 %
-In \texttt{Segment \#1}, \texttt{B1} is executed after \texttt{A4},
-and the uninitialized bug is not triggered in \autoref{fig:keyidea-a}
-because \texttt{B1} should be executed between \texttt{A2} and
-\texttt{A4} to trigger the uninitialized access bug in
-\autoref{fig:cve-2019-6974}.
-%
-Even in this case, we can still make use of \texttt{Segment \#1} not
-only to track which segments are executed, but also to \textit{derive
-  unobserved interleaving segments}.
+With this interleaving segment, we can \textit{derive unobserved
+  interleaving segments} by rearranging instructions in the
+interleaving segment.
 %
 As illustrated in \autoref{fig:hint}, we can adjust the execution
 order of three instructions, \texttt{A2}, \texttt{A4} and \texttt{B1}
