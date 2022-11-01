@@ -1,13 +1,12 @@
 \section{Exploring Thread Interleaving Space}
 \label{s:design}
 
-
-In this section, we describe our approach to effectively explore the
-search space of thread interleaving.
+In this section, we describe our approach to effectively achieve the
+two design goals, \textbf{R1} and \textbf{R2}.
 %
-We first describe the key idea of our
+We first explain the key idea of our
 approach~(\autoref{ss:overview}). Then, we illustrate our coverage
-metric in the concurrency dimension~(\autoref{ss:coverage}), and the
+metric in the concurrency dimension~(\autoref{ss:coverage}) and the
 instruction scheduling algorithm to quickly saturate the
 coverage~(\autoref{ss:scheduler}).
 
@@ -15,9 +14,8 @@ coverage~(\autoref{ss:scheduler}).
 \dr{TODO: define a term ``multi-thread seed''}
 %
 While this section focuses only on exploring the search space of
-thread interleaivng of a given multi-thread seed, \autoref{s:impl}
-describes the whole design of \sys for expanding both code coverage
-and interleaving coverage.
+thread interleaivng of a given multi-thread seed, the whole design of
+\sys will be explained later in \autoref{s:impl}.
 
 
 \subsection{Key Idea: Segmentizing thread interleaving}
@@ -39,13 +37,14 @@ and interleaving coverage.
 Our key idea starts from an extensive survey conducted by Shan Lu
 \etal~\cite{learningfrommistakes}.
 %
-According to the survey, 92.4\% (97 out of 105) of concurrency bugs
-they study manifest if a partial order of at most four memory accesses
-are enforced.
+As stated in \autoref{table:learningfrommistakes}, 92.4\% (97 out of
+105) of concurrency bugs they study manifest depending only on the
+execution order of at most four memory accesses; all other memory
+accesses do not affect the manifestation of a concurrency bug.
 %
-The example described in \autoref{fig:cve-2019-6974} also follows this
-survey since the uninitialized access is triggered depending on the
-execution order of three memory accesses.
+The example of \autoref{fig:cve-2019-6974} also follows this survey
+since the uninitialized access is triggered depending on the execution
+order of three memory accesses.
 
 
 This survey suggests a balance point of a trade-off between the
@@ -75,50 +74,59 @@ capability.
   \subfloat[Interleaving segments\label{fig:keyidea-b}]{
     \includegraphics[width=0.55\linewidth]{fig/intuition-b.pdf}
   }
-  \caption{}
+  \caption{(a) An interleaving instance example of
+    \autoref{fig:cve-2019-6974} that does not cause the concurrency
+    bug, and (b) interleaving segments contained in the interleaving
+    instance. Note that we intentionally omit instructions that do not
+    access globally-visible memory objects.}
   \label{fig:keyidea}
 \end{figure}
 %
 Based on the survey, The key idea of our approach is to consider an
 instance of thread interleaving as \textit{a composition of
   interleaving segments}, where each interleaving segment represents
-the execution order of a small number of memory accesses.
+interleaving order of a small number of memory accesses.
 %
 In particular, after executing threads concurrently, we firstly model
 an execution of these threads as a totally-ordered instruction
 sequence.
 %
 And then, we group a small number of instructions (\eg, four
-instructions) as a segment to track which segments are contained in
+instructions), and form interleaving segments
+
+as a segment to track which segments are contained in
 the execution and to search for unobserved segments in future
 iterations.
+
+
+An interleaving segment 
 
 
 \autoref{fig:keyidea} visualizes our key idea.
 %
 Let us assume we execute the two system calls in
-\autoref{fig:cve-2019-6974}, and while executing the two system calls,
-we track memory access operations conducted by the two system calls
-with timestamps.
+\autoref{fig:cve-2019-6974}, and obtain the interleaving instance
+described in \autoref{fig:keyidea-a}.
 %
-With traced memory access operations, we construct a totally-ordered
-instruction sequence as described in \autoref{fig:keyidea}-(a).
+We then decompose the interleaving intance into several interleaving
+segments, where each segment satisfies the following conditions:
 %
-Then, to track execution orders of a small number of memory
-instructions, we decompose the interleaving instance into interleaving
-segments as described in \autoref{fig:keyidea}-(b).
+1) an interleaving segment contain no more than four memory accesses,
 %
-In this example interleaving scenario, three interleaving segments,
-\texttt{Segment \#1}, \texttt{Segment \#2}, and \texttt{Segment \#3}
-are contained in the interleaving instance.
+2) 
 
-It is worth noting that instructions in a segment \dr{}
+where each segment has at most four memory accesses.
+%
+\autoref{fig:keyidea}-(b) describes three interleaving segments with
+size of 3 and 4, \texttt{Segment \#1}, \texttt{Segment \#2}, and
+\texttt{Segment \#3}.
+
+
 
 can be overlapped; in this example,
 \texttt{Segment \#1} and \texttt{Segment \#2} are overlapped over XXX.
 
 
-\dr{mention fig3a does not cause the concurrency bug }
 
 
 \PP{Benefits of thread interleaving segmentization}
@@ -190,28 +198,30 @@ bug.
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-Based on the key idea, we propose a novel concurrency coverage metric
-called interleaving segment coverage.
-%
-
-
-
 \newcommand{\mutable}{mutable edge\xspace}
 \newcommand{\mutables}{mutable edges\xspace}
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
+
+
+Based on the key idea, we propose a novel concurrency coverage metric
+called interleaving segment coverage.
 %
-Biconflict converage is designed to track conjunctions of scheduling
-constraints, and if per-input biconflict coverage is saturated, we
-confidently conclude that the concurrent job unlikely causes a race
-condition.
+Interleaving segment coverage is designed to track the execution order
+of a small number of memory accesses, and if per-input interleaving
+segment coverage is saturated, we confidently conclude that the
+multi-thread input unlikely causes a concurrency bug.
 
-We track biconflict coverage \textit{offline}\yj{I do not get it}. During the runtime of a
-kernel, the fuzzer only collects memory access operations conducted by
-the concurrent job (\eg, syscalls), and after executing the concurrent
-job, the fuzzer measures biconflict coverage of the concurrent job.
 
-\PP{Definition of biconflict coverage}
+We compute interleaving segment coverage \textit{offline}; While
+executing a multi-thread input, the fuzzer only collects memory access
+operations conducted by the multi-thread input, and after the
+executino is finished, the fuzzer computes interleaving segment
+coverage of the multi-thread input.
+
+
+
+\PP{Definition of interleaving segment coverage}
 %
 Let us represent a memory access operation $M$ as four tuples,
 $(tid, addr, op, timestamp)$ where $tid$ is the identity of a thread,
@@ -226,32 +236,37 @@ Also let us suppose all memory access operations are totally
 ordered. \ie, there are no two memory access operations that have the
 same $timestamp$.
 
-For all pair of memory access operations $M_i$ and $M_j$, we define a
-scheduling constraint $SC$ as a tuple $(M_i, M_j)$ if
-$M_i(tid) \neq M_j(tid)$, $M_i(addr) = M_j(addr)$,
-$M_i(op) = store \vee M_j(op) = store$, and
-$M_i(timestamp) < M_j(timestamp)$.
-%
-Informally, $M_i$ and $M_j$ are conflicting memory acceess operations
-that are executed in other threads, and $M_i$ was taken place before
-$M_j$.
-%
-For two scheduling constraint $SC_1(M_{1i}, M_{1j})$ and
-$SC_2(M_{2i}, M_{2j})$, $SC_1 = SC_2$ if
-$(M_{1i} = M_{2i}) \wedge (M_{1j} = M_{2j})$.
-%
-Then, we define a scheduling constraint pair $SCPair = (SC_i, SC_j)$
-for two scheduling constraints if $i < j$, $SC_i \neq SC_j$.
-%
-Lastly, biconflict coverage of the concurrent job $BC\mbox{-}Cov$ is
-defined as a set of all scheduling constraint pairs,
-$\{SCPair_1, SCPair_2, ..., SCPair_n\}$, constructed from its memory
-access operation sequence.
+% For all pair of memory access operations $M_i$ and $M_j$, we define a
+% scheduling constraint $SC$ as a tuple $(M_i, M_j)$ if
+% $M_i(tid) \neq M_j(tid)$, $M_i(addr) = M_j(addr)$,
+% $M_i(op) = store \vee M_j(op) = store$, and
+% $M_i(timestamp) < M_j(timestamp)$.
+% %
+% Informally, $M_i$ and $M_j$ are conflicting memory acceess operations
+% that are executed in other threads, and $M_i$ was taken place before
+% $M_j$.
+% %
+% For two scheduling constraint $SC_1(M_{1i}, M_{1j})$ and
+% $SC_2(M_{2i}, M_{2j})$, $SC_1 = SC_2$ if
+% $(M_{1i} = M_{2i}) \wedge (M_{1j} = M_{2j})$.
+% %
+% Then, we define a scheduling constraint pair $SCPair = (SC_i, SC_j)$
+% for two scheduling constraints if $i < j$, $SC_i \neq SC_j$.
+% %
+% Lastly, biconflict coverage of the concurrent job $BC\mbox{-}Cov$ is
+% defined as a set of all scheduling constraint pairs,
+% $\{SCPair_1, SCPair_2, ..., SCPair_n\}$, constructed from its memory
+% access operation sequence.
 
 
 
-\PP{Predicting potential biconflict coverage}
+\PP{Deriving unobserved interleaving segement coverage}
 %
+As described in \autoref{ss:overview}, observed interleaving segment
+coverage can be used to
+
+\dr{}
+
 An interleaving finding new biconflict coverage likely exposes a
 behavior that was unrevealed before.
 %
@@ -280,24 +295,6 @@ fuzzer derives \dr{TODO}...
 
 \subsection{Coverage-directed Interleaving Mutation}
 \label{ss:scheduler}
-
-\cut{
-\begin{itemize}
-\item an intuition for an interleaving mutation
-  \begin{itemize}
-  \item two observatrions
-    \begin{itemize}
-      \item many coverages can be executed together
-      \item we can infer what coverages should be further tested
-      \end{itemize}
-  \item step 1: collect coverage
-  \item step 2: inference of coverages to test
-  \item step 3: collect coverages that can be tested together
-  \item step 4: generate an interleaving to test
-  \end{itemize}
-\end{itemize}
-}
-
 
 \newcommand{\segment}{segment graph\xspace}
 \newcommand{\segments}{segment graphs\xspace}

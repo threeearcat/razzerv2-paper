@@ -34,7 +34,7 @@ satisfying the design goals.
   \centering
   \includegraphics[width=0.95\linewidth]{fig/cve-2017-10661.pdf}
   \caption{Simplified code snippet of CVE-2017-7533. If \texttt{B1} is
-    executed between \texttt{A2} and \texttt{A4}, a race condition on
+    executed between \texttt{A2} and \texttt{A4}, a concurrency bug on
     \texttt{inet->hdrincl} leads to uninitialized stack pointer usage
     on \texttt{rfv}, and an attacker may gain root privileges.}
   \label{fig:cve-2019-6974}
@@ -51,10 +51,10 @@ access bug, an attacker may gain root privileges.
 
 
 
-Assuming \texttt{inet->hdrincl} is initially \texttt{1}, the race
-condition manifests depending on the execution order of three memory
-accesses, \texttt{A2} and \texttt{A4} in thread~A, and \texttt{B1} and
-in thread~B.
+Assuming \texttt{inet->hdrincl} is initially \texttt{1}, the
+concurrency bug manifests depending on the execution order of three
+memory accesses, \texttt{A2} and \texttt{A4} in thread~A, and
+\texttt{B1} and in thread~B.
 %
 During sending a message through the ipv4 socket, thread~A reads a
 value of \texttt{inet->hdrincl} twice at \texttt{A2} and \texttt{A4}.
@@ -63,34 +63,34 @@ However, since these two read operations are not atomically executed,
 thread~B may intervene in the middle of these two read operations.
 %
 In that case, if \texttt{B1} is executed between \texttt{A2} and
-\texttt{A4}, thread~A may read different values of
-\texttt{inet->hdrincl} at \texttt{A2} and \texttt{A4}, and dereference
-\texttt{rfv} without initializing it.
+\texttt{A4}, thread~A reads different values of \texttt{inet->hdrincl}
+at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
+initializing it.
 
 
-\dr{TODO: rewording: scheduling constraint --> ???}
-%
-This example indicates that the manifestation of a concurrency bug is
-\textit{a combined result of a few scheduling constraints}, where each
-scheduling constraint is established on a pair of instructions.
+This example indicates that the manifestation of a concurrency bug
+depends on the execution order of multiple memory
+accesses. Specifically, a concurrency bug is \textit{a combined result
+  of a few scheduling constraints}, where each scheduling constraint
+is established on a pair of memory accesses.
 %
 In this example, \texttt{rfv} is not initialized only if \texttt{A2}
 is executed before \texttt{B1}. Thus, the uninitialized access
 requires a scheduling constraint
-$\texttt{A2} \rightarrow \texttt{B1}$~\footnote{In this paper,
-  $\texttt{X} \rightarrow \texttt{Y}$ denotes that \texttt{X} is
+$\texttt{A2} \Rightarrow \texttt{B1}$~\footnote{In this paper,
+  $\texttt{X} \Rightarrow \texttt{Y}$ denotes that \texttt{X} is
   executed before \texttt{Y}}.
 %
-Similary, a scheduling constraint on \texttt{B1} and \texttt{A4} also
-is required for the concurrency bug to manifest since thread~A
+Similary, a scheduling constraint on \texttt{B1} and \texttt{A4} is
+also required for the concurrency bug to manifest since thread~A
 dereferences uninitialized \texttt{rfv} only if
-$\texttt{B1} \rightarrow \texttt{A4}$.
+$\texttt{B1} \Rightarrow \texttt{A4}$.
 %
 In summary, among all possible instances of thread interleaving, only
 ones that \textit{conjunctively satisfy the two scheduling
   constraints, \ie,
-  $(\texttt{A2} \rightarrow \texttt{B1}) \wedge (\texttt{B1}
-  \rightarrow \texttt{A4})$}, cause the concurrency bug while and all
+  $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1}
+  \Rightarrow \texttt{A4})$}, cause the concurrency bug while and all
 other interleaving instances cannot.
 
 \PP{Design goals}
@@ -111,11 +111,11 @@ two design goals of a concurrency fuzzer as follows:
 For example in \autoref{fig:cve-2019-6974}, \textbf{R1} states that a
 fuzzer should adopt a proper interleaving coverage metric that can be
 used to determine whether
-$(\texttt{A2} \rightarrow \texttt{B1}) \wedge (\texttt{B1} \rightarrow
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ remains untested or not, and \textbf{R2} emphasizes an
-importance of a scheduling mechanism that quickly cover this
+importance of a scheduling mechanism that quickly covers this
 conjunctive condition instead of exploring the entire search space of
-thread interleaving, which is in fact impossible.
+thread interleaving.
 
 
 
@@ -133,8 +133,7 @@ satisfy \textbf{R1} and \textbf{R2}.
   \caption{Two instances of thread interleaving between thread~A and
     thread~B described in \autoref{fig:cve-2019-6974}. Regarding
     \texttt{inet->hdrincl}, alias coverage is saturated but the
-    concurrency bug doest not manifest. \dr{TODO: iter. -->
-      interleaving}}
+    concurrency bug doest not manifest.}
   \label{fig:alias-coverage}
 \end{figure}
 %
@@ -178,6 +177,8 @@ As described in \autoref{s:background}, proposed scheduling mechanisms
 are largely categorized into two: a randomized scheduler and a
 hint-directed scheduler.
 
+\dr{revisit after evaluation. not ready to write this part:}
+%
 Randomized schedulers~\cite{krace, pctalgorithm, muzz, ski} pay little
 attention on collected interleaving coverage when scheduling
 instructions, and rely on the randomness in diversifying thread
@@ -185,24 +186,26 @@ interleaving.
 %
 Therefore, they are inherently limited in satisfying a specific
 condition of thread interleaving (\eg,
-$(\texttt{A2} \rightarrow \texttt{B1}) \wedge (\texttt{B1} \rightarrow
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ in \autoref{fig:cve-2019-6974}).
 %
-This limitation is even more pronounced by a recent
-study~\cite{exprace} stating that many concurrency
+This limitation is even more pronounced by a recent study,
+ExpRace~\cite{exprace}, stating that many concurrency
 bugs~\cite{cve20196974, cve20191999, cve201911486} manifest only if
-thread interleaving satisfies an extreme condition.
+thread interleaving satisfies an extreme condition that randomized
+scheduler hardly satisfy.
 %
-Unfortunately, this kind of concurrency bugs are equally threatening
-the security of the kernel, but randomized schedulers hardly satisfy
-extreme conditions that trigger thus concurrency bugs.
+Unfortunately, ExpRace demonstrates that this kind of concurrency bugs
+are equally threatening the security of the kernel.
 
-Whereas, hint-directed schedulers~\cite{razzer, snowboard} enforce
-thread interleaving, and thus, are able to deterministically trigger
-concurrency bugs, even those that manifest under an extreme condition
-of thread interleaving.
-%
-However, state-of-the-art approaches adopting a hint-directed
+
+Whereas, % hint-directed schedulers~\cite{razzer, snowboard} enforce
+% thread interleaving, and thus, are able to deterministically trigger
+% concurrency bugs, even those that manifest under an extreme condition
+% of thread interleaving.
+% %
+% However, 
+state-of-the-art approaches adopting a hint-directed
 scheduler, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}, are
 not capable of diversifying thread interleaving across iterations.
 %
@@ -211,8 +214,6 @@ determine which thread interleaving requires further
 testing. Therefore, they vary thread interleaving a small degree
 across fuzzing iterations, and require a long time to trigger
 concurrency bugs.
-%
-\dr{revisit after evaluation}
 %
 According to our evaluation~\autoref{s:eval}, ...
 
@@ -228,7 +229,7 @@ According to our evaluation~\autoref{s:eval}, ...
 % In this regard, our primary question is whether existing coverage
 % metrics in the concurrency dimension are suitable to apprehend
 % interleavings potentially causing a race condition, for example,
-% $(\texttt{A1} \rightarrow \texttt{B1}) \wedge (\texttt{B4} \rightarrow
+% $(\texttt{A1} \Rightarrow \texttt{B1}) \wedge (\texttt{B4} \Rightarrow
 % \texttt{A2})$ in \autoref{fig:cve-2019-6974}.
 
 
@@ -292,13 +293,13 @@ According to our evaluation~\autoref{s:eval}, ...
 % that exhibits all execution order of a single pair of conflicting
 % accesses. If a fuzzer executes \texttt{Input 1} with interleavings in
 % \texttt{Run 1} and \texttt{Run 2}, a fuzzer observes execution orders
-% such as $\texttt{A1} \rightarrow \texttt{B1}$ (in \texttt{Run 1}) and
-% $\texttt{B1} \rightarrow \texttt{A1}$ (in \texttt{Run 2}).
+% such as $\texttt{A1} \Rightarrow \texttt{B1}$ (in \texttt{Run 1}) and
+% $\texttt{B1} \Rightarrow \texttt{A1}$ (in \texttt{Run 2}).
 % %
 % Similary, if a fuzzer executes \texttt{Input 2} with interleavings in
 % \texttt{Run 3} and \texttt{Run 4}, it observes execution orders of
-% $\texttt{A2} \rightarrow \texttt{B4}$ (in \texttt{Run 3}) and
-% $\texttt{B4} \rightarrow \texttt{A2}$ (in \texttt{Run 4}).
+% $\texttt{A2} \Rightarrow \texttt{B4}$ (in \texttt{Run 3}) and
+% $\texttt{B4} \Rightarrow \texttt{A2}$ (in \texttt{Run 4}).
 % %
 % After executing these four interleavings, \texttt{Input 3} does not
 % reveal a new execution order of a single conflicting
