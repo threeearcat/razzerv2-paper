@@ -123,11 +123,9 @@ thread interleaving, which is in fact impossible.
 \label{ss:existingapproaches}
 
 Even though prior approaches achieve their own successes, none of them
-satisfy the two design goals, \textbf{R1} and \textbf{R2}.
+satisfy \textbf{R1} and \textbf{R2}.
 
 \PP{Insufficient coverage metric}
-%
-\dr{TODO: mention this is about R1}
 %
 \begin{figure}[t]
   \centering
@@ -135,57 +133,86 @@ satisfy the two design goals, \textbf{R1} and \textbf{R2}.
   \caption{Two instances of thread interleaving between thread~A and
     thread~B described in \autoref{fig:cve-2019-6974}. Regarding
     \texttt{inet->hdrincl}, alias coverage is saturated but the
-    concurrency bug doest not manifest.}
+    concurrency bug doest not manifest. \dr{TODO: iter. -->
+      interleaving}}
   \label{fig:alias-coverage}
 \end{figure}
 %
 To the best of our knowledge, existing concurrency coverage metrics
 are not sufficient to determine whether interesting (\ie, offending)
-thread interleaving remains untested.
+thread interleaving remains untested. Thus, they do not satisfy
+\textbf{R1}.
 %
-After KRace~\cite{krace} first emphasizes the necessity of a coverage
-metric in the concurrency dimension, different concurrency coverage
-metrics are proposed such as \textit{alias coverage}~\cite{krace},
-\textit{concurrent call pair}~\cite{conzzer}, and
-\textit{\dr{XXX}}~\cite{muzz}.
+In particular, after KRace~\cite{krace} first emphasizes the necessity
+of a coverage metric in the concurrency dimension, different
+concurrency coverage metrics are proposed such as \textit{alias
+  coverage}~\cite{krace}, \textit{concurrent call
+  pair}~\cite{conzzer}, and \textit{\dr{TODO: MUZZ
+    coverage}}~\cite{muzz}.
 %
 However, they are not applicable to track behavioral changes according
-to a combination of a few scheduling constraints, mainly because they
-track only a single scheduling constraint~\cite{krace, muzz} or
-coarser-grained information such as a pair of two
+to a combination of scheduling constraints, mainly because they either
+track only a \textit{single} scheduling constraint~\cite{krace, muzz}
+or \textit{coarse-grained information} such as a pair of two
 concurrently-executed functions~\cite{conzzer}.
 
 Taking the example of alias covarege, \autoref{fig:alias-coverage}
-describes two interleaving instances that sature alias coverage found
-between two system calls in \autoref{fig:cve-2019-6974}.
+describes two interleaving instances that saturate alias coverage
+found between two system calls in \autoref{fig:cve-2019-6974}.
 %
 In these example interleaving scenarios, the uninitialized access does
-not manifest even after alias coverage is satured, and a fuzzer may
+not manifest even after alias coverage is saturated, and a fuzzer may
 decide to stop searching for new interleaving instances in the two
 system calls.
+%
+While we do not enumerate all proposed interleaving coverage metrics
+here, we find that they all share the same limitation.
 
 
 \PP{Ineffective scheduling mechanism}
 %
-\dr{TODO: mention this is about R2}
-%%
-\dr{need to revisit after evaluation}
+Stemming from insufficient coverage metrics, proposed scheduling
+mechanisms are also ineffective in satisfying \textbf{R2}.
 %
-In addition, existing approaches are not effective in exploring the
-search space of thread interleaving.
+As described in \autoref{s:background}, proposed scheduling mechanisms
+are largely categorized into two: a randomized scheduler and a
+hint-directed scheduler.
+
+Randomized schedulers~\cite{krace, pctalgorithm, muzz, ski} pay little
+attention on collected interleaving coverage when scheduling
+instructions, and rely on the randomness in diversifying thread
+interleaving.
 %
-As described in \autoref{s:motivation}, scheduling mechanisms adopted
-by prior approaches are largely categorized into two: a randomized
-scheduler and a hint-directed scheduler.
+Therefore, they are inherently limited in satisfying a specific
+condition of thread interleaving (\eg,
+$(\texttt{A2} \rightarrow \texttt{B1}) \wedge (\texttt{B1} \rightarrow
+\texttt{A4})$ in \autoref{fig:cve-2019-6974}).
 %
-A randomized scheduler inherently relines on the randomness, and
-suffers from triggering concurrency bugs that require extreme thread
-interleaving~\cite{cve20196974, cve20191999, cve201911486}.
+This limitation is even more pronounced by a recent
+study~\cite{exprace} stating that many concurrency
+bugs~\cite{cve20196974, cve20191999, cve201911486} manifest only if
+thread interleaving satisfies an extreme condition.
 %
-Whereas, approaches adopting a hint-directed scheduler~\cite{razzer,
-  snowboard} are not capable of diversifying thread interleaving
-across iterations because in each iteration, they flip the execution
-order of a single pair of instructions while others are not touched.
+Unfortunately, this kind of concurrency bugs are equally threatening
+the security of the kernel, but randomized schedulers hardly satisfy
+extreme conditions to trigger thus concurrency bugs.
+
+Whereas, hint-directed schedulers~\cite{razzer, snowboard} enforce
+thread interleaving, and thus, are able to deterministically trigger
+concurrency bugs, even those that manifest under an extreme condition
+of thread interleaving.
+%
+However, state-of-the-art approaches adopting a hint-directed
+scheduler, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}, are
+not capable of diversifying thread interleaving across iterations.
+%
+Since they do not adopt interleaving coverage, they are not able to
+determine which thread interleaving requires further
+testing. Therefore, they vary thread interleaving a small degree
+across fuzzing iterations, and require a long time to trigger
+concurrency bugs.
+%
+\dr{revisit after evaluation}
 %
 According to our evaluation~\autoref{s:eval}, ...
 
