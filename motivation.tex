@@ -7,7 +7,7 @@
 
 
 \dr{Not-defined terms: interleaving order, instance of thread
-  interleaving, multi-thread seed}
+  interleaving, multi-thread input}
 
 
 \dr{TODO: muzz, conzzer}
@@ -107,9 +107,9 @@ two design goals of a concurrency fuzzer as follows:
 \vspace{0.4em}
 \begin{enumerate}[label=\textbf{R\arabic*:}]
 %
-\item \emph{A fuzzer should be able to determine that offending
-  thread interleaving remains untested.}
-\item \emph{A fuzzer should be able to quickly explore untested
+\item \emph{A fuzzer should be able to determine that offending thread
+    interleaving remains untested.}
+\item \emph{A fuzzer should be able to quickly trigger untested
     offending thread interleaving.}
 %
 \end{enumerate}
@@ -118,10 +118,11 @@ For example in \autoref{fig:cve-2019-6974}, \textbf{R1} states that a
 fuzzer should adopt a proper interleaving coverage metric that can be
 used to determine whether
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ remains untested or not, and \textbf{R2} emphasizes an
-importance of a scheduling mechanism that quickly covers this
-conjunctive condition instead of exploring the entire search space of
-thread interleaving.
+\texttt{A4})$ remains untested or not, and \textbf{R2} describes that
+if this conjunctive condition has not been tested, a fuzzer needs to
+schedule instructions to quickly cover the conjunctive condition
+instead of exploring the entire search space of thread interleaving
+randomly.
 
 
 

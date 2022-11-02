@@ -1,4 +1,4 @@
-\section{Exploring Thread Interleaving Space}
+ \section{Exploring Thread Interleaving Space}
 \label{s:design}
 
 In this section, we describe our approach to effectively achieve the
@@ -7,12 +7,12 @@ two design goals, \textbf{R1} and \textbf{R2}.
 We first explain the key idea of our
 approach~(\autoref{ss:overview}). Then, we illustrate our concurrency
 coverage metric to achieve \textbf{R1}~(\autoref{ss:coverage}) and the
-instruction scheduling mechanism to quickly saturate the
-coverage (\eg, satisfying \textbf{R2})~(\autoref{ss:scheduler}).
+instruction scheduling mechanism to quickly saturate the coverage
+metric (\eg, satisfying \textbf{R2})~(\autoref{ss:scheduler}).
 
 
 While this section focuses only on exploring the search space of
-thread interleaivng of a given multi-thread seed, the whole design of
+thread interleaivng of a given multi-thread input, the whole design of
 \sys will be explained later in \autoref{s:impl}.
 
 
@@ -70,16 +70,15 @@ capability.
 Based on the survey, the key idea of our approach is to consider an
 instance of thread interleaving as \textit{a composition of
   interleaving segments}, where each interleaving segment represents
-interleaving orders between a small number of memory accesses.
+interleaving orders among a small number of memory accesses.
 %
 In particular, after executing threads concurrently, we firstly model
-an execution of these threads as a totally-ordered instruction
-sequence.
+the execution as a totally-ordered instruction sequence.
 %
 And then, we group a small number of instructions (\eg, four
-instructions), as a segment to track which segments are contained in
-the execution and to search for unobserved segments in future
-iterations.
+instructions), as an interleaving segment to track which segments are
+contained in the execution and to search for unobserved segments in
+future iterations.
 
 \begin{figure}[t]
   \subfloat[Interleaving instance\label{fig:keyidea-a}]{
@@ -91,9 +90,10 @@ iterations.
   }
   \caption{(a) An interleaving instance example of
     \autoref{fig:cve-2019-6974} that does not cause the concurrency
-    bug, and (b) interleaving segments contained in the interleaving
-    instance. Note that we intentionally omit instructions that do not
-    access globally-visible memory objects.}
+    bug, and (b) interleaving segments with size of three and four
+    contained in the interleaving instance. Note that we intentionally
+    omit instructions that do not access globally-visible memory
+    objects.}
   \label{fig:keyidea}
 \end{figure}
 %
@@ -106,14 +106,18 @@ execution does not cause the uninitialized access bug because
 \texttt{B1} is executed after \texttt{A4}.
 %
 As we want to focus on a small number (\eg, four) of instructions, we
-then decompose the interleaving instance into several interleaving
-segments where each interleaving segment describes interleaving orders
-of memory accesses.
+decompose the interleaving instance into several interleaving segments
+as described in \autoref{fig:keyidea-b}.
 %
-\autoref{fig:keyidea}-(b) describes three interleaving segments
-contained in the interleaving instance of \autoref{fig:keyidea-a}.
+In these interleaving segments, \texttt{Segment \#1} contains three
+memory access operations (\ie, \texttt{A2}, \texttt{A4}, and
+\texttt{B1}), and describes interleaving orders such that \texttt{B1}
+is executed after \texttt{A2} and \texttt{A4}.
 %
-
+Similarly, \texttt{Segment \#2} and \texttt{Segment \#3} describes
+interleaving orders of four memory access operations, (\texttt{A2},
+\texttt{B1}, \texttt{B2}, \texttt{A6}) and (\texttt{A4}, \texttt{B1},
+\texttt{B2}, \texttt{A6}) respectively.
 %
 It is worth noting that interleaving segments can be overlapped; in
 this example, \texttt{Segment \#1} and \texttt{Segment \#3} are
@@ -125,56 +129,60 @@ $\texttt{A4} \Rightarrow \texttt{B1}$.
 
 \PP{Benefits of thread interleaving segmentization}
 %
-This approach provides two remarkable benefits:
+Segmentizing thread interleaving provides two remarkable benefits to a
+fuzzer:
 %
 First, tracking interleaving segments is a befitting choice to
 determine if any interesting thread interleaving remains untested.
 %
 As mentioned above, most concurrency bugs manifest depending only on
-the execution order of a few memory accesses.
+the execution order of four memory access operations.
 %
-In this perspective, whether or not an interleaving instance causes a
-concurrency bug depends on whether or not an erroneous interleaving
-segment (\ie, one describing errorneous thread interleaving) is
-contained in the instance of thread interleaving.
+In this perspective, if a fuzzer observed all possible interleaving
+segments with size of four from a multi-thread input, it can
+confidently conclude that the multi-thread input will not expose a
+concurrency bug.
 %
-Therefore, from a multi-thread seed, if a fuzzer observed all possible
-interleaving segments with size of four, it can confidently conclude
-that the multi-thread seed will not expose a concurrency bug.
-%
+Therefore, \textit{interleaving segments can be act as an interleaving
+  coverage metric that allows a fuzzer to satisfy \textbf{R1}}.
 
 
 
-Second, observed interleaving segments can be used to teach a fuzzer
-which interleaving instances should be tested in future iterations.
+Second, observed interleaving segments can be used to \textit{direct}
+a fuzzer about which interleaving segments need to be tested in future
+iterations.
 %
 \autoref{fig:hint} demonstrates how an observed interleaving segment
 can be helpful for future iterations.
 %
-\texttt{Segment \#1} is an interleaving segment described in
-\autoref{fig:keyidea-b}.
+With \texttt{Segment \#1} from \autoref{fig:keyidea-b}, a fuzzer can
+derive \textit{unobserved interleaving segments} by rearranging
+instructions in the interleaving segment.
 %
-With this interleaving segment, we can derive \textit{unobserved
-  interleaving segments} by rearranging instructions in the
-interleaving segment.
+As illustrated in \autoref{fig:hint}, a fuzzer can derive unobserved
+\texttt{Segment \#1-a} by imagining an execution scenario that
+\texttt{B1} is executed before \texttt{A2}.
 %
-As illustrated in \autoref{fig:hint}, by changing the execution order
-of three instructions, \texttt{A2}, \texttt{A4} and \texttt{B1} in
-\texttt{Segment \#1}, we can derive two unobserved interleaving
-segments \texttt{Segment \#1-a} and \texttt{Segment \#1-b}.
+Similarly, \texttt{Segment \#1-b} can be derived by changing the
+execution order of \texttt{A4} and \texttt{B1}.
 %
-These two derived interleaving segments can be indicators to teach a
-fuzzer what to search for in future iterations, and if a fuzzer
-executes \texttt{Segment \#1-b}, it will discover the uninitialized
-bug.
+These two derived interleaving segments can be indicators to direct a
+fuzzer which thread interleaving to search for in future
+iterations. If a fuzzer focuses on searching these two interleaving
+segments, it will quickly discover the uninitialized bug of
+\autoref{fig:cve-2019-6974} when it executes \texttt{Segment \#1-b}.
+%
+In this way, \textit{our proposed scheduler mechanism is designed to
+  quickly explore unobserved interleaving segments, and to satisfy
+  \textbf{R2}}.
 %
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/hint.pdf}
-  \caption{\texttt{Segment \#1} is observed in \autoref{fig:keyidea},
-    and \texttt{Segment \#1--a} and \texttt{Segment \#1}--b are
-    \textit{unobserved} interleaving segments derived from
-    \texttt{Segment \#1}.}
+  \caption{\texttt{Segment \#1} is an observed segment in
+    \autoref{fig:keyidea}, and \texttt{Segment \#1--a} and
+    \texttt{Segment \#1}--b are \textit{unobserved} interleaving
+    segments derived from \texttt{Segment \#1}.}
   \label{fig:hint}
 \end{figure}
 %
@@ -189,15 +197,23 @@ bug.
 \newcommand{\immutable}{immutable edge\xspace}
 \newcommand{\immutables}{immutable edges\xspace}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/hint.pdf}
+  \caption{\texttt{Segment \#1} and its interleaving segment
+    graph. Dotted arrows represent program orders, and solid arrows
+    represent interleaving orders.}
+  \label{fig:interleavingsegmentgraph}
+\end{figure}
 
 Based on the key idea, we propose a novel concurrency coverage metric
 called interleaving segment coverage.
 %
 Interleaving segment coverage is designed to track the interleaving
 order of a small number of memory accesses, and if per-input
-interleaving segment coverage is saturated, we confidently conclude
-that the multi-thread input unlikely causes a concurrency bug.
-
+interleaving segment coverage is saturated, a fuzzer can confidently
+conclude that the multi-thread input unlikely causes a concurrency
+bug.
 
 We compute interleaving segment coverage \textit{offline}; While
 executing a multi-thread input, the fuzzer only collects memory access
@@ -208,13 +224,33 @@ coverage of the multi-thread input.
 
 \PP{Graph representation of interleaving segment}
 %
-We represent each interleaving segment as a small graph.
+We represent each interleaving segment as a small directed acyclic
+graph called an interleaving segment graph.
 %
 In this graph, vertices represent memory access operations, and edges
-represent XXX.
+represent orderings between two memory access operations.
 %
-In particular, there are two types of edges, intra-thread edges and
-inter-thread edges.
+Specifically, there are two types of orderings, program orders and
+interleaving orders.
+%
+A program order indicates the execution order between two memory
+access operations in a single thread.
+%
+On the other hand, an interleaving order represents the execution
+order between two memory access operations that access the same shared
+data and are executed by different threads.
+
+Taking the example of \texttt{Segment \#1}
+\autoref{fig:interleavingsegmentgraph} illustrates an interleaving
+segment graph corresponding to \texttt{Segment \#1}.
+%
+This interleaving segment graph contains an edge from \texttt{A2} to
+\texttt{A4} representing a program order between \texttt{A2} and
+\texttt{A4}; \texttt{A2} is executed before \texttt{A4} in thread~A.
+%
+In addition, the interleaving segment graph contains two more edges
+from \texttt{A2} to \texttt{B1}, and from \texttt{A4} to \texttt{B1}.
+
 
 
 %
