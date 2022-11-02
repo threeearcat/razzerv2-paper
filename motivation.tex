@@ -6,6 +6,10 @@
 % - limitations of existing approaches
 
 
+\dr{Not-defined terms: interleaving order, instance of thread
+  interleaving, multi-thread seed}
+
+
 \dr{TODO: muzz, conzzer}
 %
 This work is motivated by an observation that none of previous works
@@ -72,8 +76,8 @@ This example indicates that the manifestation of a concurrency bug
 depends on the execution order of multiple memory
 accesses. Specifically, a concurrency bug is \textit{a combined result
   of a few interleaving orders}, where each interleaving order is
-established on a pair of memory accesses that access the same memory
-object.
+established on a pair of memory access operations that access the same
+memory object.
 %
 In this example, \texttt{rfv} is not initialized only if \texttt{A2}
 is executed before \texttt{B1}. Thus, the uninitialized access
@@ -87,12 +91,12 @@ required for the concurrency bug to manifest since thread~A
 dereferences uninitialized \texttt{rfv} only if
 $\texttt{B1} \Rightarrow \texttt{A4}$.
 %
-In summary, among all possible instances of thread interleaving, only
+To sum up, among all possible instances of thread interleaving, only
 ones that \textit{conjunctively satisfy the two interleaving orders,
   \ie,
   $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1}
-  \Rightarrow \texttt{A4})$}, cause the concurrency bug while and all
-other interleaving instances cannot.
+  \Rightarrow \texttt{A4})$}, can cause the concurrency bug while and
+all other interleaving instances cannot.
 
 \PP{Design goals}
 %
@@ -135,7 +139,7 @@ satisfy \textbf{R1} and \textbf{R2}.
   \caption{Two instances of thread interleaving between thread~A and
     thread~B described in \autoref{fig:cve-2019-6974}. Regarding
     \texttt{inet->hdrincl}, alias coverage is saturated but the
-    concurrency bug doest not manifest.}
+    concurrency bug doest not manifest.\dr{store --> write}}
   \label{fig:alias-coverage}
 \end{figure}
 %

@@ -1,11 +1,16 @@
 \resizebox{0.95\linewidth}{!}{
+  \begin{threeparttable}
   \begin{tabular}{l | r r r r r | r}
     \toprule
-    \textbf{\# of acc.} & \textbf{1 acc.} & \textbf{2 acc.} & \textbf{3 acc.} & \textbf{4 acc.} & \textbf{>4 acc.} & \textbf{Total}\\
+    \textbf{\# of acc.} & \textbf{1 acc.}\tnote{a} & \textbf{2 acc.} & \textbf{3 acc.} & \textbf{4 acc.} & \textbf{>4 acc.} & \textbf{Total}\\
     \midrule
     \# of bugs & 7 & 25 & 53 & 12 & 8 & 105 \\
     \bottomrule
   \end{tabular}
+  \begin{tablenotes}
+  \item[a] This case can happen only for deadlock bugs that a thread waits for a lock already acquired by itself.
+  \end{tablenotes}
+  \end{threeparttable}
 }
 
 %%% Local Variables:
