@@ -204,7 +204,7 @@ In this way, \textit{our proposed scheduler mechanism is designed to
   \centering
   \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{\texttt{Segment \#1} and its interleaving segment graph. A
-    dotted arrows represent a program order, and solid arrows
+    dotted arrow represents a program order, and solid arrows
     represent interleaving orders.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
@@ -217,13 +217,6 @@ order of a small number of memory accesses, and if per-input
 interleaving segment coverage is saturated, a fuzzer can confidently
 conclude that the multi-thread input unlikely causes a concurrency
 bug.
-
-We compute interleaving segment coverage \textit{offline}; While
-executing a multi-thread input, the fuzzer only collects memory access
-operations conducted by the multi-thread input, and after the
-execution is finished, the fuzzer computes interleaving segment
-coverage of the multi-thread input.
-
 
 \PP{Graph representation of interleaving segment}
 %
@@ -258,15 +251,15 @@ instructions.
 
 
 It is worth noting that an interleaving graph has two
-properties. First, if a path exists from a vertext \texttt{X} to
+properties. First, if a path exists from a vertex \texttt{X} to
 another vertex \texttt{Y}, a memory access operation corresponding to
 \texttt{X} is executed before a memory access operation corresponding
 to \texttt{Y}.
 %
-because a program order and an interleaving order ar
-transitive relations.
+\dr{}
+This is because edges represent orderings that are a transitive
+relation.
 %
-
 Second, \textit{all interleaving segment graph cannot contain a loop}.
 %
 If there is a loop exists, any vertex \texttt{Z} on the loop is
@@ -312,7 +305,19 @@ executed before itself, which is contradictory.
 
 \PP{Interleaving segment coverage}
 %
-\dr{TODO}
+
+We compute interleaving segment coverage \textit{offline}; While
+executing a multi-thread input, the fuzzer only collects memory access
+operations conducted by the multi-thread input, and after the
+execution is finished, the fuzzer computes interleaving segment
+coverage of the multi-thread input.
+
+
+
+Given an interleaving instance, all interleaving segment graphs with
+at most four vertices could be 
+
+
 size 3 and 4
 
 no containing a vertex that is not connected with interleaving order
@@ -320,13 +325,25 @@ no containing a vertex that is not connected with interleaving order
 identity relation
 
 
+
+
+
 \PP{Deriving unobserved interleaving segement}
 %
 As described in \autoref{ss:overview}, observed interleaving segments
-are used to infer unobserved interleaving segments that a fuzzer will
-search for in future iterations.
+(\eg, \texttt{Segment \#1} and \texttt{Segment \#3} in
+\autoref{fig:hint}) are used to infer unobserved interleaving segments
+(\eg, \texttt{Segment \#1*} and \texttt{Segment \#3*}) that a fuzzer
+will search for in future iterations.
 %
-To this end, a fuzzer flips 
+In our approach, this is done by generating other interleaving segment
+graphs from a given interleaving segment graph.
+
+After a fuzzer computes interleaving segment 
+
+As a reminder, an interleaving segment graph contains two types of
+edges, 
+
 
 % An interleaving finding new biconflict coverage likely exposes a
 % behavior that was unrevealed before.
@@ -357,9 +374,6 @@ To this end, a fuzzer flips
 \subsection{Coverage-directed Interleaving Mutation}
 \label{ss:scheduler}
 
-\newcommand{\segment}{segment graph\xspace}
-\newcommand{\segments}{segment graphs\xspace}
-\newcommand{\Segments}{Segment graphs\xspace}
 
 
 % After tracking biconflict coverage of an interleaving, our
@@ -379,7 +393,7 @@ To this end, a fuzzer flips
 
 % \dr{wip.}
 
-\PP{Selecting scheduling constraints to ...}
+\PP{Selecting interleaving segments}
 %
 % Among scheduling constraint pairs in $BC\mbox{-}Cov^*$, some of them
 % cannot be obeyed simultaneously.
@@ -389,7 +403,10 @@ To this end, a fuzzer flips
 % $(Y \rightarrow X)\wedge (Z \rightarrow W)$ because of the
 % contradiction on the execution order of $X$ and $Y$.
 % %
-% We thus 
+% We thus
+
+
+As described in \autoref{fig:hint}, 
 
 
 % It may require heavy computation to identify the largest subset of
