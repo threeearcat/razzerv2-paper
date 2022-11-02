@@ -3,12 +3,12 @@
 
 
 In this section, we describe design details of \sys, a
-coverage-directed concurrency fuzzer to effectively find race
-conditions.
+coverage-directed concurrency fuzzer to effectively find concurrency
+bugs.
 %
-The key improvement of \sys lies in adopting biconflict coverage and
-the coverage-directed interleaving mutation algorithgm described in
-\autoref{s:design}.
+The key improvement of \sys lies in adopting interleaving segment
+coverage and the coverage-directed interleaving mutation algorithgm
+described in \autoref{s:design}.
 %
 To this end, \sys implements three components, the userspace fuzzer,
 target kernel instrumentation, and the execution engine.
@@ -93,45 +93,45 @@ A schedule contains an initial thread, and a set of scheduling points
 indicating an instruction on which preemption occurs.
 
 
-\subsection{Target Kernel Preparation}
+\subsection{Target Kernel Instrumentation}
 \label{ss:instrumentation}
 
 \sys requires to instrument callbacks before all memory access
 instructions for tracking memory access operations.
 %
-Unlike data race detectors such as KCSAN~\cite{kcsan}, the \sys's
-scheduling mechanism needs to recognize both plane memory accesses and
-annotated memory accesses such as atomic operations.
-%
-We deal with these two types of accesses differently since annotated
-accesses usually are implemented in assembly code, which is hard for a
-LLVM pass to understand.
-%
-In order to instrument plane accesses, we implement a LLVM pass that
-insert callback function calls after memory accesses on LLVM IR.
-%
-Our pass runs after most of binary transfomration is done, so it
-\XXX{...}.
-%
-For annotated instructions, we rely on the functionality of
-KASAN~\cite{kasan} to instrument atomic operations.
-%
-KASAN provides wrapper functions of annotation APIs to call callback
-functions before annotated memory operations, and we instruct the
-wrapper functions to call our callbacks as well.
-%
-Our callbcak functions write memory access operations along with
-various information into a region mmap-ed shared region shared by a
-userspace program (\ie, fuzzer) and a kernel. The information about
-memory operations includes the instruction address, the start address
-of a memory location, and the size of memory access.
-%
-Accordingly, a fuzzer is able to identify what memory access
-operations took place during the execution.
+% Unlike data race detectors such as KCSAN~\cite{kcsan}, the \sys's
+% scheduling mechanism needs to recognize both plane memory accesses and
+% annotated memory accesses such as atomic operations.
+% %
+% We deal with these two types of accesses differently since annotated
+% accesses usually are implemented in assembly code, which is hard for a
+% LLVM pass to understand.
+% %
+% In order to instrument plane accesses, we implement a LLVM pass that
+% insert callback function calls after memory accesses on LLVM IR.
+% %
+% Our pass runs after most of binary transfomration is done, so it
+% \XXX{...}.
+% %
+% For annotated instructions, we rely on the functionality of
+% KASAN~\cite{kasan} to instrument atomic operations.
+% %
+% KASAN provides wrapper functions of annotation APIs to call callback
+% functions before annotated memory operations, and we instruct the
+% wrapper functions to call our callbacks as well.
+% %
+% Our callbcak functions write memory access operations along with
+% various information into a region mmap-ed shared region shared by a
+% userspace program (\ie, fuzzer) and a kernel. The information about
+% memory operations includes the instruction address, the start address
+% of a memory location, and the size of memory access.
+% %
+% Accordingly, a fuzzer is able to identify what memory access
+% operations took place during the execution.
 
-\sys also requires an additional module called a trampoline that is
-used to suspend and resume a running thread. Details about the
-trampoline are described in \autoref{ss:engine}.
+% \sys also requires an additional module called a trampoline that is
+% used to suspend and resume a running thread. Details about the
+% trampoline are described in \autoref{ss:engine}.
 
 
 \subsection{Execution Engine}

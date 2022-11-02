@@ -203,8 +203,8 @@ In this way, \textit{our proposed scheduler mechanism is designed to
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
-  \caption{\texttt{Segment \#1} and its interleaving segment
-    graph. Dotted arrows represent program orders, and solid arrows
+  \caption{\texttt{Segment \#1} and its interleaving segment graph. A
+    dotted arrows represent a program order, and solid arrows
     represent interleaving orders.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
@@ -259,10 +259,14 @@ instructions.
 
 It is worth noting that an interleaving graph has two
 properties. First, if a path exists from a vertext \texttt{X} to
-another vertex \texttt{Y}, \texttt{X} is executed before \texttt{Y}.
+another vertex \texttt{Y}, a memory access operation corresponding to
+\texttt{X} is executed before a memory access operation corresponding
+to \texttt{Y}.
 %
-We can deductively prove this property such that if \dr{}...
+because a program order and an interleaving order ar
+transitive relations.
 %
+
 Second, \textit{all interleaving segment graph cannot contain a loop}.
 %
 If there is a loop exists, any vertex \texttt{Z} on the loop is
@@ -310,8 +314,10 @@ executed before itself, which is contradictory.
 %
 \dr{TODO}
 size 3 and 4
-%
+
 no containing a vertex that is not connected with interleaving order
+
+identity relation
 
 
 \PP{Deriving unobserved interleaving segement}
@@ -320,7 +326,7 @@ As described in \autoref{ss:overview}, observed interleaving segments
 are used to infer unobserved interleaving segments that a fuzzer will
 search for in future iterations.
 %
-
+To this end, a fuzzer flips 
 
 % An interleaving finding new biconflict coverage likely exposes a
 % behavior that was unrevealed before.
