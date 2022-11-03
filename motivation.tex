@@ -7,7 +7,16 @@
 
 
 \dr{Not-defined terms: interleaving order, instance of thread
-  interleaving, multi-thread input}
+  interleaving, multi-thread }
+
+\dr{
+  I'm using these terms interchangably:
+%
+  instance of thread interleaving ==  interleaving instance\\
+%
+  coverage metric in the concurrency dimension == concurrency coverage metric
+}
+
 
 
 \dr{TODO: muzz, conzzer}
@@ -16,8 +25,8 @@ This work is motivated by an observation that none of previous works
 properly addresses characteristics of \textit{offending thread
   interleaving} (\ie, one that causes a concurrency bug).
 %
-As a consequence, previous works either \textbf{1)} are not able to
-identify whether offending thread interleaving remains
+As a consequence, previous works either \textbf{1)} suffer from
+identifying whether offending thread interleaving remains
 untested~\cite{krace}, or \textbf{2)} waste the computing power by
 executing too many redundant instances of thread
 interleaving~\cite{snowboard, razzer}.

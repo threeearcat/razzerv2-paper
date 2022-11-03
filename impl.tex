@@ -29,10 +29,13 @@ implementation of each components.
 \end{figure}
 
 
-The \sys's userspace fuzzer conducts two-stage pipelined fuzzing.
+The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
+similar with recent concurrency fuzzing works, Razzer~\cite{razzer}
+and Snowboard~\cite{snowboard}.
 %
-The first stage is single-thread fuzzing which generates a
-\textit{single-thread} input program, \ie, a sequence of system calls.
+The first stage is single-thread fuzzing that focuses on expanding
+code coverage and generates a \textit{single-thread} input program,
+\ie, a sequence of system calls.
 %
 While the first stage fuzzing generates and runs sequential inputs to
 expand brach coverage, it also finds sequential inputs that include

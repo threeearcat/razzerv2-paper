@@ -303,19 +303,11 @@ executed before itself, which is contradictory.
 % access operation sequence.
 
 
-\PP{Interleaving segment coverage}
+\PP{Tracking interleaving segment coverage}
 %
 
-We compute interleaving segment coverage \textit{offline}; While
-executing a multi-thread input, the fuzzer only collects memory access
-operations conducted by the multi-thread input, and after the
-execution is finished, the fuzzer computes interleaving segment
-coverage of the multi-thread input.
-
-
-
-Given an interleaving instance, all interleaving segment graphs with
-at most four vertices could be 
+Given an interleaving instance, the fuzzer could track all
+interleaving segment graphs that contain at most four vertices.
 
 
 size 3 and 4
@@ -325,6 +317,12 @@ no containing a vertex that is not connected with interleaving order
 identity relation
 
 
+
+We track interleaving segment coverage \textit{offline}; While
+executing a multi-thread input, the fuzzer only collects memory access
+operations conducted by the multi-thread input, and after the
+execution is finished, the fuzzer computes interleaving segment
+coverage of the multi-thread input.
 
 
 
