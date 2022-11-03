@@ -1,20 +1,18 @@
 \section{Design of \sys}
 \label{s:impl}
 
-
-In this section, we describe design details of \sys, a
-coverage-directed concurrency fuzzer to effectively find concurrency
-bugs.
+\sys is a coverage-directed concurrency fuzzer to effectively find
+concurrency bugs.
 %
 The key improvement of \sys lies in adopting interleaving segment
 coverage and the coverage-directed interleaving mutation algorithgm
 described in \autoref{s:design}.
 %
-To this end, \sys implements three components, the userspace fuzzer,
-target kernel instrumentation, and the execution engine.
-%
-In the following of subsections, we describe design details and
-implementation of each components.
+In the following of subsections, we describe design details of three
+components, the userspace fuzzer~(\autoref{ss:fuzzer}), target kernel
+instrumentation~(\autoref{ss:instrumentation}), and the execution
+engine~(\autoref{ss:engine}), and implemetation of
+\sys~(\autoref{ss:impl}).
 
 
 \subsection{Userspace Fuzzer}

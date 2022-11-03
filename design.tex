@@ -305,16 +305,28 @@ executed before itself, which is contradictory.
 
 \PP{Tracking interleaving segment coverage}
 %
+Although interleaving segment graphs can capture interesting
+characteristics of an interleaving instance, it is not straightforward
+to use interleaving segment graphs as an interleaving coverage metric
+principally because of two impediments: 1) storing graphs (even though
+they are small) consumes a lot of memory, and 2) It is not simple for
+the fuzzer to determine a given interleaving segment graph is
+contained in a set of observed interleaving segment graphs.
 
-Given an interleaving instance, the fuzzer could track all
-interleaving segment graphs that contain at most four vertices.
 
 
+To addresses the impediments, the fuzzer hash each interleaving
+segment graph, and interleaving segment coverage tracks a hash table
+of interleaving segment graphs.
+%
+\dr{TODO:}
+
+
+\dr{heuristic}
+%
 size 3 and 4
-
+%
 no containing a vertex that is not connected with interleaving order
-
-identity relation
 
 
 
@@ -335,12 +347,23 @@ As described in \autoref{ss:overview}, observed interleaving segments
 will search for in future iterations.
 %
 In our approach, this is done by generating other interleaving segment
-graphs from a given interleaving segment graph.
+graphs from given interleaving segment graphs.
 
-After a fuzzer computes interleaving segment 
+Let us denote $S_{new} = \{g_1, g_2, ..., g_n \}$ as a set of newly
+observed interleaving segment graphs from a given interleaving
+instance, where $g_i$ is an interleaving segment graph.
+%
+Then, for each interleaving segment graph $g_i$, the fuzzer generates
+$S^{i}_{derived}$, a set of derived interleaving segment graphs, by
+permuting edges in $g_i$.
+%
+Specifically, \dr{}
+%
+$S_{derived} = S^{1}_{derived} \cup S^{2}_{derived} \cup ... \cup
+S^{n}_{derived}$.
 
-As a reminder, an interleaving segment graph contains two types of
-edges, 
+
+
 
 
 % An interleaving finding new biconflict coverage likely exposes a
@@ -371,75 +394,40 @@ edges,
 
 \subsection{Coverage-directed Interleaving Mutation}
 \label{ss:scheduler}
-
-
-
-% After tracking biconflict coverage of an interleaving, our
-% interleaving mutation takes potential biconflict coverage
-% $BC\mbox{-}Cov^*$ as a hint for further mutation.
-% %
-% The goal of the interleaving mutation is to generate other
-% interleavings that may cover scheduling constraint pairs in
-% $BC\mbox{-}Cov^*$.
-% %
-% Until $BC\mbox{-}Cov^*$ is not empty, the fuzzer repeats two steps of
-% the interleaving mutation:
-% %
-% 1) selecting scheduling constraint pairs to test, and
-% 2) generating scheduling points to test the selected scheduling
-% constraint pairs.
-
-% \dr{wip.}
-
-\PP{Selecting interleaving segments}
 %
-% Among scheduling constraint pairs in $BC\mbox{-}Cov^*$, some of them
-% cannot be obeyed simultaneously.
-% %
-% For example, an interleaivng obviously cannot obey the two scheduling
-% constraints $(X \rightarrow Y)\wedge (Z \rightarrow W)$ and
-% $(Y \rightarrow X)\wedge (Z \rightarrow W)$ because of the
-% contradiction on the execution order of $X$ and $Y$.
-% %
-% We thus
+After tracking interleaving segment coverage of a given multi-thread
+input, the fuzzer mutates interleaing.
+%
+To this end, the fuzzer takes $S^{*}_{derived}$ (\ie, a set of derived
+and unobserved interleaving segment graphs). Then the fuzzer 1)
+selects a subset of $S^{*}_{derived}$ to direct the fuzzer, and
+generates scheduling points to cover selected interleaving segment
+graphs.
 
 
+
+
+
+\PP{Selecting interleaving segments to direct the fuzzer}
+%
 As described in \autoref{fig:hint}, 
 
-
-% It may require heavy computation to identify the largest subset of
-% $BC\mbox{-}Cov^*$ that are all harmonious to each other.
-% %
-% Instead of finding the optimal solution, we choose to use a greedy
-% algorithm.
-% %
-
-
-% Especially, given uncaptured \segments extracted from an interleaving
-% graph, our interleaving mutation starts by selecting a random
-% \segment.
-% %
-% And then it iteratively selects a \segment while confirming that the
-% selected \segment is harmonious.
-% %
-% Determining a given \segment is harmonious is conducted by checking a
-% loop in an accumulated interleaving graph.
 
 
 
 \PP{Generating scheduling points}
 %
-% After selecting harmonious \segments, generating scheduling points can
-% be easily done by conducting a topological
-% sort~\cite{topologicalsort}.
-% %
-% Since an imaginary interleaving graph is acyclic, a topological sort
-% always returns a sequence of vertices (\ie, instructions) that does
-% not violate a program order.
-% %
-% It is well known that the time complexity of a topological sort is
-% $O(V+E)$. Considering that the graph is sparse, $E$ is a small value
-% so the time complexity can be asymptotically considered as $O(V)$.
+After selecting interleaving segment graphs, generating scheduling
+points can be easily done by conducting a topological
+sort~\cite{topologicalsort}.
+%
+Since an imaginary interleaving graph is acyclic, a topological sort
+always returns a sequence of vertices (\ie, instructions) that does
+not violate a program order.
+%
+It is well known that the time complexity of a topological sort is
+$O(V+E)$. Considering that the graph is sparse, $E$ is a small value
+so the time complexity can be asymptotically considered as $O(V)$.
 % %
 % In this sequence, scheduling points are just instructions that the
 % preemption should happen; \ie, the next instruction is executed by a
