@@ -32,12 +32,15 @@ discover concurrency bugs in the latest Linux kernel.
 \PP{Experimental setup.}
 %
 To discover new concurrency bugs, we evaluate \sys on a two-socket
-machine equipped with Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz (40MT
+machine equipped with Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz (40M
 cache) and 512\GB of RAM.
 %
 This machine provides 32 total cores and 64 total threads, and runs
 Ubuntu Server 20.04.4 LTS on Linux 5.4.143 as a host operating system.
 %
+During our experiments, we launch 32 virtual machines (VMs) where each
+VM is equipped with four vCPUs and 4\GB memory.
+
 To build a guest kernel, we use a kernel configuration used by
 \texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
 \sys search for bugs in similar kernel modules/subsystems.
@@ -101,13 +104,31 @@ process.
 \PP{Coverage growth.}
 %
 \begin{figure}[t]
+  \centering
   \includegraphics[width=\linewidth]{fig/coverage_graph-crop.pdf}
   \caption{}
   \label{fig:eval:coverage}
 \end{figure}
 %
 Since coverage metrics are the paramount performance metric of
-fuzzing, we first measure the coverage growth \dr{}
+fuzzing, we first measure the coverage growth for both code coverage
+(\ie, the number of taken branches) and interelaving coverage (\ie,
+the number of observed interleaving segments) during 100 hours of
+fuzzing.
+%
+As shown in \autoref{fig:eval:coverage}, there is a notable difference
+in scale between code coverage and interleaving coverage.
+%
+While the number of taken branches just reaches to 250,000, the number
+of interleaving segments is over 1,2500,000. Thus the size of
+interleaving coverage is more than fifty times of the size of code
+coverage.
+%
+This result confirms the conventional thought that the search space of
+thread interleaving is large.
+%
+
+\dr{}
 
 
 \PP{Fuzzing throughput.}
@@ -208,7 +229,9 @@ out of the total elapsed time.
   \label{table:knownbugs}
 \end{table}
 
-We compare \sys against various prior approaches to provide a .
+We compare \sys against various prior approaches, KRace~\cite{krace},
+Snowboard~\cite{snowboard} to demonstrate the performance improvement
+in discovering concurrency bugs.
 
 \PP{Bug selection}
 %
@@ -217,21 +240,68 @@ comparison study.
 %
 For fair comparisons, we select kernel concurrency bugs that are used
 to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
-  razzer, snowboard, krace}. Specifically, among concurrency bugs used
-in previous studies, we select ones that their exploits are publicly
-available such that we can make use of them for our evaluation.
+  razzer, snowboard, krace}.
 %
-The exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is not
-publicly available, we successfully reproduce the concurrency bug from
-the description in the Snowboard~\cite{snowboard} paper.
+Specifically, among concurrency bugs used in previous studies, we
+select ones that their exploits are publicly available such that we
+can make use of them for our evaluation.
+%
+Although the exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is
+not publicly available, we successfully reproduce the concurrency bug
+from the description in the Snowboard~\cite{snowboard} paper.
 %
 Also, even though KRace~\cite{krace} studies kernel concurrency bugs
 (\ie, data races), we do not have access to concurrency bugs that the
 authors use to evaluate KRace.
 
+\PP{Comparison methodology}
+%
+\begin{figure}[t]
+  \caption{A multi-thread input that causes
+    CVE-2016-8655~\cite{cve20168655}. The concurrency bugs may
+    manifests if two system calls in bold exeucte a specific thread
+    interleaving.}
+  \label{fig:multithreadinput}
+\end{figure}
+%
+Arguably, the most straightforward metric to compare fuzzing
+techniques is the elapsed time until concurrency bugs are discovered.
+%
+However, the elapsed time heavily depends on the randomness; because a
+fuzzer generates an input program very randomly, it is possible that
+one fuzzer quickly generates an input program that causes a
+concurrency bug, while another fuzzer takes very long time to generate
+the input program.
+
+In order to minimize the impact of the randomness and to concentrate
+on the performance impact of scheduling mechanisms, we predefine a
+multi-thread input as shown in \autoref{fig:multithreadinput}, and let
+a fuzzer repeatedly execute the given multi-thread input without
+generating new inputs nor mutating the given input.
+
+In addition, previous fuzzing approaches
+
+
 \PP{Overall }
 %
+\begin{table}[t]
+  \small
+  \centering
+  \input{table/throughput}
+  \caption{Fuzzing throughput (\# of exec/s) of \sys and
+    \texttt{Syzkaller}. \texttt{Syzkaller-memtrace} indicates
+    throughput of \texttt{Syzkaller} with memory access tracing
+    enabled.}
+  \label{table:throughput}
+\end{table}
+%
 
+
+
+
+\PP{Coverage growth}
+%
+To further understand why 
 
 
 
