@@ -234,58 +234,58 @@ the multi-thread input unlikely causes a concurrency bug.
 \PP{Graph representation of interleaving segment}
 %
 We represent each interleaving segment as a small directed acyclic
-graph (DAG) called an interleaving segment graph.
+graph (DAG) called an interleaving segment graph, or shortly, segment
+graph~\footnote{For the rest of this paper, we abbreviate
+  ``interleaving segment graph'' to ``segment graph''}.
 %
 In this graph, vertices represent memory access operations, and edges
 represent orderings between two memory access operations.
 %
-Specifically, there are two types of orderings, program orders and
-interleaving orders.
+Specifically, there are two types of edges, program-order edges and
+interleaving-order edges.
 %
-A program order indicates the execution order between two memory
+A program-order edge indicates the execution order between two memory
 access operations in a single thread.
 %
-On the other hand, an interleaving order indicates the execution order
-between two memory access operations that 1) access the same shared
-data, 2) at least one of them is a write operation, and 3) are
+On the other hand, an interleaving-order edge indicates the execution
+order between two memory access operations that 1) access the same
+shared data, 2) at least one of them is a write operation, and 3) are
 executed by different threads.
 
 Taking the example of \texttt{Segment \#1},
-\autoref{fig:interleavingsegmentgraph} illustrates an interleaving
-segment graph corresponding to \texttt{Segment \#1}.
+\autoref{fig:interleavingsegmentgraph} illustrates a segment graph
+corresponding to \texttt{Segment \#1}.
 %
-This interleaving segment graph contains an edge from \texttt{A2} to
-\texttt{A4} representing a program order between \texttt{A2} and
-\texttt{A4} (\ie, \texttt{A2} is executed before \texttt{A4} in
-thread~A).
+This segment graph contains a program-order edge from \texttt{A2} to
+\texttt{A4} representing ``\texttt{A2} is executed before \texttt{A4}
+in thread~A''.
 %
-In addition, the interleaving segment graph contains two more edges
-representing interleaving orders. In contains an edge from \texttt{A2}
-to \texttt{B1}, because 1) they access \texttt{inet->hdrincl}, 2)
+In addition, the segment graph contains two more interleaving-order
+edges. It contains an interleaving-order edge from \texttt{A2} to
+\texttt{B1}, because 1) they access \texttt{inet->hdrincl}, 2)
 \texttt{B1} is a write operations, and 3) they are executed by
-different threads. Likewise, the interleaving segment graph also
-contains an edge from \texttt{A4} to \texttt{B1}.
+different threads. Likewise, the segment graph also contains an
+interleaving-order edge from \texttt{A4} to \texttt{B1}.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
-  \caption{\texttt{Segment \#1} and its interleaving segment graph. A
+  \caption{\texttt{Segment \#1} and its segment graph. A
     dotted arrow represents a program order, and solid arrows
     represent interleaving orders.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
 
-It is worth noting that an interleaving graph has two
-properties. First, if a path exists from a vertex \texttt{X} to
-another vertex \texttt{Y}, a memory access operation corresponding to
-\texttt{X} is executed before a memory access operation corresponding
-to \texttt{Y}.
+It is worth noting that a segmentgraph has two properties. First, if
+a path exists from a vertex \texttt{X} to another vertex \texttt{Y}, a
+memory access operation corresponding to \texttt{X} is executed before
+a memory access operation corresponding to \texttt{Y}.
 %
 \dr{}
 This is because edges represent orderings that are a transitive
 relation.
 %
-Second, \textit{all interleaving segment graph cannot contain a loop}.
+Second, \textit{all segment graph cannot contain a loop}.
 %
 If there is a loop exists, any vertex \texttt{Z} on the loop is
 executed before itself, which is contradictory.
@@ -330,28 +330,27 @@ executed before itself, which is contradictory.
 
 \PP{Tracking interleaving segment coverage}
 %
-Although interleaving segment graphs can capture interesting
-characteristics of an interleaving instance, it is not straightforward
-to use interleaving segment graphs as an interleaving coverage metric
-principally because of two impediments: 1) storing graphs (even though
-they are small) consumes a lot of memory, and 2) it is not simple for
-the fuzzer to determine a given interleaving segment graph is
-contained in a set of observed interleaving segment graphs.
+Although interleaving segments can capture interesting characteristics
+of an interleaving instance, it is not straightforward to use segment
+graphs as an interleaving coverage metric because of two principal
+impediments: 1) storing graphs (even though they are small) consumes a
+lot of memory, and 2) it is not simple for the fuzzer to determine
+whether a given segment graph is explored before or not.
 
 
 
-To addresses the impediments, the fuzzer hashes each interleaving
-segment graph, and interleaving segment coverage tracks a hash table
-of interleaving segment graphs.
+To addresses the impediments, the fuzzer hashes each segment graph,
+and interleaving segment coverage tracks a hash table of segment
+graphs.
 %
-\dr{TODO:}
+\dr{TODO: explain how to hash the graph}
 
 
-\dr{heuristic}
-%
-size 3 and 4
-%
-no containing a vertex that is not connected with interleaving order
+% \dr{heuristic}
+% %
+% size 3 and 4
+% %
+% no containing a vertex that is not connected with interleaving order
 
 
 
@@ -362,73 +361,81 @@ execution is finished, the fuzzer computes interleaving segment
 coverage of the multi-thread input.
 
 
-
-\PP{Deriving unobserved interleaving segement}
+\PP{Feedback from interleaving segment coverage}
 %
-As described in \autoref{ss:overview}, observed interleaving segments
-(\eg, \texttt{Segment \#1} and \texttt{Segment \#3} in
-\autoref{fig:hint}) are used to infer unobserved interleaving segments
-(\eg, \texttt{Segment \#1*} and \texttt{Segment \#3*}) that a fuzzer
-will search for in future iterations.
+New interleaving segment coverage provides two feedbacks to the
+fuzzer.
 %
-In our approach, this is done by generating other interleaving segment
-graphs from given interleaving segment graphs.
-
-Let us denote $S_{new} = \{g_1, g_2, ..., g_n \}$ as a set of newly
-observed interleaving segment graphs from a given interleaving
-instance, where $g_i$ is an interleaving segment graph.
+First, the fuzzer notices that there are possibly more interesting
+thread interleaivng remains untested. Therefore, the fuzzer spends
+more computing power to explore more interesting thread interleaving.
 %
-Then, for each interleaving segment graph $g_i$, the fuzzer generates
-$S^{i}_{derived}$, a set of derived interleaving segment graphs, by
-permuting edges in $g_i$.
-%
-Specifically, \dr{}
-%
-$S_{derived} = S^{1}_{derived} \cup S^{2}_{derived} \cup ... \cup
-S^{n}_{derived}$.
+Second, newly found segment graph directs how to explore the search
+space of thread interleaving as detailed in \autoref{ss:scheduler}.
 
 
-
-
-
-% An interleaving finding new biconflict coverage likely exposes a
-% behavior that was unrevealed before.
-% %
-% To discover more interesting behaviors, if new biconflict coverage is
-% found, the fuzzer mutates the interleaving. \ie, the fuzzer
-% reschedules instructions to conform with other interleavings.
-
-% Before mutating an interleaving, the fuzzer predicts \textit{potential
-%   biconflict coverage}, $BC\mbox{-}Cov^*$, a set of scheduling
-% constraint pairs that \textit{has not been observed but is expected to
-%   occur with other interleavings}.
-% %
-% Potential binconflict coverage will be used to direct the interleaving
-% mutation. \ie, the fuzzer will try to generate interleavings to expose
-% undisclosed scheduling constraint pairs contained in
-% $BC\mbox{-}Cov^*$, instead of blindly mutating an interleaving.
-
-
-% $BC\mbox{-}Cov^*$ is derived from biconflict coverage $BC\mbox{-}cov$,
-% $\{SCPair_1, SCPair_2, ..., SCPair_n\}$.
-% %
-% For each $SCPair_i$ composed of $(SC_x, SC_y)$ in $BC\mbox{-}cov$, the
-% fuzzer derives \dr{TODO}...
 
 
 
 \subsection{Coverage-directed Interleaving Mutation}
 \label{ss:scheduler}
 %
-After tracking interleaving segment coverage of a given multi-thread
-input, the fuzzer mutates interleaving.
+One important role of segment graphs are to infer unexplored
+interleaving segments that the fuzzer will search for in future
+iterations.
 %
-To this end, the fuzzer takes $S^{*}_{derived}$ (\ie, a set of derived
-and unobserved interleaving segment graphs). Then the fuzzer 1)
-selects a subset of $S^{*}_{derived}$ to direct the fuzzer, and
-generates scheduling points to cover selected interleaving segment
-graphs.
 
+
+\PP{Deriving unexplored interleaving segement}
+%
+As described in \autoref{ss:overview}, explored interleaving segments
+(\eg, \texttt{Segment \#1} and \texttt{Segment \#3} in
+\autoref{fig:hint}) are used to infer unexplored interleaving segments
+(\eg, \texttt{Segment \#1*} and \texttt{Segment \#3*}) that a fuzzer
+will search for in future iterations.
+%
+In our approach, this is done by generating other segment graphs from
+given segment graphs.
+
+Let us denote $S_{new} = \{g_1, g_2, ..., g_n \}$ as a set of newly
+explored segment graphs from a given interleaving instance, where
+$g_i$ denotes a segment graph.
+%
+For each segment graph $g_i$, the fuzzer permutes interleaving-order
+edges in $g_i$, and generates $S^{i}_{derived}$, a set of derived
+segment graphs.
+%
+Specifically, the fuzzer enumerates interleaving segment graphs
+generated by permuting interleaving-order edges. Then, the fuzzer
+excludes 1) ones thas are explored before, and 2) ones that contain a
+loop.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/interleavingmutation.pdf}
+  \caption{Example interleaving segment graphs derived from
+    \texttt{Segment \#1}. The fuzzer will not utilize (b) and (c)
+    becuase (b) is already explored, and (c) contains a loop.}
+  \label{fig:interleavingmutation}
+\end{figure}
+%
+
+
+The reason why the fuzzer excludes explored interleaving segment
+graphs is intuitive; the fuzzer wants to deprioritize interleaving
+segment graphs already explored.
+%
+The fuzzer also excludes ones that contain a loop because it is
+impossible to enforce the execution order because a loop indicates a
+contradiction on the execution order; a loop indicates that any vertex
+on the loop should be executed before itself.
+
+
+
+As a last step, the fuzzer unions all sets of derived interleaving
+segment graphs such that
+$S_{derived} = S^{1}_{derived} \cup S^{2}_{derived} \cup ... \cup
+S^{n}_{derived}$.
 
 
 
@@ -436,6 +443,12 @@ graphs.
 \PP{Selecting interleaving segments to direct the fuzzer}
 %
 As described in \autoref{fig:hint}, 
+
+To this end, the fuzzer takes $S_{derived}$ (\ie, a set of derived and
+unexplored segment graphs). Then the fuzzer 1) selects a subset of
+$S_{derived}$ to direct the fuzzer, and generates scheduling points to
+cover selected interleaving segment graphs.
+
 
 
 
