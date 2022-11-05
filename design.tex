@@ -477,25 +477,33 @@ points.
 
 \PP{Selecting interleaving segments to direct the fuzzer}
 %
-With given $S_{derived}$, the fuzzer selects multiple segment graphs
-to at a time.
-
-
-
-
-
-%
 As described  \autoref{fig:hint}, multiple segment graphs can be
 explored at a time (\ie, one thread interleaving comprises multiple
 interleaving segments).
+%
+Thus, our strategy to to quickly consume $S_{derived}$ (\ie, a set of
+derived and unexplored segment graphs) is selecting multiple
+interleaving segments from $S_{derived}$, and explore them altogether.
 
 
-% 
-Thus, a method to quickly consume $S_{derived}$ (\ie, a set of derived
-and unexplored segment graphs) can be selecting multiple interleaving
-segments contained in $S_{derived}$, and finding an interleaving
-instance to cover selected interleaving segments.
+However, not all interleaving segments cannot be explored at a time.
+%
+For example, in \autoref{fig:hint}, (a) and (b) cannot be explored
+together; the segment graph (a) requires \texttt{A2} to be executed
+before \texttt{B1} while the segment graph (b) requires the opposite
+execution order between \texttt{A2} and \texttt{B1}.
 
+
+
+Formally speaking,
+
+For a given $S_{derived}$, let us denote $\bar{S}$ as a subset of
+$S_{derived}$.
+
+let us denote $V = V_1 \cup $
+
+then, segment graphs contained in a subset of $S_{derived}$ cannot be
+explored if all edges $E$ forms a loop.
 
 To this end,
 
