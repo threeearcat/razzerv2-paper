@@ -357,9 +357,9 @@ graphs.
 
 We track interleaving segment coverage \textit{offline}; While
 executing a multi-thread input, the fuzzer only collects memory access
-operations conducted by the multi-thread input, and after the
-execution is finished, the fuzzer computes interleaving segment
-coverage of the multi-thread input.
+operations annotated with timestamps, and after the execution is
+finished, the fuzzer constructs an interleaving instance, and then
+computes interleaving segment coverage of the multi-thread input.
 
 
 \PP{Feedback from interleaving segment coverage}
@@ -477,10 +477,20 @@ points.
 
 \PP{Selecting interleaving segments to direct the fuzzer}
 %
-As described in \autoref{fig:hint}, multiple segment graphs can be
+With given $S_{derived}$, the fuzzer selects multiple segment graphs
+to at a time.
+
+
+
+
+
+%
+As described  \autoref{fig:hint}, multiple segment graphs can be
 explored at a time (\ie, one thread interleaving comprises multiple
 interleaving segments).
-%
+
+
+% 
 Thus, a method to quickly consume $S_{derived}$ (\ie, a set of derived
 and unexplored segment graphs) can be selecting multiple interleaving
 segments contained in $S_{derived}$, and finding an interleaving
