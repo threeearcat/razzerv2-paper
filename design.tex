@@ -430,7 +430,7 @@ access the shared data.
 %
 With the segmant graph of (a), the fuzzer will explore thread
 interleaving that
-$(\texttt{A4} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ (\ie, the condition to cause the uninitialized access
 bug).
 %
@@ -439,10 +439,10 @@ of $\texttt{A2} \Rightarrow \texttt{B1}$ and
 $\texttt{A4} \Rightarrow \texttt{B1}$.
 %
 Besides (a) and (b), flipping $\texttt{A2} \Rightarrow \texttt{B1}$
-can the segment graph described in (c). However, This segment graph is
-excluded because it contains a loop; a loop indicates a contradiction
-on the execution order that any vertex on the loop should be executed
-before itself.
+can generate the segment graph described in (c). However, This segment
+graph is excluded because it contains a loop; a loop indicates a
+contradiction on the execution order that any vertex on the loop
+should be executed before itself.
 
 
 It is worth noting that we do not flip program-order edges (\ie,
