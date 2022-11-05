@@ -32,7 +32,7 @@ in the kernel, and summarize why existing approaches fall short in
 satisfying the design goals.
 
 
-\PP{Manifestation of concurrency bugs}
+\PP{Manifestation of concurrency bugs}\yj{shorten this paragraph}
 %
 \begin{figure}[t]
   \centering
@@ -40,7 +40,7 @@ satisfying the design goals.
   \caption{Simplified code snippet of CVE-2017-7533. If \texttt{B1} is
     executed between \texttt{A2} and \texttt{A4}, a concurrency bug on
     \texttt{inet->hdrincl} leads to uninitialized stack pointer usage
-    on \texttt{rfv}, and an attacker may gain root privileges.}
+    on \texttt{rfv}, and an attacker may gain root privileges.\yj{I do not know how attacker can gain a root privilege}}
   \label{fig:cve-2019-6974}
 \end{figure}
 %
@@ -72,6 +72,7 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
+\PP{Combined interleavings}
 This example indicates that the manifestation of a concurrency bug
 depends on the execution order of multiple memory
 accesses. Specifically, a concurrency bug is \textit{a combined result
@@ -124,11 +125,7 @@ schedule instructions to quickly cover the conjunctive condition
 instead of exploring the entire search space of thread interleaving
 randomly.
 
-
-
 \dr{TODO: emphasize the size of thread interleaving space}
-
-
 
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
