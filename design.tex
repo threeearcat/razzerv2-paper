@@ -100,10 +100,11 @@ instructions) and their interleaving orders as an interleaving segment.
 \autoref{fig:keyidea} visualizes our key idea.
 %
 Let us assume we execute the two system calls in
-\autoref{fig:cve-2019-6974} concurrently, and \autoref{fig:keyidea-a}
-represents the interleaving instance of the execution. Note that this
-execution does not cause the uninitialized access bug because
-\texttt{B1} is executed after \texttt{A4} (\ie,
+\autoref{fig:cve-2019-6974} concurrently.
+%
+\autoref{fig:keyidea-a} represents the interleaving instance of the
+execution, where the uninitialized access bug does not manifest
+because \texttt{B1} is executed after \texttt{A4} (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is not satisfied).
 %
