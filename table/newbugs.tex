@@ -39,9 +39,11 @@
     \midrule
     \#18 & 5.19-rc3 & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
     \midrule
-    \#19 & 5.19-rc3 & mm & assertion violation & Kernel BUG in find_lock_entries \\
+    \#19 & 6.0-rc7 & mm & assertion violation & Kernel BUG in find_lock_entries \\
     \midrule
-    \#20 & 5.19-rc3 & kernel & use-after-free access & KASAN: use-after-free Read in raw_notifier_call_chain \\
+    \#20 & 6.0-rc7 & kernel & use-after-free access & KASAN: use-after-free Read in raw_notifier_call_chain \\
+    \midrule
+    \#21 & 6.0-rc7 & net/ipv4 & use-after-free access & KASAN: use-after-free Read in tcp_write_timer_handler \\
     \bottomrule
   \end{tabular}
 }
