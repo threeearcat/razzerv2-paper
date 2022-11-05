@@ -486,38 +486,36 @@ derived and unexplored segment graphs) is selecting multiple
 interleaving segments from $S_{derived}$, and explore them altogether.
 
 
-However, not all interleaving segments cannot be explored at a time.
+However, not all interleaving segments cannot be explored together.
 %
 For example, in \autoref{fig:hint}, (a) and (b) cannot be explored
 together; the segment graph (a) requires \texttt{A2} to be executed
 before \texttt{B1} while the segment graph (b) requires the opposite
 execution order between \texttt{A2} and \texttt{B1}.
-
-
-
-Formally speaking,
-
-For a given $S_{derived}$, let us denote $\bar{S}$ as a subset of
-$S_{derived}$.
-
-let us denote $V = V_1 \cup $
-
-then, segment graphs contained in a subset of $S_{derived}$ cannot be
-explored if all edges $E$ forms a loop.
-
-To this end,
-
-
-the fuzzer iteratively selects derived interleaving
-segments contained in $S_{derived}$.
 %
-When selecting a derived interleaving segment, the fuzzer checks
-whether the
+Therefore, the fuzzer repeatedly selects and tests a subset of
+$S_{derived}$ that is contradiction-free (\ie, does not make a
+contradiction on the execution order) until $S_{derived}$ is empty.
 
 
+It may require a heavy computation to identify the largest
+contradiction-free subset of $S_{derived}$.
+%
+Instead of finding an optimal solution, we choose to adopt a greedy
+heuristic.
+%
+Specifically, we start with an empty set $\bar{S}$. Then, we iterate
+over derived segment graphs contained in given $S_{derived}$, and
+determine adding each segment graph into $\bar{S}$ forms a loop or
+not. If it does not form a loop, we add the segment graph into
+$\bar{S}$.
+%
+After iterating all derived segment graphs in $S_{derived}$, $\bar{S}$
+does not contain a loop. The fuzzer then excludes selected segment
+graphs from the set of all derived segment graphs (\ie,
+$S_{derived} = S_{derived} \setminus \bar{S}$), and generates
+scheduling points to expore $\bar{S}$.
 
-the fuzzer repeats the above action until until $S_{derived}$ is
-empty.
 
 
 
