@@ -1,5 +1,6 @@
 \section{Motivation}
 \label{s:motivation}
+\yj{Revise hint: Flow-OK, Clarification of text-Need work}
 
 % - characteristics of concurrency bugs
 % - challenges / design requirements
@@ -157,13 +158,14 @@ concurrency coverage metrics are proposed such as \textit{alias
   pair}~\cite{conzzer}, and \textit{\dr{TODO: MUZZ
     coverage}}~\cite{muzz}.
 %
+\yj{This paragraph must be easy enough for reader to intuitively understand, but hard to digest discussions}
 However, they are not applicable to track behavioral changes according
 to a combination of interleaving orders, mainly because they either
 track only a \textit{single} interleaving order~\cite{krace, muzz} or
 \textit{coarse-grained information} such as a pair of two
 concurrently-executed functions~\cite{conzzer}.
 
-Taking the example of alias covarege, \autoref{fig:alias-coverage}
+Taking the example of KRace's alias coverage, \autoref{fig:alias-coverage}
 describes two interleaving instances that saturate alias coverage
 found between two system calls in \autoref{fig:cve-2019-6974}.
 %
