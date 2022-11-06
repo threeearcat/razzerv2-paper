@@ -159,11 +159,12 @@ concurrency coverage metrics are proposed such as \textit{alias
     coverage}}~\cite{muzz}.
 %
 \yj{This paragraph must be easy enough for reader to intuitively understand, but hard to digest discussions}
-However, they are not applicable to track behavioral changes according
+However, they are not applicable to track behavioral changes\yj{what does it mean?} according
 to a combination of interleaving orders, mainly because they either
 track only a \textit{single} interleaving order~\cite{krace, muzz} or
 \textit{coarse-grained information} such as a pair of two
 concurrently-executed functions~\cite{conzzer}.
+\yj{I do not understand why tracking a single int. order and coarse-grain information are not able to track behavioral changes}
 
 Taking the example of KRace's alias coverage, \autoref{fig:alias-coverage}
 describes two interleaving instances that saturate alias coverage
