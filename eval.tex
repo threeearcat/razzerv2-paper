@@ -240,7 +240,7 @@ comparison study.
 %
 For fair comparisons, we select kernel concurrency bugs that are used
 to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
-  razzer, snowboard, krace}.
+  razzer, snowboard, krace, moonshine}.
 %
 Specifically, among concurrency bugs used in previous studies, we
 select ones that their exploits are publicly available such that we
@@ -250,9 +250,12 @@ Although the exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is
 not publicly available, we successfully reproduce the concurrency bug
 from the description in the Snowboard~\cite{snowboard} paper.
 %
-Also, even though KRace~\cite{krace} studies kernel concurrency bugs
-(\ie, data races), we do not have access to concurrency bugs that the
-authors use to evaluate KRace.
+Whereas, even though KRace~\cite{krace} studies kernel concurrency
+bugs (\ie, data races), we do not have access to concurrency bugs that
+the authors use to evaluate KRace, and we exclude two concurrency bugs
+(\ie, CVE-2019-1999~\cite{cve20191999} and
+CVE-2019-2025~\cite{cve20192025}) used by ExpRace~\cite{exprace}
+because \dr{XXX}.
 
 \PP{Comparison methodology}
 %
@@ -267,17 +270,17 @@ authors use to evaluate KRace.
 Arguably, the most straightforward metric to compare fuzzing
 techniques is the elapsed time until concurrency bugs are discovered.
 %
-However, the elapsed time heavily depends on the randomness; because a
-fuzzer generates an input program very randomly, it is possible that
-one fuzzer quickly generates an input program that causes a
-concurrency bug, while another fuzzer takes very long time to generate
-the input program.
+However, the elapsed time heavily depends on the randomness;
+\dr{because a fuzzer generates an input program very randomly, it is
+  possible that one fuzzer quickly generates an input program that
+  causes a concurrency bug, while another fuzzer takes very long time
+  to generate the input program}.
 
 In order to minimize the impact of the randomness and to concentrate
 on the performance impact of scheduling mechanisms, we predefine a
 multi-thread input as shown in \autoref{fig:multithreadinput}, and let
 a fuzzer repeatedly execute the given multi-thread input without
-generating new inputs nor mutating the given input.
+generating new inputs nor mutating syscalls in the given input.
 
 In addition, previous fuzzing approaches
 
