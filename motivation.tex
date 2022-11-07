@@ -59,7 +59,7 @@ access bug, an attacker may gain root privileges.
 Assuming \texttt{inet->hdrincl} is initially \texttt{1}, the
 concurrency bug manifests depending on the execution order of three
 memory accesses, \texttt{A2} and \texttt{A4} in thread~A, and
-\texttt{B1} and in thread~B.
+\texttt{B1} in thread~B.
 %
 During sending a message through the ipv4 socket, thread~A reads a
 value of \texttt{inet->hdrincl} twice at \texttt{A2} and \texttt{A4}.
