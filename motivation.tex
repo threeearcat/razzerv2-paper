@@ -7,8 +7,7 @@
 % - limitations of existing approaches
 
 
-\dr{Not-defined terms: interleaving order, instance of thread
-  interleaving ( = interleaving instance), multi-thread input}
+\dr{Not-defined terms: interleaving order, multi-thread input}
 
 
 \dr{TODO: muzz, conzzer}
@@ -18,7 +17,7 @@ properly addresses characteristics of \textit{offending thread
   interleaving} (\ie, one that causes a concurrency bug).
 %
 As a consequence, previous works either \textbf{1)} suffer from
-identifying whether offending thread interleaving remains
+identifying whether interesting thread interleavings remain
 untested~\cite{krace}, or \textbf{2)} waste the computing power by
 ineffectively exploring the search space of thread
 interleaving~\cite{snowboard, razzer}.
@@ -45,8 +44,8 @@ satisfying the design goals.
   \label{fig:cve-2019-6974}
 \end{figure}
 %
-\autoref{fig:cve-2019-6974} describes how an erroneous instance of
-thread interleaving causes a concurrency bug.
+\autoref{fig:cve-2019-6974} describes how an erroneous thread
+interleaving causes a concurrency bug.
 %
 In this example, an uninitialized access bug may manifest when two
 system calls are executed concurrently: \texttt{sendmsg()} to send a
@@ -74,6 +73,7 @@ initializing it.
 
 
 \PP{Combined interleavings}
+%
 This example indicates that the manifestation of a concurrency bug
 depends on the execution order of multiple memory
 accesses. Specifically, a concurrency bug is \textit{a combined result
@@ -93,12 +93,11 @@ required for the concurrency bug to manifest since thread~A
 dereferences uninitialized \texttt{rfv} only if
 $\texttt{B1} \Rightarrow \texttt{A4}$.
 %
-To sum up, among all possible instances of thread interleaving, only
-ones that \textit{conjunctively satisfy the two interleaving orders,
-  \ie,
+To sum up, among all possible thread interleavings, only ones that
+\textit{conjunctively satisfy the two interleaving orders, \ie,
   $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1}
   \Rightarrow \texttt{A4})$}, can cause the concurrency bug while and
-all other interleaving instances cannot.
+all other thread interleavings cannot.
 
 \PP{Design goals}
 %
@@ -126,7 +125,6 @@ schedule instructions to quickly cover the conjunctive condition
 instead of exploring the entire search space of thread interleaving
 randomly.
 
-\dr{TODO: emphasize the size of thread interleaving space}
 
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
@@ -139,8 +137,8 @@ satisfy \textbf{R1} and \textbf{R2}.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
-  \caption{Two instances of thread interleaving between thread~A and
-    thread~B described in \autoref{fig:cve-2019-6974}. Regarding
+  \caption{Two thread interleavings between thread~A and thread~B
+    described in \autoref{fig:cve-2019-6974}. Regarding
     \texttt{inet->hdrincl}, alias coverage is saturated but the
     concurrency bug doest not manifest.}
   \label{fig:alias-coverage}
@@ -166,13 +164,14 @@ track only a \textit{single} interleaving order~\cite{krace, muzz} or
 concurrently-executed functions~\cite{conzzer}.
 \yj{I do not understand why tracking a single int. order and coarse-grain information are not able to track behavioral changes}
 
-Taking the example of KRace's alias coverage, \autoref{fig:alias-coverage}
-describes two interleaving instances that saturate alias coverage
-found between two system calls in \autoref{fig:cve-2019-6974}.
+Taking the example of KRace's alias coverage,
+\autoref{fig:alias-coverage} describes two thread interleavings that
+saturate alias coverage found between two system calls in
+\autoref{fig:cve-2019-6974}.
 %
 In these example interleaving scenarios, the uninitialized access does
 not manifest even after alias coverage is saturated, and a fuzzer may
-decide to stop searching for new interleaving instances in the two
+decide to stop searching for new thread interleavings in the two
 system calls.
 %
 While we do not enumerate all proposed interleaving coverage metrics
@@ -210,13 +209,7 @@ Unfortunately, ExpRace demonstrates that this kind of concurrency bugs
 are equally threatening the security of the kernel.
 
 
-Whereas, % hint-directed schedulers~\cite{razzer, snowboard} enforce
-% thread interleaving, and thus, are able to deterministically trigger
-% concurrency bugs, even those that manifest under an extreme condition
-% of thread interleaving.
-% %
-% However, 
-state-of-the-art approaches adopting a hint-directed
+Whereas, state-of-the-art approaches adopting a hint-directed
 scheduler, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}, are
 not capable of diversifying thread interleaving across iterations.
 %
