@@ -258,6 +258,12 @@ the authors use to evaluate KRace, and we exclude two concurrency bugs
 CVE-2019-2025~\cite{cve20192025}) used by ExpRace~\cite{exprace}
 because \dr{XXX}.
 
+\PP{Kernel preparation}
+%
+Since concurrency bugs in \autoref{table:knownbugs} are introduced,
+found, and fixed at different times, 
+
+
 \PP{Comparison methodology}
 %
 \begin{figure}[t]
@@ -291,9 +297,15 @@ In addition, previous fuzzing approaches
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\linewidth]{fig/comparison_graph-crop.pdf}
-  \caption{\dr{WIP. Numbers are not real}}
+  \caption{\dr{WIP. Numbers for Krace and Snowboard are not real}}
+  \label{fig:eval:comparison}
 \end{figure*}
 %
+
+\autoref{fig:eval:comparison} shows
+
+
+The difficulty of triggering a concurrency bug is different.
 
 
 
