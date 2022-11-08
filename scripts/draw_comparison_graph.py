@@ -25,8 +25,8 @@ def draw():
     ]
 
     c2fuzz = [3, 7, 21, 6, 8, 12, 7, 3, 17]
-    snowboard = [300, 300, 300, 300, 300, 300, 300, 300, 300]
-    krace = [300, 300, 300, 300, 300, 500, 1000, 300, 1000]
+    snowboard = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    krace = [30, 41, 22, 103, 228, 10, 10000, 173, 1374]
     naive = [294, 513, 505, 3009, 1089, 40, 10000, 10000, 10000]
 
     x = np.arange(len(labels))  # the label locations
@@ -45,8 +45,8 @@ def draw():
     rects3 = ay.bar(x + width / 2, krace, width, label="Krace")
     rects4 = ay.bar(x + width / 2 + width, naive, width, label="Naive")
 
-    ax.set_ylim(0, 1000)
-    ay.set_ylim(9000, 10000)
+    ax.set_ylim(0, 1500)
+    ay.set_ylim(2000, 10500)
 
     ay.set(xlabel=None)
     ay.set_xticks(x, [])
