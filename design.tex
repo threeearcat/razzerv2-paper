@@ -52,11 +52,11 @@ This survey suggests a balance point of a trade-off between the
 completeness of the bug-finding capability and the complexity of
 exploring the search space of thread interleaving.
 %
-If one searches for all interleaving instances, he or she is able to
-discover all concurrency bugs with a cost of astronomical time, and
-if one focuses on the execution order of at most two instructions, he
-or she quickly gets his job done with a risk of a high chance of
-missing many (\eg, about 70\%) concurrency bugs.
+If one searches for all thread interleavings, he or she is able to
+discover all concurrency bugs with a cost of astronomical time, and if
+one focuses on the execution order of at most two instructions, he or
+she quickly gets his job done with a risk of a high chance of missing
+many (\eg, about 70\%) concurrency bugs.
 %
 Whereas, this paper sits between these two extremes. We track and
 search for interleaving orders of at most four memory accesses to make
@@ -67,31 +67,30 @@ capability.
 
 \PP{Segmentizing thread interleaving}
 %
-Based on the survey, the key idea of our approach is to consider an
-instance of thread interleaving as \textit{a composition of
-  interleaving segments}, where each interleaving segment represents
-interleaving orders between a small number of memory accesses.
+Based on the survey, the key idea of our approach is to consider a
+thread interleaving as \textit{a composition of interleaving
+  segments}, where each interleaving segment represents interleaving
+orders between a small number of memory accesses.
 %
 In particular, once executing threads concurrently, we firstly model
-the execution as a totally-ordered instruction sequence (\ie, an
-interleaving instance).
+the thread interleaving as a totally-ordered instruction sequence.
 %
 And then, we group a small number of instructions (\eg, four
 instructions) and their interleaving orders as an interleaving segment.
 
 
 \begin{figure}[t]
-  \subfloat[Interleaving instance\label{fig:keyidea-a}]{
+  \subfloat[Thread interleaving\label{fig:keyidea-a}]{
     \includegraphics[width=0.35\linewidth]{fig/intuition-a.pdf}
   }
   \hfill
   \subfloat[Interleaving segments\label{fig:keyidea-b}]{
     \includegraphics[width=0.55\linewidth]{fig/intuition-b.pdf}
   }
-  \caption{(a) An interleaving instance example of
+  \caption{(a) A thread interleaving example of
     \autoref{fig:cve-2019-6974} that does not cause the concurrency
     bug, and (b) interleaving segments with size of three and four
-    contained in the interleaving instance. Note that we intentionally
+    contained in the thread interleaving. Note that we intentionally
     omit instructions that do not access globally-visible memory
     objects.}
   \label{fig:keyidea}
