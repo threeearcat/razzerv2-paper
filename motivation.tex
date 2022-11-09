@@ -7,7 +7,7 @@
 % - limitations of existing approaches
 
 
-\dr{Not-defined terms: interleaving order, multi-thread input}
+\dr{Not-defined terms: multi-thread input}
 
 
 \dr{TODO: muzz, conzzer}
@@ -51,7 +51,8 @@ In this example, an uninitialized access bug may manifest when two
 system calls are executed concurrently: \texttt{sendmsg()} to send a
 message through an ipv4 socket, and \texttt{setsockopt()} to modify an
 option of the ipv4 socket. As a consequence of the uninitialized
-access bug, an attacker may gain root privileges.
+access bug, an attacker may gain root privileges through a dedicated
+attack technique~\cite{stackspray}.
 
 
 
@@ -72,32 +73,29 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
-\PP{Combined interleavings}
+\PP{Combined interleaving orders}
 %
-This example indicates that the manifestation of a concurrency bug
-depends on the execution order of multiple memory
-accesses. Specifically, a concurrency bug is \textit{a combined result
-  of a few interleaving orders}, where each interleaving order is
-established on a pair of memory access operations that access the same
+This example demonstrates that a concurrency bug is \textit{a combined
+  result of a few interleaving orders}, where each interleaving order
+denotes the execution order of a instruction pair that access the same
 memory object.
 %
-In this example, \texttt{rfv} is not initialized only if \texttt{A2}
-is executed before \texttt{B1}. Thus, the uninitialized access
-requires an interleaving order
-$\texttt{A2} \Rightarrow \texttt{B1}$~\footnote{In this paper,
-  $\texttt{X} \Rightarrow \texttt{Y}$ denotes that \texttt{X} is
-  executed before \texttt{Y}}.
+In the example of \autoref{fig:cve-2019-6974}, two interleaving orders
+such as 1) $\texttt{A2} \Rightarrow \texttt{B1}$~\footnote{In this
+  paper, $\texttt{X} \Rightarrow \texttt{Y}$ denotes that \texttt{X}
+  is executed before \texttt{Y}} (to make thread~A not initialize
+\texttt{rfv}), and
 %
-Similary, an interleaving order on \texttt{B1} and \texttt{A4} is also
-required for the concurrency bug to manifest since thread~A
-dereferences uninitialized \texttt{rfv} only if
-$\texttt{B1} \Rightarrow \texttt{A4}$.
+2) $\texttt{B1} \Rightarrow \texttt{A4}$ (to make thread~A dereference
+uninitialized \texttt{rfv}) cause the uninitialized access bug.
 %
-To sum up, among all possible thread interleavings, only ones that
-\textit{conjunctively satisfy the two interleaving orders, \ie,
-  $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1}
-  \Rightarrow \texttt{A4})$}, can cause the concurrency bug while and
-all other thread interleavings cannot.
+In order words, among all thread interleavings, ones that satisfy a
+conjunctive condition (\ie,
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$) cause the concurrency bug, while all other
+interleavings do not.
+
+
 
 \PP{Design goals}
 %
@@ -108,8 +106,8 @@ two design goals of a concurrency fuzzer as follows:
 \vspace{0.4em}
 \begin{enumerate}[label=\textbf{R\arabic*:}]
 %
-\item \emph{A fuzzer should be able to determine that offending thread
-    interleaving remains untested.}
+\item \emph{A fuzzer should be able to determine that interesting
+    thread interleaving remains untested.}
 \item \emph{A fuzzer should be able to quickly trigger untested
     offending thread interleaving.}
 %

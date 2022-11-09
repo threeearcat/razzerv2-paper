@@ -241,7 +241,7 @@ comparison study.
 %
 For fair comparisons, we select kernel concurrency bugs that are used
 to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
-  razzer, snowboard, krace, moonshine, fuze}.
+  razzer, snowboard, moonshine, fuze}.
 %
 Specifically, among concurrency bugs used in previous studies, we
 select ones that their exploits are publicly available such that we
@@ -258,17 +258,25 @@ the authors use to evaluate KRace, and we exclude two concurrency bugs
 CVE-2019-2025~\cite{cve20192025}) used by ExpRace~\cite{exprace}
 because \dr{XXX}.
 
+
+
 \PP{Kernel preparation}
 %
 Since concurrency bugs in \autoref{table:knownbugs} are introduced,
-found, and fixed at different times, 
+found, and fixed at different times, it is hard to find a kernel
+version that is vulnerable to all listed concurrency bugs.
+%
+Therefore, we inject the concurrency bugs into the Linux kernel
+version v6.0-rc7 by reverting patches fixing the concurrency bugs.
+
+
 
 
 \PP{Comparison methodology}
 %
 \begin{figure}[t]
   \caption{A multi-thread input that causes
-    CVE-2016-8655~\cite{cve20168655}. The concurrency bugs may
+    CVE-2017-17712~\cite{cve201717712}. The concurrency bugs may
     manifests if two system calls in bold exeucte a specific thread
     interleaving.}
   \label{fig:multithreadinput}
@@ -292,7 +300,7 @@ generating new inputs nor mutating syscalls in the given input.
 In addition, previous fuzzing approaches
 
 
-\PP{Overall }
+\PP{}
 %
 \begin{figure*}[t]
   \centering
@@ -302,7 +310,9 @@ In addition, previous fuzzing approaches
 \end{figure*}
 %
 
-\autoref{fig:eval:comparison} shows
+\autoref{fig:eval:comparison} shows the comparison result.
+%
+
 
 
 The difficulty of triggering a concurrency bug is different.
