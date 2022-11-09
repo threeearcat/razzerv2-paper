@@ -5,13 +5,10 @@
 %the multicore era, it leaves a risk of malfunction, \ie, concurrency
 %bug, caused by insufficient thought of concurrent events.
 %
-In this section, we introduce prior fuzzing approaches 1) to discover
-bugs in the kernel~(\autoref{ss:kernelfuzzing}), and 2) to discover
-concurrency bugs~(\autoref{ss:concurrencyfuzzing}).
+In this section, we introduce prior fuzzing approaches to discover 1)
+bugs in the kernel~(\autoref{ss:kernelfuzzing}), and 2) concurrency
+bugs~(\autoref{ss:concurrencyfuzzing}).
 
-
-\subsection{Kernel Fuzzing}
-\label{ss:kernelfuzzing}
 
 
 % \subsection{Concurrency Bug}
@@ -161,6 +158,9 @@ concurrency bugs~(\autoref{ss:concurrencyfuzzing}).
 
 % \dr{TODO: need to say the importance of observing erroneous outcomes}
 
+\subsection{Kernel Fuzzing}
+\label{ss:kernelfuzzing}
+
 
 \subsection{Concurrency Fuzzing}
 \label{ss:concurrencyfuzzing}
@@ -184,10 +184,10 @@ Recently, several studies~\cite{razzer, krace, snowboard, muzz} have
 been proposed to improve fuzzing techniques specifically in exposing
 concurrency bugs.
 %
-These studies generally adopt two strategies, namely customized
-scheduler to tail the non-determinism, and coverage metric in the
-concurrency dimension to capture interesting interleavings among all
-possible interleavings.
+These studies generally adopt two strategies, namely thread scheduling
+control to tame the non-determinism, and coverage metric in the
+concurrency dimension (shortly, concurrency coverage metric) to
+capture interesting interleavings among all possible interleavings.
 
 % \PP{Coverage-guided fuzzing}
 % %
@@ -218,45 +218,8 @@ possible interleavings.
 
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 
-\PP{Customized scheduler.}
-%
-Instead of relying on the uncontrollable kernel scheduler, concurrency
-fuzzing generally consists of a customized scheduler to increase the
-probability of bugs being exposed.
-%
-Depending on how a customized scheduler schedules instructions, it is
-largely categorized into randomized scheduler and scheduling
-hint-directed scheduler (shortly, hint-directed scheduler).
 
-A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
-designed to randomly schedule intstructions in a disciplined
-manner. It tries to keep only one thread to execute while the thread
-runs until a certain number of instructions are executed or a certain
-amount of time has elapsed.
-%
-A fuzzer and the scheduler share a small number of parameters used for
-the scheduler to pseudo-randomly determine the number of instructions
-or the amount of time to execute.
-%
-In this way, interleavings are diversified across fuzzing runs while a
-fuzzer can tailor the non-determinism caused by scheduling.
-
-On the other side, a hint-directed scheduler~\cite{razzer, snowboard}
-enfoces a specific requirement of interleaving called a scheduling
-hint.
-%
-A scheduling hint is generally in the form of an interleaving pattern
-that possibly causes a concurrency bug. For example, a scheduling hint
-may consists of execution order indicating a single-variable order
-violation; \textit{``thread A executes a store operation writing into
-  $X$ before thread B executes a load operation reading from $X$''}.
-%
-During fuzzing, a fuzzer keeps generating different scheduling hints,
-and enforces an interleaving that contains a scheduling hint to
-observe the interleaving causes an erroneous behavior.
-
-
-\PP{Coverage in the concurrency dimension.}
+\PP{Concurrency coverage metric.}
 %
 To the best of our knowledge, Krace~\cite{krace} is the first work
 that asserts the necessity of a coverage metric in the concurrency
@@ -294,6 +257,45 @@ exhibit different behaviors. Instead, they concentrate on less
 frequent inter-thread data flow based on an idea that those
 inter-thread data flow is less likely tested and more likely causes an
 abnormal behavior.
+
+\PP{Thread scheduling control.}
+%
+\dr{TODO: customized scheduler --> thread scheduling control}
+%
+Instead of relying on the uncontrollable kernel scheduler, concurrency
+fuzzing generally consists of a customized scheduler to increase the
+probability of bugs being exposed.
+%
+Depending on how a customized scheduler schedules instructions, it is
+largely categorized into randomized scheduler and scheduling
+hint-directed scheduler (shortly, hint-directed scheduler).
+
+A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
+designed to randomly schedule intstructions in a disciplined
+manner. It tries to keep only one thread to execute while the thread
+runs until a certain number of instructions are executed or a certain
+amount of time has elapsed.
+%
+A fuzzer and the scheduler share a small number of parameters used for
+the scheduler to pseudo-randomly determine the number of instructions
+or the amount of time to execute.
+%
+In this way, interleavings are diversified across fuzzing runs while a
+fuzzer can tailor the non-determinism caused by scheduling.
+
+On the other side, a hint-directed scheduler~\cite{razzer, snowboard}
+enfoces a specific requirement of interleaving called a scheduling
+hint.
+%
+A scheduling hint is generally in the form of an interleaving pattern
+that possibly causes a concurrency bug. For example, a scheduling hint
+may consists of execution order indicating a single-variable order
+violation; \textit{``thread A executes a store operation writing into
+  $X$ before thread B executes a load operation reading from $X$''}.
+%
+During fuzzing, a fuzzer keeps generating different scheduling hints,
+and enforces an interleaving that contains a scheduling hint to
+observe the interleaving causes an erroneous behavior.
 
 
 %%% Local Variables:
