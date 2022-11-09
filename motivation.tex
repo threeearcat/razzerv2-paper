@@ -1,4 +1,4 @@
-\section{Motivation}
+\section{Design Goals of \sys}
 \label{s:motivation}
 \yj{Revise hint: Flow-OK, Clarification of text-Need work}
 
@@ -73,33 +73,49 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
-\PP{Combined interleaving orders}
+\PP{Combined interleaving}
 %
 This example demonstrates that a concurrency bug is \textit{a combined
   result of a few interleaving orders}, where each interleaving order
-denotes the execution order of a instruction pair that access the same
-memory object.
+denotes the execution order of an instruction pair that access the
+same memory object.
 %
 In the example of \autoref{fig:cve-2019-6974}, two interleaving orders
-such as 1) $\texttt{A2} \Rightarrow \texttt{B1}$~\footnote{In this
-  paper, $\texttt{X} \Rightarrow \texttt{Y}$ denotes that \texttt{X}
-  is executed before \texttt{Y}} (to make thread~A not initialize
-\texttt{rfv}), and
+are required to cause the uninitialized access bug.
 %
-2) $\texttt{B1} \Rightarrow \texttt{A4}$ (to make thread~A dereference
-uninitialized \texttt{rfv}) cause the uninitialized access bug.
+First, \texttt{A2} should be executed before \texttt{B1} (\ie,
+$\texttt{A2} \Rightarrow \texttt{B1}$\footnote{In this paper,
+  $\texttt{X} \Rightarrow \texttt{Y}$ denotes that \texttt{X} is
+  executed before \texttt{Y}}) to make thread~A not initialize
+\texttt{rfv}.
 %
-In order words, among all thread interleavings, ones that satisfy a
-conjunctive condition (\ie,
+Second, \texttt{B1} should be executed before \texttt{A4} (\ie,
+$\texttt{B1} \Rightarrow \texttt{A4}$) to make thread~A dereference
+uninitialized \texttt{rfv}.
+%
+Therefore, a combination of two interleaving orders (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$) cause the concurrency bug, while all other
-interleavings do not.
+\texttt{A4})$) causes the uninitialized access bug to manifest.
+
+
+
+
+This observation provides an intuition that the progress of the thread
+interleaving exploration should be described by considering
+combinations of interleaving orders.
+%
+In other words, if the combination of interleaving orders
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$ has not been observed in \autoref{fig:cve-2019-6974}, a
+fuzzer should consider that there are more interesting thread
+interleavings and pay efforts to further explore the search space of
+thread interleaving.
 
 
 
 \PP{Design goals}
 %
-The main goal of this paper is to design a fuzzing technique to
+The primary goal of this paper is to design a fuzzing technique to
 effectively discover kernel concurrency bugs. To this end, we identify
 two design goals of a concurrency fuzzer as follows:
 
@@ -113,15 +129,16 @@ two design goals of a concurrency fuzzer as follows:
 %
 \end{enumerate}
 
-For example in \autoref{fig:cve-2019-6974}, \textbf{R1} states that a
-fuzzer should adopt a proper interleaving coverage metric that can be
-used to determine whether
+In \autoref{fig:cve-2019-6974}, \textbf{R1} states that a fuzzer
+should adopt a proper interleaving coverage metric that can be used to
+determine whether
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ remains untested or not, and \textbf{R2} describes that
-if this conjunctive condition has not been tested, a fuzzer needs to
-schedule instructions to quickly cover the conjunctive condition
-instead of exploring the entire search space of thread interleaving
-randomly.
+\texttt{A4})$ remains untested or not.
+%
+\textbf{R2} describes that if this conjunctive condition has not been
+tested, a fuzzer needs to schedule instructions to quickly cover the
+conjunctive condition instead of exploring the entire search space of
+thread interleaving randomly.
 
 
 \subsection{Limitation of prior approaches}

@@ -5,22 +5,28 @@
 %the multicore era, it leaves a risk of malfunction, \ie, concurrency
 %bug, caused by insufficient thought of concurrent events.
 %
-In this section, we clarify concurrency bug, and introduce prior
-approaches to discover concurrency bugs and discuss their limitations.
+In this section, we introduce prior fuzzing approaches 1) to discover
+bugs in the kernel~(\autoref{ss:kernelfuzzing}), and 2) to discover
+concurrency bugs~(\autoref{ss:concurrencyfuzzing}).
 
-\subsection{Concurrency Bug}
-\label{ss:concurrencybugs}
-A concurrency bug is a bug that manifests depending on the timing of
-concurrent events (\eg, memory accesses) that access shared data.
-%
-More specifically, two instructions \textit{conflict} if \textbf{1)}
-they access the same memory location, \textbf{2)} at least one of them
-is a store operation, and \textbf{3)} they are executed concurrently.
-%
-Then, a concurrency bug manifests depending on interleaving order of a
-set of conflicting instructions.
 
-A concurrency bug is
+\subsection{Kernel Fuzzing}
+\label{ss:kernelfuzzing}
+
+
+% \subsection{Concurrency Bug}
+% \label{ss:concurrencybugs}
+% A concurrency bug is a bug that manifests depending on the timing of
+% concurrent events (\eg, memory accesses) that access shared data.
+% %
+% More specifically, two instructions \textit{conflict} if \textbf{1)}
+% they access the same memory location, \textbf{2)} at least one of them
+% is a store operation, and \textbf{3)} they are executed concurrently.
+% %
+% Then, a concurrency bug manifests depending on interleaving order of a
+% set of conflicting instructions.
+
+% A concurrency bug is
 
 
 % \dr{TODO: define conflicting accesses somewhere}
