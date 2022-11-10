@@ -168,19 +168,19 @@ access bug quickly.
   \centering
   \input{table/motivation.tex}
   \caption{Recent fuzzing works to discover concurrency bugs in the
-    kernel, and their concurrency coverage metrics (\textbf{R1}) and
+    kernel, and their interleaving coverage metrics (\textbf{R1}) and
     thread scheduling control mechanisms (\textbf{R2}). ``--''
     indicates that a fuzzer does not adopt a concurrency coverage
     metric.
     %
-    \dr{MUZZ and Conzzer do not focus on the kernel. Decide
-      put them here or not.}}
+    \dr{MUZZ and Conzzer do not focus on the kernel. Decide put them
+      here or not.}}
   \label{table:motivation}
 \end{table}
 
-As shown in \autoref{table:motivation}, prior approaches to discover
-kernel concurrency bugs adopt different concurrency coverage metrics
-and thread scheduling control mechanisms.
+As shown in \autoref{table:motivation}, prior concurrency fuzzing
+approaches adopt different interleaving coverage metrics and thread
+scheduling control mechanisms.
 %
 Even though prior approaches achieve their own successes, we find that
 their interleaving coverage metrics and thread scheduling control
@@ -199,12 +199,18 @@ mechanisms do not satisfy \textbf{R1} and \textbf{R2}.
   \label{fig:alias-coverage}
 \end{figure}
 %
-To the best of our knowledge, existing concurrency coverage metrics
-are not sufficient to determine whether interesting (\ie, offending)
-thread interleaving remains untested. Thus, they do not satisfy
-\textbf{R1}.
+We find that none of existing interleaving coverage metrics consider
+a combination of interleaving orders.
 %
-In particular, after KRace~\cite{krace} first emphasizes the necessity
+Therefore, they are not sufficient to determine whether interesting
+(\ie, offending) thread interleaving remains untested. Thus, they do
+not satisfy \textbf{R1}.
+
+
+In particular,
+
+
+after KRace~\cite{krace} first emphasizes the necessity
 of a coverage metric in the concurrency dimension, different
 concurrency coverage metrics are proposed such as \textit{alias
   coverage}~\cite{krace}, \textit{concurrent call

@@ -186,11 +186,11 @@ tracking which code path each input explores.
 In the context of kernel fuzzing, a sequence of system calls appears
 as a single-thread input. Accordingly, a fuzzer executes a sequence of
 system calls and tracks execution paths that each system call explores
-using a code coverage metric such as branch coverage.
+with a code coverage metric such as branch coverage.
 %
 In addition, during the execution of such inputs, a fuzzer discovers
 vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
-  asan, ubsan}.
+  asan, ubsan, lockdep}.
 
 
 While conventional fuzzing techniques show the practicality even in
@@ -234,11 +234,10 @@ Recently, several approaches~\cite{razzer, krace, snowboard, muzz}
 have been proposed to take consider of the \textit{concurrency aspect}
 of the execution into the fuzzing process.
 %
-These approaches generally adopt two strategies, namely a coverage
-metric in the thread interleaving dimension (shortly, interleaving
-coverage metric) to capture interesting behaviors of thread
-interleavings, and a thread scheduling control mechanism to tame the
-non-deterministic behavior of thread interleaving.
+These approaches generally adopt two strategies, namely an
+interleaving coverage metric to capture interesting behaviors of
+thread interleavings, and a thread scheduling control mechanism to
+tame the non-deterministic behavior of thread interleaving.
 
 
 
@@ -272,59 +271,62 @@ non-deterministic behavior of thread interleaving.
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 
 
-\PP{Interleaving coverage metric.} \dr{TODO: rewrite}
+\PP{Interleaving coverage metric.}
 %
-To the best of our knowledge, Krace~\cite{krace} is the first work
-that asserts the necessity of a coverage metric in the concurrency
-dimension.
-%
-While many coverage metrics are proposed with their own pros and
-cons~\cite{wang2019sensitive}, they only track the sequential aspect
-of a program (\eg, branch coverage tracks whether a branch is taken or
-not) without paying attention to communication between threads.
-%
-Krace states that even after sequential coverage is saturated, there
-could be more interesting behaviors caused by thread interleavings,
-and that if there are unexplored thread interleavings in an input, a
-fuzzer should keep paying attention to the input.
+As Krace~\cite{krace} reveals, code coverage metrics are not enough to
+capture interesting behaviors of thread interleavings, because code
+coverage metrics only track the sequential aspect of a program (\eg,
+branch coverage tracks whether a branch is taken or not) without
+paying attention to thread interleavings.
 
-To capture unique behaviors in the concurrency dimension, Krace
-proposes a coverage metric called alias coverage.
+
+
+To capture interesting behaviors of thread interleavings, a few
+concurrency fuzzing approaches come up with interleaving coverage
+metrics.
 %
-Alias coverage tracks inter-thread data flow between a pair of
-instructions. In other words, alias coverage tracks
+Especially for the kernel, Krace proposes alias coverage which tracks
+inter-thread data flow between a pair of instructions. In other words,
+alias coverage tracks a directed pair of instructions
 \texttt{$I_S \rightarrow I_L$} if a load instruction \texttt{$I_L$}
 reads a value written by a store instruction \texttt{$I_S$} and they
 are executed in different threads.
-%
-% For example, if a fuzzer wants to test an interleaving that , it can
-% instruct a scheduler to enfore such requirement on the two
-% instructions.
-%
-\dr{TODO: MUZZ, and others?}
-%
-Although Razzer~\cite{razzer} and Snowboard~\cite{snowboard} adopt a
-hint-directed scheduler, they do not make use of a concurrency
-coverage metric. Therefore they do not distinguish whether two inputs
-exhibit different behaviors. Instead, they concentrate on less
-frequent inter-thread data flow based on an idea that those
-inter-thread data flow is less likely tested and more likely causes an
-abnormal behavior.
 
-\PP{Thread scheduling control mechanism.} \dr{TODO: rewrite}
+Although Razzer~\cite{razzer} and Snowboard~\cite{snowboard} also
+concentrate on discovering concurrency bugs in the kernel, they do not
+make use of a interleaving coverage metric.
 %
+Therefore they are limited in determining that a given multi-thread
+input needs to be further explored.
+
+% Instead, they concentrate on less frequent inter-thread
+% data flow based on an idea that those inter-thread data flow is less
+% likely tested and more likely causes an abnormal behavior.
+
+
+% \dr{TODO: MUZZ, and conzzer?}
+
+
+\PP{Thread scheduling control mechanism.}
 %
-Instead of relying on the uncontrollable kernel scheduler, concurrency
-fuzzing generally consists of a thread scheduling control mechanism to
-increase the probability of bugs being exposed.
+Concurrency fuzzing considers thread scheduling is another input
+domain that a fuzzer should explore.
 %
-Depending on how itschedules instructions, it is largely categorized
+To this end, concurrency fuzzing consists of a thread scheduling
+control mechanism to override the uncontrollable kernel scheduler.
+
+
+
+
+Depending on how it schedules instructions, it is largely categorized
 into randomized scheduler and scheduling hint-directed scheduler
 (shortly, hint-directed scheduler).
 
 A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
 designed to randomly schedule intstructions in a disciplined
-manner. It tries to keep only one thread to execute while the thread
+manner.
+%
+It tries to keep only one thread to execute while the thread
 runs until a certain number of instructions are executed or a certain
 amount of time has elapsed.
 %
