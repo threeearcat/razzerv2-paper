@@ -22,9 +22,9 @@ In this section, we first comprehend why concurrency bugs manifest
 depending on thread interleaving through a real-world concurrency bug
 example.
 %
-We then define design goals to effectively discover concurrency bugs
-in the kernel, and summarize why existing approaches fall short in
-satisfying the design goals.
+We then define design goals for effectively discovering concurrency
+bugs in the kernel, and summarize why existing approaches fall short
+in satisfying the design goals.
 
 
 \PP{Manifestation of concurrency bugs}
@@ -126,15 +126,15 @@ two design goals of a concurrency fuzzer as follows:
 
 In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
 that if the two system calls (\ie, \texttt{sendmsg()} and
-\texttt{setsockopt()}) no longer give new interleaving coverage (\ie,
-an interleaving coverage is saturated), a fuzzer will de-prioritize
-the two system calls and will explore thread interleavings of another
-multi-thread input.
+\texttt{setsockopt()}) no longer give new interleaving coverage with
+respect to a given interleaving coverage metric (\ie, interleaving
+coverage is saturated), a fuzzer will de-prioritize the two system
+calls to explore thread interleavings of another multi-thread input.
 %
-Therefore, an interleving coverage should capture whether
+Therefore, in order not to miss the uninitialized access bug, an
+interleving coverage metric should be able to capture whether
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ is tested or not in order not to miss the uninitialized
-access bug.
+\texttt{A4})$ is tested or not.
 
 
 On the other hand, \textbf{R2} requires a thread scheduling control
@@ -148,8 +148,8 @@ repeating the execution of two system calls in
 without making a progress of the thread interleaving exploration.
 %
 Accordingly, a thread scheduling control mechanism takes an important
-role not to waste the computing power, and to discover the
-uninitialized access bug quickly.
+role not to waste the computing power, and to expose the uninitialized
+access bug quickly.
 
 
 
@@ -181,9 +181,10 @@ uninitialized access bug quickly.
 As shown in \autoref{table:motivation}, prior approaches to discover
 kernel concurrency bugs adopt different concurrency coverage metrics
 and thread scheduling control mechanisms.
-
-Even though prior approaches achieve their own successes, none of them
-satisfy \textbf{R1} and \textbf{R2}.
+%
+Even though prior approaches achieve their own successes, we find that
+their interleaving coverage metrics and thread scheduling control
+mechanisms do not satisfy \textbf{R1} and \textbf{R2}.
 
 
 \PP{Insufficient coverage metric}
