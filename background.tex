@@ -199,9 +199,9 @@ large system softwares, they mostly focus on the \textit{sequential
 thread), while the concurrency aspect (\ie, thread interleaving) is
 left uncontrolled.
 %
-In other words, they are designed to effectively explore source codes
-residing deep inside the kernel without considering how threads are
-interleaved during the execution.
+% In other words, they are designed to effectively explore source codes
+% residing deep inside the kernel without considering how threads are
+% interleaved during the execution.
 %
 As a consequence, conventional fuzzing approaches are limited in
 discovering concurrency bugs such as race conditions, data races, and
@@ -236,7 +236,7 @@ of the execution into the fuzzing process.
 %
 These approaches generally adopt two strategies, namely a coverage
 metric in the thread interleaving dimension (shortly, interleaving
-coverage metric) to capture interesting characteristics of thread
+coverage metric) to capture interesting behaviors of thread
 interleavings, and a thread scheduling control mechanism to tame the
 non-deterministic behavior of thread interleaving.
 
@@ -272,7 +272,7 @@ non-deterministic behavior of thread interleaving.
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 
 
-\PP{Interleaving coverage metric.}
+\PP{Interleaving coverage metric.} \dr{TODO: rewrite}
 %
 To the best of our knowledge, Krace~\cite{krace} is the first work
 that asserts the necessity of a coverage metric in the concurrency
@@ -311,7 +311,7 @@ frequent inter-thread data flow based on an idea that those
 inter-thread data flow is less likely tested and more likely causes an
 abnormal behavior.
 
-\PP{Thread scheduling control.}
+\PP{Thread scheduling control mechanism.} \dr{TODO: rewrite}
 %
 %
 Instead of relying on the uncontrollable kernel scheduler, concurrency
