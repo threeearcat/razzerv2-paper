@@ -19,10 +19,6 @@ of \sys will be explained later in \autoref{s:impl}.
 \subsection{Key Idea: Segmentizing thread interleaving}
 \label{ss:overview}
 
-\dr{Is it possible to describe our coverage and alias coverage in a
-  figure?}
-
-
 % Overall 1 2 3 4 5
 % 74 0 22 33 12 7
 
@@ -162,16 +158,17 @@ unlikely that the fuzzer misses a concurrency bugs.
 %
 Accordingly, \textit{interleaving segments can be act as an
   interleaving coverage metric that allows a fuzzer to satisfy
-  \textbf{R1}}, and the fuzzer can strategize to better find
-concurrency bugs; it tracks which interleaving segments are explored
-across iterations, and searches for unexplored segments in future
-iterations.
+  \textbf{R1}}.
+  
+
+In the example of \autoref{fig:cve-2017-17712}, \dr{TODO: conect to the exapmle}
+
 
 
 
 Second, explored interleaving segments can be exploited to
 \textit{direct} the fuzzer about what thread interleaving needs to be
-explored in future iterations.
+explored in future.
 %
 \autoref{fig:hint} demonstrates how explored interleaving segments
 can be helpful for future iterations.
@@ -238,9 +235,8 @@ the multi-thread input unlikely causes a concurrency bug.
 \PP{Graph representation of interleaving segment}
 %
 We represent each interleaving segment as a small directed acyclic
-graph (DAG) called an interleaving segment graph, or shortly, segment
-graph~\footnote{For the rest of this paper, we abbreviate
-  ``interleaving segment graph'' to ``segment graph''.}.
+graph (DAG) called an interleaving segment graph (shortly, segment
+graph).
 %
 In this graph, vertices represent memory access operations, and edges
 represent orderings between two memory access operations.

@@ -68,7 +68,7 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
-\PP{Combined interleaving}
+\PP{Observation 1: Combined interleavings}
 %
 This example demonstrates that a concurrency bug is \textit{a combined
   result of a few interleaving orders}, where each interleaving order
@@ -88,68 +88,49 @@ Second, \texttt{B1} should be executed before \texttt{A4} (\ie,
 $\texttt{B1} \Rightarrow \texttt{A4}$) to make thread~A dereference
 uninitialized \texttt{rfv}.
 %
-Therefore, a combination of two interleaving orders (\ie,
+Therefore, thread interleavings that satisfy a combination of two interleaving orders (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$) causes the uninitialized access bug to manifest, while
-all other memory access operations in thread~A and thread~B do not
-contribute to the manifestation of the uninitialized access bug.
+\texttt{A4})$) cause the uninitialized access bug, while
+all other thread interleavings do not.
 
 
-
-This observation provides an insight that thread interleavings can be
-partitioned according to whether the combination of interleaving
-orders
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ is satisfied or not; all thread interleavings that
-satisfy this interleaving orders cause the uninitialized access bug,
-and remaining thread interleavings does not.
-
-
-
-\PP{Design goals}
+\PP{Design goal of an interleaving coverage metric (R1)}
 %
-The primary goal of this paper is to design a fuzzing technique to
-effectively discover kernel concurrency bugs. To this end, we identify
-two design goals of a concurrency fuzzer as follows:
 
-\vspace{0.4em}
-\begin{enumerate}[label=\textbf{R\arabic*:}]
-%
-\item A fuzzer should adopt an \textit{interleaving coverage metric}
-  that can be used to determine that interesting thread interleavings
-  remain untested.
-\item A fuzzer should adopt a \textit{thread scheduling control
-    mechanism} to quickly saturate the interleaving coverage metric.
-%
-\end{enumerate}
-
-
-In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
-that if the two system calls (\ie, \texttt{sendmsg()} and
-\texttt{setsockopt()}) no longer give new interleaving coverage with
-respect to a given interleaving coverage metric (\ie, interleaving
-coverage is saturated), a fuzzer will de-prioritize the two system
-calls to explore thread interleavings of another multi-thread input.
-%
-Therefore, in order not to miss the uninitialized access bug, an
-interleving coverage metric should be able to capture whether
+In the example of \autoref{fig:cve-2017-17712}, an
+interleaving coverage metric should be able to track whether
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is tested or not.
+%
+Otherwise, a fuzzer cannot decide if two more system calls need to be executed.
+Therefore, the uninitialized access bug may be missed 
 
 
-On the other hand, \textbf{R2} requires a thread scheduling control
-mechanism to efficiently test the combination of interleaving orders
+\PP{Observation 2:}
+%
+Interestingly, an execution that does not cause the uninitialized access bug gives a hint for effectively discovering the uninitialized access bug.
+%
+Let us assume that we 
+
+\PP{Design goal of thread scheduling control mechanism (R2)}
+%
+%
+Let us assume we execute the two system calls, and we obtain 
+
+
+%
+With the thread interleaving, we can easily infer that there is 
+
+
+\textbf{R2:} a thread scheduling control mechanism should efficiently test the combination of interleaving orders
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$.
 %
 Since thread interleaving is inherently non-deterministic, blindly
 repeating the execution of two system calls in
-\autoref{fig:cve-2017-17712} will likley waste the computing power
+\autoref{fig:cve-2017-17712} will likely waste the computing power
 without making a progress of the thread interleaving exploration.
-%
-Accordingly, a thread scheduling control mechanism takes an important
-role not to waste the computing power, and to expose the uninitialized
-access bug quickly.
+
 
 
 
