@@ -174,9 +174,12 @@ paramount to eliminate vulnerabilities in the kernel to improve the
 reliability and security of a system.
 %
 Therefore, a number of fuzzing approaches~\cite{imf, syzkaller,
-  moonshine, hfl, healer, janus, hydra} have been proposed to discover
-vulnerabilities in the kernel as the first step to eliminate
+  moonshine, hfl, healer, janus, hydra, trinity} have been proposed to
+discover vulnerabilities in the kernel as the first step to eliminate
 them.
+
+These fuzzing approaches mostly focus on how to explore source codes
+residing deep inside the kernel.
 
 
 % What do they do: explore more code path
@@ -194,8 +197,8 @@ them.
 % non-deterministic behavior.
 
 
-In spite of enormous efforts, finding concurrency bugs is still a
-daunting task.
+While conventional fuzzing techniques show the effectiveness,
+discovering kernel concurrency bugs is still a daunting task.
 %
 It is mainly due to two challenges such that 1) concurrency bugs are
 inherently caused non-deterministically, and 2) the number of possible

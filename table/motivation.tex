@@ -1,25 +1,11 @@
 \resizebox{\linewidth}{!}{
-  \begin{tabular}{l l l l l}
+  \begin{tabular}{l l l}
     \toprule
-    \textbf{Bug ID} & \textbf{Subsystem} & \textbf{Crash Type} & \textbf{Reference} \\
+     & \textbf{Concurrency coverage metric (R1)} & \textbf{Thread scheduling control (R2)} \\
     \midrule
-    CVE-2016-8655~\cite{cve20168655} & net/packet & use-after-free access & \cite{razzer, exprace} \\
-    \midrule
-    CVE-2017-2636~\cite{cve20172636} & drivers/tty & double-free & \cite{razzer, exprace} \\
-    \midrule
-    CVE-2017-7533~\cite{cve20177533} & fs/notify & slab-out-of-bound access & \cite{exprace, moonshine} \\
-    \midrule
-    CVE-2017-17712~\cite{cve201717712} & net/ipv4 & uninitialized access & \cite{razzer, exprace} \\
-    \midrule
-    CVE-2017-15649~\cite{cve201715649} & net/packet & use-after-free access & \cite{fuze} \\
-    \midrule
-    CVE-2018-12232~\cite{cve201812232} & net & NULL dereference & \cite{moonshine}  \\
-    \midrule
-    CVE-2019-6974~\cite{cve20196974} & virt/kvm & use-after-free access & \cite{exprace} \\
-    \midrule
-    CVE-2019-11486~\cite{cve201911486} & drivers/tty & use-after-free access & \cite{exprace} \\
-    \midrule
-    69e16d01d1de~\cite{snowboardbug} & net/l2tp & NULL dereference & \cite{snowboard} \\
+    \textbf{Razzer~\cite{razzer}} & None & XXX \\
+    \textbf{KRace~\cite{krace}} & Alias coverage & Delay injection \\
+    \textbf{Snowboard~\cite{snowboard}} & None & XXX \\
     \bottomrule
   \end{tabular}
 }

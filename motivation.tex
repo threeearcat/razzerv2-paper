@@ -1,4 +1,4 @@
-\section{Design Goals of \sys}
+\section{Motivation}
 \label{s:motivation}
 \yj{Revise hint: Flow-OK, Clarification of text-Need work}
 
@@ -6,21 +6,16 @@
 % - challenges / design requirements
 % - limitations of existing approaches
 
-
-\dr{Not-defined terms: multi-thread input}
-
-
-\dr{TODO: muzz, conzzer}
-
 This work is motivated by an observation that none of previous works
 properly addresses characteristics of \textit{offending thread
   interleaving} (\ie, one that causes a concurrency bug).
 %
 As a consequence, previous works either \textbf{1)} suffer from
 identifying whether interesting thread interleavings remain
-untested~\cite{krace}, or \textbf{2)} waste the computing power by
-ineffectively exploring the search space of thread
+untested~\cite{krace, conzzer, muzz}, or \textbf{2)} waste the
+computing power by ineffectively exploring the search space of thread
 interleaving~\cite{snowboard, razzer}.
+
 
 
 In this section, we first comprehend why concurrency bugs manifest
@@ -77,8 +72,8 @@ initializing it.
 %
 This example demonstrates that a concurrency bug is \textit{a combined
   result of a few interleaving orders}, where each interleaving order
-denotes the execution order of an instruction pair that access the
-same memory object.
+denotes the execution order between an instruction pair that access
+the same memory object.
 %
 In the example of \autoref{fig:cve-2019-6974}, two interleaving orders
 are required to cause the uninitialized access bug.
@@ -95,7 +90,9 @@ uninitialized \texttt{rfv}.
 %
 Therefore, a combination of two interleaving orders (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$) causes the uninitialized access bug to manifest.
+\texttt{A4})$) causes the uninitialized access bug to manifest, while
+all other memory access operations in thread~A and thread~B do not
+contribute to the manifestation of the uninitialized access bug.
 
 
 
@@ -122,10 +119,11 @@ two design goals of a concurrency fuzzer as follows:
 \vspace{0.4em}
 \begin{enumerate}[label=\textbf{R\arabic*:}]
 %
-\item \emph{A fuzzer should be able to determine that interesting
-    thread interleaving remains untested.}
-\item \emph{A fuzzer should be able to quickly trigger untested
-    offending thread interleaving.}
+\item A fuzzer should adopt a concurrency coverage metrict that
+  can be used to determine that interesting thread interleaving
+  remains untested.
+\item A fuzzer should be able to quickly trigger untested offending
+  thread interleaving.
 %
 \end{enumerate}
 
@@ -146,6 +144,13 @@ search space of thread interleaving randomly.
 
 Even though prior approaches achieve their own successes, none of them
 satisfy \textbf{R1} and \textbf{R2}.
+
+\begin{table}[t]
+  \centering
+  \input{table/motivation.tex}
+  \caption{Recent works to discover concurrency bugs in the kernel.}
+  \label{table:motivation}
+\end{table}
 
 \PP{Insufficient coverage metric}
 %
