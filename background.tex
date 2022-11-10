@@ -5,8 +5,16 @@
 %the multicore era, it leaves a risk of malfunction, \ie, concurrency
 %bug, caused by insufficient thought of concurrent events.
 %
-In this section, we introduce prior fuzzing approaches to discover 1)
-bugs in the kernel~(\autoref{ss:kernelfuzzing}), and 2) concurrency
+
+Fuzzing is an automated vulnerability discovery technique which has
+proven its effectiveness by discovering numerous vulnerabilities in
+various softwares such as the Linux kernel.
+
+In this section, we introduce prior fuzzing approaches.
+%
+We first describe conventional fuzzing approaches to discover
+vulnerabilities in the kernel~(\autoref{ss:kernelfuzzing}), followed
+by recent improvements in discovering concurrency
 bugs~(\autoref{ss:concurrencyfuzzing}).
 
 
@@ -161,6 +169,20 @@ bugs~(\autoref{ss:concurrencyfuzzing}).
 \subsection{Kernel Fuzzing}
 \label{ss:kernelfuzzing}
 
+Since the kernel is a de facto security basis of most systems, it is
+paramount to eliminate vulnerabilities in the kernel to improve the
+reliability and security of a system.
+%
+Therefore, a number of fuzzing approaches~\cite{imf, syzkaller,
+  moonshine, hfl, healer, janus, hydra} have been proposed to discover
+vulnerabilities in the kernel as the first step to eliminate
+them.
+
+
+% What do they do: explore more code path
+
+% How: inputs (= system call sequence)
+
 
 \subsection{Concurrency Fuzzing}
 \label{ss:concurrencyfuzzing}
@@ -260,15 +282,14 @@ abnormal behavior.
 
 \PP{Thread scheduling control.}
 %
-\dr{TODO: customized scheduler --> thread scheduling control}
 %
 Instead of relying on the uncontrollable kernel scheduler, concurrency
-fuzzing generally consists of a customized scheduler to increase the
-probability of bugs being exposed.
+fuzzing generally consists of a thread scheduling control mechanism to
+increase the probability of bugs being exposed.
 %
-Depending on how a customized scheduler schedules instructions, it is
-largely categorized into randomized scheduler and scheduling
-hint-directed scheduler (shortly, hint-directed scheduler).
+Depending on how itschedules instructions, it is largely categorized
+into randomized scheduler and scheduling hint-directed scheduler
+(shortly, hint-directed scheduler).
 
 A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
 designed to randomly schedule intstructions in a disciplined
