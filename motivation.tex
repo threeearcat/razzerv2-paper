@@ -36,10 +36,10 @@ satisfying the design goals.
     executed between \texttt{A2} and \texttt{A4}, a concurrency bug on
     \texttt{inet->hdrincl} leads to uninitialized stack pointer usage
     on \texttt{rfv}, and an attacker may gain root privileges.\yj{I do not know how attacker can gain a root privilege}}
-  \label{fig:cve-2019-6974}
+  \label{fig:cve-2017-17712}
 \end{figure}
 %
-\autoref{fig:cve-2019-6974} describes how an erroneous thread
+\autoref{fig:cve-2017-17712} describes how an erroneous thread
 interleaving causes a concurrency bug.
 %
 In this example, an uninitialized access bug may manifest when two
@@ -75,7 +75,7 @@ This example demonstrates that a concurrency bug is \textit{a combined
 denotes the execution order between an instruction pair that access
 the same memory object.
 %
-In the example of \autoref{fig:cve-2019-6974}, two interleaving orders
+In the example of \autoref{fig:cve-2017-17712}, two interleaving orders
 are required to cause the uninitialized access bug.
 %
 First, \texttt{A2} should be executed before \texttt{B1} (\ie,
@@ -96,17 +96,13 @@ contribute to the manifestation of the uninitialized access bug.
 
 
 
-
-This observation provides an intuition that the progress of the thread
-interleaving exploration should be described by considering
-combinations of interleaving orders.
-%
-In other words, if the combination of interleaving orders
+This observation provides an insight that thread interleavings can be
+partitioned according to whether the combination of interleaving
+orders
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ has not been observed in \autoref{fig:cve-2019-6974}, a
-fuzzer should consider that there are more interesting thread
-interleavings and strive to further explore the search space of thread
-interleaving.
+\texttt{A4})$ is satisfied or not; all thread interleavings that
+satisfy this interleaving orders cause the uninitialized access bug,
+and remaining thread interleavings does not.
 
 
 
@@ -119,24 +115,50 @@ two design goals of a concurrency fuzzer as follows:
 \vspace{0.4em}
 \begin{enumerate}[label=\textbf{R\arabic*:}]
 %
-\item A fuzzer should adopt a concurrency coverage metrict that
-  can be used to determine that interesting thread interleaving
-  remains untested.
-\item A fuzzer should be able to quickly trigger untested offending
-  thread interleaving.
+\item A fuzzer should adopt an \textit{interleaving coverage metric}
+  that can be used to determine that interesting thread interleavings
+  remain untested.
+\item A fuzzer should adopt a \textit{thread scheduling control
+    mechanism} to quickly saturate the interleaving coverage metric.
 %
 \end{enumerate}
 
-In \autoref{fig:cve-2019-6974}, \textbf{R1} states that a fuzzer
-should adopt a proper interleaving coverage metric that can be used to
-determine whether
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ remains untested or not.
+
+In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
+that if the two system calls (\ie, \texttt{sendmsg()} and
+\texttt{setsockopt()}) no longer give new interleaving coverage (\ie,
+an interleaving coverage is saturated), a fuzzer will de-prioritize
+the two system calls and will explore thread interleavings of another
+multi-thread input.
 %
-\textbf{R2} describes that if this combined interleaving orders has
-not been tested, a fuzzer needs to schedule instructions to quickly
-cover the combined interleaving orders instead of exploring the entire
-search space of thread interleaving randomly.
+Therefore, an interleving coverage should capture whether
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$ is tested or not in order not to miss the uninitialized
+access bug.
+
+
+On the other hand, \textbf{R2} requires a thread scheduling control
+mechanism to efficiently test the combination of interleaving orders
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$.
+%
+Since thread interleaving is inherently non-deterministic, blindly
+repeating the execution of two system calls in
+\autoref{fig:cve-2017-17712} will likley waste the computing power
+without making a progress of the thread interleaving exploration.
+%
+Accordingly, a thread scheduling control mechanism takes an important
+role not to waste the computing power, and to discover the
+uninitialized access bug quickly.
+
+
+
+
+%
+% \textbf{R2} describes that if this combined interleaving orders has
+% not been tested, a fuzzer needs to schedule instructions to quickly
+% cover the combined interleaving orders instead of exploring the entire
+% search space of thread interleaving randomly.
 
 
 \subsection{Limitation of prior approaches}
@@ -145,10 +167,17 @@ search space of thread interleaving randomly.
 \begin{table}[t]
   \centering
   \input{table/motivation.tex}
-  \caption{Recent works to discover concurrency bugs in the kernel.}
+  \caption{Recent fuzzing works to discover concurrency bugs in the
+    kernel, and their concurrency coverage metrics (\textbf{R1}) and
+    thread scheduling control mechanisms (\textbf{R2}). ``--''
+    indicates that a fuzzer does not adopt a concurrency coverage
+    metric.
+    %
+    \dr{MUZZ and Conzzer do not focus on the kernel. Decide
+      put them here or not.}}
   \label{table:motivation}
 \end{table}
-%
+
 As shown in \autoref{table:motivation}, prior approaches to discover
 kernel concurrency bugs adopt different concurrency coverage metrics
 and thread scheduling control mechanisms.
@@ -163,7 +192,7 @@ satisfy \textbf{R1} and \textbf{R2}.
   \centering
   \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
   \caption{Two thread interleavings between thread~A and thread~B
-    described in \autoref{fig:cve-2019-6974}. Regarding
+    described in \autoref{fig:cve-2017-17712}. Regarding
     \texttt{inet->hdrincl}, alias coverage is saturated but the
     concurrency bug doest not manifest.}
   \label{fig:alias-coverage}
@@ -192,7 +221,7 @@ concurrently-executed functions~\cite{conzzer}.
 Taking the example of KRace's alias coverage,
 \autoref{fig:alias-coverage} describes two thread interleavings that
 saturate alias coverage found between two system calls in
-\autoref{fig:cve-2019-6974}.
+\autoref{fig:cve-2017-17712}.
 %
 In these example interleaving scenarios, the uninitialized access does
 not manifest even after alias coverage is saturated, and a fuzzer may
@@ -222,7 +251,7 @@ interleaving.
 Therefore, they are inherently limited in satisfying a specific
 condition of thread interleaving (\eg,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ in \autoref{fig:cve-2019-6974}).
+\texttt{A4})$ in \autoref{fig:cve-2017-17712}).
 %
 This limitation is even more pronounced by a recent study,
 ExpRace~\cite{exprace}, stating that many concurrency
@@ -259,7 +288,7 @@ According to our evaluation~\autoref{s:eval}, ...
 % metrics in the concurrency dimension are suitable to apprehend
 % interleavings potentially causing a race condition, for example,
 % $(\texttt{A1} \Rightarrow \texttt{B1}) \wedge (\texttt{B4} \Rightarrow
-% \texttt{A2})$ in \autoref{fig:cve-2019-6974}.
+% \texttt{A2})$ in \autoref{fig:cve-2017-17712}.
 
 
 

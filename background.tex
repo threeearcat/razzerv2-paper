@@ -180,6 +180,8 @@ them.
 
 These fuzzing approaches mostly focus on how to explore source codes
 residing deep inside the kernel.
+%
+
 
 
 % What do they do: explore more code path
@@ -210,8 +212,8 @@ been proposed to improve fuzzing techniques specifically in exposing
 concurrency bugs.
 %
 These studies generally adopt two strategies, namely thread scheduling
-control to tame the non-determinism, and coverage metric in the
-concurrency dimension (shortly, concurrency coverage metric) to
+control to tame the non-determinism, and coverage metric in the thread
+interleaving dimension (shortly, interleaving coverage metric) to
 capture interesting interleavings among all possible interleavings.
 
 % \PP{Coverage-guided fuzzing}
@@ -244,7 +246,7 @@ capture interesting interleavings among all possible interleavings.
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
 
 
-\PP{Concurrency coverage metric.}
+\PP{Interleaving coverage metric.}
 %
 To the best of our knowledge, Krace~\cite{krace} is the first work
 that asserts the necessity of a coverage metric in the concurrency
