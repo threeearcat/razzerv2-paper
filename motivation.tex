@@ -142,15 +142,20 @@ search space of thread interleaving randomly.
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
 
-Even though prior approaches achieve their own successes, none of them
-satisfy \textbf{R1} and \textbf{R2}.
-
 \begin{table}[t]
   \centering
   \input{table/motivation.tex}
   \caption{Recent works to discover concurrency bugs in the kernel.}
   \label{table:motivation}
 \end{table}
+%
+As shown in \autoref{table:motivation}, prior approaches to discover
+kernel concurrency bugs adopt different concurrency coverage metrics
+and thread scheduling control mechanisms.
+
+Even though prior approaches achieve their own successes, none of them
+satisfy \textbf{R1} and \textbf{R2}.
+
 
 \PP{Insufficient coverage metric}
 %
