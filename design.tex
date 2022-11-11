@@ -41,7 +41,7 @@ execution order of at most four memory accesses; all other memory
 accesses and their execution orders do not affect the manifestation of
 a concurrency bug.
 %
-Taking the example of \autoref{fig:cve-2019-6974}, the uninitizlied
+Taking the example of \autoref{fig:cve-2017-17712}, the uninitizlied
 access bug is triggered depending only on the execution order of three
 memory accesses (\eg, \texttt{A2}, \texttt{A4} and \texttt{B1}), while
 others (\eg, \texttt{A6} and \texttt{B2}) are irrelevant to the
@@ -88,7 +88,7 @@ instructions) and their interleaving orders as an interleaving segment.
     \includegraphics[width=0.55\linewidth]{fig/intuition-b.pdf}
   }
   \caption{(a) A thread interleaving example of
-    \autoref{fig:cve-2019-6974} that does not cause the concurrency
+    \autoref{fig:cve-2017-17712} that does not cause the concurrency
     bug, and (b) interleaving segments with size of three and four
     contained in the thread interleaving. Note that we intentionally
     omit instructions that do not access globally-visible memory
@@ -99,7 +99,7 @@ instructions) and their interleaving orders as an interleaving segment.
 \autoref{fig:keyidea} visualizes our key idea.
 %
 Let us assume we execute the two system calls in
-\autoref{fig:cve-2019-6974} concurrently.
+\autoref{fig:cve-2017-17712} concurrently.
 %
 \autoref{fig:keyidea-a} represents the interleaving instance of the
 execution, where the uninitialized access bug does not manifest

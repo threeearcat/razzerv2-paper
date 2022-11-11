@@ -188,7 +188,7 @@ as a single-thread input. Accordingly, a fuzzer executes a sequence of
 system calls and tracks execution paths that each system call explores
 with a code coverage metric such as branch coverage.
 %
-In addition, during the execution of such inputs, a fuzzer discovers
+In addition, during the execution of such inputs, a fuzzer detects
 vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
   asan, ubsan, lockdep}.
 
@@ -235,9 +235,10 @@ have been proposed to take consider of the \textit{concurrency aspect}
 of the execution into the fuzzing process.
 %
 These approaches generally adopt two strategies, namely an
-interleaving coverage metric to capture interesting behaviors of
-thread interleavings, and a thread scheduling control mechanism to
-tame the non-deterministic behavior of thread interleaving.
+\textit{interleaving coverage metric} to capture interesting behaviors
+of thread interleavings, and a \textit{thread scheduling control
+  mechanism} to tame the non-deterministic behavior of thread
+interleaving.
 
 
 
@@ -274,23 +275,30 @@ tame the non-deterministic behavior of thread interleaving.
 \PP{Interleaving coverage metric.}
 %
 As Krace~\cite{krace} reveals, code coverage metrics are not enough to
-capture interesting behaviors of thread interleavings, because code
-coverage metrics only track the sequential aspect of a program (\eg,
-branch coverage tracks whether a branch is taken or not) without
-paying attention to thread interleavings.
+capture interesting behaviors of thread interleavings because code
+coverage metrics only track behaviors in a single thread without
+paying attention to thread interleavings (\eg, branch coverage tracks
+whether a branch is taken or not in a single thread).
 
 
+\dr{TODO: rewrite}
 
 To capture interesting behaviors of thread interleavings, a few
-concurrency fuzzing approaches come up with interleaving coverage
-metrics.
+concurrency fuzzing approaches~\cite{conzzer, muzz, krace} come up
+with interleaving coverage metrics.
 %
-Especially for the kernel, Krace proposes alias coverage which tracks
-inter-thread data flow between a pair of instructions. In other words,
-alias coverage tracks a directed pair of instructions
-\texttt{$I_S \rightarrow I_L$} if a load instruction \texttt{$I_L$}
+Especially for the kernel, Krace~\cite{krace} proposes alias coverage
+as an interleaving coverage metric, which tracks inter-thread data
+flow between a pair of instructions.
+%
+In other words, alias coverage tracks a directed pair of instructions
+\texttt{$I_S \rightarrow I_L$}, if a load instruction \texttt{$I_L$}
 reads a value written by a store instruction \texttt{$I_S$} and they
 are executed in different threads.
+%
+If Krace no longer finds such instruction pair in a given multi-thread
+input, it concludes that the multi-thread input has been explored
+enough, and de-prioritize the multi-thread input.
 
 Although Razzer~\cite{razzer} and Snowboard~\cite{snowboard} also
 concentrate on discovering concurrency bugs in the kernel, they do not
@@ -317,6 +325,7 @@ control mechanism to override the uncontrollable kernel scheduler.
 
 
 
+\dr{TODO: rewrite}
 
 Depending on how it schedules instructions, it is largely categorized
 into randomized scheduler and scheduling hint-directed scheduler

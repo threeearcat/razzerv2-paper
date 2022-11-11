@@ -68,7 +68,7 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
-\PP{Observation 1: Combined interleavings}
+\PP{Observation 1: Combined interleaving orders}
 %
 This example demonstrates that a concurrency bug is \textit{a combined
   result of a few interleaving orders}, where each interleaving order
@@ -94,11 +94,26 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 all other thread interleavings do not.
 
 
-\PP{Design goal of an interleaving coverage metric (R1)}
+\PP{Design goal 1: descriptive interleaving coverage metric}
 %
+This observation provides an insight that an interleaving coverage
+metric should consider a combination of 
+
 
 In the example of \autoref{fig:cve-2017-17712}, an
 interleaving coverage metric should be able to track whether
+
+
+In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
+that if the two system calls (\ie, \texttt{sendmsg()} and
+\texttt{setsockopt()}) no longer give new interleaving coverage with
+respect to a given interleaving coverage metric (\ie, interleaving
+coverage is saturated), a fuzzer will de-prioritize the two system
+calls to explore thread interleavings of another multi-thread input.
+%
+Therefore, in order not to miss the uninitialized access bug, an
+interleving coverage metric should be able to capture whether
+
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is tested or not.
 %
@@ -106,26 +121,37 @@ Otherwise, a fuzzer cannot decide if two more system calls need to be executed.
 Therefore, the uninitialized access bug may be missed 
 
 
-\PP{Observation 2:}
+\PP{Observation 2: XXX}
 %
-Interestingly, an execution that does not cause the uninitialized access bug gives a hint for effectively discovering the uninitialized access bug.
+Interestingly, an execution that does not cause the uninitialized
+access bug gives a hint as to which thread interleavings should be
+further explored.
 %
-Let us assume that we 
+Let us assume we execute the two system calls \textit{sequentially}
+such that the execution of thread~A is followed by the execution of
+thread~B.
+%
+Even though the sequential execution does not cause the uninitialized
+access bug, we can observe that three memory access operations,
+\texttt{A2}, \texttt{A4}, and \texttt{B1} are executed in the order of
+$(\texttt{A2} \Rightarrow \texttt{A4}) \wedge (\texttt{A4} \Rightarrow
+\texttt{B1})$.
+%
+Unsuprisingly, we can easily imagine a thread interleaving by flipping
+the execution order between \texttt{A4} and \texttt{B1}.
+%
+And this imaginary thread interleaving is what we are looking for; it
+satisfies the combination of interleaving orders,
+$(\texttt{A2} \Rightarrow \texttt{A4}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$ that causes the uninitialized access bug.
 
-\PP{Design goal of thread scheduling control mechanism (R2)}
-%
-%
-Let us assume we execute the two system calls, and we obtain 
 
 
+\PP{Design goal 2: effective thread scheduling control mechanism}
 %
-With the thread interleaving, we can easily infer that there is 
+Based on the observation 2, we elicit a design goal 
 
 
-\textbf{R2:} a thread scheduling control mechanism should efficiently test the combination of interleaving orders
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$.
-%
 Since thread interleaving is inherently non-deterministic, blindly
 repeating the execution of two system calls in
 \autoref{fig:cve-2017-17712} will likely waste the computing power
