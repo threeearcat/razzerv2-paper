@@ -88,37 +88,75 @@ Second, \texttt{B1} should be executed before \texttt{A4} (\ie,
 $\texttt{B1} \Rightarrow \texttt{A4}$) to make thread~A dereference
 uninitialized \texttt{rfv}.
 %
-Therefore, thread interleavings that satisfy a combination of two interleaving orders (\ie,
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$) cause the uninitialized access bug, while
-all other thread interleavings do not.
+Therefore, thread interleavings that satisfy a combination of two
+interleaving orders (\ie,
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$ cause
+the uninitialized access bug, while all other thread interleavings do
+not.
 
 
-\PP{Design goal 1: descriptive interleaving coverage metric}
+\PP{Design goal 1: combinatorial interleaving coverage metric}
 %
-This observation provides an insight that an interleaving coverage
-metric should consider a combination of 
-
-
-In the example of \autoref{fig:cve-2017-17712}, an
-interleaving coverage metric should be able to track whether
-
-
-In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
-that if the two system calls (\ie, \texttt{sendmsg()} and
-\texttt{setsockopt()}) no longer give new interleaving coverage with
-respect to a given interleaving coverage metric (\ie, interleaving
-coverage is saturated), a fuzzer will de-prioritize the two system
-calls to explore thread interleavings of another multi-thread input.
+This observation provides an insight that a concurrency bug is not
+caused by just a single interleaving order (\eg,
+$\texttt{A2} \Rightarrow \texttt{B1}$), but by a combination of
+interleaving orders (\eg,
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$)
 %
-Therefore, in order not to miss the uninitialized access bug, an
-interleving coverage metric should be able to capture whether
+As a consequence, tracking single interleaving orders is not enough
+for an interleaving coverage metric.
 
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ is tested or not.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
+  \caption{Two thread interleavings between thread~A and thread~B
+    described in \autoref{fig:cve-2017-17712}. Regarding
+    \texttt{inet->hdrincl}, all four interleaving orders are observed
+    ($\texttt{A2} \Rightarrow \texttt{B1}$ and
+    $\texttt{A4} \Rightarrow \texttt{B1}$ in
+    \texttt{Interleaving~\#1}, $\texttt{B1} \Rightarrow \texttt{A2}$,
+    and $\texttt{B1} \Rightarrow \texttt{A4}$ in
+    \texttt{Interleaving~\#2}), but the uninitialized access bug does
+    not manifest.}
+  \label{fig:alias-coverage}
+\end{figure}
 %
-Otherwise, a fuzzer cannot decide if two more system calls need to be executed.
-Therefore, the uninitialized access bug may be missed 
+% In the example of \autoref{fig:cve-2017-17712}, an
+% interleaving coverage metric should be able to track whether
+%
+\autoref{fig:alias-coverage} shows what happens if an interleaving
+coverage metric tracks single interleaving orders.
+%
+In the two interleavings described in this figure, we can observe all
+four interleaving orders with respect to \texttt{inet->hdrincl}, while
+the uninitialized access bug does not manifest.
+%
+Therefore, if an interleaving coverage metric tracks single
+interleaving orders, the coverage metric can be saturated even though
+a concurrency bug does not manifest, and a fuzzer may miss a
+concurrency bug.
+%
+To avoid this pitfall, an interleaving coverage metric should be
+designed while considering a combination of interleaving orders.
+
+
+
+
+% In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
+% that if the two system calls (\ie, \texttt{sendmsg()} and
+% \texttt{setsockopt()}) no longer give new interleaving coverage with
+% respect to a given interleaving coverage metric (\ie, interleaving
+% coverage is saturated), a fuzzer will de-prioritize the two system
+% calls to explore thread interleavings of another multi-thread input.
+% %
+% Therefore, in order not to miss the uninitialized access bug, an
+% interleving coverage metric should be able to capture whether
+
+% $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+% \texttt{A4})$ is tested or not.
+% %
+% Otherwise, a fuzzer cannot decide if two more system calls need to be executed.
+% Therefore, the uninitialized access bug may be missed 
 
 
 \PP{Observation 2: XXX}
@@ -127,29 +165,33 @@ Interestingly, an execution that does not cause the uninitialized
 access bug gives a hint as to which thread interleavings should be
 further explored.
 %
-Let us assume we execute the two system calls \textit{sequentially}
-such that the execution of thread~A is followed by the execution of
-thread~B.
+To demonstrate this, let us assume we execute the two system calls
+\textit{sequentially} such that the execution of thread~A is followed
+by the execution of thread~B.
 %
 Even though the sequential execution does not cause the uninitialized
 access bug, we can observe that three memory access operations,
 \texttt{A2}, \texttt{A4}, and \texttt{B1} are executed in the order of
-$(\texttt{A2} \Rightarrow \texttt{A4}) \wedge (\texttt{A4} \Rightarrow
-\texttt{B1})$.
+$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$.
 %
-Unsuprisingly, we can easily imagine a thread interleaving by flipping
-the execution order between \texttt{A4} and \texttt{B1}.
+Unsuprisingly, we can easily imagine an interleaving of these three
+instructions by flipping the execution order of \texttt{A4} and
+\texttt{B1} (\ie,
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
-And this imaginary thread interleaving is what we are looking for; it
-satisfies the combination of interleaving orders,
-$(\texttt{A2} \Rightarrow \texttt{A4}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ that causes the uninitialized access bug.
+And this imaginary interleaving is what we are looking for; it is
+exactly the condition that causes the uninitialized access bug, and if
+we execute the imaginary interleaving, we can discover the
+uninitialized access bug.
 
 
 
 \PP{Design goal 2: effective thread scheduling control mechanism}
 %
-Based on the observation 2, we elicit a design goal 
+Based on the observation 2, we elicit a design goal of a thread
+scheduling control mechanism.
+%
+
 
 
 Since thread interleaving is inherently non-deterministic, blindly
@@ -196,15 +238,6 @@ mechanisms do not satisfy \textbf{R1} and \textbf{R2}.
 
 \PP{Insufficient coverage metric}
 %
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
-  \caption{Two thread interleavings between thread~A and thread~B
-    described in \autoref{fig:cve-2017-17712}. Regarding
-    \texttt{inet->hdrincl}, alias coverage is saturated but the
-    concurrency bug doest not manifest.}
-  \label{fig:alias-coverage}
-\end{figure}
 %
 We find that none of existing interleaving coverage metrics consider
 a combination of interleaving orders.
