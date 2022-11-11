@@ -10,11 +10,9 @@ Fuzzing is an automated vulnerability discovery technique which has
 proven its effectiveness by discovering numerous vulnerabilities in
 various softwares such as the Linux kernel.
 
-In this section, we introduce prior fuzzing approaches.
-%
-We first describe conventional fuzzing approaches to discover
-vulnerabilities in the kernel~(\autoref{ss:kernelfuzzing}), followed
-by recent improvements in discovering concurrency
+In this section, we introduce conventional fuzzing approaches to
+discover vulnerabilities in the kernel~(\autoref{ss:kernelfuzzing}),
+followed by recent improvements in discovering concurrency
 bugs~(\autoref{ss:concurrencyfuzzing}).
 
 
@@ -225,8 +223,8 @@ have been proposed to take consider of the \textit{concurrency aspect}
 of the execution into the fuzzing process.
 %
 These approaches generally adopt two strategies, namely an
-\textit{interleaving coverage metric} to capture interesting behaviors
-of thread interleavings, and a \textit{thread scheduling control
+\textit{interleaving coverage metric} to capture unique behaviors of
+thread interleavings, and a \textit{thread scheduling control
   mechanism} to tame the non-deterministic behavior of thread
 interleaving.
 
@@ -265,16 +263,16 @@ interleaving.
 \PP{Interleaving coverage metric.}
 %
 As Krace~\cite{krace} reveals, code coverage metrics (\eg, branch
-coverage) are not enough to capture interesting behaviors of thread
+coverage) are not enough to capture unique behaviors of thread
 interleavings. This is because code coverage metrics only track
 behaviors in a single thread without paying attention to thread
 interleavings (\eg, branch coverage tracks whether a branch is taken
 or not in a single thread).
 
 
-To capture interesting behaviors of thread interleavings, a few
-concurrency fuzzing approaches~\cite{conzzer, krace} come up with
-interleaving coverage metrics.
+To capture unique behaviors of thread interleavings, a few concurrency
+fuzzing approaches~\cite{conzzer, krace} come up with interleaving
+coverage metrics.
 %
 Especially, Krace~\cite{krace} proposes alias coverage as an
 interleaving coverage metric, where alias coverage tracks an
@@ -287,16 +285,16 @@ metric called concurrent call pair, where each concurrent call pair
 represents a pair of two concurrently-executed functions augmented
 with calling contexts.
 
-These fuzzing approaches aggregate interleaving coverage across
+Concurrency fuzzing approaches aggregate interleaving coverage across
 iterations while repeatedly executing a given multi-thread input (\ie,
-a multi-threaded system call sequence), until the multi-thread input
-no longer provides new interleaving coverage.
+a multi-threaded system call sequence) until the multi-thread input no
+longer provides new interleaving coverage.
 %
 Taking Krace as an example, alias coverage constructs a set of
-instruction pairs collected across iterations. When further iterations
-do not generate a new instruction pair, Krace de-prioritizes the
-multi-thread input to explore thread interleavings of nother
-multi-thread inputs.
+instruction pairs collected through iterations. When further
+iterations do not generate a new instruction pair, Krace
+de-prioritizes the multi-thread input to explore thread interleavings
+of other multi-thread inputs.
 
 
 
@@ -340,8 +338,8 @@ concurrency fuzzing consists of a thread scheduling control mechanism
 to override the kernel scheduler.
 
 
-The basic purpose of a thread scheduling control mechanism is to stall
-the execution of a thread during the execution.
+The common purpose of a thread scheduling control mechanism is to
+stall the execution of a thread during the execution.
 %
 To this end, various methods are used; Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} temporary suspends a virtual CPU on which a
@@ -350,8 +348,8 @@ memory accesses through instrumentation, and Conzzer~\cite{conzzer}
 inject delays through the breakpoint feature.
 
 
-While these methods are different, all of them allow a fuzzer to
-control thread scheduling.
+While these methods are designed differently, all of them allow a
+fuzzer to control thread scheduling.
 %
 For instance, a fuzzer can specify exact instruction locations to
 stall the execution~\cite{snowboard, razzer, conzzer}, or a delay to

@@ -41,16 +41,12 @@ in satisfying the design goals.
   \label{fig:cve-2017-17712}
 \end{figure}
 %
-In \autoref{fig:cve-2017-17712}, an uninitialized access bug, which
-may allow attackers to gain root privileges, may manifest when two
-system calls are executed concurrently: \texttt{sendmsg()} to send a
-message through an ipv4 socket, and \texttt{setsockopt()} to modify an
-option of the ipv4 socket.
-%
-Assuming \texttt{inet->hdrincl} is initially \texttt{1}, the
-concurrency bug manifests depending on the execution order of three
-memory accesses, \texttt{A2} and \texttt{A4} in thread~A, and
-\texttt{B1} in thread~B.
+In \autoref{fig:cve-2017-17712}, an uninitialized access bug may
+manifest when two system calls are executed concurrently:
+\texttt{sendmsg()} to send a message through an ipv4 socket, and
+\texttt{setsockopt()} to modify an option of the ipv4 socket.
+
+Let us assume \texttt{inet->hdrincl} is initially \texttt{1}.
 %
 During sending a message through the ipv4 socket, thread~A reads a
 value of \texttt{inet->hdrincl} twice at \texttt{A2} and \texttt{A4}.
@@ -64,7 +60,7 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
-\PP{Observation 1: Combined interleaving orders}
+\PP{Observation 1: Combined interleavings}
 %
 This example demonstrates that a concurrency bug is \textit{a combined
   result of a few interleaving orders}, where each interleaving order
@@ -84,11 +80,11 @@ Second, \texttt{B1} should be executed before \texttt{A4} (\ie,
 $\texttt{B1} \Rightarrow \texttt{A4}$) to make thread~A dereference
 uninitialized \texttt{rfv}.
 %
-Therefore, thread interleavings that satisfy a combination of two
+Therefore, thread interleavings satisfying a combination of the two
 interleaving orders (\ie,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$ cause
-the uninitialized access bug, while all other thread interleavings do
-not.
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4}))$ cause the uninitialized access bug, while all other
+thread interleavings do not.
 
 
 \PP{Design goal 1: Combinatorial interleaving coverage}
@@ -97,14 +93,15 @@ As shown in the above observation, a concurrency bug is not caused by
 just a single interleaving order (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1}$), but by a combination of
 interleaving orders (\eg,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4}))$.
 %
-As a consequence, tracking individual interleaving orders is not
-enough as an interleaving coverage metric.
+As a consequence, tracking individual interleaving
+orders is not enough as an interleaving coverage metric.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
+  \includegraphics[width=0.90\linewidth]{fig/alias-coverage.pdf}
   \caption{Two thread interleavings between thread~A and thread~B
     described in \autoref{fig:cve-2017-17712}. The uninitialized
     access bug does not manifest in both interleavings.}
@@ -114,7 +111,7 @@ enough as an interleaving coverage metric.
 \autoref{fig:alias-coverage} shows what happens if an interleaving
 coverage metric tracks individual interleaving orders.
 %
-In the two interleavings described in this figure, we can observe all
+In the two interleavings described in this figure, we can track all
 four individual interleaving orders regarding \texttt{inet->hdrincl}
 (\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
 $\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
@@ -125,11 +122,10 @@ interleavings.
 %
 Therefore, if an interleaving coverage metric tracks individual
 interleaving orders, the coverage metric can be saturated even though
-a concurrency bug still resides in a multi-thread input, and a fuzzer
-may miss a concurrency bug.
-%
+a concurrency bug still resides in a multi-thread input.
+
 To avoid this pitfall, an interleaving coverage metric should be
-designed while considering a combination of interleaving orders.
+designed by considering a combination of interleaving orders.
 
 
 
@@ -156,14 +152,13 @@ designed while considering a combination of interleaving orders.
 Interestingly, a previous execution that did not cause the
 uninitialized access bug provides a feedback as to which thread
 interleavings should be further explored.
-%
+
 To demonstrate this, let us assume we execute the two system calls
 \textit{sequentially} such that the execution of thread~A is followed
 by the execution of thread~B.
 %
-Even though the sequential execution does not cause the uninitialized
-access bug, we can observe that three instructions, \texttt{A2},
-\texttt{A4}, and \texttt{B1} are executed in the order of
+In this sequential execution, we can observe that three instructions,
+\texttt{A2}, \texttt{A4}, and \texttt{B1} are executed in the order of
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$.
 %
 Unsuprisingly, we can easily imagine an interleaving of these three
@@ -172,13 +167,14 @@ instructions by flipping the execution order of \texttt{A4} and
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 And this imaginary interleaving is what exactly we are looking for; it
-is the condition that causes the uninitialized access bug, and if we
-execute the imaginary interleaving, we can discover the uninitialized
-access bug.
+satisfies the combination of interleaving orders
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4}))$, and if we execute the imaginary interleaving, we can
+discover the uninitialized access bug.
 
 
 
-\PP{Design goal 2: History-directed thread scheduling control}
+\PP{Design goal 2: XXX thread scheduling control}
 %
 Based on the observation 2, we elicit a design goal of a thread
 scheduling control mechanism.
@@ -187,10 +183,19 @@ Particulary, a thread scheduling control mechanism should leverage a
 history of previous executions to efficiently determine what to search
 in future executions.
 
-Since thread interleaving is inherently non-deterministic, blindly
-repeating the execution of two system calls in
-\autoref{fig:cve-2017-17712} will likely waste the computing power
-without making a progress of the thread interleaving exploration.
+
+If a fuzzer explores the search space of thread interleaving randomly,
+it likley wastes the computing power without making a progress of the
+thread interleaving exploration.
+%
+Considering the search space of thread interleaving is enormous, and
+concurrency bugs often manifest with extreme thread
+interleavings~\cite{cve20196974, cve20191999, cve201911486}, this
+severly degrades the performance of a concurrency fuzzer.
+%
+Therefore, it is important for a fuzzer to decide what to search in
+the future, and fortunately, a history of previous executions can be
+helpful in establishing the search strategy.
 
 
 
@@ -229,45 +234,49 @@ mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 \PP{Insufficient coverage metric}
 %
-%
 We find that none of existing interleaving coverage metrics consider
 a combination of interleaving orders.
 %
-Therefore, they are not sufficient to determine whether interesting
-(\ie, offending) thread interleaving remains untested. Thus, they do
-not satisfy \textbf{R1}.
+Therefore, they may be saturated even before a concurrency bug is
+exposed, misleading a fuzzer to de-prioritize an input in which a
+concurrency bug resides.
 
 
-In particular,
+In particular, alias coverage is designed to track individual
+interleaving orders. As shown through \autoref{fig:alias-coverage},
+tracking individual interleaving orders may mislead a fuzzer to think
 
-
-after KRace~\cite{krace} first emphasizes the necessity
-of a coverage metric in the concurrency dimension, different
-concurrency coverage metrics are proposed such as \textit{alias
-  coverage}~\cite{krace}, \textit{concurrent call
-  pair}~\cite{conzzer}, and \textit{\dr{TODO: MUZZ
-    coverage}}~\cite{muzz}.
 %
-\yj{This paragraph must be easy enough for reader to intuitively understand, but hard to digest discussions}
-However, they are not applicable to track behavioral changes\yj{what does it mean?} according
-to a combination of interleaving orders, mainly because they either
-track only a \textit{single} interleaving order~\cite{krace, muzz} or
-\textit{coarse-grained information} such as a pair of two
-concurrently-executed functions~\cite{conzzer}.
-\yj{I do not understand why tracking a single int. order and coarse-grain information are not able to track behavioral changes}
+In fact, the two thread interleavings described in
+\autoref{fig:alias-coverage}
+%
+In addition, concurrenct call pair is intrinsically not able to
+describe interleaving orders of intsructions.
 
-Taking the example of KRace's alias coverage,
-\autoref{fig:alias-coverage} describes two thread interleavings that
-saturate alias coverage found between two system calls in
-\autoref{fig:cve-2017-17712}.
-%
-In these example interleaving scenarios, the uninitialized access does
-not manifest even after alias coverage is saturated, and a fuzzer may
-decide to stop searching for new thread interleavings in the two
-system calls.
-%
-While we do not enumerate all proposed interleaving coverage metrics
-here, we find that they all share the same limitation.
+Razzer and Snowboard do not adopt a interleaving coverage metric at
+all.
+
+
+% \yj{This paragraph must be easy enough for reader to intuitively understand, but hard to digest discussions}
+% However, they are not applicable to track behavioral changes\yj{what does it mean?} according
+% to a combination of interleaving orders, mainly because they either
+% track only a \textit{single} interleaving order~\cite{krace, muzz} or
+% \textit{coarse-grained information} such as a pair of two
+% concurrently-executed functions~\cite{conzzer}.
+% \yj{I do not understand why tracking a single int. order and coarse-grain information are not able to track behavioral changes}
+
+% Taking the example of KRace's alias coverage,
+% \autoref{fig:alias-coverage} describes two thread interleavings that
+% saturate alias coverage found between two system calls in
+% \autoref{fig:cve-2017-17712}.
+% %
+% In these example interleaving scenarios, the uninitialized access does
+% not manifest even after alias coverage is saturated, and a fuzzer may
+% decide to stop searching for new thread interleavings in the two
+% system calls.
+% %
+% While we do not enumerate all proposed interleaving coverage metrics
+% here, we find that they all share the same limitation.
 
 
 \PP{Ineffective scheduling mechanism}
