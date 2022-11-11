@@ -277,21 +277,20 @@ concurrency fuzzing approaches~\cite{conzzer, krace} come up with
 interleaving coverage metrics.
 %
 Especially, Krace~\cite{krace} proposes alias coverage as an
-interleaving coverage metric.
-%
-While executing a multi-thread input (\ie, a multi-threaded system
-call sequence), alias coverage collects an instruction pair ($I_S$,
-$I_L$), if a read instruction $I_L$ reads a value written by a write
-instruction $I_S$, and they are executed by different threads.
+interleaving coverage metric, where alias coverage tracks an
+instruction pair ($I_S$, $I_L$), if a read instruction $I_L$ reads a
+value written by a write instruction $I_S$, and they are executed by
+different threads.
 %
 Whereas, Conzzer~\cite{conzzer} proposes another interleaving coverage
 metric called concurrent call pair, where each concurrent call pair
 represents a pair of two concurrently-executed functions augmented
 with calling contexts.
 
-These fuzzing approaches repeatedly execute a multi-thread input, and
-aggregate interleaving coverage across iterations until the
-multi-thread input no longer provides new interleaving coverage.
+These fuzzing approaches aggregate interleaving coverage across
+iterations while repeatedly executing a given multi-thread input (\ie,
+a multi-threaded system call sequence), until the multi-thread input
+no longer provides new interleaving coverage.
 %
 Taking Krace as an example, alias coverage constructs a set of
 instruction pairs collected across iterations. When further iterations
@@ -332,19 +331,31 @@ multi-thread inputs.
 
 \PP{Thread scheduling control mechanism.}
 %
-Concurrency fuzzing considers thread scheduling is another input
-domain that a fuzzer needs to explore.
+Unlike conventional fuzzing approaches, concurrency fuzzing considers
+thread scheduling is another input domain that a fuzzer needs to
+explore.
 %
-To control thread schduling, concurrency fuzzing consists of a thread
-scheduling control mechanism to override the uncontrollable kernel
-scheduler.
+Since the kernel scheduler is not under the control of a fuzzer,
+concurrency fuzzing consists of a thread scheduling control mechanism
+to override the kernel scheduler.
 
 
-During the
+The basic purpose of a thread scheduling control mechanism is to stall
+the execution of a thread during the execution.
+%
+To this end, various methods are used. Razzer~\cite{razzer} and
+Snowboard~\cite{snowboard} temporary suspends a virtual CPU on which a
+target thread is running, Krace~\cite{krace} injects a delay before
+memory accesses through instrumentation, and Conzzer~\cite{conzzer}
+injects a delay through the breakpoint feature.
 
 
-A thread scheduling control mechanism stalls the execution of a thread
-
+While these methods are different, all of them allow a fuzzer to
+control thread scheduling.
+%
+For instance, a fuzzer can specify exact instruction locations to
+stall the execution~\cite{snowboard, razzer, conzzer}, or the amount
+of delays injected at runtime~\cite{krace}.
 
 
 % \dr{TODO: rewrite}
