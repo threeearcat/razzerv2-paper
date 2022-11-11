@@ -174,9 +174,9 @@ Throughout decades, a number of fuzzing approaches~\cite{imf,
 proposed to discover vulnerabilities in the kernel.
 %
 These approaches, specifically coverage-guided fuzzing approaches,
-execute a massive number of single-thread inputs (\ie, sequences of
-system calls) while tracking the execution path that each input
-explores by using a code coverage metric (\eg, branch coverage).
+execute a massive number of inputs (\ie, sequences of system calls)
+while tracking the execution path that each input explores by using a
+code coverage metric (\eg, branch coverage).
 %
 In addition, during the execution of such inputs, a fuzzer detects
 vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
@@ -272,24 +272,30 @@ interleavings (\eg, branch coverage tracks whether a branch is taken
 or not in a single thread).
 
 
-\dr{TODO: revisit}
 To capture interesting behaviors of thread interleavings, a few
 concurrency fuzzing approaches~\cite{conzzer, krace} come up with
 interleaving coverage metrics.
 %
 Especially, Krace~\cite{krace} proposes alias coverage as an
-interleaving coverage metric, which tracks individual
-instruction-pairs that \dr{}concurrently access the same memory location.
+interleaving coverage metric.
+%
+While executing a multi-thread input (\ie, a multi-threaded system
+call sequence), alias coverage collects an instruction pair ($I_S$,
+$I_L$), if a read instruction $I_L$ reads a value written by a write
+instruction $I_S$, and they are executed by different threads.
 %
 Whereas, Conzzer~\cite{conzzer} proposes another interleaving coverage
 metric called concurrent call pair, where each concurrent call pair
 represents a pair of two concurrently-executed functions augmented
 with calling contexts.
 
-These fuzzing approaches repeatedly execute a multi-thread input (\ie,
-a multi-threaded system call sequence) while tracking interleaving
-coverage of the multi-thread input. If the multi-thread input no
-longer provides new interleaving coverage, a fuzzer de-prioritizes the
+These fuzzing approaches repeatedly execute a multi-thread input, and
+aggregate interleaving coverage across iterations until the
+multi-thread input no longer provides new interleaving coverage.
+%
+Taking Krace as an example, alias coverage constructs a set of
+instruction pairs collected across iterations. When further iterations
+do not generate a new instruction pair, Krace de-prioritizes the
 multi-thread input to explore thread interleavings of nother
 multi-thread inputs.
 
