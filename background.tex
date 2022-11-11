@@ -343,19 +343,19 @@ to override the kernel scheduler.
 The basic purpose of a thread scheduling control mechanism is to stall
 the execution of a thread during the execution.
 %
-To this end, various methods are used. Razzer~\cite{razzer} and
+To this end, various methods are used; Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} temporary suspends a virtual CPU on which a
-target thread is running, Krace~\cite{krace} injects a delay before
+target thread is running, Krace~\cite{krace} injects delays before
 memory accesses through instrumentation, and Conzzer~\cite{conzzer}
-injects a delay through the breakpoint feature.
+inject delays through the breakpoint feature.
 
 
 While these methods are different, all of them allow a fuzzer to
 control thread scheduling.
 %
 For instance, a fuzzer can specify exact instruction locations to
-stall the execution~\cite{snowboard, razzer, conzzer}, or the amount
-of delays injected at runtime~\cite{krace}.
+stall the execution~\cite{snowboard, razzer, conzzer}, or a delay to
+inject before each memory access at runtime~\cite{krace}.
 
 
 % \dr{TODO: rewrite}
