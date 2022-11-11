@@ -30,7 +30,7 @@ in satisfying the design goals.
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.95\linewidth]{fig/cve-2017-10661.pdf}
+  \includegraphics[width=0.9\linewidth]{fig/cve-2017-10661.pdf}
   \caption{Simplified code snippet of CVE-2017-17712. If \texttt{B1}
     is executed between \texttt{A2} and \texttt{A4}, concurrenct
     accesses on \texttt{inet->hdrincl} leads to uninitialized stack
@@ -151,11 +151,11 @@ designed while considering a combination of interleaving orders.
 % Therefore, the uninitialized access bug may be missed 
 
 
-\PP{Observation 2: XXX}
+\PP{Observation 2: Feedback from previous executions}
 %
-Interestingly, a previous execution that does not cause the
-uninitialized access bug gives a hint as to which thread interleavings
-should be further explored.
+Interestingly, a previous execution that did not cause the
+uninitialized access bug provides a feedback as to which thread
+interleavings should be further explored.
 %
 To demonstrate this, let us assume we execute the two system calls
 \textit{sequentially} such that the execution of thread~A is followed
