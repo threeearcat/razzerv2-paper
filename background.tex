@@ -174,13 +174,9 @@ Throughout decades, a number of fuzzing approaches~\cite{imf,
 proposed to discover vulnerabilities in the kernel.
 %
 These approaches, specifically coverage-guided fuzzing approaches,
-execute a massive number of inputs while tracking which the execution
-path each input explores.
-
-In the context of kernel fuzzing, a sequence of system calls appears
-as a single-thread input. Accordingly, a fuzzer executes a sequence of
-system calls and tracks execution paths that each system call explores
-with a code coverage metric such as branch coverage.
+execute a massive number of single-thread inputs (\ie, sequences of
+system calls) while tracking the execution path that each input
+explores by using a code coverage metric (\eg, branch coverage).
 %
 In addition, during the execution of such inputs, a fuzzer detects
 vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
@@ -276,9 +272,10 @@ interleavings (\eg, branch coverage tracks whether a branch is taken
 or not in a single thread).
 
 
+\dr{TODO: revisit}
 To capture interesting behaviors of thread interleavings, a few
-concurrency fuzzing approaches~\cite{conzzer, muzz, krace} come up
-with interleaving coverage metrics.
+concurrency fuzzing approaches~\cite{conzzer, krace} come up with
+interleaving coverage metrics.
 %
 Especially, Krace~\cite{krace} proposes alias coverage as an
 interleaving coverage metric, which tracks individual
@@ -287,7 +284,7 @@ instruction-pairs that \dr{}concurrently access the same memory location.
 Whereas, Conzzer~\cite{conzzer} proposes another interleaving coverage
 metric called concurrent call pair, where each concurrent call pair
 represents a pair of two concurrently-executed functions augmented
-with calling contexts. \dr{need more details?}
+with calling contexts.
 
 These fuzzing approaches repeatedly execute a multi-thread input (\ie,
 a multi-threaded system call sequence) while tracking interleaving

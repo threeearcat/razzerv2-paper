@@ -93,8 +93,8 @@ not.
 
 \PP{Design goal 1: Combinatorial interleaving coverage}
 %
-This observation provides an insight that a concurrency bug is not
-caused by just a single interleaving order (\eg,
+As shown in the above observation, a concurrency bug is not caused by
+just a single interleaving order (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1}$), but by a combination of
 interleaving orders (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
@@ -224,7 +224,7 @@ scheduling control mechanisms.
 %
 Even though prior approaches achieve their own successes, we find that
 their interleaving coverage metrics and thread scheduling control
-mechanisms do not satisfy \textbf{R1} and \textbf{R2}.
+mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
 \PP{Insufficient coverage metric}

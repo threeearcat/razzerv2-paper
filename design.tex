@@ -1,14 +1,15 @@
 \section{Exploring Thread Interleaving Space}
 \label{s:design}
 
-In this section, we describe our approach to effectively achieve the
-two design goals, \textbf{R1} and \textbf{R2}.
+In this section, we describe our approach to effectively achieve
+\textbf{Design goal 1} and \textbf{2}.
 %
 We first explain the key idea of our
 approach~(\autoref{ss:overview}). Then, we illustrate our concurrency
-coverage metric to achieve \textbf{R1}~(\autoref{ss:coverage}) and the
-instruction scheduling mechanism to quickly saturate the coverage
-metric (\eg, satisfying \textbf{R2})~(\autoref{ss:scheduler}).
+coverage metric to achieve \textbf{Design goal
+  1}~(\autoref{ss:coverage}) and the instruction scheduling mechanism
+to quickly saturate the coverage metric (\eg, satisfying
+\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
 
 While this section focuses only on how to explore the search space of
@@ -18,9 +19,6 @@ of \sys will be explained later in \autoref{s:impl}.
 
 \subsection{Key Idea: Segmentizing thread interleaving}
 \label{ss:overview}
-
-% Overall 1 2 3 4 5
-% 74 0 22 33 12 7
 
 \begin{table}[t]
   \centering
@@ -101,14 +99,14 @@ instructions) and their interleaving orders as an interleaving segment.
 Let us assume we execute the two system calls in
 \autoref{fig:cve-2017-17712} concurrently.
 %
-\autoref{fig:keyidea-a} represents the interleaving instance of the
+\autoref{fig:keyidea-a} represents the thread interleaving of the
 execution, where the uninitialized access bug does not manifest
 because \texttt{B1} is executed after \texttt{A4} (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is not satisfied).
 %
 In order to track interleaving orders of a small number (\eg, four) of
-instructions, we decompose the interleaving instance into several
+instructions, we decompose the thread interleaving into several
 interleaving segments as described in \autoref{fig:keyidea-b}.
 %
 In these interleaving segments, \texttt{Segment \#1} contains three
@@ -190,11 +188,11 @@ Besides \texttt{Segment \#1*}, \texttt{Segment \#3*} can also be
 derived from \texttt{Segment \#3}.
 %
 Interestingly, \texttt{Segment \#1*} and \texttt{Segment \#3*} can be
-used to compose a new interleaving instance.
+used to compose a new thread interleaving.
 %
-By executing an interleaving instance
-including the two derived interleaving segments, the fuzzer is able to
-quickly test a number of interleaving segments.
+By executing a thread interleaving including the two derived
+interleaving segments, the fuzzer is able to quickly test a number of
+interleaving segments.
 %
 In this way, \textit{our proposed scheduler mechanism is designed to
   quickly explore unexplored interleaving segments, and to satisfy
