@@ -4,17 +4,14 @@
 In this section, we describe our approach to effectively achieve
 \textbf{Design goal 1} and \textbf{2}.
 %
-We first explain the key idea of our
-approach~(\autoref{ss:overview}). Then, we illustrate our concurrency
-coverage metric to achieve \textbf{Design goal
-  1}~(\autoref{ss:coverage}) and the instruction scheduling mechanism
-to quickly saturate the coverage metric (\eg, satisfying
-\textbf{Design goal 2})~(\autoref{ss:scheduler}).
-
-
-While this section focuses only on how to explore the search space of
-thread interleaivng with a given multi-thread input, the whole design
-of \sys will be explained later in \autoref{s:impl}.
+We first explain the key idea of our approach~(\autoref{ss:overview}). 
+At first, we illustrate our concurrency
+coverage metric to express combinatorial interleavings 
+(\textbf{Design goal 1})~(\autoref{ss:coverage}) and the instruction scheduling mechanism
+to quickly saturate the coverage metric (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+%While this section focuses only on how to explore the search space of
+%thread interleaving with a given multi-thread input, the whole design
+%of \sys will be explained later in \autoref{s:impl}.
 
 
 \subsection{Key Idea: Segmentizing thread interleaving}
@@ -30,40 +27,35 @@ of \sys will be explained later in \autoref{s:impl}.
   \label{table:learningfrommistakes}
 \end{table}
 
-Our key idea starts from an extensive survey conducted by Shan Lu
-\etal~\cite{learningfrommistakes}.
-%
-As stated in \autoref{table:learningfrommistakes}, 92.4\% (97 out of
-105) of concurrency bugs they study manifest depending only on the
-execution order of at most four memory accesses; all other memory
-accesses and their execution orders do not affect the manifestation of
-a concurrency bug.
-%
-Taking the example of \autoref{fig:cve-2017-17712}, the uninitizlied
-access bug is triggered depending only on the execution order of three
+When fuzzing concurrency bugs with a coverage metric, the fundamental challenge is its large search space because
+the combinations of thread interleavings increase the 
+the search space exponentially. Therefore, this work seek to 
+strike the balance
+in the trade-off between bug-finding capability and search 
+complexity. Observed by a previous study~\cite{learningfrommistakes}
+as shown in \autoref{table:learningfrommistakes}\yj{Do we need the table?}, 92.4\% (97 out of
+105) of concurrency bugs manifest when a bug-finding system 
+monitors instruction execution orders including \textit{at most} 
+four memory accesses referring to the same object\yj{the same address?}.
+All other memory
+accesses beyond four accesses and their execution orders do not
+meaningfully affect manifestation of a concurrency bug. 
+The observation also is applied to the example of \autoref{fig:cve-2017-17712}. The uninitialized access bug is triggered by 
+the execution order of three
 memory accesses (\eg, \texttt{A2}, \texttt{A4} and \texttt{B1}), while
-others (\eg, \texttt{A6} and \texttt{B2}) are irrelevant to the
+others (\eg, \texttt{A6} and \texttt{B2}) are irrelevant to manifest the
 concurrency bug.
-
-
-This survey suggests a balance point of a trade-off between the
-completeness of the bug-finding capability and the complexity of
-exploring the search space of thread interleaving.
-%
-If one searches for all thread interleavings, he or she is able to
-discover all concurrency bugs with a cost of astronomical time, and if
-one focuses on the execution order of at most two instructions, he or
-she quickly gets his job done with a risk of a high chance of missing
-many (\eg, about 70\%) concurrency bugs.
-%
-Whereas, this paper sits between these two extremes. We track and
-search for interleaving orders of at most four memory accesses to make
-the problem tractable while maintaining a strong bug-finding
-capability.
-
-
+Following the observation, this work confines the search space 
+to interleaving orders including at most four memory accesses,
+which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
 
 \PP{Segmentizing thread interleaving}
+\yj{rewrite this paragraph. revision point: \\
+- If possible, try to put the benefit paragraph before explain how 
+to build a segment  \\ 
+- how to group the segment. Any constraints to follow?   \\
+- The example does not kindly explain how to build a segment.   \\
+}
 %
 Based on the survey, the key idea of our approach is to consider a
 thread interleaving as \textit{a composition of interleaving
