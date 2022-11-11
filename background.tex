@@ -169,20 +169,14 @@ bugs~(\autoref{ss:concurrencyfuzzing}).
 \subsection{(Conventional) Kernel Fuzzing}
 \label{ss:kernelfuzzing}
 
-Since the kernel is a de facto security basis of an entire system, it
-is paramount to eliminate vulnerabilities in the kernel to improve the
-reliability and security of a system.
+Throughout decades, a number of fuzzing approaches~\cite{imf,
+  syzkaller, moonshine, hfl, healer, janus, hydra, trinity} have been
+proposed to discover vulnerabilities in the kernel.
 %
-Therefore, a number of fuzzing approaches~\cite{imf, syzkaller,
-  moonshine, hfl, healer, janus, hydra, trinity} have been proposed to
-discover vulnerabilities in the kernel as the first step to secure the
-system.
+These approaches, specifically coverage-guided fuzzing approaches,
+generally execute a massive number of inputs while tracking which code
+path each input explores.
 
-
-These fuzzing approaches, specifically coverage-guided fuzzing
-approaches, generally execute a massive number of inputs while
-tracking which code path each input explores.
-%
 In the context of kernel fuzzing, a sequence of system calls appears
 as a single-thread input. Accordingly, a fuzzer executes a sequence of
 system calls and tracks execution paths that each system call explores
@@ -205,7 +199,7 @@ left uncontrolled.
 %
 As a consequence, conventional fuzzing approaches are limited in
 discovering concurrency bugs such as race conditions, data races, and
-deadlocks.
+deadlocks~\cite{covcon, terragni2018effectiveness}.
 
 
 % What do they do: explore more code path
@@ -274,38 +268,56 @@ interleaving.
 
 \PP{Interleaving coverage metric.}
 %
-As Krace~\cite{krace} reveals, code coverage metrics are not enough to
-capture interesting behaviors of thread interleavings because code
-coverage metrics only track behaviors in a single thread without
-paying attention to thread interleavings (\eg, branch coverage tracks
-whether a branch is taken or not in a single thread).
+As Krace~\cite{krace} reveals, code coverage metrics (\eg, branch
+coverage) are not enough to capture interesting behaviors of thread
+interleavings. This is because code coverage metrics only track
+behaviors in a single thread without paying attention to thread
+interleavings (\eg, branch coverage tracks whether a branch is taken
+or not in a single thread).
 
-
-\dr{TODO: rewrite}
 
 To capture interesting behaviors of thread interleavings, a few
 concurrency fuzzing approaches~\cite{conzzer, muzz, krace} come up
 with interleaving coverage metrics.
 %
-Especially for the kernel, Krace~\cite{krace} proposes alias coverage
-as an interleaving coverage metric, which tracks inter-thread data
-flow between a pair of instructions.
+Especially, Krace~\cite{krace} proposes alias coverage as an
+interleaving coverage metric, which tracks individual
+instruction-pairs that \dr{}concurrently access the same memory location.
 %
-In other words, alias coverage tracks a directed pair of instructions
-\texttt{$I_S \rightarrow I_L$}, if a load instruction \texttt{$I_L$}
-reads a value written by a store instruction \texttt{$I_S$} and they
-are executed in different threads.
-%
-If Krace no longer finds such instruction pair in a given multi-thread
-input, it concludes that the multi-thread input has been explored
-enough, and de-prioritize the multi-thread input.
+Whereas, Conzzer~\cite{conzzer} proposes another interleaving coverage
+metric called concurrent call pair, where each concurrent call pair
+represents a pair of two concurrently-executed functions augmented
+with calling contexts. \dr{need more details?}
 
-Although Razzer~\cite{razzer} and Snowboard~\cite{snowboard} also
-concentrate on discovering concurrency bugs in the kernel, they do not
-make use of a interleaving coverage metric.
-%
-Therefore they are limited in determining that a given multi-thread
-input needs to be further explored.
+These fuzzing approaches repeatedly execute a multi-thread input (\ie,
+a multi-threaded system call sequence) while tracking interleaving
+coverage of the multi-thread input. If the multi-thread input no
+longer provides new interleaving coverage, a fuzzer de-prioritizes the
+multi-thread input to explore thread interleavings of nother
+multi-thread inputs.
+
+
+
+% inter-thread data flow
+% between a pair of instructions.
+% %
+% In other words, alias coverage tracks a directed pair of instructions
+% \texttt{$I_S \rightarrow I_L$}, if a load instruction \texttt{$I_L$}
+% reads a value written by a store instruction \texttt{$I_S$} and they
+% are executed in different threads.
+% %
+% If Krace no longer finds such instruction pair in a given multi-thread
+% input, it concludes that the multi-thread input has been explored
+% enough, and de-prioritize the multi-thread input.
+
+
+
+% Although Razzer~\cite{razzer} and Snowboard~\cite{snowboard} also
+% concentrate on discovering concurrency bugs in the kernel, they do not
+% make use of a interleaving coverage metric.
+% %
+% Therefore they are limited in determining that a given multi-thread
+% input needs to be further explored.
 
 % Instead, they concentrate on less frequent inter-thread
 % data flow based on an idea that those inter-thread data flow is less
@@ -318,47 +330,54 @@ input needs to be further explored.
 \PP{Thread scheduling control mechanism.}
 %
 Concurrency fuzzing considers thread scheduling is another input
-domain that a fuzzer should explore.
+domain that a fuzzer needs to explore.
 %
-To this end, concurrency fuzzing consists of a thread scheduling
-control mechanism to override the uncontrollable kernel scheduler.
+To control thread schduling, concurrency fuzzing consists of a thread
+scheduling control mechanism to override the uncontrollable kernel
+scheduler.
+
+
+During the
+
+
+A thread scheduling control mechanism stalls the execution of a thread
 
 
 
-\dr{TODO: rewrite}
+% \dr{TODO: rewrite}
 
-Depending on how it schedules instructions, it is largely categorized
-into randomized scheduler and scheduling hint-directed scheduler
-(shortly, hint-directed scheduler).
+% Depending on how it schedules instructions, it is largely categorized
+% into randomized scheduler and scheduling hint-directed scheduler
+% (shortly, hint-directed scheduler).
 
-A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
-designed to randomly schedule intstructions in a disciplined
-manner.
-%
-It tries to keep only one thread to execute while the thread
-runs until a certain number of instructions are executed or a certain
-amount of time has elapsed.
-%
-A fuzzer and the scheduler share a small number of parameters used for
-the scheduler to pseudo-randomly determine the number of instructions
-or the amount of time to execute.
-%
-In this way, interleavings are diversified across fuzzing runs while a
-fuzzer can tailor the non-determinism caused by scheduling.
+% A randomized scheduler~\cite{ski, pctalgorithm, krace, sparsernr} is
+% designed to randomly schedule intstructions in a disciplined
+% manner.
+% %
+% It tries to keep only one thread to execute while the thread
+% runs until a certain number of instructions are executed or a certain
+% amount of time has elapsed.
+% %
+% A fuzzer and the scheduler share a small number of parameters used for
+% the scheduler to pseudo-randomly determine the number of instructions
+% or the amount of time to execute.
+% %
+% In this way, interleavings are diversified across fuzzing runs while a
+% fuzzer can tailor the non-determinism caused by scheduling.
 
-On the other side, a hint-directed scheduler~\cite{razzer, snowboard}
-enfoces a specific requirement of interleaving called a scheduling
-hint.
-%
-A scheduling hint is generally in the form of an interleaving pattern
-that possibly causes a concurrency bug. For example, a scheduling hint
-may consists of execution order indicating a single-variable order
-violation; \textit{``thread A executes a store operation writing into
-  $X$ before thread B executes a load operation reading from $X$''}.
-%
-During fuzzing, a fuzzer keeps generating different scheduling hints,
-and enforces an interleaving that contains a scheduling hint to
-observe the interleaving causes an erroneous behavior.
+% On the other side, a hint-directed scheduler~\cite{razzer, snowboard}
+% enfoces a specific requirement of interleaving called a scheduling
+% hint.
+% %
+% A scheduling hint is generally in the form of an interleaving pattern
+% that possibly causes a concurrency bug. For example, a scheduling hint
+% may consists of execution order indicating a single-variable order
+% violation; \textit{``thread A executes a store operation writing into
+%   $X$ before thread B executes a load operation reading from $X$''}.
+% %
+% During fuzzing, a fuzzer keeps generating different scheduling hints,
+% and enforces an interleaving that contains a scheduling hint to
+% observe the interleaving causes an erroneous behavior.
 
 
 %%% Local Variables:

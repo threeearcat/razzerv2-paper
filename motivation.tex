@@ -1,6 +1,5 @@
 \section{Motivation}
 \label{s:motivation}
-\yj{Revise hint: Flow-OK, Clarification of text-Need work}
 
 % - characteristics of concurrency bugs
 % - challenges / design requirements
@@ -32,25 +31,22 @@ in satisfying the design goals.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/cve-2017-10661.pdf}
-  \caption{Simplified code snippet of CVE-2017-17712. If \texttt{B1} is
-    executed between \texttt{A2} and \texttt{A4}, a concurrency bug on
-    \texttt{inet->hdrincl} leads to uninitialized stack pointer usage
-    on \texttt{rfv}, and an attacker may gain root privileges.\yj{I do not know how attacker can gain a root privilege}}
+  \caption{Simplified code snippet of CVE-2017-17712. If \texttt{B1}
+    is executed between \texttt{A2} and \texttt{A4}, concurrenct
+    accesses on \texttt{inet->hdrincl} leads to uninitialized stack
+    pointer usage on \texttt{rfv}, and an attacker may gain root
+    privileges through a dedicated attack
+    technique~\cite{stackspray}.\yj{I do not know how attacker can
+      gain a root privilege}}
   \label{fig:cve-2017-17712}
 \end{figure}
 %
-\autoref{fig:cve-2017-17712} describes how an erroneous thread
-interleaving causes a concurrency bug.
-%
-In this example, an uninitialized access bug may manifest when two
+In \autoref{fig:cve-2017-17712}, an uninitialized access bug, which
+may allow attackers to gain root privileges, may manifest when two
 system calls are executed concurrently: \texttt{sendmsg()} to send a
 message through an ipv4 socket, and \texttt{setsockopt()} to modify an
-option of the ipv4 socket. As a consequence of the uninitialized
-access bug, an attacker may gain root privileges through a dedicated
-attack technique~\cite{stackspray}.
-
-
-
+option of the ipv4 socket.
+%
 Assuming \texttt{inet->hdrincl} is initially \texttt{1}, the
 concurrency bug manifests depending on the execution order of three
 memory accesses, \texttt{A2} and \texttt{A4} in thread~A, and
@@ -95,46 +91,42 @@ the uninitialized access bug, while all other thread interleavings do
 not.
 
 
-\PP{Design goal 1: combinatorial interleaving coverage metric}
+\PP{Design goal 1: Combinatorial interleaving coverage}
 %
 This observation provides an insight that a concurrency bug is not
 caused by just a single interleaving order (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1}$), but by a combination of
 interleaving orders (\eg,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$)
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
-As a consequence, tracking single interleaving orders is not enough
-for an interleaving coverage metric.
+As a consequence, tracking individual interleaving orders is not
+enough as an interleaving coverage metric.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
   \caption{Two thread interleavings between thread~A and thread~B
-    described in \autoref{fig:cve-2017-17712}. Regarding
-    \texttt{inet->hdrincl}, all four interleaving orders are observed
-    ($\texttt{A2} \Rightarrow \texttt{B1}$ and
-    $\texttt{A4} \Rightarrow \texttt{B1}$ in
-    \texttt{Interleaving~\#1}, $\texttt{B1} \Rightarrow \texttt{A2}$,
-    and $\texttt{B1} \Rightarrow \texttt{A4}$ in
-    \texttt{Interleaving~\#2}), but the uninitialized access bug does
-    not manifest.}
+    described in \autoref{fig:cve-2017-17712}. The uninitialized
+    access bug does not manifest in both interleavings.}
   \label{fig:alias-coverage}
 \end{figure}
 %
-% In the example of \autoref{fig:cve-2017-17712}, an
-% interleaving coverage metric should be able to track whether
-%
 \autoref{fig:alias-coverage} shows what happens if an interleaving
-coverage metric tracks single interleaving orders.
+coverage metric tracks individual interleaving orders.
 %
 In the two interleavings described in this figure, we can observe all
-four interleaving orders with respect to \texttt{inet->hdrincl}, while
-the uninitialized access bug does not manifest.
+four individual interleaving orders regarding \texttt{inet->hdrincl}
+(\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
+$\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
+$\texttt{B1} \Rightarrow \texttt{A2}$, and
+$\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2), while the
+uninitialized access bug does not manifest in both thread
+interleavings.
 %
-Therefore, if an interleaving coverage metric tracks single
+Therefore, if an interleaving coverage metric tracks individual
 interleaving orders, the coverage metric can be saturated even though
-a concurrency bug does not manifest, and a fuzzer may miss a
-concurrency bug.
+a concurrency bug still resides in a multi-thread input, and a fuzzer
+may miss a concurrency bug.
 %
 To avoid this pitfall, an interleaving coverage metric should be
 designed while considering a combination of interleaving orders.
@@ -161,17 +153,17 @@ designed while considering a combination of interleaving orders.
 
 \PP{Observation 2: XXX}
 %
-Interestingly, an execution that does not cause the uninitialized
-access bug gives a hint as to which thread interleavings should be
-further explored.
+Interestingly, a previous execution that does not cause the
+uninitialized access bug gives a hint as to which thread interleavings
+should be further explored.
 %
 To demonstrate this, let us assume we execute the two system calls
 \textit{sequentially} such that the execution of thread~A is followed
 by the execution of thread~B.
 %
 Even though the sequential execution does not cause the uninitialized
-access bug, we can observe that three memory access operations,
-\texttt{A2}, \texttt{A4}, and \texttt{B1} are executed in the order of
+access bug, we can observe that three instructions, \texttt{A2},
+\texttt{A4}, and \texttt{B1} are executed in the order of
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$.
 %
 Unsuprisingly, we can easily imagine an interleaving of these three
@@ -179,20 +171,21 @@ instructions by flipping the execution order of \texttt{A4} and
 \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
-And this imaginary interleaving is what we are looking for; it is
-exactly the condition that causes the uninitialized access bug, and if
-we execute the imaginary interleaving, we can discover the
-uninitialized access bug.
+And this imaginary interleaving is what exactly we are looking for; it
+is the condition that causes the uninitialized access bug, and if we
+execute the imaginary interleaving, we can discover the uninitialized
+access bug.
 
 
 
-\PP{Design goal 2: effective thread scheduling control mechanism}
+\PP{Design goal 2: History-directed thread scheduling control}
 %
 Based on the observation 2, we elicit a design goal of a thread
 scheduling control mechanism.
 %
-
-
+Particulary, a thread scheduling control mechanism should leverage a
+history of previous executions to efficiently determine what to search
+in future executions.
 
 Since thread interleaving is inherently non-deterministic, blindly
 repeating the execution of two system calls in
@@ -213,6 +206,7 @@ without making a progress of the thread interleaving exploration.
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
 
+\yj{Revise hint: Flow-OK, Clarification of text-Need work}
 \begin{table}[t]
   \centering
   \input{table/motivation.tex}
@@ -220,10 +214,7 @@ without making a progress of the thread interleaving exploration.
     kernel, and their interleaving coverage metrics (\textbf{R1}) and
     thread scheduling control mechanisms (\textbf{R2}). ``--''
     indicates that a fuzzer does not adopt a concurrency coverage
-    metric.
-    %
-    \dr{MUZZ and Conzzer do not focus on the kernel. Decide put them
-      here or not.}}
+    metric.}
   \label{table:motivation}
 \end{table}
 
