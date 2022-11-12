@@ -37,7 +37,7 @@ expanding code coverage.
 %
 In addition, the single-thread fuzzing identifies a pair of system
 calls in a single-thread input that \textit{potentially} exhibits new
-Zinterleaving coverage, and hands it to the next stage.
+interleaving coverage, and hands it to the next stage.
 
 
 The second stage is a \textit{multi-thread} fuzzing to explore thread
@@ -76,8 +76,8 @@ fuzzing~\cite{syzkaller}.
 It constructs a single-threaded system call sequence $I_{ST}$ with two
 strategies: generation and mutation.
 %
-When generating a single-thread input, \sys randomly generates a
-system call sequence based on well-formed system description grammar
+When using the generation strategy, \sys randomly generates a system
+call sequence based on well-formed system description grammar
 \texttt{Syzlang}~\cite{syzlang}.
 %
 \texttt{Syzlang} describes templates of available system calls
@@ -90,29 +90,40 @@ providing reasonable arguments of the system call.
 
 The mutation strategy is an alternative of the generating strategy.
 When using a mutation strategy, \sys picks up a already-generated
-single-thread input, and modifies the single-thread ipnut. It may
-append additional system calls, remove existing system calls, or
-change values of arguments, while following \texttt{Syzlang}.
+single-thread input, and modifies the single-thread input by appending
+additional system calls, removing existing system calls, or changing
+values of arguments.
 
 
 \PP{Single-Thread Executor}
 %
 After the single-thread generator provides a single-thread input
-$I_{ST}$, the single-thread executor runs the input while tracing
+$I_{ST}$, the single-thread executor runs the input while profiling
 basic blocks and memory accesses that each system call execute.
+
+With profiled basic blocks and memory accesses, the single-thread
+executor conducts two tasks.
+%
+The first task is similar with what conventional kernel fuzzing
+does. In other words, if $I_{ST}$ exposes new code coverage that has
+not been explored, \sys keeps $I_{ST}$, and feeds it back to the
+single-thread generator so that the single-thread generator further
+mutates $I_{ST}$ to find more code coverage.
+%
+For this, \sys employs branch coverage, which is known as a golden
+code coverage metric.
+%
+As a result, \sys keeps a minimal set of $I_{ST}$, called a corpus,
+which may execute previous-executed branches when running
+single-thread inputs in the corpus.
+
+
+Second, the single-thread executor identifies if any pair of system
+calls in $I_{ST}$ potentially exposes new interleaving coverage if
+executed concurrently.
 %
 
-
-
-
-
-Specifically, traced basic blocks are used to track code coverage. For
-this, \sys uses branch coverage as code coverage.
-%
-After executing $I_{ST}$, 
-
-
-
+Specificall
 
 
 \subsubsection{Multi-thread fuzzing}
@@ -125,7 +136,6 @@ We choose to use a hash value of
 
 the FNV-1~\cite{fnv, fnv-go}, non-cryptographic hash function,
 
-\PP{Schedule}
 
 A schedule is an outcome of the interleaving mutation.
 
@@ -139,7 +149,6 @@ indicating an instruction on which preemption occurs.
 \PP{Multi-Thread Executor}
 
 
-\PP{Tracking Interleaving Segment Coverage}
 
 
 \subsection{Target Kernel Instrumentation}
