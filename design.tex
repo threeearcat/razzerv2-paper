@@ -218,7 +218,7 @@ efficiently search possible instruction interleavings.
 If \Intcov of a given input is saturated, 
 a fuzzer can confidently conclude that the input unlikely causes a concurrency bug and proceed to the next input.
 
-\PP{Graph representation of interleaving segment}
+\PP{Graph representation of interleaved instructions}
 As discussed, \Intcov contains multiple interleaved instructions, 
 so \intcov cannot be presented as a single instruction interleaving 
 (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
@@ -236,7 +236,6 @@ Whereas, an interleaving-order edge indicates the execution
 order between two memory-access instructions that 1) access the same
 shared data, 2) at least one of them is a write operation, and 3) are
 executed by different threads.
-
 \autoref{fig:interleavingsegmentgraph} illustrates how a interleaving 
 graph is derived from a interleaving segment, \texttt{Segment \#1}.
 This interleaving graph contains a program-order edge from \texttt{A2} to
@@ -315,21 +314,19 @@ and \texttt{A4} $\rightarrow$ \texttt{B1}.
 
 
 \PP{Tracking interleaving segment coverage}
-%
-Although interleaving segments can capture interesting characteristics
-of an interleaving instance, it is not straightforward to use segment
-graphs as an interleaving coverage metric because of two principal
-impediments: 1) storing graphs (even though they are small) consumes a
-lot of memory, and 2) it is not simple for the fuzzer to determine
-whether a given segment graph is explored before or not.
-
-
-
-To addresses the impediments, the fuzzer hashes each segment graph,
+We track interleaving segment coverage \textit{offline}. While
+executing a multi-thread input, a fuzzer collects memory-access
+instructions annotated with timestamps. After the execution is
+finished, the fuzzer collect segments and then builds interleaving 
+graphs for each segment to compute \intcov for the given input.
+In practice, \intcov contains a large number of interleaving graphs, 
+whic consumes a large amount of memory even thought the size of graphs is 
+small.
+To reduce memory consumption, we hash each segment graph,
 and interleaving segment coverage tracks a hash table of segment
 graphs.
 %
-\dr{TODO: explain how to hash the graph}
+\dr{TODO: explain how to hash the graph}\yj{Fill this, I will edit later.}
 
 
 % \dr{heuristic}
@@ -340,30 +337,21 @@ graphs.
 
 
 
-We track interleaving segment coverage \textit{offline}; While
-executing a multi-thread input, the fuzzer only collects memory access
-operations annotated with timestamps, and after the execution is
-finished, the fuzzer constructs an interleaving instance, and then
-computes interleaving segment coverage of the multi-thread input.
-
-
-\PP{Feedback from interleaving segment coverage}
+\PP{Utilizing interleaving segment coverage}
 Compared to the alias coverage, \intcov and the form of interleaving graph
-express semantically richer information. \intcov captures combinations 
-of multiple memory-accessing instructions as a unit of an interleaving segment, which helps a fuzz explore the large search space quickly. 
-%
-New interleaving segment coverage provides two feedbacks to the
-fuzzer.
-%
-First, the fuzzer notices that there are possibly more interesting
-thread interleaivng remains untested. Therefore, the fuzzer spends
-more computing power to explore more interesting thread interleaving.
-%
-Second, newly found segment graph directs how to explore the search
-space of thread interleaving as detailed in \autoref{ss:scheduler}.
-
-
-
+express semantically richer information. \Intcov captures combinations 
+of multiple memory-accessing instructions as a unit of an interleaving segment, which allows a fuzzer to explore the large search space more quickly than using alias coverage, which uses a single instruction interleaving. Intuitively, across two different runs, \intcov can precisely tell 
+their differences in terms of at least two instruction interleavings, 
+but the alias coverage can tell at least one\yj{DR, it this claim OK to you?}.
+\Intcov provides guiding feedback to a fuzzer.
+\Intcov guides the fuzzer to identify that there are possibly more useful instruction interleavings remain untested. So, the fuzzer spends
+more computing power to explore more interesting (unseen) instruction interleavings from \intcov. We emphasize that our searching strategy is 
+\textit{not random} unlike previous approaches~\yj{cites}.
+We use\yj{transform? better word?} a newly found interleaving graph 
+to direct the fuzzer to systematically explore 
+the search space of instruction interleavings while minimizing
+redundant and useless search trials. \autoref{ss:scheduler} 
+discusses our search strategy.
 
 
 \subsection{Coverage-directed Thread Scheduling Control}
