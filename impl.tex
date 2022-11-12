@@ -1,7 +1,7 @@
 \section{Design of \sys}
 \label{s:impl}
 
-\sys is a coverage-directed concurrency fuzzer to effectively find
+\sys is a coverage-directed concurrency fuzzer to effectively discover
 concurrency bugs.
 %
 The key improvement of \sys lies in adopting interleaving segment
@@ -9,9 +9,9 @@ coverage and the coverage-directed interleaving mutation algorithgm
 described in \autoref{s:design}.
 %
 In the following of subsections, we describe design details of three
-components, the userspace fuzzer~(\autoref{ss:fuzzer}), target kernel
+parts, the userspace fuzzer~(\autoref{ss:fuzzer}), the target kernel
 instrumentation~(\autoref{ss:instrumentation}), and the execution
-engine~(\autoref{ss:engine}), and implemetation of
+engine~(\autoref{ss:engine}), followed by implemetation of
 \sys~(\autoref{ss:impl}).
 
 
@@ -31,52 +31,91 @@ The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
 similar with recent concurrency fuzzing works, Razzer~\cite{razzer}
 and Snowboard~\cite{snowboard}.
 %
-The first stage is single-thread fuzzing that focuses on expanding
-code coverage and generates a \textit{single-thread} input program,
-\ie, a sequence of system calls.
+The first stage is a \textit{single-thread} fuzzing that generates a
+single-thread input, \ie, a sequence of system calls, and focuses on
+expanding code coverage.
 %
-While the first stage fuzzing generates and runs sequential inputs to
-expand brach coverage, it also finds sequential inputs that include
-system calls, called XXX, that may expose new biconflict coverage when
-executed concurrently.
+In addition, the single-thread fuzzing identifies a pair of system
+calls in a single-thread input that \textit{potentially} exhibits new
+Zinterleaving coverage, and hands it to the next stage.
 
-\autoref{fig:workflow} describes the workflow of the \sys's userspace
-fuzzer.
+
+The second stage is a \textit{multi-thread} fuzzing to explore thread
+interleavings, and discover concurrency bugs.
+%
+The multi-thread fuzzing generates a multi-thread input based on an
+input handed by a single-thread fuzzing, and repeatedly runs the
+multi-thread input while enforcing different thread interleavings.
+
+
+Both stages consists of two components, an input generator and an
+input executor. We explain details of each component in the following.
+
+
+\subsubsection{Single-thread fuzzing}
+%
+In a single-thread fuzzing phase, the single-thread generator
+generates $I_{ST}$, a single-thread input as a sequence of random
+system calls.
+%
+And then, the single-thread executor executes $I_{ST}$ to perform two
+things. First, it collects code coverage of $I_{ST}$ with the purpose
+of exporing source codes residing deep inside the kernel. Second, it
+identifies two system calls in a single-thread ipnut that potentially
+exhibit new interleaving coverage.
+%
+If identified, $I_{ST}$ will be handed to the next phase, the
+multi-thread fuzzing.
+
+
+\PP{Single-Thread Generator}
+%
+The single-thread generator is similar with conventional
+fuzzing~\cite{syzkaller}.
+%
+It constructs a single-threaded system call sequence $I_{ST}$ with two
+strategies: generation and mutation.
+%
+When generating a single-thread input, \sys randomly generates a
+system call sequence based on well-formed system description grammar
+\texttt{Syzlang}~\cite{syzlang}.
+%
+\texttt{Syzlang} describes templates of available system calls
+including types of arguments and the type of a return value, as well
+as a range of feasible values of each arguments.
+%
+According to \texttt{Syzlang}, \sys produces a single-thread system
+call sequence by repeatedly selecting a random system call and
+providing reasonable arguments of the system call.
+
+The mutation strategy is an alternative of the generating strategy.
+When using a mutation strategy, \sys picks up a already-generated
+single-thread input, and modifies the single-thread ipnut. It may
+append additional system calls, remove existing system calls, or
+change values of arguments, while following \texttt{Syzlang}.
+
+
+\PP{Single-Thread Executor}
+%
+After the single-thread generator provides a single-thread input
+$I_{ST}$, the single-thread executor runs the input while tracing
+basic blocks and memory accesses that each system call execute.
 %
 
 
+
+
+
+Specifically, traced basic blocks are used to track code coverage. For
+this, \sys uses branch coverage as code coverage.
 %
-The second stage is to explore the interleaving. Given a sequential
-input program from the first stage, it constructs a
-\textit{multi-thread} input program that executes the XXX syscalls
-concurrently.
-%
-During the second stage fuzzing, the fuzzer keeps generating
-interleavings of the XXX syscalls and tracks biconflict coverage for
-the concurrent dimension.
+After executing $I_{ST}$, 
 
 
 
 
-A userspace fuzzer implmenets the interleaving mutation algorithm
-described in \autoref{s:design}.
-%
-We choose to implement \sys based on Syzkaller~\cite{syzkaller} which
-is a grammar-based grey-box fuzzer since Syzkaller has been found many
-bugs for a few years.
-%
 
-\PP{Sequential fuzzing}
-%
-\sys's sequential fuzzing is similar with Syzkaller.
-
-In the first phase fuzzing, \sys make use of branch coverage for the
-sequential dimension
-
-
-KCOV~\cite{kcov}
-
-\PP{Concurrent fuzzing}
+\subsubsection{Multi-thread fuzzing}
 
 %
 In order to use interleaving graph as interleaving coverage, we need a
@@ -94,12 +133,39 @@ A schedule contains an initial thread, and a set of scheduling points
 indicating an instruction on which preemption occurs.
 
 
+\PP{Multi-Thread Generator}
+
+
+\PP{Multi-Thread Executor}
+
+
+\PP{Tracking Interleaving Segment Coverage}
+
+
 \subsection{Target Kernel Instrumentation}
 \label{ss:instrumentation}
 
-\sys requires to instrument callbacks before all memory access
-instructions for tracking memory access operations.
+\sys requires to instrument callbacks to trace basic blocks and memory
+accesses executed by each system calls.
 %
+To this end, \sys incorporates a compiler pass that instruments
+callbacks 1) at the beginning of each basic block, and 2) before each
+instruction that access memory.
+%
+
+
+
+% \autoref{fig:instrument} shows how the \sys's compiler pass transforms
+% a binary.
+% %
+% During runtime, 
+
+
+One important thing is that 
+
+
+
+
 % Unlike data race detectors such as KCSAN~\cite{kcsan}, the \sys's
 % scheduling mechanism needs to recognize both plane memory accesses and
 % annotated memory accesses such as atomic operations.

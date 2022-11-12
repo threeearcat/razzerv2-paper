@@ -59,7 +59,7 @@ at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
 initializing it.
 
 
-\PP{Observation 1: Combined interleavings}
+\PP{Observation 1: Combined interleaving orders}
 %
 This example demonstrates that a concurrency bug is \textit{a combined
   result of a few interleaving orders}, where each interleaving order
@@ -120,8 +120,8 @@ uninitialized access bug does not manifest in both thread
 interleavings.
 %
 Therefore, if an interleaving coverage metric tracks individual
-interleaving orders, the coverage metric can be saturated even though
-a concurrency bug still resides in a multi-thread input.
+interleaving orders, the coverage metric can be saturated even if a
+concurrency bug still resides in a multi-thread input.
 
 To avoid this pitfall, an interleaving coverage metric should be
 designed by considering a combination of interleaving orders.
@@ -173,7 +173,7 @@ discover the uninitialized access bug.
 
 
 
-\PP{Design goal 2: XXX thread scheduling control}
+\PP{Design goal 2: History-based thread interleaving exploration}
 %
 Based on the observation 2, we elicit a design goal of a thread
 scheduling control mechanism.
@@ -185,12 +185,13 @@ in future executions.
 
 If a fuzzer explores the search space of thread interleaving randomly,
 it likley wastes the computing power without making a progress of the
-thread interleaving exploration.
+thread interleaving exploration~\cite{covcon,
+  terragni2018effectiveness}.
 %
 Considering the search space of thread interleaving is enormous, and
 concurrency bugs often manifest with extreme thread
 interleavings~\cite{cve20196974, cve20191999, cve201911486}, this
-severly degrades the performance of a concurrency fuzzer.
+severly degrades the performance of concurrency fuzzing.
 %
 Therefore, it is important for a fuzzer to decide what to search in
 the future, and fortunately, a history of previous executions can be

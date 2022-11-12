@@ -69,22 +69,17 @@ And then, we group a small number of instructions (\eg, four
 instructions) and their interleaving orders as an interleaving segment.
 
 
-\begin{figure}[t]
-  \subfloat[Thread interleaving\label{fig:keyidea-a}]{
-    \includegraphics[width=0.35\linewidth]{fig/intuition-a.pdf}
-  }
-  \hfill
-  \subfloat[Interleaving segments\label{fig:keyidea-b}]{
-    \includegraphics[width=0.55\linewidth]{fig/intuition-b.pdf}
-  }
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
     \autoref{fig:cve-2017-17712} that does not cause the concurrency
-    bug, and (b) interleaving segments with size of three and four
-    contained in the thread interleaving. Note that we intentionally
-    omit instructions that do not access globally-visible memory
-    objects.}
+    bug, (b) interleaving pairs that access the same memory object,
+    and (c) instruction segments composed of two instruction pairs.
+    Note that we intentionally omit instructions that do not access
+    globally-visible memory objects.}
   \label{fig:keyidea}
-\end{figure}
+\end{figure*}
 %
 \autoref{fig:keyidea} visualizes our key idea.
 %
