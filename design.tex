@@ -45,22 +45,21 @@ the execution order of three
 memory accesses (\eg, \texttt{A2}, \texttt{A4} and \texttt{B1}), while
 others (\eg, \texttt{A6} and \texttt{B2}) are irrelevant to manifest the
 concurrency bug.
-Following the observation, this work confines the search space 
-to interleaving orders including at most four memory accesses,
-which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
+
 
 \PP{Segmentizing thread interleaving}
-\yj{rewrite this paragraph. revision point: \\
-- If possible, try to put the benefit paragraph before explain how 
-to build a segment  \\ 
-- how to group the segment. Any constraints to follow?   \\
-- The example does not kindly explain how to build a segment.   \\
-}
-%
-Based on the survey, the key idea of our approach is to consider a
-thread interleaving as \textit{a composition of interleaving
-  segments}, where each interleaving segment represents interleaving
-orders between a small number of memory accesses.
+To reduce the search complexity, we take the classical wisdom of problem decomposition where 
+complexity of a problem exponentially decreases as the problem size decreases.
+Our key strategy is \textit{decomposing} the search space into 
+small sub-spaces. We call a sub-space \textit{interleaving segment}.
+Each interleaving segment consists of instructions accessing 
+the same memory addresses (i.e., conflicting instructions).
+When constructing a interleaving segment, following the observation, 
+this work confines the size of a interleaving segment 
+to contain instruction interleavings including at most four memory accesses,
+which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
+
+\PP{Building segments}
 %
 In particular, once executing threads concurrently, we firstly model
 the thread interleaving as a totally-ordered instruction sequence.
