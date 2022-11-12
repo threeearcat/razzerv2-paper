@@ -1,0 +1,45 @@
+\section{Appendix}
+
+\subsection{Virtual Machine Introspection}
+\label{s:appendix:vmi}
+
+
+As a hardware breakpoint does not distinguish the running context of a
+kernel, if the context switch happens, a breakpoint may be hit by
+another thread or an interrupt handler, making the execution out of
+expectation.
+%
+The hypervisor recognizes a running context using \texttt{task_struct}
+which holds the thread description, and the per-cpu
+\texttt{preempt_count} variable indicating what context the thread is
+in (\eg, a task context for running a syscall, or a hardIRQ context to
+handle hardware interrupts).
+%
+If a breakpoint is hit by a context other than the fuzzer-controlled
+thread, our hypervisor ignores it and keeps the breakpoint.
+
+
+
+When the suspended thread already acquires a lock while the running
+thread wants to hold the same lock, the whole execution cannot make a
+progress, because our hypervisor forces the lock-holding thread to
+suspend.
+%
+Therefore, our hypervisor inspects whether the running thread is going
+to be blocked due to the lock contention, and if it is, our hypervisor
+takes control from the running thread to the suspended thread.
+%
+Inspecting the lock contention is conducted by hooking lockdep
+functions~\cite{lockdep} that are commonly called from synchronization
+prmitives.
+%
+When the lockdep functions are called, our hypervisor determins
+whether the running thread can make a progress through various
+information such as the address of the synchronization primitive, and
+operation type (\ie, lock, unlock, and trylock).
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "p"
+%%% End:

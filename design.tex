@@ -85,7 +85,7 @@ instructions) and their interleaving orders as an interleaving segment.
 Let us assume we execute the two system calls in
 \autoref{fig:cve-2017-17712} concurrently.
 %
-\autoref{fig:keyidea-a} represents the thread interleaving of the
+\autoref{fig:keyidea}-(a) represents the thread interleaving of the
 execution, where the uninitialized access bug does not manifest
 because \texttt{B1} is executed after \texttt{A4} (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
@@ -93,7 +93,7 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 %
 In order to track interleaving orders of a small number (\eg, four) of
 instructions, we decompose the thread interleaving into several
-interleaving segments as described in \autoref{fig:keyidea-b}.
+interleaving segments as described in \autoref{fig:keyidea}-(b).
 %
 In these interleaving segments, \texttt{Segment \#1} contains three
 memory access operations (\ie, \texttt{A2}, \texttt{A4}, and

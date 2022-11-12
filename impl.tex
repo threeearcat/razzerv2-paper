@@ -9,14 +9,15 @@ coverage and the coverage-directed interleaving \dr{}mutation
 algorithgm described in \autoref{s:design}.
 %
 
-
+\dr{TODO: why do we explain instrumentation and engine first, fuzzer
+  later}
 
 
 In the following of subsections, we describe design details of the
-userspace fuzzer~(\autoref{ss:fuzzer}), the target kernel
-instrumentation~(\autoref{ss:instrumentation}), the execution
-engine~(\autoref{ss:engine}), and the implementation details of
-\sys~(\autoref{ss:impl}).
+target kernel instrumentation~(\autoref{ss:instrumentation}) and the
+execution engine~(\autoref{ss:engine}), followed by the userspace
+fuzzer~(\autoref{ss:fuzzer}).  Lastly, we explain the implementation
+details of \sys~(\autoref{ss:impl}).
 
 
 \subsection{Target Kernel Instrumentation}
@@ -38,37 +39,50 @@ shared between the user space and the kernel space.
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/instrumentation.pdf}
-  \caption{}
+  \caption{(a) A part of \texttt{raw_sendmsg()} in
+    \autoref{fig:cve-2017-17712}, (b) abstract of the intrumented
+    binary, and (c) memory accesses and basic blocks recorded during
+    runtime.}
   \label{fig:instrumentation}
 \end{figure}
 
 \autoref{fig:instrumentation} shows how the \sys's compiler pass
-works.
+inserts callbacks, and how each callback records memory accesses and
+basic blocks.
 %
-When compiling a source code, the compiler pass inserts a function
-call \texttt{trace_basicblock()} at the beginning of the basic block
-(\ie, \texttt{0xb}) .
+When compiling a source code in (a), the compiler pass inserts
+function calls \texttt{trace_basicblock()} at \texttt{0x0} (\ie, the
+beginning of the compiled function) and \texttt{0x12} (\ie, the
+beginning of the basic block).
 %
-Similarly, a function call \texttt{trace_read()} is also inserted at
-\texttt{0x0} before an instruction at \texttt{0x5} that access
-globally-visible memory objects (\eg, at \texttt{0x0}).
+Similarly, the compiler pass inserts a function call
+\texttt{trace_access()} at \texttt{0x5}, which is right before an
+instruction that accesses \texttt{inet->hdrincl} at \texttt{0xa}.
 
 
-During runtime, the callback function \texttt{trace_basicblock()}
-records starting address of each basic block (\eg, \texttt{0xb}) into
-a memory region \texttt{Basicblock record}.
+During runtime, \texttt{trace_basicblock()} takes the instruction
+address of the function call as input (\ie \texttt{0x0} and
+\texttt{0x12}), and records the instruction address into
+\texttt{Basicblock record}.
 %
-Also, callback functions \texttt{trace_read()} and
-\texttt{trace_write()} record a four-tuple of the instruction address,
-the memory object addresss, the size of memory access, and the type of
-memory access (\eg, \texttt{(\&inet->hdrincl, 0x5, 1, read)}, into
-\texttt{Memory access record}.
+On the other hand, \texttt{trace_access()} takes four parameters, the
+address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
+the instruction address accessing the memory object (\ie,
+\texttt{0x5}), the size of the memory access (\ie, \texttt{1}), and
+the type of the memory access (\ie, \texttt{read}), and records them
+into \texttt{Memory access record}.
+
+
+
+
 
 
 It is worth noting that \texttt{Basicblock record} and \texttt{Memory
-  access record} are per-thread memory regions which is shared with
-the userspace space and the kernel space, so threads of the userspace
-fuzzer can identify basic blocks and memory accesses they executed.
+  access record} are per-thread memory regions, which is shared
+between the user space and the kernel space. Thus, after threads of
+the userspace fuzzer execute system calls, each thread can identify
+basic blocks and memory accesses executed by a system call that it
+executed.
 
 
 
@@ -116,40 +130,74 @@ fuzzer can identify basic blocks and memory accesses they executed.
 \subsection{Execution Engine}
 \label{ss:engine}
 
-\begin{figure}
+In order to allow the userspace fuzzer to control thread scheduling,
+\sys introduces an execution engine.
+%
+The execution engine is implemented in the hypervisor layer to be
+non-intrusive to the kernel execution, the userspace fuzzer requests
+the execution engine to control thread scheduling through hypercall
+interfaces.
+
+\PP{Schedule}
+%
+A schedule is a specification of how to control thread scheduling.
+%
+It contains per-system call sequences of scheduling points, where each
+scheduling point is described as a two-tuple, (instruction address,
+scheduling order).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/schedule.pdf}
+  \caption{(a) Thread interleaving to run, and (b) Schedule specifies
+    scheduling points for (a).}
+  \label{fig:schedule}
+\end{figure}
+
+\autoref{fig:schedule} illustrates an example of a schedule. In order
+to run a thread interleaving in \autoref{fig:schedule}-(a), four
+preemptions are required at \texttt{A2}, \texttt{B1}, \texttt{A6}, and
+\texttt{B2}.
+%
+And each schedule point denotes on which these preemptions occur,
+annotated with the order of preemption.
+
+
+During fuzzing, the userspace fuzzer keeps generating different
+schedules, and requests the execution engine through hypercall
+interfaces to control thread scheduling according to a schedule.
+
+
+
+
+
+\PP{Thread scheduling control}
+%
+Through hypercall interfaces, the execution engine accepts a schedule
+from the userspace fuzzer. After that, when threads of the userspace
+fuzzer execute sytsem calls, the execution engine controls thread
+scheduling as described in the given schedule.
+
+%
+\begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/workflow-hypervisor.pdf}
   \caption{The workflow of the execution engine. \red{IMPORTANT: this
       is copied from AITIA. Need to redraw}}
   \label{fig:workflow-hypervisor}
 \end{figure}
-
-We introduce an execution engine in order to allow the userspace
-fuzzer to control thread scheduling.
-%
-The execution engine is implemented in the hypervisor layer to be
-non-intrusive to the execution of the kernel, and communicates with
-the userspace fuzzer through hypercall interfaces.
-
-
-
-\PP{Schedule}
-%
-A schedule describes
-
-
-
-
-
-\PP{Enforcing interleavings}
 %
 \autoref{fig:workflow-hypervisor} shows a workflow of the execution
 engine.
 %
-The userspace fuzzer spawns threads that execute a system call
-respectively.
+At the beginning, the userspace fuzzer spawns threads that are
+responsible to execute system calls concurrently.
 %
-Then, each thread calls hypercalls to deliever scheduling points to
+Then, each thread is assigned a system call and its scheduling points.
+\dr{}
+
+
+each thread calls hypercalls to deliver scheduling points to
 the execution engine before executing a system call.
 
 
@@ -201,48 +249,34 @@ thread continues its execution.
 
 \PP{Virtual Machine Instrospection}
 %
-\dr{Not important contents but too long}
+While controlling thread scheduling of system calls, the execution
+engine introspects the target kernel for two reasons.
 %
-In the middle of execution, our hypervisor introspects the target
-kernel for two reasons.
+First, because a hardware breakpoint does not distinguish which thread
+hit the breakpoint, it needs to determine whether the breakpoint is
+hit by a thread of the userspace fuzzer, when a breakpoint is hit.
 %
-First, when a breakpoint is hit, it needs to determine whether the
-breakpoint is hit by a fuzzer-controlled thread.
+If it is the case, the execution engine suspends the running thread
+and resumes the suspended thread as specified in a schedule.
 %
-As a hardware breakpoint does not distinguish the running context of a
-kernel, if the context switch happens, a breakpoint may be hit by
-another thread or an interrupt handler, making the execution out of
-expectation.
-%
-The hypervisor recognizes a running context using \texttt{task_struct}
-which holds the thread description, and the per-cpu
-\texttt{preempt_count} variable indicating what context the thread is
-in (\eg, a task context for running a syscall, or a hardIRQ context to
-handle hardware interrupts).
-%
-If a breakpoint is hit by a context other than the fuzzer-controlled
-thread, our hypervisor ignores it and keeps the breakpoint.
+Otherwise, the execution engine ignores the breakpoint hit, and keeps
+running the kernel.
 
-Second, when a running thread tries to acquire a lock, our hypervisor
-inspects the lock is held by a suspended thread.
+
 %
-When the suspended thread already acquires a lock while the running
-thread wants to hold the same lock, the whole execution cannot make a
-progress, because our hypervisor forces the lock-holding thread to
-suspend.
+Second, when a running thread tries to acquire a lock, the execution
+engine need to inspect the lock is held by a suspended thread to
+prevent a situation 
 %
-Therefore, our hypervisor inspects whether the running thread is going
-to be blocked due to the lock contention, and if it is, our hypervisor
-takes control from the running thread to the suspended thread.
-%
-Inspecting the lock contention is conducted by hooking lockdep
-functions~\cite{lockdep} that are commonly called from synchronization
-prmitives.
-%
-When the lockdep functions are called, our hypervisor determins
-whether the running thread can make a progress through various
-information such as the address of the synchronization primitive, and
-operation type (\ie, lock, unlock, and trylock).
+If a running thread is trying to acquire a lock, the execution engine 
+
+
+
+While the virtual machine introspection is crucial to properly control
+thread scheduling, we leave details of the virtual machine
+introspection in \autoref{s:appendix:vmi}.
+
+
 
 \subsection{Userspace Fuzzer}
 \label{ss:fuzzer}
