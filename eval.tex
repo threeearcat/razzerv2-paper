@@ -39,7 +39,7 @@ This machine provides 32 total cores and 64 total threads, and runs
 Ubuntu Server 20.04.4 LTS on Linux 5.4.143 as a host operating system.
 %
 During our experiments, we launch 32 virtual machines (VMs) where each
-VM is equipped with four vCPUs and 4\GB memory.
+VM is equipped with four vCPUs and 8\GB memory.
 
 To build a guest kernel, we use a kernel configuration used by
 \texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
@@ -115,23 +115,40 @@ fuzzing, we first measure the coverage growth for both code coverage
 (\ie, the number of taken branches) and interelaving coverage (\ie,
 the number of observed interleaving segments) during 100 hours of
 fuzzing.
-%
+
 As shown in \autoref{fig:eval:coverage}, there is a notable difference
 in scale between code coverage and interleaving coverage.
 %
-While the number of taken branches just reaches to 250,000, the number
-of interleaving segments is over 1,2500,000. Thus the size of
-interleaving coverage is more than fifty times of the size of code
+While the number of taken branches just reaches to 300K, the number of
+interleaving segments is over 20M. Thus, the scale of interleaving
+coverage is more than 66 times of code coverage during our evaluation.
+%
+This result follows the conventional belief that the search space of
+thread interleaving is very large.
+
+One thing to note about this scale difference is that storing
+interleaving segment coverage consumes more memory than storing branch
 coverage.
 %
-This result confirms the conventional thought that the search space of
-thread interleaving is large.
+In our implementation, both branch coverage and interleaving segment
+coverage are represented as hash tables where each element is
+8-byte. Therefore, storing interleaving segment coverage consumes
+about 180\MB while storing branch coverage requires 2\MB.
 %
+While this high memory pressure is definitely a downside of
+interleaving segment coverage, we can consider this as a traditional
+space-time tradeoff~\cite{spacetimetradeoff}; we invest \textit{more
+  memory} to discover concurrency bugs \textit{faster}.
+%
+% In addition, considering each VM is equipped with 8\GB memory, it is
+% endurable for the fuzzer to store interleaving segment coverage using
+% 180\MB (or even using ten times of 180\MB).
 
 
-\dr{space-time tradeoff}
+\PP{Coverage growth without thread scheduling control}
+%
+In order to understand the effectiveness of \dr{}
 
-\dr{}
 
 
 \PP{Fuzzing throughput.}
@@ -147,18 +164,19 @@ thread interleaving is large.
   \label{table:throughput}
 \end{table}
 %
-All \sys's mechanisms entail the trade-off; they provide benefits in
-finding concurrency bugs with a cost of additional overheads and
-throughput degradation.
+All \sys's mechanisms provide benefits in finding concurrency bugs
+with a cost of additional overheads and throughput degradation.
 %
 To comprehend the trade-off, we measure the fuzzing throughput of \sys
 and compare it with the \texttt{Syzkaller}'s throughput.
 %
-Since fuzzing throughput is highly affected by initial seeds, we
-measure throughput with an empty set of seed. And because both
-\texttt{Syzkaller} and \sys restart VMs after an hour of fuzzing, we
-run them for an hour and measure throughput in order to eliminate
-noises caused by, for example, VM rebooting or kernel crashes.
+In order to experiment in the same environment, we measure throughput
+with an empty set of seed. And because both \texttt{Syzkaller} and
+\sys restart VMs after an hour of fuzzing, we measure throughput in an
+hour of execution in order to eliminate noises caused by, for example,
+VM rebooting or kernel crashes.
+
+
 
 \autoref{table:throughput} shows the result. As expected, \sys shows
 the lower throughput than \texttt{Syzkaller}. In particular, the
@@ -167,24 +185,29 @@ throughput.
 %
 To further understand why the \sys's throughput is degraded, we
 additionally measure throughput of \texttt{Syzkaller} with memory
-access tracing enabled (but not making use of it).
+access tracing enabled~(\autoref{ss:instrumentation}) (but not making
+use of it).
 %
 As shown in the \texttt{Syzkaller-memtrace} column in
 \autoref{table:throughput}, it shows the throughput similar to that of
-\sys; the \texttt{Syzkaller-memtrace}'s throughput is 4.1\% higher
-than the throughput of \sys.
+\sys; the \texttt{Syzkaller-memtrace}'s throughput is just 4.1\%
+higher than the throughput of \sys.
 
-\dr{This is similar argument with KRace:}
+
 These results indicate that the throughput of \sys is mainly degraded
 by the heavy instrumentation to trace memory accesses.
 %
 However, as KRace~\cite{krace} states, it can be understandable as a
-trade-off between throughput and seed quality.
+trade-off between throughput and input quality.
 %
 In the fuzzer's perspective, while tracking memory accesses has
 negative impacts on throughput, it provides a higher chance for a
 fuzzer to execute more interesting inputs (\ie, interesting thread
 interleaving) and not to waste computing resources.
+%
+The effectiveness of high input quality is pronounced in
+\autoref{ss:comparison}, showing \sys can discover concurrency bugs
+extremely fast.
 
 
 
