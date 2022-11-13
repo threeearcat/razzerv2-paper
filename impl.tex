@@ -9,6 +9,8 @@ coverage and the coverage-directed interleaving \dr{}mutation
 algorithgm described in \autoref{s:design}.
 %
 
+
+
 \dr{TODO: why do we explain instrumentation and engine first, fuzzer
   later}
 
@@ -24,7 +26,7 @@ details of \sys~(\autoref{ss:impl}).
 \label{ss:instrumentation}
 
 \sys requires to profile basic blocks and memory accesses executed by
-each system calls.
+each system call.
 %
 To this end, \sys incorporates a compiler pass that inserts callback
 function calls 1) at the beginning of each basic block, and 2) before
@@ -68,7 +70,7 @@ address of the function call as input (\ie \texttt{0x0} and
 On the other hand, \texttt{trace_access()} takes four parameters, the
 address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
 the instruction address accessing the memory object (\ie,
-\texttt{0x5}), the size of the memory access (\ie, \texttt{1}), and
+\texttt{0xa}), the size of the memory access (\ie, \texttt{1}), and
 the type of the memory access (\ie, \texttt{read}), and records them
 into \texttt{Memory access record}.
 
@@ -79,12 +81,10 @@ into \texttt{Memory access record}.
 
 It is worth noting that \texttt{Basicblock record} and \texttt{Memory
   access record} are per-thread memory regions, which is shared
-between the user space and the kernel space. Thus, after threads of
-the userspace fuzzer execute system calls, each thread can identify
-basic blocks and memory accesses executed by a system call that it
+between the user space and the kernel space. Thus, after a thread of
+the userspace fuzzer executes a system call, it can can identify basic
+blocks and memory accesses executed by the system call that it
 executed.
-
-
 
 
 
@@ -130,13 +130,14 @@ executed.
 \subsection{Execution Engine}
 \label{ss:engine}
 
-In order to allow the userspace fuzzer to control thread scheduling,
-\sys introduces an execution engine.
+\sys introduces an execution engine in order to grant an ability to
+the userspace fuzzer that it can control thread scheduling.
 %
 The execution engine is implemented in the hypervisor layer to be
-non-intrusive to the kernel execution, the userspace fuzzer requests
-the execution engine to control thread scheduling through hypercall
-interfaces.
+non-intrusive to the kernel execution, and the userspace fuzzer can
+request the execution engine to control thread scheduling through
+hypercall interfaces.
+
 
 \PP{Schedule}
 %
@@ -150,7 +151,7 @@ scheduling order).
   \centering
   \includegraphics[width=0.9\linewidth]{fig/schedule.pdf}
   \caption{(a) Thread interleaving to run, and (b) Schedule specifies
-    scheduling points for (a).}
+    scheduling points to run (a).}
   \label{fig:schedule}
 \end{figure}
 
@@ -171,12 +172,18 @@ interfaces to control thread scheduling according to a schedule.
 
 
 
-\PP{Thread scheduling control}
+\PP{Enforcing a schedule}
 %
-Through hypercall interfaces, the execution engine accepts a schedule
-from the userspace fuzzer. After that, when threads of the userspace
-fuzzer execute sytsem calls, the execution engine controls thread
-scheduling as described in the given schedule.
+In order for the userspace fuzzer to ask the execution engine to
+enforce a schedule, the userspace fuzzer sends a schedule to run
+before executing system calls.
+%
+After that, the threads notify the execution engine that they are
+ready to execute system calls, and start executing system calls,
+%
+During the execution, the execution engine deliberately suspends and
+resumes the execution of system calls as described in the given
+schedule.
 
 %
 \begin{figure}[t]
@@ -190,61 +197,98 @@ scheduling as described in the given schedule.
 \autoref{fig:workflow-hypervisor} shows a workflow of the execution
 engine.
 %
-At the beginning, the userspace fuzzer spawns threads that are
-responsible to execute system calls concurrently.
+At the beginning, the userspace fuzzer spawns threads, where each
+thread is assigned a system call annotated with scheduling points.
 %
-Then, each thread is assigned a system call and its scheduling points.
+Then, each thread invokes hypercalls (\ie,
+\texttt{hcall_scheduling_point()}) to deliver scheduling points to the
+execution engine, followed by a hypercall \texttt{hcall_ready()} that
+sleeps until all threads call are ready.
+%
+After all threads call \texttt{hcall_ready()}, the execution engine
+wakes up them, and the threads start executing system calls.
+
+
+While executing system calls, the execution engine keeps only one
+thread to run.
+%
+When the running thread reaches a scheduling point, the execution
+engine performs preemption by suspending the running thread and
+resuming the next thread to run as specified in the given schedule.
+
+
+
+\PP{Performing preemption}
+%
+In order to perform preemption, \sys leverages the hardware breakpoint
+feature~\cite{hwbp} shipped in modern Intel CPU chipsets.
+%
+When the execution engine receives scheduling points, the execution
+engine installs breakpoints on instructions on which scheduling points
+refer, and recognizes that a thread of the userspace fuzzer reaches a
+scheduling point when a breakpoint is hit.
+
+
+When a thread hits a breakpoint, the execution engine saves register
+values of the thread, and then changes the program counter of the
+thread to an infinite loop called a trampoline.
+%
+In the trampoline, the thread keeps calling \texttt{cond_resched()} to
+yield a CPU without proceeding with the system call execution.
+%
+To resume the suspended thread, the execution engine restores
+registers with the values of registers including a program counter
+saved when the thread was suspended, and then the thread can continue
+its execution.
+
+
+
+While a hardware breakpoint feature is well-fitting for our pupose, it
+has a restriction on the number of breakpoints that can be installed
+at the same time.
+%
+In Intel CPU chipsets, at most four hardware breakpoints can be
+installed simultaneously, and the number of scheduling points can be
+larger than four.
+%
+\dr{} \sys overcomes this restriction by leveraging the fact that
+scheduling points are ordered. In other words, the execution engine
+installed breakpoints on a first few scheduling points, and when a
+installed breakpoint is hit, the execution engine moves a breakpoint
+onto a next scheduling point.
+%
+Also we expect that this restriction can be further mitigated by using
+architectures with more hardware breakpoints (\eg, ARM v7 equipped six
+hardware breakpoints), or using a software breakpoint feature that
+does not have a restriction on the number of breakpoints.
+
+
+
+\dr{not important. i'm thinking remove this}
+%
+In performing preemption, we choose to suspend and resume a guest
+thread instead of a whole virtual CPU on which the guest thread runs.
+%
+While suspending and resuming a whole virtual CPU is adopted by
+previous approaches~\cite{ski, snowboard, razzer} it is not suitable
+for our purpose because \textit{if suspending a virtual CPU, it may
+  suspend another virtual CPU}. Details are explained in the appendix
+section~(\autoref{s:appendix:preemption}).
+
+
+
+
+\PP{Handling missing scheduling points}
+%
+It is worth noting that instructions on which scheduling points
+install may not be executed during the execution, for example, in case
+that the control flow changes because of kernel internal states.
+%
+For example, it is possible that
+
 \dr{}
 
 
-each thread calls hypercalls to deliver scheduling points to
-the execution engine before executing a system call.
-
-
-
-After the fuzzer sends a schedule, the userspace fuzzer notifies the
-execution engine, and the execution engine starts executing with the
-intial thread specified in the given schedule while other threads are
-suspended.
-
-%
-When the running thread reaches a scheduling point, a hypervisor
-performs preemption by suspending the running thread and resuming the
-next thread to run in order to enforce the execution order between
-memory access operations.
-%
-\dr{TODO:}
-Details about suspending and resuming a thread is described later.
-
-
-\PP{Suspending a thread}
-%
-A few prior approaches~\cite{ski, snowboard, razzer} suspend a vCPU
-instead of a guest thread. While suspending a vCPU grants the ability
-to control an interleaving, it is not suitable for our purpose because
-suspending a vCPU may unexpectedly suspend another vCPU. An example we
-observed is TLB shootdown~\cite{tlbshootdown}. When a vCPU wants TLB
-shootdown, it sends inter-process interrupts (IPIs) to all cores and
-wait until all cores to execute the TLB shootdown handler.  In this
-case, if one vCPU is entirely suspended, the TLB shootdown cannot be
-successfully conducted causing the vCPU invoking TLB shootdown
-blocked.
-%
-Therefore, instead of adopting the prior approach, our hypervisor is
-designed to suspends and resumes a guest thread.
-%
-In order to suspend a thread at an arbirary location, we use a
-hardware breakpoint functionality~\cite{hwbp} shipped in modern Intel
-CPU chipsets.
-%
-When a guest thread hits a breakpoint, our hypervisor saves its
-register values and then changes the program counter of the thread to
-an infinite loop called trampoline. In the trampoline, the thread
-keeps calling \texttt{cond_resched()} to yield a CPU to make all other
-kernel functionalities (\eg, handling the TLB shootdown handler) work
-normally. When the guest thread resumes, our hypervisor restores
-registers with the values saved when the thread is suspended, and the
-thread continues its execution.
 
 
 \PP{Virtual Machine Instrospection}
@@ -253,28 +297,31 @@ While controlling thread scheduling of system calls, the execution
 engine introspects the target kernel for two reasons.
 %
 First, because a hardware breakpoint does not distinguish which thread
-hit the breakpoint, it needs to determine whether the breakpoint is
-hit by a thread of the userspace fuzzer, when a breakpoint is hit.
+hits the breakpoint, the execution engine needs to determine whether
+the breakpoint is hit by a thread of the userspace fuzzer or by
+irrelevant thread.
 %
-If it is the case, the execution engine suspends the running thread
-and resumes the suspended thread as specified in a schedule.
+If a breakpoint is hit by a thread of the userspace fuzzer, the
+execution engine suspends the running thread and resumes the suspended
+thread as specified in a schedule.
 %
 Otherwise, the execution engine ignores the breakpoint hit, and keeps
 running the kernel.
 
 
-%
 Second, when a running thread tries to acquire a lock, the execution
-engine need to inspect the lock is held by a suspended thread to
-prevent a situation 
+engine inspects whether the lock is held by a suspended thread to
+prevent unexpected block (\ie, both threads cannot make a progress).
 %
-If a running thread is trying to acquire a lock, the execution engine 
-
+If it is the case, the execution engine performs preemption so that
+the lock-holder thread (\ie, the suspended thread) resumes the
+execution, and the lock-waiting thread gets suspended.
 
 
 While the virtual machine introspection is crucial to properly control
-thread scheduling, we leave details of the virtual machine
-introspection in \autoref{s:appendix:vmi}.
+thread scheduling, we leave details of how we implement the virtual
+machine introspection in the appendix
+section~(\autoref{s:appendix:vmi}).
 
 
 
