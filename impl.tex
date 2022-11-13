@@ -499,20 +499,18 @@ A
 We implement \sys in various software layers as follows:
 %
 The target kernel instrumentation~(\autoref{ss:instrumentation}) is
-implemented in two parts, a compiler pass and callback functions. A
-compiler pass is based on the version 12.0.1 of the LLVM compiler
-suite~\cite{llvm}.
-%
-In particular, we modify two existing LLVM passes, such as the
+implemented in two parts, a compiler pass and callback functions. The
+compiler pass is implemented on the LLVM compiler suite
+12.0.1~\cite{llvm} by modifying two existing LLVM passes, the
 \texttt{SanitizerCoverage} pass~\cite{kcovpass} (for tracing basic
 blocks) and the \texttt{ThreadSanitizer} pass~\cite{tsanpass} (for
 tracing memory accesses).
 %
-And, we implement the callback functions into the Linux kernel source
+And, the callback functions are implemented in the Linux kernel source
 tree.
 %
-Thus, when compiling the Linux kernel, our callbacks are also compiled
-into the kernel binary.
+Thus, when compiling the kernel, our callbacks are also compiled into
+the kernel binary.
 
 
 The execution engine~(\autoref{ss:engine}) is implemented on QEMU
@@ -542,10 +540,9 @@ instrumentation~(\autoref{ss:instrumentation}) is implemented with 323
 LoC in C++ (for the compiler pass) and 265 LoC in C (for callback
 functions).
 %
-For the rest, \sys modifies existing frameworks as follows: QEMU to
-implement execution engine~(\autoref{ss:engine}) with 1662 LoC in C,
-and Syzkaller to implement the userspace fuzzer~(\autoref{ss:fuzzer})
-with 3334 LoC in GoLang and 341 LoC in C++.
+The execution engine~(\autoref{ss:engine}) is implemented with 1662
+LoC in C. And the userspace fuzzer~(\autoref{ss:fuzzer}) is
+implemented with 3334 LoC in GoLang and 341 LoC in C++.
 
 % the compiler pass is implmented in 323 lines of C++
 % the callback functions are implmeneted in 265 lines of C
