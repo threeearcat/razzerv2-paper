@@ -514,7 +514,7 @@ To allow hypercalls from the guest user space, we also modify the KVM
 module of the host kernel.
 %
 In addition, the trampoline is enclosed into the target kernel source
-tree.
+tree as a loadable module.
 
 
 Lastly, the \sys's userspace fuzzer~(\autoref{ss:fuzzer}) is
@@ -523,6 +523,7 @@ fuzzer developed by Google.
 
 
 
+\PP{Lines of Code}
 We use scc~\cite{scc} and sloccount~\cite{sloccount} to measure LoC of
 GO and C respectively.
 
