@@ -23,7 +23,8 @@ to quickly saturate the coverage metric (\textbf{Design goal 2})~(\autoref{ss:sc
   \caption{Statistics provided by Shan Lu
     \etal~\cite{learningfrommistakes}, stating the number of
     concurrency bugs according to the number of memory accesses
-    involved in the manifestation of a concurrency bug.}
+    involved in the manifestation of a concurrency bug. \yj{Do we need
+      the table?} \dr{No. we can remove this.}}
   \label{table:learningfrommistakes}
 \end{table}
 
@@ -33,7 +34,7 @@ the search space exponentially. Therefore, this work seek to
 strike the balance
 in the trade-off between bug-finding capability and search 
 complexity. Observed by a previous study~\cite{learningfrommistakes}
-as shown in \autoref{table:learningfrommistakes}\yj{Do we need the table?}, 92.4\% (97 out of
+as shown in \autoref{table:learningfrommistakes}, 92.4\% (97 out of
 105) of concurrency bugs manifest when a bug-finding system 
 monitors instruction execution orders including \textit{at most} 
 four memory accesses referring to the same object\yj{the same address?}.
