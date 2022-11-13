@@ -242,7 +242,8 @@ saved when the thread was suspended, and then the thread can continue
 its execution.
 
 
-
+\dr{where to put this?}
+%
 While a hardware breakpoint feature is well-fitting for our pupose, it
 has a restriction on the number of breakpoints that can be installed
 at the same time.
@@ -253,9 +254,9 @@ larger than four.
 %
 \dr{} \sys overcomes this restriction by leveraging the fact that
 scheduling points are ordered. In other words, the execution engine
-installed breakpoints on a first few scheduling points, and when a
-installed breakpoint is hit, the execution engine moves a breakpoint
-onto a next scheduling point.
+installed breakpoints on a first few (\eg, four) scheduling points,
+and when a installed breakpoint is hit, the execution engine moves a
+breakpoint onto the next scheduling point.
 %
 Also we expect that this restriction can be further mitigated by using
 architectures with more hardware breakpoints (\eg, ARM v7 equipped six
@@ -486,15 +487,47 @@ A
 \subsection{Implementation}
 \label{ss:impl}
 
-We implement \sys in various software layers.
+We implement \sys in various software layers as follows:
 %
+The target kernel instrumentation~(\autoref{ss:instrumentation}) is
+implemented in two parts, a compiler pass and callback functions. A
+compiler pass is based on the version 12.0.1 of the LLVM compiler
+suite~\cite{llvm}.
+%
+In particular, we modify two existing LLVM passes, such as the
+\texttt{SanitizerCoverage} pass~\cite{kcovpass} (for tracing basic
+blocks) and the \texttt{ThreadSanitizer} pass~\cite{tsanpass} (for
+tracing memory accesses).
+%
+To implement the callback functions, we enclose definitions of the
+callback functions into the Linux kernel source tree.
+%
+Thus, when compiling the Linux kernel, our callbacks are also compiled
+into the kernel binary.
 
+
+The execution engine~(\autoref{ss:engine}) is implemented on QEMU
+6.0.0, and leverages KVM (Kernel-based Virtual Machine) to take
+advantage of hardware acceleration.
 %
-To allow 
+To allow hypercalls from the guest user space, we also modify the KVM
+module of the host kernel.
+%
+In addition, the trampoline is enclosed into the target kernel source
+tree.
+
+
+Lastly, the \sys's userspace fuzzer~(\autoref{ss:fuzzer}) is
+implemented based on \texttt{Syzkaller}~\cite{syzkaller}, a kernel
+fuzzer developed by Google.
+
 
 
 We use scc~\cite{scc} and sloccount~\cite{sloccount} to measure LoC of
 GO and C respectively.
+
+
+
 
 
 %%% Local Variables:
