@@ -221,12 +221,14 @@ extremely fast.
   \label{table:elapsedtime}
 \end{table}
 %
-\dr{Rewrite}
+To further closely examine \sys's overheads, we measure the elapsed
+time for an iteration of a fuzzing loop, and break down the elapsed
+time.
 %
-To closely examine \sys's overheads, we measure the elapsed time for
-an iteration of a fuzzing loop, and break down the elapsed time into
-time taken by computation (\ie, incurred by generating a schedule and
-checking new coverage) and execution of an input.
+Specifically, each iteration consists of three steps
+
+into time taken by computation (\ie, incurred by generating a
+schedule and checking new coverage) and execution of an input.
 %
 It is worth noting that executing an input entails two overheads for
 controling thread interleaving and tracing memory accesses. To
@@ -270,8 +272,8 @@ to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
   razzer, snowboard, moonshine, fuze}.
 %
 Specifically, among concurrency bugs used in previous studies, we
-select ones that their exploits are publicly available such that we
-can make use of them for our evaluation.
+select ones that their exploits are publicly available so that we can
+make use of them for our evaluation.
 %
 Although the exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is
 not publicly available, we successfully reproduce the concurrency bug

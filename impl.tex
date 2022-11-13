@@ -9,17 +9,31 @@ coverage and the coverage-directed interleaving \dr{}mutation
 algorithgm described in \autoref{s:design}.
 %
 
+\dr{}In particular, \sys consists of two stages of fuzzing.
+%
+The first stage is a single-thread fuzzing, which focuses on expanding
+code coverage.
+%
+The second stage is a multi-thread fuzzing to explore thread
+interleavings, and discover concurrency bugs.
+%
+In each stage, \sys profiles memory accesses to track interleaving
+segment coverage through binary instrumentation.
+%
+Also, during the second stage, \sys employs an execution engine, which
+controls thread scheduling as the fuzzer instructs.
 
 
-\dr{TODO: why do we explain instrumentation and engine first, fuzzer
-  later}
 
-
-In the following of subsections, we describe design details of the
-target kernel instrumentation~(\autoref{ss:instrumentation}) and the
-execution engine~(\autoref{ss:engine}), followed by the userspace
-fuzzer~(\autoref{ss:fuzzer}).  Lastly, we explain the implementation
-details of \sys~(\autoref{ss:impl}).
+In the following of subsections, we firstly provide two building
+blocks of \sys, the target kernel
+instrumentation~(\autoref{ss:instrumentation}) and the execution
+engine~(\autoref{ss:engine}).
+%
+And then we describe design details of the userspace
+fuzzer~(\autoref{ss:fuzzer}).
+%
+Lastly, we explain how we implement \sys~(\autoref{ss:impl}).
 
 
 \subsection{Target Kernel Instrumentation}
@@ -172,9 +186,7 @@ interfaces to control thread scheduling according to a schedule.
 
 
 
-\PP{Enforcing a schedule}
-\dr{rewrite}
-
+\PP{Workflow of enforcing a schedule}
 %
 In order for the userspace fuzzer to ask the execution engine to
 enforce a schedule, the userspace fuzzer sends a schedule to run
@@ -183,9 +195,9 @@ before executing system calls.
 After that, the threads notify the execution engine that they are
 ready to execute system calls, and start executing system calls,
 %
-During the execution, the execution engine deliberately suspends and
-resumes the execution of system calls as described in the given
-schedule.
+During the execution, the execution engine keeps only one thread to
+run, and deliberately suspends and resumes the execution of system
+calls according to the given schedule.
 
 %
 \begin{figure}[t]
@@ -205,18 +217,13 @@ thread is assigned a system call annotated with scheduling points.
 Then, each thread invokes hypercalls (\ie,
 \texttt{hcall_scheduling_point()}) to deliver scheduling points to the
 execution engine, followed by a hypercall \texttt{hcall_ready()} that
-sleeps until all threads call are ready.
+sleeps until all threads are ready.
 %
-After all threads call \texttt{hcall_ready()}, the execution engine
+After all threads invoke \texttt{hcall_ready()}, the execution engine
 wakes up them, and the threads start executing system calls.
 
 
-While executing system calls, the execution engine keeps only one
-thread to run.
-%
-When the running thread reaches a scheduling point, the execution
-engine performs preemption by suspending the running thread and
-resuming the next thread to run as specified in the given schedule.
+\dr{}
 
 
 
@@ -501,8 +508,8 @@ In particular, we modify two existing LLVM passes, such as the
 blocks) and the \texttt{ThreadSanitizer} pass~\cite{tsanpass} (for
 tracing memory accesses).
 %
-To implement the callback functions, we enclose definitions of the
-callback functions into the Linux kernel source tree.
+And, we implement the callback functions into the Linux kernel source
+tree.
 %
 Thus, when compiling the Linux kernel, our callbacks are also compiled
 into the kernel binary.
@@ -526,8 +533,29 @@ fuzzer developed by Google.
 
 
 \PP{Lines of Code}
+%
 We use scc~\cite{scc} and sloccount~\cite{sloccount} to measure LoC of
-GO and C respectively.
+GO and C, C++ respectively.
+%
+To summarize, the target kernel
+instrumentation~(\autoref{ss:instrumentation}) is implemented with 323
+LoC in C++ (for the compiler pass) and 265 LoC in C (for callback
+functions).
+%
+For the rest, \sys modifies existing frameworks as follows: QEMU to
+implement execution engine~(\autoref{ss:engine}) with 1662 LoC in C,
+and Syzkaller to implement the userspace fuzzer~(\autoref{ss:fuzzer})
+with 3334 LoC in GoLang and 341 LoC in C++.
+
+% the compiler pass is implmented in 323 lines of C++
+% the callback functions are implmeneted in 265 lines of C
+% the execution engine is implemented in 1662 lines of C
+% the trampoline is 66 in C
+% c2fuzz:
+% go 3334
+% C++ 341
+
+
 
 
 

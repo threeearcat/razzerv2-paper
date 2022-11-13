@@ -3,20 +3,20 @@
 \subsection{}
 \label{s:appendix:preemption}
 
-% A few prior approaches~\cite{ski, snowboard, razzer} suspend a vCPU
-% instead of a guest thread. While suspending a vCPU grants the ability
-% to control an interleaving, it is not suitable for our purpose because
-% suspending a vCPU may unexpectedly suspend another vCPU. An example we
-% observed is TLB shootdown~\cite{tlbshootdown}. When a vCPU wants TLB
-% shootdown, it sends inter-process interrupts (IPIs) to all cores and
-% wait until all cores to execute the TLB shootdown handler.  In this
-% case, if one vCPU is entirely suspended, the TLB shootdown cannot be
-% successfully conducted causing the vCPU invoking TLB shootdown
-% blocked.
-% %
-% Therefore, instead of adopting the prior approach, our hypervisor is
-% designed to suspends and resumes a guest thread.
+A few prior approaches~\cite{ski, snowboard, razzer} suspend a vCPU
+instead of a guest thread. While suspending a vCPU grants the ability
+to control an interleaving, it is not suitable for our purpose because
+suspending a vCPU may unexpectedly suspend another vCPU. An example we
+observed is TLB shootdown~\cite{tlbshootdown}. When a vCPU wants TLB
+shootdown, it sends inter-process interrupts (IPIs) to all cores and
+wait until all cores to execute the TLB shootdown handler.  In this
+case, if one vCPU is entirely suspended, the TLB shootdown cannot be
+successfully conducted causing the vCPU invoking TLB shootdown
+blocked.
 %
+Therefore, instead of adopting the prior approach, our hypervisor is
+designed to suspends and resumes a guest thread.
+
 %
 
 
