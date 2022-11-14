@@ -86,20 +86,17 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 thread interleavings do not.
 
 
-\PP{Design goal 1: Combinatorial interleaving coverage}
+\PP{Design goal 1: Informative interleaving coverage}
 %
-An interleaving coverage metric should be able to determine whether
-the combined interleaving orders
-%
-In other words, 
-
-Semantically, if interleaving coverage is saturated, the combined
-interleaving orders
+In order for a fuzzer to discover the uninitialized access bug, an
+interleaving coverage should not be saturated until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4}))$ should be executed.
+\texttt{A4}))$ is executed.
 %
-Otherwise, a fuzzer may move on to other inputs, and miss the
-uninitialized access bug.
+Otherwise, a fuzzer may think that there is no more interesting thread
+interleaving in the multi-thread input, and stop searching for new
+thread interleavings, missing the uninitialized access bug.
+%
 
 
 
@@ -149,14 +146,15 @@ discover the uninitialized access bug.
 
 
 
-\PP{Design goal 2: History-based thread interleaving search strategy}
+\PP{Design goal 2: Coverage-based interleaving search strategy}
 %
-Based on the observation 2, we elicit a design goal of a thread
-interleaving search strategy.
+In the perspective of fuzzing, previous executions are tracked using a
+coverage metric.
 %
-Particulary, a thread interleaving search strategy should leverage a
-history of previous executions to efficiently determine what to search
-in future executions.
+Therefore, if an interleaving coverage metric tracks that
+$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
+explored, then, a fuzzer can utilize the interleaving coverage metric
+to determine which interleaving to run in future iterations.
 
 
 % If a fuzzer explores the search space of thread interleaving randomly,
