@@ -153,8 +153,12 @@ coverage metric.
 %
 Therefore, if an interleaving coverage metric tracks that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
-explored, then, a fuzzer can utilize the interleaving coverage metric
-to determine which interleaving to run in future iterations.
+explored before, then, a fuzzer can utilize interleaving coverage to
+determine which interleaving to search in future iterations (\ie,
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
+%
+As a consequence, a fuzzer can quickly discover the uninitialized
+access bug.
 
 
 % If a fuzzer explores the search space of thread interleaving randomly,
@@ -205,7 +209,11 @@ their interleaving coverage metrics and thread scheduling control
 mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
-\PP{Insufficient coverage metric}
+\PP{Less-informative coverage metric}
+%
+We find that previously proposed interleaving coverage metrics are not
+informative enough to determine
+
 %
 \begin{figure}[t]
   \centering
@@ -215,52 +223,53 @@ mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
     access bug does not manifest in both interleavings.}
   \label{fig:alias-coverage}
 \end{figure}
-%
-\autoref{fig:alias-coverage} shows what happens if an interleaving
-coverage metric tracks individual interleaving orders.
-%
-In the two interleavings described in this figure, we can track all
-four individual interleaving orders regarding \texttt{inet->hdrincl}
-(\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
-$\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
-$\texttt{B1} \Rightarrow \texttt{A2}$, and
-$\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2), while the
-uninitialized access bug does not manifest in both thread
-interleavings.
-%
-Therefore, if an interleaving coverage metric tracks individual
-interleaving orders, the coverage metric can be saturated even if a
-concurrency bug still resides in a multi-thread input.
-
-%
-We find that none of existing interleaving coverage metrics consider
-a combination of interleaving orders.
-%
-Therefore, they may be saturated even before a concurrency bug is
-exposed, misleading a fuzzer to de-prioritize an input in which a
-concurrency bug resides.
 
 
-In particular, alias coverage is designed to track individual
-interleaving orders. As shown through \autoref{fig:alias-coverage},
-tracking individual interleaving orders may mislead a fuzzer to think
+% \autoref{fig:alias-coverage} shows what happens if an interleaving
+% coverage metric tracks individual interleaving orders.
+% %
+% In the two interleavings described in this figure, we can track all
+% four individual interleaving orders regarding \texttt{inet->hdrincl}
+% (\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
+% $\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
+% $\texttt{B1} \Rightarrow \texttt{A2}$, and
+% $\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2), while the
+% uninitialized access bug does not manifest in both thread
+% interleavings.
+% %
+% Therefore, if an interleaving coverage metric tracks individual
+% interleaving orders, the coverage metric can be saturated even if a
+% concurrency bug still resides in a multi-thread input.
 
-%
-In fact, the two thread interleavings described in
-\autoref{fig:alias-coverage}
-%
-In addition, concurrenct call pair is intrinsically not able to
-describe interleaving orders of intsructions.
-
-Razzer and Snowboard do not adopt a interleaving coverage metric at
-all.
-
-tracking individual interleaving
-orders is not enough as an interleaving coverage metric.
+% %
+% We find that none of existing interleaving coverage metrics consider
+% a combination of interleaving orders.
+% %
+% Therefore, they may be saturated even before a concurrency bug is
+% exposed, misleading a fuzzer to de-prioritize an input in which a
+% concurrency bug resides.
 
 
-To avoid this pitfall, an interleaving coverage metric should be
-designed by considering a combination of interleaving orders.
+% In particular, alias coverage is designed to track individual
+% interleaving orders. As shown through \autoref{fig:alias-coverage},
+% tracking individual interleaving orders may mislead a fuzzer to think
+
+% %
+% In fact, the two thread interleavings described in
+% \autoref{fig:alias-coverage}
+% %
+% In addition, concurrenct call pair is intrinsically not able to
+% describe interleaving orders of intsructions.
+
+% Razzer and Snowboard do not adopt a interleaving coverage metric at
+% all.
+
+% tracking individual interleaving
+% orders is not enough as an interleaving coverage metric.
+
+
+% To avoid this pitfall, an interleaving coverage metric should be
+% designed by considering a combination of interleaving orders.
 
 
 
@@ -286,16 +295,11 @@ designed by considering a combination of interleaving orders.
 % here, we find that they all share the same limitation.
 
 
-\PP{Ineffective scheduling mechanism}
+\PP{Coverage-irrelevant interleaving search strategy}
 %
 Stemming from insufficient coverage metrics, proposed scheduling
 mechanisms are also ineffective in satisfying \textbf{R2}.
 %
-As described in \autoref{s:background}, proposed scheduling mechanisms
-are largely categorized into two: a randomized scheduler and a
-hint-directed scheduler.
-
-\dr{revisit after evaluation. not ready to write this part:}
 %
 % Randomized schedulers~\cite{krace, pctalgorithm, muzz, ski} pay little
 % attention on collected interleaving coverage when scheduling
