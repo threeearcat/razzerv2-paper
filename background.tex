@@ -218,15 +218,16 @@ deadlocks~\cite{covcon, terragni2018effectiveness}.
 % possible interleavings grows exponentially to the number of memory
 % access operations.
 
-Recently, several approaches~\cite{razzer, krace, snowboard, muzz,
-  conzzer} have been proposed to take consider of the
-\textit{concurrency aspect} of the execution into the fuzzing process.
+Recently, several approaches, classified as concurrency
+fuzzing~\cite{razzer, krace, snowboard, muzz, conzzer}, have been
+proposed to take consider of the \textit{concurrency aspect} of kernel
+execution into the fuzzing process.
 %
-Concurrency fuzzers generally repeat executing a multi-thread input
-(\eg, a multi-threaded system call sequence) while 1) capturing unique
-behaviors of thread interleavings with a \textit{interleaivng coverage
-  metric}, and 2) taming the non-determinitsic behavior of thread
-interleavings using \textit{thread scheduling control}.
+Concurrency fuzzers generally repeat the execution of a multi-thread
+input (\eg, a multi-threaded system call sequence) while 1) capturing
+unique behaviors of thread interleavings with a \textit{interleaivng
+  coverage metric}, and 2) taming the non-determinitsic behavior of
+thread interleavings through a \textit{thread scheduling control}.
 
 
 % \PP{Coverage-guided fuzzing}
@@ -344,7 +345,7 @@ A thread scheduling control mechanism is used to control thread
 scheduling as a fuzzer wants.
 %
 To this end, various methods are used; Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard} suspends and resumes virtual CPUs on which
+Snowboard~\cite{snowboard} suspend and resume virtual CPUs on which
 target threads are running, Krace~\cite{krace} injects delays before
 memory accesses through instrumentation, and Conzzer~\cite{conzzer}
 inject delays through the breakpoint feature.
@@ -353,11 +354,11 @@ While these methods are designed differently, all of them allow a
 fuzzer to control thread scheduling.
 
 
-A thread interleaving search strategy determines which thread
-interleaving to run for each execution.
+A thread interleaving search strategy is adopted for a fuzzer to
+determine which thread interleaving to run for each iteration.
 %
-For instance, Krace~\cite{krace} randomly determins a thread
-interleaving to run, Snowboard~\cite{snowboard} and
+\dr{explain correctly: }For instance, Krace~\cite{krace} randomly
+determins a thread interleaving to run, Snowboard~\cite{snowboard} and
 Razzer~\cite{razzer} enforces an interleaving order of a single pair
 of instructions, and \dr{Conzzer does this, and MUZZ does that}.
 
