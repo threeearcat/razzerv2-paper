@@ -308,12 +308,12 @@ engine introspects the target kernel for two reasons.
 %
 First, because a hardware breakpoint does not distinguish which thread
 hits the breakpoint, the execution engine needs to determine whether
-the breakpoint is hit by a thread of the userspace fuzzer or by
+the breakpoint is hit by a thread of the userspace fuzzer, or by an
 irrelevant thread.
 %
 If a breakpoint is hit by a thread of the userspace fuzzer, the
-execution engine suspends the running thread and resumes the suspended
-thread as specified in a schedule.
+execution engine suspends the thread and resumes the
+previously-suspended thread as specified in a schedule.
 %
 Otherwise, the execution engine ignores the breakpoint hit, and keeps
 running the kernel.
