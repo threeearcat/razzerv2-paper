@@ -197,7 +197,7 @@ higher than the throughput of \sys.
 These results indicate that the throughput of \sys is mainly degraded
 by the heavy instrumentation to trace memory accesses.
 %
-However, as KRace~\cite{krace} states, it can be understandable as a
+However, as Krace~\cite{krace} states, it can be understandable as a
 trade-off between throughput and input quality.
 %
 In the fuzzer's perspective, while tracking memory accesses has
@@ -258,7 +258,7 @@ out of the total elapsed time.
   \label{table:knownbugs}
 \end{table}
 
-We compare \sys against various prior approaches, KRace~\cite{krace},
+We compare \sys against various prior approaches, Krace~\cite{krace},
 Snowboard~\cite{snowboard} to demonstrate the performance improvement
 in discovering concurrency bugs.
 
@@ -279,9 +279,9 @@ Although the exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is
 not publicly available, we successfully reproduce the concurrency bug
 from the description in the Snowboard~\cite{snowboard} paper.
 %
-Whereas, even though KRace~\cite{krace} studies kernel concurrency
+Whereas, even though Krace~\cite{krace} studies kernel concurrency
 bugs (\ie, data races), we do not have access to concurrency bugs that
-the authors use to evaluate KRace, and we exclude two concurrency bugs
+the authors use to evaluate Krace, and we exclude two concurrency bugs
 (\ie, CVE-2019-1999~\cite{cve20191999} and
 CVE-2019-2025~\cite{cve20192025}) used by ExpRace~\cite{exprace}
 because \dr{XXX}.

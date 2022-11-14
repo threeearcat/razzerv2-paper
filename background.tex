@@ -173,10 +173,10 @@ proposed to discover vulnerabilities in the kernel.
 %
 These approaches, specifically coverage-guided fuzzing approaches,
 execute a massive number of inputs (\ie, sequences of system calls)
-while tracking the execution path that each input explores by using a
-code coverage metric (\eg, branch coverage).
+while a code coverage metric (\eg, branch coverage) tracks the
+execution path that each input explores by using.
 %
-In addition, during the execution of such inputs, a fuzzer detects
+In addition, during the execution of inputs, a fuzzer detects
 vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
   asan, ubsan, lockdep}.
 
@@ -358,7 +358,7 @@ On the other hand, a thread interleaving search strategy is adopted
 for a fuzzer to determine which thread interleaving to run for each
 iteration.
 %
-\dr{explain correctly: }For instance, Krace~\cite{krace} randomly
+\dr{TODO: explain correctly: }For instance, Krace~\cite{krace} randomly
 determins a thread interleaving to run, Snowboard~\cite{snowboard} and
 Razzer~\cite{razzer} enforces an interleaving order of a single pair
 of instructions, and \dr{Conzzer does this, and MUZZ does that}.

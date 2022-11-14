@@ -98,30 +98,6 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 As a consequence, tracking individual interleaving
 orders is not enough as an interleaving coverage metric.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.90\linewidth]{fig/alias-coverage.pdf}
-  \caption{Two thread interleavings between thread~A and thread~B
-    described in \autoref{fig:cve-2017-17712}. The uninitialized
-    access bug does not manifest in both interleavings.}
-  \label{fig:alias-coverage}
-\end{figure}
-%
-\autoref{fig:alias-coverage} shows what happens if an interleaving
-coverage metric tracks individual interleaving orders.
-%
-In the two interleavings described in this figure, we can track all
-four individual interleaving orders regarding \texttt{inet->hdrincl}
-(\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
-$\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
-$\texttt{B1} \Rightarrow \texttt{A2}$, and
-$\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2), while the
-uninitialized access bug does not manifest in both thread
-interleavings.
-%
-Therefore, if an interleaving coverage metric tracks individual
-interleaving orders, the coverage metric can be saturated even if a
-concurrency bug still resides in a multi-thread input.
 
 To avoid this pitfall, an interleaving coverage metric should be
 designed by considering a combination of interleaving orders.
@@ -152,9 +128,9 @@ Interestingly, a previous execution that did not cause the
 uninitialized access bug provides a feedback as to which thread
 interleavings should be further explored.
 
-To demonstrate this, let us assume we execute the two system calls
-\textit{sequentially} such that the execution of thread~A is followed
-by the execution of thread~B.
+To demonstrate this, let us assume we execute the two system calls in
+\autoref{fig:cve-2017-17712} \textit{sequentially} such that the
+execution of thread~A is followed by the execution of thread~B.
 %
 In this sequential execution, we can observe that three instructions,
 \texttt{A2}, \texttt{A4}, and \texttt{B1} are executed in the order of
@@ -173,29 +149,29 @@ discover the uninitialized access bug.
 
 
 
-\PP{Design goal 2: History-based thread interleaving exploration}
+\PP{Design goal 2: History-based thread interleaving search strategy}
 %
 Based on the observation 2, we elicit a design goal of a thread
-scheduling control mechanism.
+interleaving search strategy.
 %
-Particulary, a thread scheduling control mechanism should leverage a
+Particulary, a thread interleaving search strategy should leverage a
 history of previous executions to efficiently determine what to search
 in future executions.
 
 
-If a fuzzer explores the search space of thread interleaving randomly,
-it likley wastes the computing power without making a progress of the
-thread interleaving exploration~\cite{covcon,
-  terragni2018effectiveness}.
-%
-Considering the search space of thread interleaving is enormous, and
-concurrency bugs often manifest with extreme thread
-interleavings~\cite{cve20196974, cve20191999, cve201911486}, this
-severly degrades the performance of concurrency fuzzing.
-%
-Therefore, it is important for a fuzzer to decide what to search in
-the future, and fortunately, a history of previous executions can be
-helpful in establishing the search strategy.
+% If a fuzzer explores the search space of thread interleaving randomly,
+% it likley wastes the computing power without making a progress of the
+% thread interleaving exploration~\cite{covcon,
+%   terragni2018effectiveness}.
+% %
+% Considering the search space of thread interleaving is enormous, and
+% concurrency bugs often manifest with extreme thread
+% interleavings~\cite{cve20196974, cve20191999, cve201911486}, this
+% severly degrades the performance of concurrency fuzzing.
+% %
+% Therefore, it is important for a fuzzer to decide what to search in
+% the future, and fortunately, a history of previous executions can be
+% helpful in establishing the search strategy.
 
 
 
@@ -232,6 +208,32 @@ mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
 \PP{Insufficient coverage metric}
+%
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.90\linewidth]{fig/alias-coverage.pdf}
+  \caption{Two thread interleavings between thread~A and thread~B
+    described in \autoref{fig:cve-2017-17712}. The uninitialized
+    access bug does not manifest in both interleavings.}
+  \label{fig:alias-coverage}
+\end{figure}
+%
+\autoref{fig:alias-coverage} shows what happens if an interleaving
+coverage metric tracks individual interleaving orders.
+%
+In the two interleavings described in this figure, we can track all
+four individual interleaving orders regarding \texttt{inet->hdrincl}
+(\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
+$\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
+$\texttt{B1} \Rightarrow \texttt{A2}$, and
+$\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2), while the
+uninitialized access bug does not manifest in both thread
+interleavings.
+%
+Therefore, if an interleaving coverage metric tracks individual
+interleaving orders, the coverage metric can be saturated even if a
+concurrency bug still resides in a multi-thread input.
+
 %
 We find that none of existing interleaving coverage metrics consider
 a combination of interleaving orders.
@@ -289,37 +291,37 @@ hint-directed scheduler.
 
 \dr{revisit after evaluation. not ready to write this part:}
 %
-Randomized schedulers~\cite{krace, pctalgorithm, muzz, ski} pay little
-attention on collected interleaving coverage when scheduling
-instructions, and rely on the randomness in diversifying thread
-interleaving.
-%
-Therefore, they are inherently limited in satisfying a specific
-condition of thread interleaving (\eg,
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ in \autoref{fig:cve-2017-17712}).
-%
-This limitation is even more pronounced by a recent study,
-ExpRace~\cite{exprace}, stating that many concurrency
-bugs~\cite{cve20196974, cve20191999, cve201911486} manifest only if
-thread interleaving satisfies an extreme condition that randomized
-scheduler hardly satisfy.
-%
-Unfortunately, ExpRace demonstrates that this kind of concurrency bugs
-are equally threatening the security of the kernel.
+% Randomized schedulers~\cite{krace, pctalgorithm, muzz, ski} pay little
+% attention on collected interleaving coverage when scheduling
+% instructions, and rely on the randomness in diversifying thread
+% interleaving.
+% %
+% Therefore, they are inherently limited in satisfying a specific
+% condition of thread interleaving (\eg,
+% $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+% \texttt{A4})$ in \autoref{fig:cve-2017-17712}).
+% %
+% This limitation is even more pronounced by a recent study,
+% ExpRace~\cite{exprace}, stating that many concurrency
+% bugs~\cite{cve20196974, cve20191999, cve201911486} manifest only if
+% thread interleaving satisfies an extreme condition that randomized
+% scheduler hardly satisfy.
+% %
+% Unfortunately, ExpRace demonstrates that this kind of concurrency bugs
+% are equally threatening the security of the kernel.
 
 
-Whereas, state-of-the-art approaches adopting a hint-directed
-scheduler, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}, are
-not capable of diversifying thread interleaving across iterations.
-%
-Since they do not adopt interleaving coverage, they are not able to
-determine which thread interleaving requires further
-testing. Therefore, they vary thread interleaving a small degree
-across fuzzing iterations, and require a long time to trigger
-concurrency bugs.
-%
-According to our evaluation~\autoref{s:eval}, ...
+% Whereas, state-of-the-art approaches adopting a hint-directed
+% scheduler, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}, are
+% not capable of diversifying thread interleaving across iterations.
+% %
+% Since they do not adopt interleaving coverage, they are not able to
+% determine which thread interleaving requires further
+% testing. Therefore, they vary thread interleaving a small degree
+% across fuzzing iterations, and require a long time to trigger
+% concurrency bugs.
+% %
+% According to our evaluation~\autoref{s:eval}, ...
 
 
 % In the perspective of fuzzing, a coverage metric is a paramount gear
