@@ -334,8 +334,17 @@ thread scheduling is another input domain that a fuzzer needs to
 explore.
 %
 Since the kernel scheduler is not under the control of a fuzzer,
-concurrency fuzzing consists of a thread scheduling control mechanism
-to override the kernel scheduler.
+concurrency fuzzing overrides the kernel scheduler, and controls
+thread scheduling as desired.
+
+
+
+To this end, concurrency fuzzing consists of a a thread scheduling
+control mechanism
+
+and (\ie,  ).
+
+
 
 
 The common purpose of a thread scheduling control mechanism is to

@@ -2,7 +2,7 @@
 \label{s:relwk}
 
 For decades, immense efforts have been made to effectively discover
-concurrency bugs in the kernel. In this section, We describe prior
+concurrency bugs in the kernel. In this section, we describe prior
 efforts in three categories, kernel fuzzing, controlled concurrency
 testing, and data race detection.
 
@@ -24,9 +24,9 @@ inside the kerenl, a number of attempts have been made to incorporate
 advanced techniques such as seed distillation~\cite{moonshine},
 relation learning~\cite{healer}, and symbolic execution~\cite{hfl}.
 %
-Moreover, several works expand the search space beyond syscalls to
-disk images of a file system~\cite{janus, hydra}, or the communication
-with hardwares through MMIO/DMA~\cite{periscope}.
+Moreover, several works expand the input space beyond syscalls to disk
+images of a file system~\cite{janus, hydra}, or the communication with
+hardwares through MMIO/DMA~\cite{periscope}.
 %
 Although they all achieve meaningful successes, they are limited in
 exploring thread interleavings, which raises a demand for discovering
