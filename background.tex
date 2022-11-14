@@ -359,8 +359,9 @@ for a fuzzer to determine which thread interleaving to run for each
 iteration.
 %
 For instance, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}
-picks a single pair of instructions that access the same memory
-object, and enforce their execution order.
+picks a single pair of instructions that access the same memory object
+\texttt{X} and \texttt{Y}, and enforce their execution order such that
+\texttt{X} is executed before \texttt{Y}.
 %
 Whereas, Krace~\cite{krace} randomly determins a thread interleaving
 to run for each execution.
