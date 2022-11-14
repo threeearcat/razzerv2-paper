@@ -2,20 +2,39 @@
 \label{s:relwk}
 
 For decades, immense efforts have been made to effectively discover
-concurrency bugs. In this section, We describe prior efforts in three
-categories, data race detection, controlled concurrency testing, and
-kernel fuzzing.
+concurrency bugs in the kernel. In this section, We describe prior
+efforts in three categories, kernel fuzzing, controlled concurrency
+testing, and data race detection.
 
 
-\PP{Data race detector}
+\PP{Kernel fuzzing}
 %
-
-\cite{lkmm, linuxmemorymodel}
-
-Although the concept of data race is widely known, the semantic
-
-This work and data race detectors are complementary to each other.
+To discover vulnerabilities in the kernel, fuzzing, specifically
+coverage-guided fuzzing~\cite{syzkaller, moonshine, healer, hfl, imf,
+  janus, hydra, trinity, kafl, periscope, syzvegas, ksg}, has proven
+to be practical and is widely used in industrial fields.
 %
+For example, Syzkaller~\cite{syzkaller}, a kernel fuzzer developed by
+Google, has found thousands of bugs, and kernel developers very often
+rely on Syzkaller to find vulnerabilities and test their
+implementation.
+%
+To further improve the Syzkaller, and to find vulnerabilities deeper
+inside the kerenl, a number of attempts have been made to incorporate
+advanced techniques such as seed distillation~\cite{moonshine},
+relation learning~\cite{healer}, and symbolic execution~\cite{hfl}.
+%
+Moreover, several works expand the search space beyond syscalls to
+disk images of a file system~\cite{janus, hydra}, or the communication
+with hardwares through MMIO/DMA~\cite{periscope}.
+%
+Although they all achieve meaningful successes, they are limited in
+exploring thread interleavings, which raises a demand for discovering
+concurrency bugs in the kernel.
+
+
+
+
 
 
 
@@ -27,58 +46,46 @@ Controlled concurrnecy testing~\cite{ski, pctalgorithm, sparsernr,
 as CCT) introduces an idea of overriding the kernel scheduler and
 testing thread interleavings methodically.
 %
+Specifically, this line of approaches aims to systematically explore
+interleavings of a \textit{given} test scenario.
+%
+In addition, they adopt various techniques to reduce the search space
+of thread interleavings such as preemption
+bounding~\cite{pctalgorithm, ski}, delay
+bounding~\cite{delaybounding}, and dynamic partial order
+reduction~\cite{dpor1, dpor2, dpor3}.
 
 
 
-As far as we know, concurrency fuzzing stems from CCT techniques.
+To the best of our knowledge, concurrency fuzzing stems from CCT
+techniques with an idea of merging \textit{the test case generation}
+(\ie, fuzzing) and \textit{the thread interleaving exploration} (\ie,
+CCT).
 %
 Specifically, Razzer~\cite{razzer}, arguably the first concurrency
 fuzzer, states that Razzer is inspired by SKI~\cite{ski}, a CCT
 technique aiming the kernel.
-
-
-
-
-\PP{Kernel fuzzing}
 %
+Other concurrency fuzzers~\cite{krace, muzz, snowboard, conzzer} are
+also (at least indirectly) affected by CCT techniques as all of them
+consists of thread scheduling control mechanisms.
+%
+We believe \sys takes one step further in this direction by answering
+the question \textit{``what is the proper interleaving coverage
+  metric''} and \textit{``how to utilize interleaving coverage''}.
+
+
+
+\PP{Data race detection}
 %
 
-IMF~\cite{imf}
+\cite{lkmm, linuxmemorymodel}
 
-Syzkaller~\cite{syzkaller},
+Although the concept of data race is widely known, the semantic
 
-Moonshine~\cite{moonshine}
-
-HFL~\cite{hfl}
-
-Healer~\cite{healer} is
-
-Janus~\cite{janus}
-
-Hydra~\cite{hydra}
-
-
-Although we adopt Syzkaller as its sequential mutation, 
-
-
-
-
-% 
-To the best of our knowledge, Razzer~\cite{razzer} is the first
-attempt to improve a fuzzing technique in discovering concurrency
-bugs.
+This work and data race detectors are complementary to each other.
 %
-The main idea of Razzer is to guide
 
-
-After Razzer, Krace~\cite{krace} asserts the necessity of a coverage
-metric in the concurrency dimension. Krace defines alias coverage
-
-
-MUZZ~\cite{muzz}
-
-
-Snowboard~\cite{snowboard}
 
 
 
