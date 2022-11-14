@@ -185,7 +185,6 @@ and suffer from describing a combination of interleaving orders.
 On the other hand, concurrenct call pair trakcs a pair of
 concurrently-executed functions, and do not differentiate
 interleavings taken place in the same function pair.
-%
 
 
 
@@ -262,13 +261,19 @@ executions in searching for unexplored thread interleavings.
 %
 Krace~\cite{krace} explores thread interleavings randomly without
 considering what thread interleavings are explored before.
-%
+
 Whereas, Conzzer~\cite{conzzer} is the only work that attempts to
 direct a fuzzer based on interleaving coverage.
 %
 However, its interleaving coverage is limited in distinguishing tested
 interleavings and untested interleavings in the instruction-level
 granularity.
+%
+In other words, the Conzzer's interleaving search strategy can direct
+a fuzzer to execute two functions, \texttt{raw_sendmsg()} and
+\texttt{do_ip_setsockopt()} concurrently. But it suffers from
+triggering the uninitialized bug since it does not control thread
+scheduling in the instruction-level granularity.
 
 
 \dr{TODO: MUZZ}
