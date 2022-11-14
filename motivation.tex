@@ -95,28 +95,12 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 %
 Otherwise, a fuzzer may think that there is no more interesting thread
 interleaving in the multi-thread input, and stop searching for new
-thread interleavings, missing the uninitialized access bug.
+thread interleavings of the multi-thread input, missing the
+uninitialized access bug.
 %
 
 
 
-
-
-% In the example of \autoref{fig:cve-2017-17712}, \textbf{R1} states
-% that if the two system calls (\ie, \texttt{sendmsg()} and
-% \texttt{setsockopt()}) no longer give new interleaving coverage with
-% respect to a given interleaving coverage metric (\ie, interleaving
-% coverage is saturated), a fuzzer will de-prioritize the two system
-% calls to explore thread interleavings of another multi-thread input.
-% %
-% Therefore, in order not to miss the uninitialized access bug, an
-% interleving coverage metric should be able to capture whether
-
-% $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-% \texttt{A4})$ is tested or not.
-% %
-% Otherwise, a fuzzer cannot decide if two more system calls need to be executed.
-% Therefore, the uninitialized access bug may be missed 
 
 
 \PP{Observation 2: Feedback from previous executions}
@@ -144,46 +128,22 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4}))$, and if we execute the imaginary interleaving, we can
 discover the uninitialized access bug.
 
-
-
 \PP{Design goal 2: Coverage-based interleaving search strategy}
 %
-In the perspective of fuzzing, previous executions are tracked using a
-coverage metric.
+% In the perspective of fuzzing, previous executions are tracked using a
+% coverage metric.
 %
-Therefore, if an interleaving coverage metric tracks that
+If an interleaving coverage metric tracks that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
-explored before, then, a fuzzer can utilize interleaving coverage to
-determine which interleaving to search in future iterations (\ie,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
+\textit{explored} before, then a fuzzer can utilize interleaving
+coverage to infer \textit{unexplored} thread interleavings (\eg,
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$), and
+directly search for unexplored thread interleavings in future
+iterations.
 %
-As a consequence, a fuzzer can quickly discover the uninitialized
-access bug.
+In this way, a fuzzer can quickly discover the uninitialized access
+bug, without redundantly executing thread interleavings.
 
-
-% If a fuzzer explores the search space of thread interleaving randomly,
-% it likley wastes the computing power without making a progress of the
-% thread interleaving exploration~\cite{covcon,
-%   terragni2018effectiveness}.
-% %
-% Considering the search space of thread interleaving is enormous, and
-% concurrency bugs often manifest with extreme thread
-% interleavings~\cite{cve20196974, cve20191999, cve201911486}, this
-% severly degrades the performance of concurrency fuzzing.
-% %
-% Therefore, it is important for a fuzzer to decide what to search in
-% the future, and fortunately, a history of previous executions can be
-% helpful in establishing the search strategy.
-
-
-
-
-
-%
-% \textbf{R2} describes that if this combined interleaving orders has
-% not been tested, a fuzzer needs to schedule instructions to quickly
-% cover the combined interleaving orders instead of exploring the entire
-% search space of thread interleaving randomly.
 
 
 \subsection{Limitation of prior approaches}
@@ -209,12 +169,20 @@ their interleaving coverage metrics and thread scheduling control
 mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
-\PP{Less-informative coverage metric}
+\PP{Less-informative interleaving coverage}
 %
-We find that previously proposed interleaving coverage metrics are not
-informative enough to determine
+We find that previously proposed interleaving coverage metrics are
+less-informative to determine whether a multi-thread input needs to be
+further tested. Thus, they do not satisfy the \textbf{Design goal 1}.
+%
+This is because none of them consider a combination of interleaving
+orders, which is a necessary condition for a concurrency bug to
+manifest; alias coverage considers only a single interleaving order,
+and concurrenct call pair do not differentiate interleavings taken
+place in the same function pair.
 
-%
+
+
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.90\linewidth]{fig/alias-coverage.pdf}
@@ -225,51 +193,30 @@ informative enough to determine
 \end{figure}
 
 
-% \autoref{fig:alias-coverage} shows what happens if an interleaving
-% coverage metric tracks individual interleaving orders.
-% %
-% In the two interleavings described in this figure, we can track all
-% four individual interleaving orders regarding \texttt{inet->hdrincl}
-% (\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
-% $\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
-% $\texttt{B1} \Rightarrow \texttt{A2}$, and
-% $\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2), while the
-% uninitialized access bug does not manifest in both thread
-% interleavings.
-% %
-% Therefore, if an interleaving coverage metric tracks individual
-% interleaving orders, the coverage metric can be saturated even if a
-% concurrency bug still resides in a multi-thread input.
+\autoref{fig:alias-coverage} shows two interleavings that saturate
+existing interleaving coverage, where the uninitialized access bug
+does not manifest.
+%
+In the two interleavings described in this figure, we can observe all
+four individual interleaving orders regarding \texttt{inet->hdrincl}
+(\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
+$\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
+$\texttt{B1} \Rightarrow \texttt{A2}$, and
+$\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2).
+%
+Therefore, alias coverage is saturated with these two thread
+interleavings.
+%
+Moreover, concurrent call pair is also saturated with these two thread
+interleavings, because once two functions, \texttt{sendmsg()} and
+\texttt{setsockop()}, are executed concurrently, concurrnet call pair
+does not matter how a thread interleaving occurs within the function
+pair.
 
-% %
-% We find that none of existing interleaving coverage metrics consider
-% a combination of interleaving orders.
-% %
-% Therefore, they may be saturated even before a concurrency bug is
-% exposed, misleading a fuzzer to de-prioritize an input in which a
-% concurrency bug resides.
+Therefore, they can possibly be saturated even before a concurrency
+bug is exposed, misleading a fuzzer to de-prioritize a multi-thread
+input in which a concurrency bug resides.
 
-
-% In particular, alias coverage is designed to track individual
-% interleaving orders. As shown through \autoref{fig:alias-coverage},
-% tracking individual interleaving orders may mislead a fuzzer to think
-
-% %
-% In fact, the two thread interleavings described in
-% \autoref{fig:alias-coverage}
-% %
-% In addition, concurrenct call pair is intrinsically not able to
-% describe interleaving orders of intsructions.
-
-% Razzer and Snowboard do not adopt a interleaving coverage metric at
-% all.
-
-% tracking individual interleaving
-% orders is not enough as an interleaving coverage metric.
-
-
-% To avoid this pitfall, an interleaving coverage metric should be
-% designed by considering a combination of interleaving orders.
 
 
 
@@ -297,136 +244,25 @@ informative enough to determine
 
 \PP{Coverage-irrelevant interleaving search strategy}
 %
-Stemming from insufficient coverage metrics, proposed scheduling
-mechanisms are also ineffective in satisfying \textbf{R2}.
+Stemming from less-informative coverage metrics, proposed interleaving
+search strategies are not properly directed by interleaving coverage,
+and do not satisfy the \textbf{Design goal 2}. Thus, they explore
+thread interleavings ineffectively.
+
+Since Razzer~\cite{razzer} and Snowboard~\cite{snowboard} do not make
+use of interleaving coverage at all, they cannot rely on previous
+executions in searching for unexplored thread interleavings to run.
 %
+Krace~\cite{krace} explores thread interleavings randomly without
+considering what thread interleavings are explored before.
 %
-% Randomized schedulers~\cite{krace, pctalgorithm, muzz, ski} pay little
-% attention on collected interleaving coverage when scheduling
-% instructions, and rely on the randomness in diversifying thread
-% interleaving.
-% %
-% Therefore, they are inherently limited in satisfying a specific
-% condition of thread interleaving (\eg,
-% $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-% \texttt{A4})$ in \autoref{fig:cve-2017-17712}).
-% %
-% This limitation is even more pronounced by a recent study,
-% ExpRace~\cite{exprace}, stating that many concurrency
-% bugs~\cite{cve20196974, cve20191999, cve201911486} manifest only if
-% thread interleaving satisfies an extreme condition that randomized
-% scheduler hardly satisfy.
-% %
-% Unfortunately, ExpRace demonstrates that this kind of concurrency bugs
-% are equally threatening the security of the kernel.
+Whereas, Conzzer~\cite{conzzer} is the only work that attempts to
+direct a fuzzer based on interleaving coverage, but concurrent call
+pair cannot distinguish tested interleavings and untested
+interleavings in the instruction-level granularity.
 
 
-% Whereas, state-of-the-art approaches adopting a hint-directed
-% scheduler, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}, are
-% not capable of diversifying thread interleaving across iterations.
-% %
-% Since they do not adopt interleaving coverage, they are not able to
-% determine which thread interleaving requires further
-% testing. Therefore, they vary thread interleaving a small degree
-% across fuzzing iterations, and require a long time to trigger
-% concurrency bugs.
-% %
-% According to our evaluation~\autoref{s:eval}, ...
-
-
-% In the perspective of fuzzing, a coverage metric is a paramount gear
-% to determine whether a given input is worthy of further mutation.
-% %
-% If a coverage metric does not represent whether an input has a
-% potential to trigger a race condition, a fuzzer may ignore inputs in
-% which there are unexplored interleavings, or waste the computing power
-% to valueless inputs.
-% %
-% In this regard, our primary question is whether existing coverage
-% metrics in the concurrency dimension are suitable to apprehend
-% interleavings potentially causing a race condition, for example,
-% $(\texttt{A1} \Rightarrow \texttt{B1}) \wedge (\texttt{B4} \Rightarrow
-% \texttt{A2})$ in \autoref{fig:cve-2017-17712}.
-
-
-
-% Unfortunately, we observe that none of existing approaches incorporate
-% a proper coverage metric for race conditions.
-% %
-% A few of existing approaches~\cite{snowboard, razzer} do not adopt a
-% coverage in the concurrency dimension at all. Therefore, they do not
-% make a decision as to whether a given input is worth further testing.
-% %
-% Other approaches~\cite{krace, muzz} adopt coverage metrics that are
-% not suitable for race conditions as they do not consider a combined
-% result of multiple pairs of conflicting accesses. As a consequence,
-% race conditions may not be exposed even after the coverages are
-% saturated.
-% %
-% % Consequently, existing approaches have difficulty in distinguishing a
-% % given input has a potential to cause an interesting behavior, \ie,
-% % a race condition.
-
-
-
-% \yj{This is the key paragraph to point out the limitation of previous approaches, but very vague. Make specific claims of why Kraces' alias coverage is insufficient by giving an example.}
-% %
-% In order to show why comprehending multiple pairs of conflicting
-% accesses is important, let us suppose we have three inputs that
-% consists of two concurrent syscalls as described in
-% \autoref{fig:alias-coverage}.
-% %
-% For all inputs, thread~A executes a \texttt{mmap()} syscall to map the
-% binder driver to a user address space while thread~B handles different
-% ioctl requests such that \texttt{ioctl(FREE_BUFFER)},
-% \texttt{ioctl(REPLY)}, and \texttt{ioctl(TRANSACTION)} for
-% \texttt{Input 1}, \texttt{Input 2}, and \texttt{Input 3} respectively.
-% %
-% It is worth noting that in \texttt{Input 1} and \texttt{Input 2},
-% there is only one pair of conflicting accesses; in \texttt{Input 1},
-% the two threads conflict on \texttt{alloc->vma}, and in \texttt{Input
-%   2}, the two threads conflict on \texttt{alloc->mm}.
-
-
-
-% \begin{figure}[t]
-%   \centering
-%   \includegraphics[width=0.9\linewidth]{fig/alias-coverage-interleaving.pdf}
-%   \caption{Four interleavings of \texttt{Input 1} and \texttt{Input 2}
-%     in \autoref{fig:alias-coverage}. After executing these four
-%     interleavings, all possible execution orders of a single
-%     conflicting accesses are exhibited.\dr{Run 1 -> Interleaving 1?}}
-%   \label{fig:alias-coverage-interleaving}
-% \end{figure}
-
-% In this example, if we adopt a coverage metric that focuses on a
-% single pair of conflicting accesses (\eg, alias coverage), a fuzzer
-% may not recognize that \texttt{Input 3} may exhibit a different
-% behavior than \texttt{Input 1} and \texttt{Input 2}~(\ie, a
-% NULL-dereference bug).
-% %
-% \autoref{fig:alias-coverage-interleaving} shows four interleavings
-% that exhibits all execution order of a single pair of conflicting
-% accesses. If a fuzzer executes \texttt{Input 1} with interleavings in
-% \texttt{Run 1} and \texttt{Run 2}, a fuzzer observes execution orders
-% such as $\texttt{A1} \Rightarrow \texttt{B1}$ (in \texttt{Run 1}) and
-% $\texttt{B1} \Rightarrow \texttt{A1}$ (in \texttt{Run 2}).
-% %
-% Similary, if a fuzzer executes \texttt{Input 2} with interleavings in
-% \texttt{Run 3} and \texttt{Run 4}, it observes execution orders of
-% $\texttt{A2} \Rightarrow \texttt{B4}$ (in \texttt{Run 3}) and
-% $\texttt{B4} \Rightarrow \texttt{A2}$ (in \texttt{Run 4}).
-% %
-% After executing these four interleavings, \texttt{Input 3} does not
-% reveal a new execution order of a single conflicting
-% accesses. Therfore, as a Krace state, a fuzzer may de-prioritize
-% \texttt{Input 3}, and the race condition may not be found.
-
-% In summary, in order to determine whether an input shows interesting
-% behaviors or not, a fuzzer needs to comprehend \textit{a combined
-%   result of multiple pairs of conflicting accesses} as it is the
-% primary reason of race conditions.
-
+\dr{TODO: MUZZ}
 
 
 %%% Local Variables:
