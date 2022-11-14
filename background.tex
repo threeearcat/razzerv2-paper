@@ -358,14 +358,14 @@ On the other hand, a thread interleaving search strategy is adopted
 for a fuzzer to determine which thread interleaving to run for each
 iteration.
 %
-\dr{TODO: explain correctly: }For instance, Krace~\cite{krace} randomly
-determins a thread interleaving to run, Snowboard~\cite{snowboard} and
-Razzer~\cite{razzer} enforces an interleaving order of a single pair
-of instructions, and \dr{Conzzer does this, and MUZZ does that}.
+For instance, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}
+picks a single pair of instructions that access the same memory
+object, and enforce their execution order.
+%
+Whereas, Krace~\cite{krace} randomly determins a thread interleaving
+to run for each execution.
 
-% For instance, a fuzzer can specify exact instruction locations to
-% stall the execution~\cite{snowboard, razzer, conzzer}, or a delay to
-% inject before each memory access at runtime~\cite{krace}.
+\dr{Conzzer and MUZZ?}
 
 
 % \dr{TODO: rewrite}
