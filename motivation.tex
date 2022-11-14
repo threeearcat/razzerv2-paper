@@ -252,8 +252,7 @@ input in which a concurrency bug resides.
 %
 Stemming from less-informative coverage metrics, proposed interleaving
 search strategies are not properly directed by interleaving coverage,
-and do not satisfy the \textbf{Design goal 2}. Thus, they explore
-thread interleavings ineffectively.
+and thus, do not satisfy the \textbf{Design goal 2}.
 
 Since Razzer~\cite{razzer} and Snowboard~\cite{snowboard} do not make
 use of interleaving coverage at all, they cannot rely on previous
@@ -265,15 +264,17 @@ considering what thread interleavings are explored before.
 Whereas, Conzzer~\cite{conzzer} is the only work that attempts to
 direct a fuzzer based on interleaving coverage.
 %
-However, its interleaving coverage is limited in distinguishing tested
-interleavings and untested interleavings in the instruction-level
-granularity.
+However, its interleaving coverage (\ie, concurrent call pair) tracks
+thread interleavings in the function-level granularity, and is limited
+in distinguishing tested interleavings and untested interleavings in
+the instruction-level granularity.
 %
 In other words, the Conzzer's interleaving search strategy can direct
 a fuzzer to execute two functions, \texttt{raw_sendmsg()} and
-\texttt{do_ip_setsockopt()} concurrently. But it suffers from
-triggering the uninitialized bug since it does not control thread
-scheduling in the instruction-level granularity.
+\texttt{do_ip_setsockopt()}, concurrently.
+%
+But even after that, Conzzer suffers from triggering the uninitialized
+bug since it is not aware of the execution order of instructions.
 
 
 \dr{TODO: MUZZ}
