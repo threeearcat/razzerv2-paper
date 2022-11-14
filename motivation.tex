@@ -89,7 +89,7 @@ thread interleavings do not.
 \PP{Design goal 1: Informative interleaving coverage}
 %
 In order for a fuzzer to discover the uninitialized access bug, an
-interleaving coverage should not be saturated until
+interleaving coverage metric should not be saturated until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4}))$ is executed.
 %
@@ -137,12 +137,11 @@ Therefore, if an interleaving coverage metric tracks that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
 \textit{explored} before, then a fuzzer can utilize interleaving
 coverage to infer \textit{unexplored} thread interleavings (\eg,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$), and
-directly search for unexplored thread interleavings in future
-iterations.
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
-In this way, a fuzzer can quickly discover the uninitialized access
-bug, without redundantly executing thread interleavings.
+In this way, a fuzzer can effectively determine what to execute in
+future iterations, and quickly discover the uninitialized access bug
+without redundantly executing thread interleavings.
 
 
 
@@ -176,8 +175,7 @@ less-informative to determine whether a multi-thread input needs to be
 further tested. Thus, they do not satisfy the \textbf{Design goal 1}.
 %
 This is because none of them consider a combination of interleaving
-orders, which is a necessary condition for a concurrency bug to
-manifest.
+orders. 
 %
 Specifically, alias coverage tracks individual interleaving orders,
 and suffer from describing a combination of interleaving orders.
@@ -214,8 +212,8 @@ Therefore, alias coverage is saturated with these two thread
 interleavings.
 %
 Moreover, concurrent call pair is also saturated with these two thread
-interleavings, because once two functions, \texttt{sendmsg()} and
-\texttt{setsockop()}, are executed concurrently, concurrnet call pair
+interleavings, because once two functions \texttt{sendmsg()} and
+\texttt{setsockop()} are executed concurrently, concurrnet call pair
 does not matter how a thread interleaving occurs within the function
 pair.
 
@@ -256,7 +254,7 @@ and thus, do not satisfy the \textbf{Design goal 2}.
 
 Since Razzer~\cite{razzer} and Snowboard~\cite{snowboard} do not make
 use of interleaving coverage at all, they cannot rely on previous
-executions in searching for unexplored thread interleavings.
+executions in inferring unexplored thread interleavings.
 %
 Krace~\cite{krace} explores thread interleavings randomly without
 considering what thread interleavings are explored before.
@@ -270,8 +268,8 @@ in distinguishing tested interleavings and untested interleavings in
 the instruction-level granularity.
 %
 In other words, the Conzzer's interleaving search strategy can direct
-a fuzzer to execute two functions, \texttt{raw_sendmsg()} and
-\texttt{do_ip_setsockopt()}, concurrently.
+a fuzzer to execute two functions \texttt{raw_sendmsg()} and
+\texttt{do_ip_setsockopt()} concurrently.
 %
 But even after that, Conzzer suffers from triggering the uninitialized
 bug since it is not aware of the execution order of instructions.

@@ -226,8 +226,8 @@ execution into the fuzzing process.
 Concurrency fuzzers generally repeat the execution of a multi-thread
 input (\eg, a multi-threaded system call sequence) while 1) capturing
 unique behaviors of thread interleavings with a \textit{interleaivng
-  coverage metric}, and 2) taming the non-determinitsic behavior of
-thread interleavings through a \textit{thread scheduling control}.
+  coverage metric}, and 2) exploring thread interleavings based on
+a \textit{thread interleaving search strategy}.
 
 
 % \PP{Coverage-guided fuzzing}
@@ -326,24 +326,35 @@ of other multi-thread inputs.
 % \dr{TODO: MUZZ, and conzzer?}
 
 
-\PP{Thread scheduling control.}
+\PP{Thread interleaving search strategy}
 %
 Unlike conventional fuzzing approaches, concurrency fuzzing considers
 thread scheduling is another input domain that a fuzzer needs to
 explore.
 %
-Since the kernel scheduler is not under the control of a fuzzer,
-concurrency fuzzing overrides the kernel scheduler, and controls
-thread scheduling as desired.
 
-
-
-To this end, concurrency fuzzing consists of a thread scheduling
-control mechanism, and a thread interleaving search strategy.
+To determine which thread interleaving to run for each iteration, a
+fuzzer adopts thread interleaving search strategy.
 %
-A thread scheduling control mechanism is used to control thread
-scheduling as a fuzzer wants, and depending on a concurrency fuzzer,
-various mechanisms are used;
+For instance, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}
+picks a single pair of instructions that access the same memory object
+\texttt{X} and \texttt{Y}, and test their execution order such that
+\texttt{X} is executed before \texttt{Y}.
+%
+Whereas, Krace~\cite{krace} randomly determins a thread interleaving
+to run for each execution.
+%
+\dr{Conzzer and MUZZ?}
+
+
+
+After determining a thread interleaivng to run,w concurrency fuzzing
+overrides the kernel scheduler, and controls thread scheduling as
+desired.
+%
+To this end, a thread scheduling control mechanism is used to control
+thread scheduling as a fuzzer wants. Depending on a concurrency
+fuzzer, various mechanisms are used;
 %
 Razzer~\cite{razzer} and Snowboard~\cite{snowboard} suspend and resume
 virtual CPUs on which target threads are running, Krace~\cite{krace}
@@ -353,20 +364,6 @@ through instrumentation and the breakpoint feature respectively.
 While these methods are designed differently, all of them allow a
 fuzzer to control thread scheduling.
 
-
-On the other hand, a thread interleaving search strategy is adopted
-for a fuzzer to determine which thread interleaving to run for each
-iteration.
-%
-For instance, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}
-picks a single pair of instructions that access the same memory object
-\texttt{X} and \texttt{Y}, and enforce their execution order such that
-\texttt{X} is executed before \texttt{Y}.
-%
-Whereas, Krace~\cite{krace} randomly determins a thread interleaving
-to run for each execution.
-
-\dr{Conzzer and MUZZ?}
 
 
 % \dr{TODO: rewrite}
