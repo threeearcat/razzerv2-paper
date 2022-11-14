@@ -4,25 +4,43 @@
 For decades, immense efforts have been made to effectively discover
 concurrency bugs. In this section, We describe prior efforts in three
 categories, data race detection, controlled concurrency testing, and
-fuzzing.
+kernel fuzzing.
 
 
-\PP{Data race detection}
+\PP{Data race detector}
 %
 
 \cite{lkmm, linuxmemorymodel}
 
+Although the concept of data race is widely known, the semantic
+
+This work and data race detectors are complementary to each other.
+%
+
+
 
 \PP{Controlled concurrency testing}
 %
-
-
-\PP{Fuzzing}
+Controlled concurrnecy testing~\cite{ski, pctalgorithm, sparsernr,
+  chess, nagarakatte2012multicore, abdelrasoul2017promoting,
+  cai2016radius, mukherjee2020learning, schedulebounding} (abbreviated
+as CCT) introduces an idea of overriding the kernel scheduler and
+testing thread interleavings methodically.
 %
-Since a kernel is a security basis of most systems, eliminating bugs
-in a kernel is a paramount task to provide reliable
-services. Therefore, many fuzzing approaches have been proposed to
-find out bugs as the first step towards eliminating them.
+
+
+
+As far as we know, concurrency fuzzing stems from CCT techniques.
+%
+Specifically, Razzer~\cite{razzer}, arguably the first concurrency
+fuzzer, states that Razzer is inspired by SKI~\cite{ski}, a CCT
+technique aiming the kernel.
+
+
+
+
+\PP{Kernel fuzzing}
+%
 %
 
 IMF~\cite{imf}
@@ -42,8 +60,10 @@ Hydra~\cite{hydra}
 
 Although we adopt Syzkaller as its sequential mutation, 
 
-\PP{Concurrency fuzzing}
-%
+
+
+
+% 
 To the best of our knowledge, Razzer~\cite{razzer} is the first
 attempt to improve a fuzzing technique in discovering concurrency
 bugs.
