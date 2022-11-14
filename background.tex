@@ -326,7 +326,7 @@ of other multi-thread inputs.
 % \dr{TODO: MUZZ, and conzzer?}
 
 
-\PP{Thread scheduling control.} \dr{split this into two?}
+\PP{Thread scheduling control.}
 %
 Unlike conventional fuzzing approaches, concurrency fuzzing considers
 thread scheduling is another input domain that a fuzzer needs to
@@ -342,20 +342,21 @@ To this end, concurrency fuzzing consists of a thread scheduling
 control mechanism, and a thread interleaving search strategy.
 %
 A thread scheduling control mechanism is used to control thread
-scheduling as a fuzzer wants.
+scheduling as a fuzzer wants, and depending on a concurrency fuzzer,
+various mechanisms are used;
 %
-To this end, various methods are used; Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard} suspend and resume virtual CPUs on which
-target threads are running, Krace~\cite{krace} injects delays before
-memory accesses through instrumentation, and Conzzer~\cite{conzzer}
-inject delays through the breakpoint feature.
+Razzer~\cite{razzer} and Snowboard~\cite{snowboard} suspend and resume
+virtual CPUs on which target threads are running, Krace~\cite{krace}
+and Conzzer~\cite{conzzer} inject delays before memory accesses
+through instrumentation and the breakpoint feature respectively.
 %
 While these methods are designed differently, all of them allow a
 fuzzer to control thread scheduling.
 
 
-A thread interleaving search strategy is adopted for a fuzzer to
-determine which thread interleaving to run for each iteration.
+On the other hand, a thread interleaving search strategy is adopted
+for a fuzzer to determine which thread interleaving to run for each
+iteration.
 %
 \dr{explain correctly: }For instance, Krace~\cite{krace} randomly
 determins a thread interleaving to run, Snowboard~\cite{snowboard} and
