@@ -190,10 +190,12 @@ interleavings taken place in the same function pair.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.90\linewidth]{fig/alias-coverage.pdf}
+  \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
   \caption{Two thread interleavings between thread~A and thread~B
     described in \autoref{fig:cve-2017-17712}. The uninitialized
-    access bug does not manifest in both interleavings.}
+    access bug does not manifest in both interleavings. We
+    intentionally omits bug-irrelevant memory accesses (\ie,
+    \texttt{A6} and \texttt{B2}).}
   \label{fig:alias-coverage}
 \end{figure}
 

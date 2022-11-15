@@ -54,10 +54,10 @@ kernel space.
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/instrumentation.pdf}
-  \caption{(a) A part of \texttt{raw_sendmsg()} in
-    \autoref{fig:cve-2017-17712}, (b) abstract of the intrumented
-    binary, and (c) memory accesses and basic blocks recorded during
-    runtime.}
+  \caption{(a) Part of \texttt{raw_sendmsg()} in
+    \autoref{fig:cve-2017-17712}, (b) instrumented source code of (a)
+    (gray on the background), and (c) memory accesses and basic blocks
+    recorded during runtime.}
   \label{fig:instrumentation}
 \end{figure}
 
@@ -65,24 +65,21 @@ kernel space.
 inserts callbacks, and how each callback records memory accesses and
 basic blocks.
 %
-When compiling a source code in (a), the compiler pass inserts
-function calls \texttt{trace_basicblock()} at \texttt{0x0} (\ie, the
-beginning of the compiled function) and \texttt{0x12} (\ie, the
-beginning of the basic block).
-%
-Similarly, the compiler pass inserts a function call
-\texttt{trace_access()} at \texttt{0x5}, which is right before an
-instruction that accesses \texttt{inet->hdrincl} at \texttt{0xa}.
+When compiling a source code in (a), the compiler pass two inserts
+function calls; \texttt{trace_basicblock()} before \texttt{A3} which
+is the first instruction of the basic block, and
+\texttt{trace_access()} before \texttt{A2} which is an instruction
+that accesses \texttt{inet->hdrincl}.
 
 
 During runtime, \texttt{trace_basicblock()} takes the starting address
-of basic block as input (\ie \texttt{0x0} and \texttt{0x12}), and
-records the starting address into \texttt{Basicblock record}.
+of basic block as input (\ie \\texttt{A3}), and records the starting
+address into \texttt{Basicblock record}.
 %
 On the other hand, \texttt{trace_access()} takes four parameters, the
 address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
 the instruction address accessing the memory object (\ie,
-\texttt{0xa}), the size of the memory access (\ie, \texttt{1}), and
+\texttt{A2}), the size of the memory access (\ie, \texttt{1}), and
 the type of the memory access (\ie, \texttt{read}), and records them
 into \texttt{Memory access record}.
 
@@ -161,18 +158,20 @@ scheduling order).
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/schedule.pdf}
-  \caption{(a) Thread interleaving to run, and (b) Schedule specifies
-    scheduling points to run (a).}
+  \caption{(a) Thread interleaving to run, and (b) schedule describes
+    thread interleaving of (a).}
   \label{fig:schedule}
 \end{figure}
 
 \autoref{fig:schedule} illustrates an example of a schedule. In order
-to run a thread interleaving in \autoref{fig:schedule}-(a), four
-preemptions are required at \texttt{A2}, \texttt{B1}, \texttt{A6}, and
-\texttt{B2}.
+to run a thread interleaving in \autoref{fig:schedule}-(a), the
+execution should start with \texttt{sendmsg()}. So the schedule states
+that a starting syscall is \texttt{sendmsg()}.
 %
-And each schedule point denotes on which these preemptions occur,
-annotated with the order of preemption.
+Then, in \autoref{fig:schedule}-(a), four preemptions (including the
+end of system calls) are required at \texttt{A2}, \texttt{B1},
+\texttt{A6}, and \texttt{B2}, and each schedule point denotes on which
+these preemptions occur, annotated with the order of preemption.
 
 
 During fuzzing, the userspace fuzzer keeps generating different
@@ -431,7 +430,8 @@ in $I_{ST}$ potentially exposes new interleaving coverage if executed
 concurrently.
 %
 More specifically, for each pair of system calls, the single-thread
-executor checks  \dr{}
+executor derives interleaving segment graphs, and checks that among
+derived interleaving segment graphs, there is one 
 %
 
 
