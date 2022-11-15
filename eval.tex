@@ -21,8 +21,8 @@ In order to demonstrate the practicality of \sys, we run \sys to
 discover concurrency bugs in the latest Linux kernel.
 
 \begin{table*}[t]
-  \input{table/newbugs.tex}
   \centering
+  \input{table/newbugs.tex}
   \caption{List of concurrency bugs newly discovered by \sys. The
     \texttt{Recurrent} column denotes that a crash was previously
     addressed but reoccurs even after its patch is applied.}
@@ -93,6 +93,143 @@ bugs are exposed and fixed accordingly.
 
 
 
+\subsection{Comparison with prior approaches}
+\label{ss:comparison}
+
+\begin{table}[t]
+  \input{table/knownbugs.tex}
+  \centering
+  \caption{Known concurrency bugs that are studied in previous works,
+    MoonShine~\cite{moonshine}, Razzer~\cite{razzer},
+    ExpRace~\cite{exprace}, FUZE~\cite{fuze}, and
+    Snowboard~\cite{snowboard}.}
+  \label{table:knownbugs}
+\end{table}
+
+We conduct a comparison study \sys against various prior approaches to
+demonstrate the performance improvement \sys in discovering
+concurrency bugs.
+%
+In particular, 1) we compare the \sys's interleaving search strategy
+with methods of previous interleaving search
+strategies\dr{}~(\autoref{sss:interleavingsearch}), and 2) an
+interleaving segment coverage with alias coverage~\cite{krace} and
+concurrent call
+pair~\cite{conzzer}~(\autoref{sss:interleavingcoverage}).
+
+
+\PP{Bug selection}
+%
+\autoref{table:knownbugs} represents concurrency bugs we use for the
+comparison study.
+%
+For a fair comparison, our concurrency bug selection criteria are 1)
+concurrency bugs are used in previous studies on previous
+studies~\cite{exprace, razzer, snowboard, moonshine, fuze}, and 2)
+their exploits are publicly available so that we can make use of them
+for our evaluation.
+
+But there are few exceptions as follows: Although the exploit of
+\texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
+we successfully reproduce the concurrency bug from the description of
+the Snowboard~\cite{snowboard} paper.
+%
+Whereas, even though Krace~\cite{krace} studies kernel concurrency
+bugs (\ie, data races), we exclude concurrency bugs used in Krace,
+because we do not have access to those concurrency bugs. Also, we
+exclude two Android-related concurrency bugs (\ie,
+CVE-2019-1999~\cite{cve20191999} and CVE-2019-2025~\cite{cve20192025})
+evaluted by ExpRace~\cite{exprace} because their exploits require to
+execute Android-specific code spaces where \sys (and
+\texttt{Syzkaller}) are limited to exploring.
+
+
+
+\PP{Kernel preparation}
+%
+Since concurrency bugs in \autoref{table:knownbugs} are introduced,
+found, and fixed at different times, it is hard to find a kernel
+version that is vulnerable to all listed concurrency bugs.
+%
+Therefore, we inject the concurrency bugs into the Linux kernel
+version v6.0-rc7 by reverting patches fixing the concurrency bugs.
+
+
+
+
+
+
+\subsubsection{Comparison of interleaving search strategies}
+\label{sss:interleavingsearch}
+%
+
+
+% \PP{Comparison methodology}
+% %
+% Arguably, the most straightforward metric to compare fuzzing
+% techniques is the elapsed time until concurrency bugs are discovered.
+% %
+% However, the elapsed time heavily depends on the randomness;
+% \dr{because a fuzzer generates an input program very randomly, it is
+%   possible that one fuzzer quickly generates an input program that
+%   causes a concurrency bug, while another fuzzer takes very long time
+%   to generate the input program}.
+
+% In order to minimize the impact of the randomness and to concentrate
+% on the performance impact of scheduling mechanisms, we predefine a
+% multi-thread input as shown in \autoref{fig:multithreadinput}, and let
+% a fuzzer repeatedly execute the given multi-thread input without
+% generating new inputs nor mutating syscalls in the given input.
+
+% In addition, previous fuzzing approaches
+
+%
+% \begin{figure*}[t]
+%   \centering
+%   \includegraphics[width=\linewidth]{fig/comparison_graph-crop.pdf}
+%   \caption{\dr{table is better?}}
+%   \label{fig:eval:comparison}
+% \end{figure*}
+% %
+
+fg
+
+\begin{table}
+  \centering
+  \input{table/comparison-interleaving-search.tex}
+  \caption{}
+  \label{table:comparison-interleaving-search}
+\end{table}
+
+
+\autoref{table:comparison-interleaving-search} shows the comparison
+result.
+
+
+
+\subsubsection{Comparison of interleaving coverage metrics}
+\label{sss:interleavingcoverage}
+
+
+\PP{Comparison methodology}
+
+
+
+
+
+
+% Single
+% cve-2016-8655 O
+% cve-2017-15649 O
+% cve-2017-17712 X
+% cve-2017-2636 X
+% cve-2017-7533 X
+% cve-2019-6974 X
+% cve-2019-11486 X
+% 69e16d01d1d O
+
+
+
 
 \subsection{Performance characteristics of \sys}
 \label{ss:characteristics}
@@ -111,7 +248,7 @@ We first provide performance characteristics of the whole \sys.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{fig/coverage_graph-crop.pdf}
-  \caption{Coverage growth of \sys under different circumstances.}
+  \caption{Coverage growth of \sys.}
   \label{fig:eval:coverage}
 \end{figure}
 %
@@ -140,8 +277,7 @@ coverage are represented as hash tables where each element is
 8-byte. Therefore, storing interleaving segment coverage consumes
 about 180\MB while storing branch coverage requires 2\MB.
 %
-While storing interleaving segment applies the high memory pressure,
-we can consider this as a traditional space-time
+We can consider this result as a traditional space-time
 tradeoff~\cite{spacetimetradeoff}; we invest \textit{more memory} to
 discover concurrency bugs \textit{faster}.
 %
@@ -183,9 +319,9 @@ the lower throughput than \texttt{Syzkaller}. In particular, the
 throughput.
 %
 To further understand why the \sys's throughput is degraded, we
-additionally measure throughput of \texttt{Syzkaller} with memory
-access tracing enabled~(\autoref{ss:instrumentation}) (but not making
-use of it).
+additionally measure throughput of \texttt{Syzkaller} while tracing
+memory accesses (through instrumentation described in
+\autoref{ss:instrumentation}), but not making use of it.
 %
 As shown in the \texttt{Syzkaller-memtrace} column in
 \autoref{table:throughput}, it shows the throughput similar to that of
@@ -211,36 +347,61 @@ extremely fast.
 
 
 
-\PP{Per-input execution time}
+\PP{Per-input overhead}
 %
 \begin{table}[t]
   \centering
   \input{table/elapsedtime.tex}
-  \caption{\dr{rewrite:} Elapsed time (ms) for executing one input.}
+  \caption{\dr{TODO: prettify}
+    %
+    Elapsed time (ms) for executing one multi-thread input, and
+    overheads of \sys.}
   \label{table:elapsedtime}
 \end{table}
 %
-To further closely examine \sys's overheads, we measure the elapsed
-time for an iteration of a fuzzing loop, and break down the elapsed
-time.
+In \sys, there are two types of overheads for executing a single
+multi-thread input, such as computational overheads, and runtime
+overheads.
 %
-Specifically, each iteration consists of three steps
+Specifically, computation overheads are caused by tracking
+interleaving segment coverage after executing the
+input~(\autoref{ss:coverage}), and calculating scheduling points
+before executing the input~(\autoref{ss:scheduler}).
+%
+On the other hand, runtime overheads are caused by tracing memory
+accesses~(\autoref{ss:instrumentation}) and controlling thread
+scheduling~(\autoref{ss:engine}).
 
-into time taken by computation (\ie, incurred by generating a
-schedule and checking new coverage) and execution of an input.
-%
-It is worth noting that executing an input entails two overheads for
-controling thread interleaving and tracing memory accesses. To
-identify how much each overhead occupies, we disable XXX and YYY, and
-again measure elapsed times.
-%
-For each measurement, we run 10 thousands times and take an average.
 
-\autoref{table:elapsedtime} shows the result. When executing the
-input, the computational overhead is approximately 9\% of the total
-elapsed time. In contrast, executing an input takes the longest time
-out of the total elapsed time.
 \dr{}
+%
+To closely examine these overheads, we measure the elapsed time for
+executing a single multi-thread input, and break down the elapsed time
+into time taken by each steps.
+%
+For this measurement, we run 10 thousands times and take an average.
+
+
+
+
+\autoref{table:elapsedtime} shows the result. When executing a single
+input, the total elapsed time is 267.2ms.
+%
+During the executioon, the part that took the longest time is
+executing system calls; it takes 107.6ms.
+%
+However, overheads incurred by \sys is not negligible. Tracing memory
+accesses~(\autoref{ss:instrumentation}) takes 90.7ms, and controlling
+thread scheduling~(\autoref{ss:engine}) takes 42.8ms. These two
+runtime overheads almost double the execution time, and are the main
+cause of degrading the throughput of fuzzing as shown in the above.
+%
+In contrast, the total amound of time for computation is 26.1 = (8.9 +
+17.2)ms, and occupies approximately 9\% of the total elapsed time.
+%
+Accordingly, we can see that the computational overhead is relatively
+small.
+
 
 
 \subsubsection{Impact on coverage growth}
@@ -261,7 +422,7 @@ To see how much \sys improves thread interleaving exploration, we
 disable the thread scheduling control in the multi-thread fuzzing
 phase of \sys, and measure the interleaving coverage.
 %
-The result is described in a line denotted by \texttt{Interleaivng
+The result is described in a line denoted by \texttt{Interleaivng
   segment w/o scheduling control} in \autoref{fig:eval:coverage}.
 %
 With the thread scheduling control disabled, \sys finds 29.1\% less
@@ -281,7 +442,7 @@ that \sys might explore code coverage less than the baseline
 %
 To see the difference of the code coverage exploration in \sys and
 \texttt{Syzkaller}, we measure code coverage of \texttt{Syzkaller} and
-illustrate it as a line denotted by \texttt{Branch (Syzkaller)} in
+illustrate it as a line denoted by \texttt{Branch (Syzkaller)} in
 \autoref{fig:eval:coverage}.
 %
 As a result, \sys finds 3.2\% less code coverage compared to the
@@ -291,128 +452,6 @@ baseline \texttt{Syzkaller}.
 
 
 
-
-
-
-\subsection{Comparison with prior approaches}
-\label{ss:comparison}
-
-\begin{table}[t]
-  \input{table/knownbugs.tex}
-  \centering
-  \caption{Known concurrency bugs that are studied in previous works,
-    MoonShine~\cite{moonshine}, Razzer~\cite{razzer},
-    ExpRace~\cite{exprace}, FUZE~\cite{fuze}, and
-    Snowboard~\cite{snowboard}.}
-  \label{table:knownbugs}
-\end{table}
-
-We compare \sys against various prior approaches to demonstrate the
-performance improvement \sys in discovering concurrency bugs.
-
-\PP{Bug selection}
-%
-\autoref{table:knownbugs} represents concurrency bugs we use for the
-comparison study.
-%
-For fair comparisons, we select kernel concurrency bugs that are used
-to evaluate previous studies on kernel concurrency bugs~\cite{exprace,
-  razzer, snowboard, moonshine, fuze}.
-%
-Specifically, among concurrency bugs used in previous studies, we
-select ones that their exploits are publicly available so that we can
-make use of them for our evaluation.
-%
-Although the exploit of \texttt{69e16d01d1de}~\cite{snowboardbug} is
-not publicly available, we successfully reproduce the concurrency bug
-from the description in the Snowboard~\cite{snowboard} paper.
-%
-Whereas, even though Krace~\cite{krace} studies kernel concurrency
-bugs (\ie, data races), we do not have access to concurrency bugs that
-the authors use to evaluate Krace, and we exclude two concurrency bugs
-(\ie, CVE-2019-1999~\cite{cve20191999} and
-CVE-2019-2025~\cite{cve20192025}) used by ExpRace~\cite{exprace}
-because \dr{XXX}.
-
-
-
-\PP{Kernel preparation}
-%
-Since concurrency bugs in \autoref{table:knownbugs} are introduced,
-found, and fixed at different times, it is hard to find a kernel
-version that is vulnerable to all listed concurrency bugs.
-%
-Therefore, we inject the concurrency bugs into the Linux kernel
-version v6.0-rc7 by reverting patches fixing the concurrency bugs.
-
-
-
-
-\PP{Comparison methodology}
-%
-\begin{figure}[t]
-  \caption{A multi-thread input that causes
-    CVE-2017-17712~\cite{cve201717712}. The concurrency bugs may
-    manifests if two system calls in bold exeucte a specific thread
-    interleaving.}
-  \label{fig:multithreadinput}
-\end{figure}
-%
-Arguably, the most straightforward metric to compare fuzzing
-techniques is the elapsed time until concurrency bugs are discovered.
-%
-However, the elapsed time heavily depends on the randomness;
-\dr{because a fuzzer generates an input program very randomly, it is
-  possible that one fuzzer quickly generates an input program that
-  causes a concurrency bug, while another fuzzer takes very long time
-  to generate the input program}.
-
-In order to minimize the impact of the randomness and to concentrate
-on the performance impact of scheduling mechanisms, we predefine a
-multi-thread input as shown in \autoref{fig:multithreadinput}, and let
-a fuzzer repeatedly execute the given multi-thread input without
-generating new inputs nor mutating syscalls in the given input.
-
-In addition, previous fuzzing approaches
-
-
-\PP{ZZZ}
-%
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\linewidth]{fig/comparison_graph-crop.pdf}
-  \caption{\dr{WIP. Snowboard is not implemented yet} \dr{table is better?}}
-  \label{fig:eval:comparison}
-\end{figure*}
-%
-
-\autoref{fig:eval:comparison} shows the comparison result.
-%
-
-
-
-The difficulty of triggering a concurrency bug is different.
-
-
-
-\dr{}
-\PP{WWW}
-
-
-
-
-
-
-
-% Single
-% cve-2016-8655 O
-% cve-2017-15649 O
-% cve-2017-17712 X
-% cve-2017-2636 X
-% cve-2017-7533 X
-% cve-2019-6974 X
-% cve-2019-11486 X
-% 69e16d01d1d O
 
 
 

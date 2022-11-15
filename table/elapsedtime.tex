@@ -1,12 +1,11 @@
 \resizebox{\linewidth}{!}{
-  \begin{tabular}{l l l l l l}
+  \begin{tabular}{l l l l l l }
     \toprule
-    \multirow{2}{*}{Total} & \multicolumn{2}{c}{Computation} & \multicolumn{3}{c}{Runtime} \\
-    \cmidrule(lr){2-3}
-    \cmidrule(lr){4-6}
-     & Mutation & Coverage & Exec. & w/o XXX & w/o XXX \\
+    & & \multicolumn{2}{c}{Comp. overhead~(\autoref{s:design})} & \multicolumn{2}{c}{Runtime overhead~(\autoref{s:impl})} \\
+    \toprule
+    Total & \thead{Exec.\\syscall} & \thead{Tracking\\coverage\\(\autoref{ss:coverage})} & \thead{Interleavi-\\ng search\\(\autoref{ss:scheduler})} & \thead{Tracing\\accsses\\(\autoref{ss:instrumentation})}  & \thead{Thread\\scheduling\\(\autoref{ss:engine})}  \\
     \midrule
-    267.2 & 17.2 & 8.9 & 241.1 & 198.3 & 107.6 \\
+    267.2 & 107.6  & 8.9 & 17.2 & 90.7 & 42.8 \\
     \bottomrule
   \end{tabular}
 }
