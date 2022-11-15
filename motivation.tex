@@ -5,24 +5,24 @@
 % - challenges / design requirements
 % - limitations of existing approaches
 
-This work is motivated by an observation that none of previous works
+This work is motivated by an observation that none of previous work
 properly addresses characteristics of \textit{offending thread
   interleaving} (\ie, one that causes a concurrency bug).
 %
-As a consequence, previous works either \textbf{1)} suffer from
+As a consequence, previous work either \textbf{1)} suffers from
 identifying whether interesting thread interleavings remain
-untested~\cite{krace, conzzer, muzz}, or \textbf{2)} waste the
+untested~\cite{krace, conzzer, muzz}\yj{use clearer sentence}, or \textbf{2)} waste the
 computing power by ineffectively exploring the search space of thread
 interleaving~\cite{snowboard, razzer}.
 
 
 
-In this section, we first comprehend why concurrency bugs manifest
+In this section, we first study how concurrency bugs manifest
 depending on thread interleaving through a real-world concurrency bug
 example.
 %
-We then define design goals for effectively discovering concurrency
-bugs in the kernel, and summarize why existing approaches fall short
+From the study, we elicit design goals to effectively discover concurrency
+bugs in the kernel, and discuss why existing approaches have limitations 
 in satisfying the design goals.
 
 
@@ -61,13 +61,13 @@ initializing it.
 
 \PP{Observation 1: Combined interleaving orders}
 %
-This example demonstrates that a concurrency bug is \textit{a combined
-  result of a few interleaving orders}, where each interleaving order
+This example demonstrates that a concurrency bug is caused by \textit{a combined
+  result of multiple interleaving orders}, where each interleaving order
 denotes the execution order between an instruction pair that access
 the same memory object.
 %
 In the example of \autoref{fig:cve-2017-17712}, two interleaving orders
-are required to cause the uninitialized access bug.
+are combined to eventually cause the uninitialized access bug.
 %
 First, \texttt{A2} should be executed before \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1}$\footnote{In this paper,
@@ -77,19 +77,25 @@ $\texttt{A2} \Rightarrow \texttt{B1}$\footnote{In this paper,
 %
 Second, \texttt{B1} should be executed before \texttt{A4} (\ie,
 $\texttt{B1} \Rightarrow \texttt{A4}$) to make thread~A dereference
-uninitialized \texttt{rfv}.
+uninitialized \texttt{rfv} while other interleavings do not 
+contribute to the bug.
 %
-Therefore, thread interleavings satisfying a combination of the two
-interleaving orders (\ie,
+%Therefore, thread interleavings satisfying a combination of the two
+%interleaving orders (\ie,
+%$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+%\texttt{A4}))$ cause the uninitialized access bug, while all other
+%thread interleavings do not.
+Therefore, to trigger kernel concurrency bugs, a fuzzer must 
+consider a combination of multiple interleaving orders. e.g.,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4}))$ cause the uninitialized access bug, while all other
-thread interleavings do not.
+\texttt{A4}))$ in \autoref{fig:cve-2017-17712}.
 
 
 \PP{Design goal 1: Informative interleaving coverage}
-%
-In order for a fuzzer to discover the uninitialized access bug, an
-interleaving coverage metric should not be saturated until
+The observation gives an insight of how to define coverage metric 
+in a concurrency fuzzer.
+To discover the uninitialized access bug, an
+interleaving coverage metric should not be saturated\yj{metric is saturated?} until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is executed.
 %
@@ -146,8 +152,6 @@ without redundantly executing thread interleavings.
 
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
-
-\yj{Revise hint: Flow-OK, Clarification of text-Need work}
 \begin{table}[t]
   \centering
   \input{table/motivation.tex}
@@ -158,11 +162,9 @@ without redundantly executing thread interleavings.
   \label{table:motivation}
 \end{table}
 
-As shown in \autoref{table:motivation}, prior concurrency fuzzing
-approaches adopt different interleaving coverage metrics and thread
-scheduling control mechanisms.
+\autoref{table:motivation} summarizes interleaving coverage metrics and thread scheduling control mechanisms of prior approaches.
 %
-Even though prior approaches achieve their own successes, we find that
+Even though they achieve their own successes, we find that
 their interleaving coverage metrics and thread scheduling control
 mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
