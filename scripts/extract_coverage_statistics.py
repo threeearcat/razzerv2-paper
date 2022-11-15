@@ -65,7 +65,7 @@ def parse(filename):
                 auxg = aux.group(1, 2)
                 l = list(g)
                 l[1] = int(l[1]) + int(auxg[0])
-                l[3] = int(l[3]) + int(auxg[1])
+                l[2] = int(l[2]) + int(auxg[1])
                 g = tuple(l)
             rec = g + (len(crashes),)
 
@@ -73,7 +73,12 @@ def parse(filename):
         prevts = ts
 
     for ts in sorted(res, key=lambda ts: int(ts)):
-        print(ts - start, ", ".join(str(f) for f in res[ts]), sep=", ")
+        print(
+            ts - start,
+            res[ts][2],
+            res[ts][4],
+            sep=", ",
+        )
 
 
 def main():
