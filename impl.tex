@@ -5,50 +5,49 @@
 concurrency bugs.
 %
 The key improvement of \sys lies in adopting interleaving segment
-coverage and the coverage-directed interleaving \dr{}mutation
-algorithgm described in \autoref{s:design}.
+coverage and the coverage-directed interleaving search strategy
+described in \autoref{s:design}.
 %
 
-\dr{}In particular, \sys consists of two stages of fuzzing.
+In particular, \sys consists of two stages of fuzzing.
 %
 The first stage is a single-thread fuzzing, which focuses on expanding
-code coverage.
+code coverage\dr{}.
 %
 The second stage is a multi-thread fuzzing to explore thread
 interleavings, and discover concurrency bugs.
 %
-In each stage, \sys profiles memory accesses to track interleaving
-segment coverage through binary instrumentation.
+In each stage, \sys requires to profile memory accesses executed by
+each syscall to track interleaving segment coverage.
 %
-Also, during the second stage, \sys employs an execution engine, which
-controls thread scheduling as the fuzzer instructs.
+And in the the second stage, \sys needs a mechanism to control thread
+scheduling as desired.
 
 
 
 In the following of subsections, we firstly provide two building
 blocks of \sys, the target kernel
-instrumentation~(\autoref{ss:instrumentation}) and the execution
-engine~(\autoref{ss:engine}).
+instrumentation~(\autoref{ss:instrumentation}) to profile memory
+accesses, and the execution engine~(\autoref{ss:engine}) to control
+thread schedulings.
 %
-And then we describe design details of the userspace
-fuzzer~(\autoref{ss:fuzzer}).
-%
-Lastly, we explain how we implement \sys~(\autoref{ss:impl}).
+And then we describe design details of \sys~(\autoref{ss:fuzzer}),
+followed by implementation details of \sys~(\autoref{ss:impl}).
 
 
 \subsection{Target Kernel Instrumentation}
 \label{ss:instrumentation}
 
-\sys requires to profile basic blocks and memory accesses executed by
-each system call.
+\sys requires to profile basic blocks (for code coverage) and memory
+accesses (for interleaving coverage) executed by each system call.
 %
 To this end, \sys incorporates a compiler pass that inserts callback
 function calls 1) at the beginning of each basic block, and 2) before
 each instruction that accesses globally-visible memory objects.
 %
-These callback functions trace basic blocks and memory accesses during
-the execution in the kernel, and records them into memory regions
-shared between the user space and the kernel space.
+These callback functions records executed basic blocks and memory
+accesses into memory regions shared between the user space and the
+kernel space.
 
 
 
@@ -76,10 +75,9 @@ Similarly, the compiler pass inserts a function call
 instruction that accesses \texttt{inet->hdrincl} at \texttt{0xa}.
 
 
-During runtime, \texttt{trace_basicblock()} takes the instruction
-address of the function call as input (\ie \texttt{0x0} and
-\texttt{0x12}), and records the instruction address into
-\texttt{Basicblock record}.
+During runtime, \texttt{trace_basicblock()} takes the starting address
+of basic block as input (\ie \texttt{0x0} and \texttt{0x12}), and
+records the starting address into \texttt{Basicblock record}.
 %
 On the other hand, \texttt{trace_access()} takes four parameters, the
 address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
@@ -94,11 +92,10 @@ into \texttt{Memory access record}.
 
 
 It is worth noting that \texttt{Basicblock record} and \texttt{Memory
-  access record} are per-thread memory regions, which is shared
-between the user space and the kernel space. Thus, after a thread of
-the userspace fuzzer executes a system call, it can can identify basic
-blocks and memory accesses executed by the system call that it
-executed.
+  access record} are per-thread memory regions, shared between the
+user space and the kernel space. Thus, after a userspace thread
+executes a system call, the thread can identify basic blocks and
+memory accesses that it executed.
 
 
 
@@ -220,7 +217,7 @@ execution engine, followed by a hypercall \texttt{hcall_ready()} that
 sleeps until all threads are ready.
 %
 After all threads invoke \texttt{hcall_ready()}, the execution engine
-wakes up them, and the threads start executing system calls.
+wakes them up, and the threads start executing system calls.
 
 
 \dr{}
