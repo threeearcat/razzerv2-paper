@@ -338,9 +338,9 @@ fuzzer adopts a thread interleaving search strategy (shortly, an
 interleaving search strategy).
 %
 For instance, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}
-picks a single pair of instructions that access the same memory object
-\texttt{X} and \texttt{Y}, and test their execution order such that
-\texttt{X} is executed before \texttt{Y}.
+picks a single pair of instructions (\eg, \texttt{X} and \texttt{Y})
+that access the same memory object and test their execution order,
+\eg, executing \texttt{X} before \texttt{Y}.
 %
 Whereas, Krace~\cite{krace} randomly determins a thread interleaving
 to run for each execution.
