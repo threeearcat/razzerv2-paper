@@ -119,7 +119,7 @@ From the sequential execution, a fuzzer observes that the three instructions,
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$. 
 The execution order does not cause the uninitialized access bug.
 %
-From the explored execution, one can easily imagine a new interleaving order of these three
+However, from the explored execution, one can easily imagine a new interleaving order of these three
 instructions by changing the execution order of \texttt{A4} and
 \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
@@ -127,10 +127,11 @@ $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 The \yj{speculative} interleaving is what exactly we are looking for; it
 satisfies the combination of interleaving orders
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4}))$, and if we execute the speculative interleaving, we can
-discover the uninitialized access bug.
+\texttt{A4}))$, and, if executed, the interleaving order triggers 
+the uninitialized access bug.
 
 \PP{Design goal 2: Coverage-based interleaving search strategy}
+The observation 
 %
 In the perspective of fuzzing, previous executions are tracked using a
 coverage metric.
