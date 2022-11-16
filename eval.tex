@@ -195,7 +195,7 @@ and Snowboard \dr{does not utilize KVM}.
 %
 Therefore, we implement their approaches on the multi-thread fuzzing
 phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
-random delay injection scheme of Krace, and 2) the PMC-test scheme of
+random delay injection scheme of Krace, and 2) the \dr{}PMC-test scheme of
 Snowboard.
 %
 In addition of recent concurrency fuzzing works, we also compare with
@@ -252,6 +252,7 @@ kernel scheduler.
 Regardless of the difficulty of discovering concurrency bugs, \sys can
 discover all of concurrency bugs extremely fast.
 \dr{wip.}
+
 Compared to the kernel scheduler (\ie, the \texttt{Naive} column)
 
 

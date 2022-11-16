@@ -50,15 +50,15 @@ Lastly, we describe the implementation detail of
 \end{figure}
 
 
-The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
-similar with recent concurrency fuzzers, Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard}.
+%The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
+%similar with recent concurrency fuzzers, Razzer~\cite{razzer} and
+%Snowboard~\cite{snowboard}.
 %
-In \sys, the first stage is a \textit{single-thread} fuzzing that
-focuses on expanding code coverage\dr{}, and the second stage is a
-\textit{multi-thread} fuzzing to explore thread interleavings.
+%In \sys, the first stage is a \textit{single-thread} fuzzing that
+%focuses on expanding code coverage\dr{}, and the second stage is a
+%\textit{multi-thread} fuzzing to explore thread interleavings.
 
-Both stages consists of two components, an input generator and an
+In \sys, both single-thread fuzzing multi-thread fuzzing consist of two components, an input generator and an
 input executor. We explain details of each component in the following.
 
 
@@ -136,18 +136,18 @@ Second, the single-thread executor identifies a pair of system calls
 in $I_{ST}$ that potentially exposes new interleaving coverage if
 executed concurrently.
 %
-More specifically, for each pair of system calls, the single-thread
-executor derives interleaving segment graphs, and checks that among
-derived interleaving segment graphs, there is one 
+More specifically, for each system call pair ($S_i$, $S_j$), the single-thread
+executor generates interleaving segment graphs from memory accesses of the system call pair.
 %
-
+While $S_i$ and $S_j$ was not executed concurrently, the single-thread executor does not record generated interleaving segment graphs as interleaving segment coverage, but make us of them to derive unobserved interleaving segment graphs.
+%
+If XXX, then the single-thread executor hands $I_{ST}$, ($S_i$, $S_j$), and XXX to the multi-thread fuzzing.
 
 
 \subsubsection{Multi-thread fuzzing}
 \label{sss:multithreadfuzzing}
 %
-After $I_{ST}$ is handed with a pair of system calls to execute
-concurrently, the multi-thread generator transforms $I_{ST}$ to a
+After $I_{ST}$ is handed with ($S_i$, $S_j$) and XXX, the multi-thread generator transforms $I_{ST}$ to a
 multi-thread input $I_{MT}$.
 %
 In addition, the multi-thread generator generates \textit{schedules}
@@ -156,15 +156,38 @@ a set of scheduling points) during runtime.
 
 
 The multi-thread executor then repeatedly tests each schedule of
-$I_{MT}$ one at a time.
+$I_{MT}$ one at a time with a support of the execution engine..
+
+\PP{Schedule}
 %
-To this end, the multi-thread executor instruments $I_{MT}$ with
-hypercalls in order to tell the execution engine how to control thread
-scheduling.
+A schedule is a specification of how to control thread scheduling.
 %
-Lastly, the multi-thread executor runs $I_{MT}$ while enforcing a
-given schedule with a support of the execution
-engine~(\autoref{ss:engine}).
+It contains per-system call sequences of scheduling points, where each
+scheduling point is described as a two-tuple, (instruction address,
+scheduling order).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{fig/schedule.pdf}
+  \caption{(a) Thread interleaving to run, and (b) schedule describes
+    thread interleaving of (a). \dr{redraw (b)}}
+  \label{fig:schedule}
+\end{figure}
+
+\autoref{fig:schedule} illustrates an example of a schedule. In order
+to run a thread interleaving in \autoref{fig:schedule}-(a), the
+execution should start with \texttt{sendmsg()}. So the schedule states
+that a starting syscall is \texttt{sendmsg()}.
+%
+Then, in \autoref{fig:schedule}-(a), four preemptions (including the
+end of system calls) are required at \texttt{A2}, \texttt{B1},
+\texttt{A6}, and \texttt{B2}, and each schedule point denotes on which
+these preemptions occur, annotated with the order of preemption.
+
+
+%During fuzzing, the userspace fuzzer keeps generating different
+%schedules, and requests the execution engine through hypercall
+%interfaces to control thread scheduling according to a schedule.
 
 
 
@@ -175,24 +198,46 @@ engine~(\autoref{ss:engine}).
 % method to store them, and compare them to a new interleaving graph.
 % %
 % We choose to use a hash value of
-
+%
 % the FNV-1~\cite{fnv, fnv-go}, non-cryptographic hash function,
-
-
+%
+%
 % A schedule is an outcome of the interleaving mutation.
 % A schedule contains an initial thread, and a set of scheduling points
 % indicating an instruction on which preemption occurs.
+%
+The multi-thread generator takes $I_{ST}$, a pair of system calls to run concurrently, and interleaving segment graphs as input. Then, it generates $I_{MT}$ from $I_{ST}$ to 
 
 
-With a given $I_{ST}$ and a pair of system calls, the multi-thread
-generator transforms it to $I_{MT}$.
 
 
 
 
 \PP{Multi-Thread Executor}
 %
-A 
+The purpose of the multi-thread executor is to run $I_{MT}$ while enforcing a schedule given generated by the multi-thread generator.
+%
+To this end, the multi-thread executor invokes hypercalls to deliver a schedule to the execution engine before executing system calls of $I_{MT}$.
+
+
+
+During the execution of $I_{MT}$, 
+
+For example, the Linux
+kernel employs various dynamic techniques to detect harmful
+races. Examples are lockdep [29], KASAN [2], or assertions
+manually inserted by kernel developers. We enabled all of
+these techniques while building the kernel binary such that
+RAZZER can leverage this enhanced race detection capability.
+If a violation is detected, RAZZER generates a detailed report
+about the harmful race.
+
+After executing $I_{MT}$, the multi-thread executor collect memory accesses that racing system calls executed.
+%
+With these memory accesses, it tracks interleaving segment coverage.
+
+
+
 
 
 
@@ -216,7 +261,7 @@ kernel space.
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{fig/instrumentation.pdf}
+  \includegraphics[width=0.9\linewidth]{fig/instrumentation.pdf}
   \caption{(a) Part of \texttt{raw_sendmsg()} in
     \autoref{fig:cve-2017-17712}, (b) instrumented source code of (a)
     (gray on the background), and (c) memory accesses and basic blocks
@@ -310,38 +355,6 @@ request the execution engine to control thread scheduling through
 hypercall interfaces.
 
 
-\PP{Schedule}
-%
-A schedule is a specification of how to control thread scheduling.
-%
-It contains per-system call sequences of scheduling points, where each
-scheduling point is described as a two-tuple, (instruction address,
-scheduling order).
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.9\linewidth]{fig/schedule.pdf}
-  \caption{(a) Thread interleaving to run, and (b) schedule describes
-    thread interleaving of (a). \dr{redraw (b)}}
-  \label{fig:schedule}
-\end{figure}
-
-\autoref{fig:schedule} illustrates an example of a schedule. In order
-to run a thread interleaving in \autoref{fig:schedule}-(a), the
-execution should start with \texttt{sendmsg()}. So the schedule states
-that a starting syscall is \texttt{sendmsg()}.
-%
-Then, in \autoref{fig:schedule}-(a), four preemptions (including the
-end of system calls) are required at \texttt{A2}, \texttt{B1},
-\texttt{A6}, and \texttt{B2}, and each schedule point denotes on which
-these preemptions occur, annotated with the order of preemption.
-
-
-During fuzzing, the userspace fuzzer keeps generating different
-schedules, and requests the execution engine through hypercall
-interfaces to control thread scheduling according to a schedule.
-
-
 
 
 
@@ -410,7 +423,7 @@ saved when the thread was suspended, and then the thread can continue
 its execution.
 
 
-\dr{where to put this?}
+\PP{Restriction of hardware breakpoint}
 %
 While a hardware breakpoint feature is well-fitting for our pupose, it
 has a restriction on the number of breakpoints that can be installed
@@ -420,9 +433,9 @@ In Intel CPU chipsets, at most four hardware breakpoints can be
 installed simultaneously, and the number of scheduling points can be
 larger than four.
 %
-\dr{} \sys overcomes this restriction by leveraging the fact that
+\sys overcomes this restriction by leveraging the fact that
 scheduling points are ordered. In other words, the execution engine
-installed breakpoints on a first few (\eg, four) scheduling points,
+installs breakpoints on a first few (\eg, four) scheduling points,
 and when a installed breakpoint is hit, the execution engine moves a
 breakpoint onto the next scheduling point.
 %
@@ -433,16 +446,16 @@ does not have a restriction on the number of breakpoints.
 
 
 
-\dr{not important. i'm thinking remove this}
+%\dr{not important. i'm thinking remove this}
 %
-In performing preemption, we choose to suspend and resume a guest
-thread instead of a whole virtual CPU on which the guest thread runs.
+%In performing preemption, we choose to suspend and resume a guest
+%thread instead of a whole virtual CPU on which the guest thread runs.
 %
-While suspending and resuming a whole virtual CPU is adopted by
-previous approaches~\cite{ski, snowboard, razzer} it is not suitable
-for our purpose because \textit{if suspending a virtual CPU, it may
-  suspend another virtual CPU}. Details are explained in the appendix
-section~(\autoref{s:appendix:preemption}).
+%While suspending and resuming a whole virtual CPU is adopted by
+%previous approaches~\cite{ski, snowboard, razzer} it is not suitable
+%for our purpose because \textit{if suspending a virtual CPU, it may
+%  suspend another virtual CPU}. Details are explained in the appendix
+%section~(\autoref{s:appendix:preemption}).
 
 
 
@@ -450,13 +463,14 @@ section~(\autoref{s:appendix:preemption}).
 \PP{Handling missing scheduling points}
 %
 It is worth noting that instructions on which scheduling points
-install may not be executed during the execution, for example, in case
-that the control flow changes because of kernel internal states.
+install may not be executed if the control flow changes due to kernel internal states.
 %
-For example, it is possible that
-
-\dr{}
-
+\dr{}In such case, we keep the order of scheduling points.
+%
+For example, when executing a schedule of \autoref{fig:schedule}, it is possible that thread~A may not execute \texttt{A2}, and hit a breakpoint on \texttt{A6}.
+%
+Then, we ignore all scheduling points before \texttt{A6} (\ie, \texttt{A2} and \texttt{B1}), and keep 
+enforcing a schedule after \texttt{A6} (\ie, \texttt{B2}).
 
 
 
