@@ -11,9 +11,10 @@ properly addresses characteristics of \textit{offending thread
 %
 As a consequence, previous work either \textbf{1)} suffers from
 identifying whether interesting thread interleavings remain
-untested~\cite{krace, conzzer, muzz}\yj{use clearer sentence}, or \textbf{2)} waste the
-computing power by ineffectively exploring the search space of thread
-interleaving~\cite{snowboard, razzer}.
+untested~\cite{krace, conzzer, muzz}\yj{use clearer sentence},
+%
+or \textbf{2)} waste the computing power by ineffectively exploring
+the search space of thread interleaving~\cite{snowboard, razzer}.
 
 
 
@@ -133,34 +134,35 @@ the uninitialized access bug.
 \PP{Design goal 2: Coverage-based interleaving search strategy}
 The observation gives a direction that how a fuzzer should explore 
 the search space using a coverage metric.
-If an interleaving coverage metric tracks\yj{metric tracks?} that
+If interleaving coverage tracks that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
 \textit{explored} before, a fuzzer can utilize interleaving
 coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$). 
 This allows a systematic way to explore the search space rather than 
-performing randomized search pervasively used in previous approaches~\yj{cite}.
+performing randomized search pervasively used in previous approaches~\cite{ski, krace, pctalgorithm}\yj{cite}.
 
 In summary, using the coverage metric expressing combinations of interleaving orders and the coverage-based search strategy, a fuzzer can effectively determine what to execute in future iterations, and quickly discover concurrency bugs
 without redundantly executing thread interleavings.
 
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
-\begin{table}[t]
-  \centering
-  \input{table/motivation.tex}
-  \caption{Interleaving coverage metrics and interleaving search
-    strategy of recent concurrency fuzzing. ``--'' indicates that a
-    fuzzer does not adopt a concurrency coverage metric. \dr{TODO:
-      rewording}}
-  \label{table:motivation}
-\end{table}
-
-\autoref{table:motivation} summarizes interleaving coverage metrics and 
-interleaving search strategies of prior approaches.
 %
-Even though they achieve their own successes, we find that
-their interleaving coverage metrics and thread scheduling control
+% \begin{table}[t]
+%   \centering
+%   \input{table/motivation.tex}
+%   \caption{Interleaving coverage metrics and interleaving search
+%     strategy of recent concurrency fuzzing. ``--'' indicates that a
+%     fuzzer does not adopt a concurrency coverage metric. \dr{TODO:
+%       rewording}}
+%   \label{table:motivation}
+% \end{table}
+
+% \autoref{table:motivation} summarizes interleaving coverage metrics and 
+% interleaving search strategies of prior approaches.
+%
+Even though previous approaches achieve their own successes, we find
+that their interleaving coverage metrics and thread scheduling control
 mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 

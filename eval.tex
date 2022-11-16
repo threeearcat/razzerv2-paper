@@ -173,7 +173,11 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 \begin{table*}
   \centering
   \input{table/comparison-interleaving-search.tex}
-  \caption{}
+  \caption{Result of the comparison study against various
+    state-of-the-art kernel concurrency fuzzers (\ie,
+    Krace~\cite{krace} and Snowboard~\cite{snowboard}). The
+    \texttt{Naive} column indicates the kernel scheduler (\ie, no
+    thread scheduling control applied). \dr{}}
   \label{table:comparison-interleaving-search}
 \end{table*}
 %
@@ -183,7 +187,33 @@ discover a given concurrency bug for each approach.
 \PP{Comparison methodology}
 %
 We compare \sys to state-of-the-art kernel concurrency fuzzers,
-snowboard~\cite{snowboard}, and Krace~\cite{krace}.
+Snowboard~\cite{snowboard}, and Krace~\cite{krace}.
+%
+Unfortunately, we cannot directly run Snowboard and Krace for the
+comparison study becaues Krace is implemented only for file systems,
+and Snowboard \dr{does not utilize KVM}.
+%
+Therefore, we implement their approaches on the multi-thread fuzzing
+phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
+random delay injection scheme of Krace, and 2) the PMC-test scheme of
+Snowboard.
+%
+In addition of recent concurrency fuzzing works, we also compare with
+the kernel scheduler (\ie, no thread scheduling control applied) as
+the baseline.
+
+
+With these kernel concurrency fuzzers, we measure the number of
+executions and the elapsed time required to discover concurrency bugs.
+%
+However, these metrics heavily depend on the randomness and initial
+seeds~\cite{fuzzingeval}.
+%
+\dr{wip.}
+
+\dr{say: one but at a time, seed fix (disble single-thread fuzzing), N
+  times of executions,}
+
 
 % %
 % Arguably, the most straightforward metric to compare fuzzing
@@ -208,14 +238,21 @@ snowboard~\cite{snowboard}, and Krace~\cite{krace}.
 \autoref{table:comparison-interleaving-search} shows the comparison
 result.
 %
-As the figure shows, the difficulty of discovering varies from bug to
-bug. For example, \texttt{CVE-2018-12232} appears the easiest
-concurrency bug to discover since it can be easily discovered even
-without any thread scheduling control.
+As the table shows, the difficulty of discovering varies from bug to
+bug. For example, CVE-2018-12232 appears the easiest concurrency bug
+to discover since it can be discovered within 40 executions even
+without any thread scheduling control mechanism.
 %
-On the other hand, three concurrency bugs, \texttt{CVE-2019-6974},
-\texttt{CVE-2019-11486}, and \texttt{69e16d01d1de} 
+On the other hand, three concurrency bugs, CVE-2019-6974,
+CVE-2019-11486, and \texttt{69e16d01d1de}, hard to discover with the
+kernel scheduler.
 
+
+
+Regardless of the difficulty of discovering concurrency bugs, \sys can
+discover all of concurrency bugs extremely fast.
+\dr{wip.}
+Compared to the kernel scheduler (\ie, the \texttt{Naive} column)
 
 
 
@@ -226,6 +263,11 @@ We also justify the choice of our interleaving coverage by comparing .
 
 
 \PP{Comparison methodology}
+
+
+\PP{Result}
+%
+
 
 
 
@@ -370,8 +412,11 @@ extremely fast.
   \input{table/elapsedtime.tex}
   \caption{
     %
-    Elapsed time (ms) for executing one multi-thread input, and
-    overheads of each components of \sys.}
+    Elapsed time (ms) for executing one multi-thread input. We
+    decompose the elapsed time into the system call execution
+    (\texttt{Exec. syscall}), computational overheads
+    (\texttt{Comp. overhead}) and runtime overhead (\texttt{Runtime
+      overhead}) of \sys.}
   \label{table:elapsedtime}
 \end{table}
 %
@@ -469,6 +514,7 @@ baseline \texttt{Syzkaller}.
 While this is a definitely downside of \sys. However, considering the
 benefit in exploring thread interleavings is huge, we still believe
 that this is a tolerable result.
+\dr{}
 
 
 

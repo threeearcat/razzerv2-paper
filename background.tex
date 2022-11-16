@@ -224,10 +224,13 @@ proposed to take consider of the \textit{concurrency aspect} of kernel
 execution into the fuzzing process.
 %
 Concurrency fuzzers generally repeat the execution of a multi-thread
-input (\eg, a multi-threaded system call sequence) while 1) capturing
-unique behaviors of thread interleavings with a \textit{interleaivng
-  coverage metric}, and 2) exploring thread interleavings based on
-a \textit{thread interleaving search strategy}.
+input (\eg, a multi-threaded system call sequence) while
+%
+1) capturing unique behaviors of thread interleavings with a
+\textit{interleaivng coverage metric}, and
+%
+2) determining which thread interleave to run on each iteration with a
+\textit{thread interleaving search strategy}.
 
 
 % \PP{Coverage-guided fuzzing}
@@ -274,26 +277,36 @@ To capture unique behaviors of thread interleavings, a few concurrency
 fuzzing approaches~\cite{conzzer, krace} come up with interleaving
 coverage metrics.
 %
-Especially, Krace~\cite{krace} proposes alias coverage as an
-interleaving coverage metric, where alias coverage tracks an
-instruction pair ($I_S$, $I_L$), if a read instruction $I_L$ reads a
-value written by a write instruction $I_S$, and they are executed by
-different threads.
-%
-Whereas, Conzzer~\cite{conzzer} proposes another interleaving coverage
-metric called concurrent call pair, where each concurrent call pair
-represents a pair of two concurrently-executed functions augmented
-with calling contexts.
+Interleaving coverage metrics are used to track the execution order of
+concurrent events between threads from a finer-granularity (\eg,
+instruction~\cite{krace}) to a coarser-granularity (\eg,
+function~\cite{conzzer}).
 
-Concurrency fuzzing approaches aggregate interleaving coverage across
-iterations while repeatedly executing a given multi-thread input until
-the multi-thread input no longer provides new interleaving coverage.
+Concurrency fuzzers aggregate interleaving coverage while repeatedly
+executing a multi-thread input, and if the multi-thread input no
+longer provides new interleaving coverage, the fuzzer moves on to
+explore thread interleavings of other multi-thread inputs.
+
+
 %
-Taking Krace as an example, alias coverage constructs a set of
-instruction pairs collected through iterations. When further
-iterations do not generate a new instruction pair, Krace
-de-prioritizes the multi-thread input to explore thread interleavings
-of other multi-thread inputs.
+% Especially, Krace~\cite{krace} proposes alias coverage as an
+% interleaving coverage metric, where alias coverage tracks the
+% execution order of two instructions,
+% %
+% Whereas, Conzzer~\cite{conzzer} proposes another interleaving coverage
+% metric called concurrent call pair, where each concurrent call pair
+% represents a pair of two concurrently-executed functions augmented
+% with calling contexts.
+
+% Concurrency fuzzers aggregate interleaving coverage across iterations
+% while repeatedly executing a given multi-thread input until the
+% multi-thread input no longer provides new interleaving coverage.
+% %
+% Taking Krace as an example, alias coverage constructs a set of
+% instruction pairs collected through iterations. When further
+% iterations do not generate a new instruction pair, Krace
+% de-prioritizes the multi-thread input to explore thread interleavings
+% of other multi-thread inputs.
 
 
 
@@ -328,41 +341,36 @@ of other multi-thread inputs.
 
 \PP{Thread interleaving search strategy}
 %
-Unlike conventional fuzzing approaches, concurrency fuzzing considers
-thread scheduling is another input domain that a fuzzer needs to
-explore.
+Unlike conventional fuzzers, concurrency fuzzers consider thread
+scheduling is another input domain that a fuzzer needs to explore.
 %
 
 To determine which thread interleaving to run for each iteration, a
 fuzzer adopts a thread interleaving search strategy (shortly, an
 interleaving search strategy).
 %
-For instance, Razzer~\cite{razzer} and Snowboard~\cite{snowboard}
-picks a single pair of instructions (\eg, \texttt{X} and \texttt{Y})
-that access the same memory object and test their execution order,
-\eg, executing \texttt{X} before \texttt{Y}.
+For instance, for every execution, Razzer~\cite{razzer} and
+Snowboard~\cite{snowboard} determines the execution order of a single
+pair of instructions, and Krace~\cite{krace} randomly determins a
+thread interleaving to run.
 %
-Whereas, Krace~\cite{krace} randomly determins a thread interleaving
-to run for each execution.
+Whereas Conzzer~\cite{conzzer} designates two functions to run
+concurrently.
 %
-\dr{Conzzer and MUZZ?}
+\dr{MUZZ?}
 
 
 
-After determining a thread interleaivng to run,w concurrency fuzzing
+After determining a thread interleaivng to run, concurrency fuzzing
 overrides the kernel scheduler, and controls thread scheduling as
 desired.
 %
-To this end, a thread scheduling control mechanism is used to control
-thread scheduling as a fuzzer wants. Depending on a concurrency
-fuzzer, various mechanisms are used;
+To this end, various thread scheduling control mechanisms are used,
+such as suspending/resuming virtual CPUs~\cite{razzer, snowboard}, or
+injecting delays via instrumentation~\cite{krace} or the breakpoint
+feature~\cite{conzzer}.
 %
-Razzer~\cite{razzer} and Snowboard~\cite{snowboard} suspend and resume
-virtual CPUs on which target threads are running, Krace~\cite{krace}
-and Conzzer~\cite{conzzer} inject delays before memory accesses
-through instrumentation and the breakpoint feature respectively.
-%
-While these methods are designed differently, all of them allow a
+While these mechanisms are designed differently, all of them allow a
 fuzzer to control thread scheduling.
 
 
