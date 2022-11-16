@@ -137,11 +137,12 @@ If an interleaving coverage metric tracks\yj{metric tracks?} that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
 \textit{explored} before, a fuzzer can utilize interleaving
 coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$)
-instead of s
-%
-In this way, a fuzzer can effectively determine what to execute in
-future iterations, and quickly discover the uninitialized access bug
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$). 
+This allows a systematic way to explore the search space rather than 
+using randomized search pervasively used in previous approaches~\yj{cite}.
+
+Using the coverage metric expressing a combinations of interleaving orders and the feedback-base search strategy, a fuzzer can effectively determine what to execute in future iterations, and quickly discover 
+ccess bug
 without redundantly executing thread interleavings.
 
 
