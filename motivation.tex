@@ -137,7 +137,8 @@ If an interleaving coverage metric tracks\yj{metric tracks?} that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
 \textit{explored} before, a fuzzer can utilize interleaving
 coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
+$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$)
+in
 %
 In this way, a fuzzer can effectively determine what to execute in
 future iterations, and quickly discover the uninitialized access bug
