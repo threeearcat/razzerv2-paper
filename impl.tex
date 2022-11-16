@@ -73,7 +73,7 @@ that accesses \texttt{inet->hdrincl}.
 
 
 During runtime, \texttt{trace_basicblock()} takes the starting address
-of basic block as input (\ie \\texttt{A3}), and records the starting
+of basic block as input (\ie, \texttt{A3}), and records the starting
 address into \texttt{Basicblock record}.
 %
 On the other hand, \texttt{trace_access()} takes four parameters, the
@@ -186,7 +186,7 @@ interfaces to control thread scheduling according to a schedule.
 %
 In order for the userspace fuzzer to ask the execution engine to
 enforce a schedule, the userspace fuzzer sends a schedule to run
-before executing system calls.
+thorugh hypercall interfaces.
 %
 After that, the threads notify the execution engine that they are
 ready to execute system calls, and start executing system calls,

@@ -70,7 +70,7 @@ Other concurrency fuzzers~\cite{krace, muzz, snowboard, conzzer} are
 also (at least indirectly) affected by CCT techniques as all of them
 consists of thread scheduling control mechanisms.
 %
-We believe \sys takes one step further in brining CCT into fuzzing by
+We believe \sys takes one step further in adopting CCT into fuzzing by
 answering two questions, \textit{``what is the proper interleaving
   coverage metric''} and \textit{``how to utilize interleaving
   coverage in searching thread interleavings''}.
@@ -87,17 +87,19 @@ bugs~\cite{lkmm, linuxmemorymodel}.
 These works detect the occurence of two instructions that access the
 same memory address without proper synchronization or ordering.
 
-In fact, data race detectors are intrinsically orthogonal to \sys.
+In fact, data race detectors are intrinsically orthogonal to \sys,
+thus, data race detectors can be integrated into \sys to provide a
+stronger concurrency bug detection capability.
 %
-In our evaluation, there are non-data race concurrency
-bugs~\cite{snowboardbug, cve20196974, cve20177533} that cannot be
-detected using a data race detector, while data race detectors can be
-helpful in detecting non-memory corruption bugs such as performance
-degradation.
+For example, during our evaluation, \sys can easily trigger non-data
+race concurrency bugs~\cite{snowboardbug, cve20196974, cve20177533}
+that cannot be detected using a data race detector, while data race
+detectors can be helpful in detecting non-memory corruption bugs such
+as performance degradation.
 %
 Even though we do not make use of a data race detector during our
-evaluation, we believe the \sys's concurrency bug detection capability
-can be augmented with a data race detector.
+evaluation, we believe \sys and data race detectors contribute in
+discovering concurrency bugs in their own way.
 
 
 
