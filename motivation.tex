@@ -139,13 +139,10 @@ $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
 coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$). 
 This allows a systematic way to explore the search space rather than 
-using randomized search pervasively used in previous approaches~\yj{cite}.
+performing randomized search pervasively used in previous approaches~\yj{cite}.
 
-Using the coverage metric expressing a combinations of interleaving orders and the feedback-base search strategy, a fuzzer can effectively determine what to execute in future iterations, and quickly discover 
-con bug
+In summary, using the coverage metric expressing combinations of interleaving orders and the coverage-based search strategy, a fuzzer can effectively determine what to execute in future iterations, and quickly discover concurrency bugs
 without redundantly executing thread interleavings.
-
-
 
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
@@ -159,7 +156,8 @@ without redundantly executing thread interleavings.
   \label{table:motivation}
 \end{table}
 
-\autoref{table:motivation} summarizes interleaving coverage metrics and thread scheduling control mechanisms of prior approaches.
+\autoref{table:motivation} summarizes interleaving coverage metrics and 
+interleaving search strategies of prior approaches.
 %
 Even though they achieve their own successes, we find that
 their interleaving coverage metrics and thread scheduling control
@@ -169,18 +167,15 @@ mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
 \PP{Less-informative interleaving coverage}
 %
 We find that previously proposed interleaving coverage metrics are
-less-informative to determine whether a multi-thread input needs to be
-further tested. Thus, they do not satisfy the \textbf{Design goal 1}.
-%
-This is because none of them consider a combination of interleaving
+less-informative 
+%to determine whether a multi-thread input needs to be further tested. 
+because none of them consider a combination of interleaving
 orders. 
 %
-Specifically, alias coverage tracks individual interleaving orders,
-and suffer from describing a combination of interleaving orders.
-%
-On the other hand, concurrenct call pair trakcs a pair of
-concurrently-executed functions, and do not differentiate
-interleavings taken place in the same function pair.
+Specifically, alias coverage tracks individual interleaving orders only.
+Concurrent call pair tracks a pair of
+concurrently-executed functions, but they do not differentiate
+interleavings taken place in the same function pair\yj{I do not get this}.
 
 
 
@@ -197,9 +192,11 @@ interleavings taken place in the same function pair.
 \end{figure}
 
 
-\autoref{fig:alias-coverage} shows two interleavings that saturate
-existing interleaving coverage, where the uninitialized access bug
-does not manifest.
+\autoref{fig:alias-coverage} illustrates their limitations.
+It shows two different interleavings that the uninitialized access bug 
+does not manifest. 
+
+%saturate existing interleaving coverage
 %
 In the two interleavings described in this figure, we can observe all
 four individual interleaving orders regarding \texttt{inet->hdrincl}
