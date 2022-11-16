@@ -430,9 +430,9 @@ interleaving segment coverage during the same period.
 This result indicates that our design choices significantly improve in
 exploring thread interleavings.
 %
-Specifically, \sys not just explores thread interleaving fast
+As a consequence, \sys can effectively discover concurrency bugs as
+shown in \autoref{ss:comparison}.
 
-\dr{}
 
 
 \PP{Impact on code exploration}
@@ -450,9 +450,9 @@ illustrate it as a line denoted by \texttt{Branch (Syzkaller)} in
 As a result, \sys finds 3.2\% less code coverage compared to the
 baseline \texttt{Syzkaller}.
 %
-
-\dr{}
-
+While this is a definitely downside of \sys. However, considering the
+benefit in exploring thread interleavings is huge, we still believe
+that this is a tolerable result.
 
 
 
