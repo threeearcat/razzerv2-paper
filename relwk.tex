@@ -79,13 +79,26 @@ answering two questions, \textit{``what is the proper interleaving
 
 \PP{Data race detection}
 %
-
-\cite{lkmm, linuxmemorymodel}
-
-Although the concept of data race is widely known, the semantic
-
-This work and data race detectors are complementary to each other.
+A large volume of works~\cite{pacer, datacollider, hybridchecker,
+  literace, helgrind, frost, prorace, tsan, kcsan, txrace} are
+proposed to detect data races, a \textit{subset} of concurrency
+bugs~\cite{lkmm, linuxmemorymodel}.
 %
+These works detect the occurence of two instructions that access the
+same memory address without proper synchronization or ordering.
+
+In fact, data race detectors are intrinsically orthogonal to \sys.
+%
+In our evaluation, there are non-data race concurrency
+bugs~\cite{snowboardbug, cve20196974, cve20177533} that cannot be
+detected using a data race detector, while data race detectors can be
+helpful in detecting non-memory corruption bugs such as performance
+degradation.
+%
+Even though we do not make use of a data race detector during our
+evaluation, we believe the \sys's concurrency bug detection capability
+can be augmented with a data race detector.
+
 
 
 

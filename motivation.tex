@@ -94,8 +94,8 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \PP{Design goal 1: Informative interleaving coverage}
 The observation gives an insight of how to define coverage metric 
 in a concurrency fuzzer.
-To discover the uninitialized access bug, an
-interleaving coverage metric should not be saturated\yj{metric is saturated?} until
+To discover the uninitialized access bug, 
+interleaving coverage should not be saturated until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is executed.
 %
