@@ -1,25 +1,27 @@
-\resizebox{\linewidth}{!}{
-  \begin{tabular}{l l l l l}
+\resizebox{0.9\linewidth}{!}{
+  \begin{tabular}{l l l l l l l l l}
     \toprule
-    \textbf{Bug ID} & \textbf{\sys} & \textbf{Snowboard} & \textbf{Krace} & \textbf{Naive} \\
+    \multirow{2}{*}{\textbf{Bug ID}} & \multicolumn{2}{c}{\textbf{\sys}} & \multicolumn{2}{c}{\textbf{Snowboard}~\cite{snowboard}} & \multicolumn{2}{c}{\textbf{Krace}~\cite{krace}} & \multicolumn{2}{c}{\textbf{Naive}} \\
+    \cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7} \cmidrule(rl){8-9}
+    & \# of exec. & Elapsed time & \# of exec. & Elapsed time & \# of exec. & Elapsed time & \# of exec. & Elapsed time \\
     \midrule
-    CVE-2016-8655~\cite{cve20168655} & \\
+    CVE-2016-8655~\cite{cve20168655} & 3 & & 11 & & 30 & & 294 & \\
     \midrule
-    CVE-2017-2636~\cite{cve20172636} & \\
+    CVE-2017-2636~\cite{cve20172636} & 7 & & \dr{?} & & 41 & & 513 & \\
     \midrule
-    CVE-2017-7533~\cite{cve20177533} & \\
+    CVE-2017-7533~\cite{cve20177533} & 21 & & 97 & & 22 & & 505 & \\
     \midrule
-    CVE-2017-17712~\cite{cve201717712} & \\
+    CVE-2017-17712~\cite{cve201717712} & 6 & & 47 & & 103 & & 3009 & \\
     \midrule
-    CVE-2017-15649~\cite{cve201715649} & \\
+    CVE-2017-15649~\cite{cve201715649} & 8 & & 35 & & 228 & & 1089 & \\
     \midrule
-    CVE-2018-12232~\cite{cve201812232} & \\
+    CVE-2018-12232~\cite{cve201812232} & 12 & & 10 & & 10 & & 40& \\
     \midrule
-    CVE-2019-6974~\cite{cve20196974} & \\ 
+    CVE-2019-6974~\cite{cve20196974} & 7 & & 184 & & \xmark & & \xmark & \\
     \midrule
-    CVE-2019-11486~\cite{cve201911486} & \\ 
+    CVE-2019-11486~\cite{cve201911486} & 3 & & 23 & & 173 & & \xmark & \\
     \midrule
-    69e16d01d1de~\cite{snowboardbug} & \\ 
+    69e16d01d1de~\cite{snowboardbug} & 17 & & 97 & & 1337 & & \xmark & \\
     \bottomrule
   \end{tabular}
 }

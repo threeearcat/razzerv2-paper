@@ -8,11 +8,12 @@ Specifically, we 1) demonstrate the practicality of \sys by providing
 newly found concurrency bugs in the Linux
 kernel~(\autoref{ss:realworldbugs}),
 %
-2) provide comprehensive performance characteristics of \sys (\eg,
-throughput and overheads)~(\autoref{ss:characteristics}) and,
+2) compare \sys against prior concurrency fuzzing
+techniques~(\autoref{ss:comparison}), and
 %
-3) compare \sys against prior concurrency fuzzing
-techniques~(\autoref{ss:comparison}).
+3) provide comprehensive performance characteristics of \sys (\eg,
+throughput and overheads)~(\autoref{ss:characteristics}).
+%
 
 \subsection{Finding Real-world Concurrency Bugs}
 \label{ss:realworldbugs}
@@ -106,16 +107,14 @@ bugs are exposed and fixed accordingly.
   \label{table:knownbugs}
 \end{table}
 
-We conduct a comparison study \sys against various prior approaches to
-demonstrate the performance improvement \sys in discovering
-concurrency bugs.
-%
-In particular, 1) we compare the \sys's interleaving search strategy
-with methods of previous interleaving search
-strategies\dr{}~(\autoref{sss:interleavingsearch}), and 2) an
-interleaving segment coverage with alias coverage~\cite{krace} and
-concurrent call
-pair~\cite{conzzer}~(\autoref{sss:interleavingcoverage}).
+We compare \sys against various prior approaches 1) to demonstrate its
+performance improvement in discovering concurrency bugs
+(\autoref{sss:interleavingsearch}), and 2) justify the design choice
+of interleaivng segment coverage (\autoref{sss:interleavingcoverage}).
+
+% interleaving segment coverage with alias coverage~\cite{krace} and
+% concurrent call
+% pair~\cite{conzzer}~(\autoref{sss:interleavingcoverage}).
 
 
 \PP{Bug selection}
@@ -132,16 +131,18 @@ for our evaluation.
 But there are few exceptions as follows: Although the exploit of
 \texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
 we successfully reproduce the concurrency bug from the description of
-the Snowboard~\cite{snowboard} paper.
+the Snowboard~\cite{snowboard} paper. Thus, we inlcude this
+concurrency bug into the concurrency bug list for evaluation.
 %
 Whereas, even though Krace~\cite{krace} studies kernel concurrency
-bugs (\ie, data races), we exclude concurrency bugs used in Krace,
-because we do not have access to those concurrency bugs. Also, we
-exclude two Android-related concurrency bugs (\ie,
+bugs (\ie, data races), we do not take concurrency bugs from Krace,
+because we do not have access to ones used in Krace.
+%
+Also, we exclude two Android-related concurrency bugs (\ie,
 CVE-2019-1999~\cite{cve20191999} and CVE-2019-2025~\cite{cve20192025})
 evaluted by ExpRace~\cite{exprace} because their exploits require to
-execute Android-specific code spaces where \sys (and
-\texttt{Syzkaller}) are limited to exploring.
+execute Android-specific code spaces where the current implementation
+of \sys (and \texttt{Syzkaller}) is limited to exploring.
 
 
 
@@ -162,9 +163,28 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 \subsubsection{Comparison of interleaving search strategies}
 \label{sss:interleavingsearch}
 %
+% \begin{figure*}[t]
+%   \centering
+%   \includegraphics[width=\linewidth]{fig/comparison_graph-crop.pdf}
+%   \caption{\dr{table is better?}}
+%   \label{fig:eval:comparison}
+% \end{figure*}
+%
+\begin{table*}
+  \centering
+  \input{table/comparison-interleaving-search.tex}
+  \caption{}
+  \label{table:comparison-interleaving-search}
+\end{table*}
+%
+Here, we measure the elapsed time and number of executions required to
+discover a given concurrency bug for each approach.
 
+\PP{Comparison methodology}
+%
+We compare \sys to state-of-the-art kernel concurrency fuzzers,
+snowboard~\cite{snowboard}, and Krace~\cite{krace}.
 
-% \PP{Comparison methodology}
 % %
 % Arguably, the most straightforward metric to compare fuzzing
 % techniques is the elapsed time until concurrency bugs are discovered.
@@ -183,31 +203,26 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 
 % In addition, previous fuzzing approaches
 
+\PP{Result}
 %
-% \begin{figure*}[t]
-%   \centering
-%   \includegraphics[width=\linewidth]{fig/comparison_graph-crop.pdf}
-%   \caption{\dr{table is better?}}
-%   \label{fig:eval:comparison}
-% \end{figure*}
-% %
-
-
-\begin{table}
-  \centering
-  \input{table/comparison-interleaving-search.tex}
-  \caption{}
-  \label{table:comparison-interleaving-search}
-\end{table}
-
-
 \autoref{table:comparison-interleaving-search} shows the comparison
 result.
+%
+As the figure shows, the difficulty of discovering varies from bug to
+bug. For example, \texttt{CVE-2018-12232} appears the easiest
+concurrency bug to discover since it can be easily discovered even
+without any thread scheduling control.
+%
+On the other hand, three concurrency bugs, \texttt{CVE-2019-6974},
+\texttt{CVE-2019-11486}, and \texttt{69e16d01d1de} 
 
 
 
-\subsubsection{Comparison of interleaving coverage metrics}
+
+\subsubsection{Justification of interleaving segment coverage}
 \label{sss:interleavingcoverage}
+%
+We also justify the choice of our interleaving coverage by comparing .
 
 
 \PP{Comparison methodology}
@@ -312,6 +327,8 @@ VM rebooting or kernel crashes.
 
 
 
+\dr{}
+%
 \autoref{table:throughput} shows the result. As expected, \sys shows
 the lower throughput than \texttt{Syzkaller}. In particular, the
 \sys's throughput is about 54\% of the \texttt{Syzkaller}'s
@@ -413,9 +430,8 @@ interleaving coverage growth and the code coverage growth.
 \PP{Impact on interleaving exploration}
 %
 As the primiary purpose of this work is to effectively explore thread
-interleavings, the \sys's thread scheduling
-control~(\autoref{ss:scheduler}) should contribute in effectively
-expanding the interleaving coverage.
+interleavings, the \sys's approach~(\autoref{s:design}) should
+contribute in effectively expanding the interleaving coverage.
 %
 To see how much \sys improves thread interleaving exploration, we
 disable the thread scheduling control in the multi-thread fuzzing
