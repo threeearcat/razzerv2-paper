@@ -12,33 +12,196 @@ described in \autoref{s:design}.
 In particular, \sys consists of two stages of fuzzing.
 %
 The first stage is a single-thread fuzzing, which focuses on expanding
-code coverage\dr{}.
+code coverage.\dr{}
 %
 The second stage is a multi-thread fuzzing to explore thread
 interleavings, and discover concurrency bugs.
 %
-In each stage, \sys requires to profile memory accesses executed by
-each syscall to track interleaving segment coverage.
+In each stage, \sys traces memory accesses executed by each system
+call to track interleaving segment coverage.
 %
-And in the the second stage, \sys needs a mechanism to control thread
+And in the the second stage, \sys adopts a mechanism to control thread
 scheduling as desired.
 
 
 
-In the following of subsections, we firstly provide two building
-blocks of \sys, the target kernel
-instrumentation~(\autoref{ss:instrumentation}) to profile memory
-accesses, and the execution engine~(\autoref{ss:engine}) to control
-thread schedulings.
+In the following of subsections, we provide the overall design of
+\sys~(\autoref{ss:fuzzer}), followed by two building blocks of \sys,
+the target kernel instrumentation~(\autoref{ss:instrumentation}) to
+collect memory accesses, and the execution
+engine~(\autoref{ss:engine}) to control thread schedulings.
 %
-And then we describe design details of \sys~(\autoref{ss:fuzzer}),
-followed by implementation details of \sys~(\autoref{ss:impl}).
+Lastly, we describe the implementation detail of
+\sys~(\autoref{ss:impl}).
+
+
+
+
+\subsection{Userspace Fuzzer}
+\label{ss:fuzzer}
+
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/architecture.pdf}
+  \caption{Workflow of \sys \dr{TODO: redraw to describe the workflow}}
+  \label{fig:workflow}
+\end{figure}
+
+
+The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
+similar with recent concurrency fuzzers, Razzer~\cite{razzer} and
+Snowboard~\cite{snowboard}.
+%
+In \sys, the first stage is a \textit{single-thread} fuzzing that
+focuses on expanding code coverage\dr{}, and the second stage is a
+\textit{multi-thread} fuzzing to explore thread interleavings.
+
+Both stages consists of two components, an input generator and an
+input executor. We explain details of each component in the following.
+
+
+\subsubsection{Single-thread fuzzing}
+%
+In a single-thread fuzzing stage, the single-thread generator
+generates a single-thread input (refered as $I_{ST}$) in the form of a
+sequence of random system calls.
+%
+And then, the single-thread executor executes $I_{ST}$ to perform two
+things.
+%
+First, it tracks code coverage of $I_{ST}$ with the purpose of
+exploring source codes residing deep inside the kernel.
+%
+Second, it identifies two system calls in $I_{ST}$ that potentially
+exhibit new interleaving segment coverage.  If identified, $I_{ST}$
+will be handed to the next stage, the multi-thread fuzzing.
+
+
+\PP{Single-Thread Generator}
+%
+The single-thread generator is similar with conventional
+fuzzing~\cite{syzkaller}.
+%
+It constructs a single-threaded system call sequence $I_{ST}$ with two
+strategies: generation and mutation.
+%
+When using the generation strategy, \sys randomly generates a system
+call sequence based on well-formed system call description grammar
+\texttt{Syzlang}~\cite{syzlang}.
+%
+\texttt{Syzlang} describes templates of available system calls
+including types of arguments and the type of a return value, as well
+as a range of feasible values of each arguments.
+%
+According to \texttt{Syzlang}, \sys produces a single-thread system
+call sequence by repeatedly selecting a random system call and
+providing reasonable arguments of the system call.
+
+The mutation strategy is an alternative of the generation strategy.
+When using a mutation strategy, \sys picks up a already-generated
+single-thread input, and modifies the single-thread input by appending
+additional system calls, removing existing system calls, or changing
+values of arguments of existing system calls.
+
+
+\PP{Single-Thread Executor}
+%
+Given $I_{ST}$ from the single-thread generator, the single-thread
+executor runs $I_{ST}$, and traces basic blocks and memory accesses
+executed by each system call with a support from instrumentation
+detailed in \autoref{ss:instrumentation}.
+
+With traced basic blocks and memory accesses, the single-thread
+executor conducts two tasks.
+%
+The first task is similar with what conventional kernel fuzzing
+does.
+%
+In other words, the single-thread executor computes branch coverage
+using traced basic blocks.
+%
+Then, if $I_{ST}$ exposes new branch coverage that has not been
+explored, \sys keeps $I_{ST}$, and feeds it back to the single-thread
+generator so that the single-thread generator further mutates $I_{ST}$
+to find more branch coverage.
+%
+\dr{remove:}As a result, \sys keeps a minimal set of $I_{ST}$, called
+a corpus, which may execute previously-executed branches when running
+single-thread inputs in the corpus.
+
+
+Second, the single-thread executor identifies a pair of system calls
+in $I_{ST}$ that potentially exposes new interleaving coverage if
+executed concurrently.
+%
+More specifically, for each pair of system calls, the single-thread
+executor derives interleaving segment graphs, and checks that among
+derived interleaving segment graphs, there is one 
+%
+
+
+
+\subsubsection{Multi-thread fuzzing}
+\label{sss:multithreadfuzzing}
+%
+After $I_{ST}$ is handed with a pair of system calls to execute
+concurrently, the multi-thread generator transforms $I_{ST}$ to a
+multi-thread input $I_{MT}$.
+%
+In addition, the multi-thread generator generates \textit{schedules}
+where each schedule describes how to enforce thread interleaving (\ie,
+a set of scheduling points) during runtime.
+
+
+The multi-thread executor then repeatedly tests each schedule of
+$I_{MT}$ one at a time.
+%
+To this end, the multi-thread executor instruments $I_{MT}$ with
+hypercalls in order to tell the execution engine how to control thread
+scheduling.
+%
+Lastly, the multi-thread executor runs $I_{MT}$ while enforcing a
+given schedule with a support of the execution
+engine~(\autoref{ss:engine}).
+
+
+
+
+\PP{Multi-Thread Generator}
+%
+% In order to use interleaving graph as interleaving coverage, we need a
+% method to store them, and compare them to a new interleaving graph.
+% %
+% We choose to use a hash value of
+
+% the FNV-1~\cite{fnv, fnv-go}, non-cryptographic hash function,
+
+
+% A schedule is an outcome of the interleaving mutation.
+% A schedule contains an initial thread, and a set of scheduling points
+% indicating an instruction on which preemption occurs.
+
+
+With a given $I_{ST}$ and a pair of system calls, the multi-thread
+generator transforms it to $I_{MT}$.
+
+
+
+
+\PP{Multi-Thread Executor}
+%
+A 
+
+
+
 
 
 \subsection{Target Kernel Instrumentation}
 \label{ss:instrumentation}
 
-\sys requires to profile basic blocks (for code coverage) and memory
+\sys requires to trace basic blocks (for code coverage) and memory
 accesses (for interleaving coverage) executed by each system call.
 %
 To this end, \sys incorporates a compiler pass that inserts callback
@@ -328,165 +491,6 @@ While the virtual machine introspection is crucial to properly control
 thread scheduling, we leave details of how we implement the virtual
 machine introspection in the appendix
 section~(\autoref{s:appendix:vmi}).
-
-
-
-\subsection{Userspace Fuzzer}
-\label{ss:fuzzer}
-
-
-
-\begin{figure}
-  \includegraphics[width=0.9\linewidth]{fig/architecture.pdf}
-  \caption{Workflow of \sys \dr{TODO: redraw to describe the workflow}}
-  \label{fig:workflow}
-\end{figure}
-
-
-The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
-similar with recent concurrency fuzzers, Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard}.
-%
-In \sys, the first stage is a \textit{single-thread} fuzzing that
-focuses on expanding code coverage\dr{}, and the second stage is a
-\textit{multi-thread} fuzzing to explore thread interleavings.
-
-Both stages consists of two components, an input generator and an
-input executor. We explain details of each component in the following.
-
-
-\subsubsection{Single-thread fuzzing}
-%
-In a single-thread fuzzing phase, the single-thread generator
-generates a single-thread input (refered as $I_{ST}$) in the form of a
-sequence of random system calls.
-%
-And then, the single-thread executor executes $I_{ST}$ to perform two
-things.
-%
-First, it collects code coverage of $I_{ST}$ with the purpose of
-exploring source codes residing deep inside the kernel.
-%
-Second, it identifies two system calls in $I_{ST}$ that potentially
-exhibit new interleaving coverage.  If identified, $I_{ST}$ will be
-handed to the next phase, namely the multi-thread fuzzing.
-
-
-\PP{Single-Thread Generator}
-%
-The single-thread generator is similar with conventional
-fuzzing~\cite{syzkaller}.
-%
-It constructs a single-threaded system call sequence $I_{ST}$ with two
-strategies: generation and mutation.
-%
-When using the generation strategy, \sys randomly generates a system
-call sequence based on well-formed system call description grammar
-\texttt{Syzlang}~\cite{syzlang}.
-%
-\texttt{Syzlang} describes templates of available system calls
-including types of arguments and the type of a return value, as well
-as a range of feasible values of each arguments.
-%
-According to \texttt{Syzlang}, \sys produces a single-thread system
-call sequence by repeatedly selecting a random system call and
-providing reasonable arguments of the system call.
-
-The mutation strategy is an alternative of the generating strategy.
-When using a mutation strategy, \sys picks up a already-generated
-single-thread input, and modifies the single-thread input by appending
-additional system calls, removing existing system calls, or changing
-values of arguments of existing system calls.
-
-
-\PP{Single-Thread Executor}
-%
-Given $I_{ST}$ from the single-thread generator, the single-thread
-executor runs $I_{ST}$, and profiles basic blocks and memory accesses
-executed by each system call with a support from instrumentation
-detailed in \autoref{ss:instrumentation}.
-
-With profiled basic blocks and memory accesses, the single-thread
-executor conducts two tasks.
-%
-The first task is similar with what conventional kernel fuzzing
-does.
-%
-In other words, the single-thread executor computes branch coverage
-using profiled basic blocks.
-%
-Then, if $I_{ST}$ exposes new branch coverage that has not been
-explored, \sys keeps $I_{ST}$, and feeds it back to the single-thread
-generator so that the single-thread generator further mutates $I_{ST}$
-to find more branch coverage.
-%
-As a result, \sys keeps a minimal set of $I_{ST}$, called a corpus,
-which may execute previously-executed branches when running
-single-thread inputs in the corpus.
-
-
-Second, the single-thread executor identifies a pair of system calls
-in $I_{ST}$ potentially exposes new interleaving coverage if executed
-concurrently.
-%
-More specifically, for each pair of system calls, the single-thread
-executor derives interleaving segment graphs, and checks that among
-derived interleaving segment graphs, there is one 
-%
-
-
-
-\subsubsection{Multi-thread fuzzing}
-\label{sss:multithreadfuzzing}
-%
-After $I_{ST}$ is handed with a pair of system calls to execute
-concurrently, the multi-thread generator transforms $I_{ST}$ to a
-multi-thread input $I_{MT}$.
-%
-In addition, the multi-thread generator generates \textit{schedules}
-where each schedule describes how to enforce thread interleaving (\ie,
-a set of scheduling points) during runtime.
-
-
-The multi-thread executor then repeatedly tests each schedule of
-$I_{MT}$ one at a time.
-%
-To this end, the multi-thread executor instruments $I_{MT}$ with
-hypercalls in order to tell the execution engine how to control thread
-scheduling.
-%
-Lastly, the multi-thread executor runs $I_{MT}$ while enforcing a
-given schedule with a support of the execution
-engine~(\autoref{ss:engine}).
-
-
-
-
-\PP{Multi-Thread Generator}
-%
-% In order to use interleaving graph as interleaving coverage, we need a
-% method to store them, and compare them to a new interleaving graph.
-% %
-% We choose to use a hash value of
-
-% the FNV-1~\cite{fnv, fnv-go}, non-cryptographic hash function,
-
-
-% A schedule is an outcome of the interleaving mutation.
-% A schedule contains an initial thread, and a set of scheduling points
-% indicating an instruction on which preemption occurs.
-
-
-With a given $I_{ST}$ and a pair of system calls, the multi-thread
-generator transforms it to $I_{MT}$.
-
-
-
-
-\PP{Multi-Thread Executor}
-%
-A 
-
 
 
 

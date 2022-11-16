@@ -9,12 +9,15 @@ This work is motivated by an observation that none of previous work
 properly addresses characteristics of \textit{offending thread
   interleaving} (\ie, one that causes a concurrency bug).
 %
-As a consequence, previous work either \textbf{1)} suffers from
-identifying whether interesting thread interleavings remain
-untested~\cite{krace, conzzer, muzz}\yj{use clearer sentence},
+As a consequence, previous work either \textbf{1)} disregards a
+multi-thread input in which a concurrency bug reside~\cite{krace,
+  conzzer}, %\yj{use clearer sentence}
+% suffers from
+% identifying whether interesting thread interleavings remain
+% untested
 %
 or \textbf{2)} waste the computing power by ineffectively exploring
-the search space of thread interleaving~\cite{snowboard, razzer}.
+the search space of thread interleaving~\cite{snowboard, razzer, muzz}.
 
 
 
@@ -115,12 +118,17 @@ to guide what interleaving orders should be further explored.
 In the example of \autoref{fig:cve-2017-17712}, let us assume 
 if a fuzzer executes the two system calls \textit{sequentially} 
 such that thread~A executes all instructions followed by the execution of thread~B.
-From the sequential execution, a fuzzer observes that the three instructions,
-\texttt{A2}, \texttt{A4}, and \texttt{B1}, are \yj{can a fuzzer know they are conflicting instructions?} executed in the order of
-$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$. 
-The execution order does not cause the uninitialized access bug.
 %
-However, from the explored execution, one can easily imagine a new interleaving order of these three
+Then, let us also assume that a fuzzer observes the three
+instructions, \texttt{A2}, \texttt{A4}, and \texttt{B1}, access the
+same memory object~(\ie, \texttt{inet->hdrincl}), and are executed in
+the order of
+$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$.
+% \yj{can a fuzzer know they are conflicting instructions?}
+%
+This execution order does not cause the uninitialized access bug.
+%
+However, from the explored execution, one can easily imagine a new interleaving of these three
 instructions by changing the execution order of \texttt{A4} and
 \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
@@ -140,7 +148,7 @@ $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
 coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$). 
 This allows a systematic way to explore the search space rather than 
-performing randomized search pervasively used in previous approaches~\cite{ski, krace, pctalgorithm}\yj{cite}.
+performing randomized search pervasively used in previous approaches~\cite{ski, krace, pctalgorithm, muzz}.%\yj{cite}
 
 In summary, using the coverage metric expressing combinations of interleaving orders and the coverage-based search strategy, a fuzzer can effectively determine what to execute in future iterations, and quickly discover concurrency bugs
 without redundantly executing thread interleavings.
@@ -162,8 +170,8 @@ without redundantly executing thread interleavings.
 % interleaving search strategies of prior approaches.
 %
 Even though previous approaches achieve their own successes, we find
-that their interleaving coverage metrics and thread scheduling control
-mechanisms do not satisfy \textbf{Design goal 1} and \textbf{2}.
+that their interleaving coverage metrics and interleaving search
+strategies do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
 \PP{Less-informative interleaving coverage}
