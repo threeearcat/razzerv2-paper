@@ -92,6 +92,7 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 
 
 \PP{Design goal 1: Informative interleaving coverage}
+\yj{Revisit text to get the point across better}
 The observation gives an insight of how to define coverage metric 
 in a concurrency fuzzer.
 To discover the uninitialized access bug, 
@@ -105,32 +106,28 @@ thread interleavings of the multi-thread input, missing the
 uninitialized access bug.
 
 
-
-
-
-\PP{Observation 2: Feedback from previous executions}
+\PP{Observation 2: Feedback from explored executions}
 %
-Interestingly, a previous execution that did not cause the
-uninitialized access bug provides a feedback as to which thread
-interleavings should be further explored.
+An explored execution that did not cause a concurrency bug provides useful feedback 
+to guide what interleaving orders should be further explored.
 
-To demonstrate this, let us assume we execute the two system calls in
-\autoref{fig:cve-2017-17712} \textit{sequentially} such that the
-execution of thread~A is followed by the execution of thread~B.
+In the example of \autoref{fig:cve-2017-17712}, let us assume 
+if a fuzzer executes the two system calls \textit{sequentially} 
+such that thread~A executes all instructions followed by the execution of thread~B.
+From the sequential execution, a fuzzer observes that the three instructions,
+\texttt{A2}, \texttt{A4}, and \texttt{B1}, are \yj{can a fuzzer know they are conflicting instructions?} executed in the order of
+$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$. 
+The execution order does not cause the uninitialized access bug.
 %
-In this sequential execution, we can observe that three instructions,
-\texttt{A2}, \texttt{A4}, and \texttt{B1} are executed in the order of
-$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$.
-%
-Unsuprisingly, we can easily imagine an interleaving of these three
-instructions by flipping the execution order of \texttt{A4} and
+From the explored execution, one can easily imagine a new interleaving order of these three
+instructions by changing the execution order of \texttt{A4} and
 \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
-And this imaginary interleaving is what exactly we are looking for; it
+The \yj{speculative} interleaving is what exactly we are looking for; it
 satisfies the combination of interleaving orders
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4}))$, and if we execute the imaginary interleaving, we can
+\texttt{A4}))$, and if we execute the speculative interleaving, we can
 discover the uninitialized access bug.
 
 \PP{Design goal 2: Coverage-based interleaving search strategy}
