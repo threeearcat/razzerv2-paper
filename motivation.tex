@@ -131,15 +131,12 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 the uninitialized access bug.
 
 \PP{Design goal 2: Coverage-based interleaving search strategy}
-The observation gives a direction that how a fuzzer 
-%
-In the perspective of fuzzing, previous executions are tracked using a
-coverage metric.
-%
-Therefore, if an interleaving coverage metric tracks that
+The observation gives a direction that how a fuzzer should explore 
+the search space using a coverage metric.
+If an interleaving coverage metric tracks\yj{metric tracks?} that
 $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
-\textit{explored} before, then a fuzzer can utilize interleaving
-coverage to infer \textit{unexplored} thread interleavings (\eg,
+\textit{explored} before, a fuzzer can utilize interleaving
+coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 In this way, a fuzzer can effectively determine what to execute in
