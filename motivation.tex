@@ -201,9 +201,9 @@ which tracks interleaving orders of a \textit{single} instruction
 pair.
 %
 Alias coverage determines a thread interleaving \texttt{X} exposes a
-unique behavior if \texttt{X} contains an unexplored
-directed-instruction pair ($I_W \rightarrow I_R$), where $I_R$ reads a
-value written by $I_W$ and they are executed by different threads.
+unique behavior if \texttt{X} contains an unexplored interleaving
+order ($I_W \Rightarrow I_R$), where $I_R$ reads a value written by
+$I_W$ and they are executed by different threads.
 
 Then, \autoref{fig:alias-coverage} illustrates the simplified
 explanation of why alias coverage does not satisfy the \textbf{Design
@@ -211,19 +211,18 @@ explanation of why alias coverage does not satisfy the \textbf{Design
 %
 Assuming \texttt{Interleaving \#1} is executed first, alias covereage
 identifies \texttt{Interleaving \#1} exposes unique behaviors when it
-sees two unexplored directed-instruction pairs (\ie,
-($\texttt{B1} \rightarrow \texttt{A2}$) and
-($\texttt{B1} \rightarrow \texttt{A4}$)).
+sees two unexplored interleaving orders (\ie,
+($\texttt{B1} \Rightarrow \texttt{A2}$) and
+($\texttt{B1} \Rightarrow \texttt{A4}$)).
 %
 But, when alias coverage faces \texttt{Interleaving \#2} after
 \texttt{Interleaving \#1}, it suffers from locating unobserved unique
 behaviors of \texttt{Interleaving \#2}.
 %
-As mentioned above, alias coverage captures a single
-directed-instruction pair.  But in \texttt{Interleaving \#2}, there is
-no unobserved directed-instruction pair (\ie,
-($\texttt{B1} \rightarrow \texttt{A4}$) is already observed in
-\texttt{Interleaving \#1}).
+As mentioned above, alias coverage captures a single interleaving
+order. But in \texttt{Interleaving \#2}, there is no unobserved
+interleaving order (\ie, ($\texttt{B1} \Rightarrow \texttt{A4}$) is
+already observed in \texttt{Interleaving \#1}).
 %
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
