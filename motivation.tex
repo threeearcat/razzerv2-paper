@@ -219,10 +219,9 @@ But, when alias coverage faces \texttt{Interleaving \#2} after
 \texttt{Interleaving \#1}, it suffers from locating unobserved unique
 behaviors of \texttt{Interleaving \#2}.
 %
-As mentioned above, alias coverage captures a single interleaving
-order. But in \texttt{Interleaving \#2}, there is no unobserved
-interleaving order (\ie, ($\texttt{B1} \Rightarrow \texttt{A4}$) is
-already observed in \texttt{Interleaving \#1}).
+In \texttt{Interleaving \#2}, there is no unobserved interleaving
+order (\ie, ($\texttt{B1} \Rightarrow \texttt{A4}$) is already
+observed in \texttt{Interleaving \#1}).
 %
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
