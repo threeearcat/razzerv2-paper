@@ -29,7 +29,7 @@ rev.tex: FORCE
 	   "$(shell git log -1 --format='%ci' HEAD)" > $@
 
 code/%.tex: code/% ## build highlighted tex code from source code
-	pygmentize -P tabsize=4 -P mathescape -f latex $^ | mark.py > $@
+	pygmentize -P tabsize=4 -P mathescape -f latex $^ | bin/mark.py > $@
 
 code/fmt.tex: ## generate color table
 	pygmentize -f latex -S default > $@
