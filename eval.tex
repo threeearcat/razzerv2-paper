@@ -175,44 +175,53 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
   \input{table/comparison-interleaving-search.tex}
   \caption{Result of the comparison study against various
     state-of-the-art kernel concurrency fuzzers (\ie,
-    Krace~\cite{krace} and Snowboard~\cite{snowboard}). The
-    \texttt{Naive} column indicates the kernel scheduler (\ie, no
-    thread scheduling control applied). \dr{}}
+    Krace~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
+    number of executions and the elapsed time (in ms) required to
+    discover each concurrency bug. The \texttt{Naive} column indicates
+    the kernel scheduler (\ie, no thread scheduling control applied).}
   \label{table:comparison-interleaving-search}
 \end{table*}
 %
 Here, we measure the elapsed time and number of executions required to
 discover a given concurrency bug for each approach.
 
-\PP{Comparison methodology}
+\PP{Comparison target}
 %
 We compare \sys to state-of-the-art kernel concurrency fuzzers,
 Snowboard~\cite{snowboard}, and Krace~\cite{krace}.
 %
 Unfortunately, we cannot directly run Snowboard and Krace for the
 comparison study becaues Krace is implemented only for file systems,
-and Snowboard \dr{does not utilize KVM}.
+and Snowboard is \dr{}.
 %
 Therefore, we implement their approaches on the multi-thread fuzzing
 phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
-random delay injection scheme of Krace, and 2) the \dr{}PMC-test scheme of
-Snowboard.
+random delay injection scheme of Krace, and 2) the
+enforcing-single-interleaving-order scheme of Snowboard.
 %
 In addition of recent concurrency fuzzing works, we also compare with
 the kernel scheduler (\ie, no thread scheduling control applied) as
 the baseline.
 
 
+\PP{Comparison method}
+%
 With these kernel concurrency fuzzers, we measure the number of
 executions and the elapsed time required to discover concurrency bugs.
 %
 However, these metrics heavily depend on the randomness and initial
-seeds~\cite{fuzzingeval}.
+seeds, which are known as impediments for a fair fuzzing
+evaluation~\cite{fuzzingeval}.
 %
-\dr{wip.}
-
-\dr{say: one but at a time, seed fix (disble single-thread fuzzing), N
-  times of executions,}
+In order to eliminate impacts of such impediments, we disable the
+single-thread fuzzing~(\autoref{ss:singlethreadfuzzing}), and manually
+provide a multi-thread input as well as a pair of system calls that
+can cause each concurrency bug. Then, we observe how each fuzzer
+explore thread interleavings of a given pair of system calls.
+%
+In this way, we can focus on the effectiveness of the thread
+interleaving exploration of each fuzzer without being interrupted by
+the randomness. \dr{N times of executions.}
 
 
 % %
@@ -260,10 +269,13 @@ Compared to the kernel scheduler (\ie, the \texttt{Naive} column)
 \subsubsection{Justification of interleaving segment coverage}
 \label{sss:interleavingcoverage}
 %
-We also justify the choice of our interleaving coverage by comparing .
+We also justify the choice of our interleaving coverage by
+demonstrating what happens if a fuzzer adopts less-informative
+interleaving coverage.
 
 
 \PP{Comparison methodology}
+%
 
 
 \PP{Result}

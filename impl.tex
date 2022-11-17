@@ -11,14 +11,15 @@ described in \autoref{s:design}.
 
 In particular, \sys consists of two stages of fuzzing.
 %
-The first stage is a single-thread fuzzing, which focuses on expanding
-code coverage.\dr{}
+The first stage is a single-thread fuzzing, which focuses on
+identifying two system calls that may expose new interleaving
+segments.
 %
 The second stage is a multi-thread fuzzing to explore thread
 interleavings, and discover concurrency bugs.
 %
 In each stage, \sys traces memory accesses executed by each system
-call to track interleaving segment coverage.
+call to track interleaving segments.
 %
 And in the the second stage, \sys adopts a mechanism to control thread
 scheduling as desired.
@@ -28,8 +29,8 @@ scheduling as desired.
 In the following of subsections, we provide the overall design of
 \sys~(\autoref{ss:fuzzer}), followed by two building blocks of \sys,
 the target kernel instrumentation~(\autoref{ss:instrumentation}) to
-collect memory accesses, and the execution
-engine~(\autoref{ss:engine}) to control thread schedulings.
+trace memory accesses, and the execution engine~(\autoref{ss:engine})
+to control thread schedulings.
 %
 Lastly, we describe the implementation detail of
 \sys~(\autoref{ss:impl}).
@@ -63,6 +64,7 @@ input executor. We explain details of each component in the following.
 
 
 \subsubsection{Single-thread fuzzing}
+\label{ss:singlethreadfuzzing}
 %
 In a single-thread fuzzing stage, the single-thread generator
 generates a single-thread input (refered as $I_{ST}$) in the form of a

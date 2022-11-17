@@ -1,6 +1,31 @@
 \section{Conclusion}
 \label{s:conclusion}
 
+% We proposed RAZZER, a fuzz testing tool tailored to find race
+% bugs. It utilizes a static analysis to spot potential data race points
+% to guide the fuzzer to identify races. Moreover, it modifies the
+% underlying hypervisor to trigger a race deterministically. The
+% evaluation of RAZZER demonstrates its strong capability to
+% detect races. It has thus far detected 30 new races in the Linux
+% kernel, and a comparison study with other state-of-the-art tools,
+% specifically Syzkaller and SKI, demonstrates its outstanding
+% efficiency to detect race bugs in the kernel.
+
+% We perform in-depth studies of Linux kernel concurrency
+% bugs and drive three requirements: comprehensiveness, pattern-
+% agnostic, and conciseness. This work proposes AITIA to sat-
+% isfy the three requirements. AITIA fully automates the process
+% of identifying the root cause of kernel concurrency bugs re-
+% ported from existing bug-finding systems and analyzes the
+% root cause as a form of a causality chain. We evaluate AITIA
+% on 22 real-world concurrency bugs and successfully diagnose
+% six unfixed bugs using AITIA.
+
+
+We propose \sys, a concurrency fuzzer
+
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "p"
