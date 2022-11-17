@@ -284,29 +284,43 @@ search strategies are not properly directed by interleaving coverage,
 and thus, do not satisfy the \textbf{Design goal 2}.
 
 Since Razzer~\cite{razzer} and Snowboard~\cite{snowboard} do not make
-use of interleaving coverage at all, they cannot rely on previous
-executions in inferring unexplored thread interleavings.
+use of interleaving coverage at all, they intrinsically cannot rely on
+explored thread interleavings in inferring unexplored thread
+interleavings.
 %
 Krace~\cite{krace} explores thread interleavings randomly without
-considering what thread interleavings are explored before.
-
-Whereas, Conzzer~\cite{conzzer} is the only work that attempts to
-direct a fuzzer based on interleaving coverage.
+considering what thread interleavings are explored before. In other
+words, Krace utilizes interleaving coverage only when deciding whether
+or not to run a multi-thread input more, but not when inferring which
+thread interleavings to search in future iterations.
 %
-However, its interleaving coverage (\ie, concurrent call pair) tracks
-thread interleavings in the function-level granularity, and is limited
-in distinguishing tested interleavings and untested interleavings in
-the instruction-level granularity.
+Conzzer~\cite{conzzer} is the only work that attempts to direct a
+fuzzer based on interleaving coverage, but it's interleaving coverage
+metric, concurrent call pair, does not capture interleavings of
+instructions, which are true reasons of concurrency bugs.
 %
-In other words, the Conzzer's interleaving search strategy can direct
-a fuzzer to execute two functions \texttt{raw_sendmsg()} and
-\texttt{do_ip_setsockopt()} concurrently.
-%
-But even after that, Conzzer suffers from triggering the uninitialized
-bug since it is not aware of the execution order of instructions.
+As a consequence, none of existing approaches effectively search
+thread interleavings to run in future iterations.
 
 
-\dr{TODO: MUZZ}
+
+% %
+% However, its interleaving coverage (\ie, concurrent call pair) tracks
+% thread interleavings in the function-level granularity, and is limited
+% in distinguishing tested interleavings and untested interleavings in
+% the instruction-level granularity.
+% %
+% In other words, the Conzzer's interleaving search strategy can direct
+% a fuzzer to execute two functions \texttt{raw_sendmsg()} and
+% \texttt{do_ip_setsockopt()} concurrently.
+% %
+% But even after that, Conzzer suffers from triggering the uninitialized
+% bug since it is not aware of the execution order of instructions.
+
+
+
+
+% \dr{TODO: MUZZ}
 
 
 %%% Local Variables:
