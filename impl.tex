@@ -9,17 +9,19 @@ coverage and the coverage-directed interleaving search strategy
 described in \autoref{s:design}.
 %
 
-In particular, \sys consists of two stages of fuzzing.
+In particular, \sys consists of two stages of fuzzing similar with
+recent concurrency fuzzers, Razzer~\cite{razzer} and
+Snowboard~\cite{snowboard}.
 %
 The first stage is a single-thread fuzzing, which focuses on
 identifying two system calls that may expose new interleaving
 segments.
 %
 The second stage is a multi-thread fuzzing to explore thread
-interleavings, and discover concurrency bugs.
+interleavings and discover concurrency bugs.
 %
-In each stage, \sys traces memory accesses executed by each system
-call to track interleaving segments.
+In both stage, \sys traces memory accesses executed by each system
+call to track\dr{} interleaving segments.
 %
 And in the the second stage, \sys adopts a mechanism to control thread
 scheduling as desired.
@@ -27,12 +29,12 @@ scheduling as desired.
 
 
 In the following of subsections, we provide the overall design of
-\sys~(\autoref{ss:fuzzer}), followed by two building blocks of \sys,
-the target kernel instrumentation~(\autoref{ss:instrumentation}) to
-trace memory accesses, and the execution engine~(\autoref{ss:engine})
-to control thread schedulings.
+\sys~(\autoref{ss:fuzzer}).
 %
-Lastly, we describe the implementation detail of
+Then, we describe the target kernel
+instrumentation~(\autoref{ss:instrumentation}) to trace memory
+accesses and the execution engine~(\autoref{ss:engine}) to control
+thread schedulings, followed by the implementation detail of
 \sys~(\autoref{ss:impl}).
 
 
@@ -46,21 +48,14 @@ Lastly, we describe the implementation detail of
 \begin{figure}
   \centering
   \includegraphics[width=0.9\linewidth]{fig/architecture.pdf}
-  \caption{Workflow of \sys \dr{TODO: redraw to describe the workflow}}
+  \caption{An overview of \sys.}
   \label{fig:workflow}
 \end{figure}
 
 
-%The \sys's userspace fuzzer conducts two-stage pipelined fuzzing
-%similar with recent concurrency fuzzers, Razzer~\cite{razzer} and
-%Snowboard~\cite{snowboard}.
-%
-%In \sys, the first stage is a \textit{single-thread} fuzzing that
-%focuses on expanding code coverage\dr{}, and the second stage is a
-%\textit{multi-thread} fuzzing to explore thread interleavings.
-
-In \sys, both single-thread fuzzing multi-thread fuzzing consist of two components, an input generator and an
-input executor. We explain details of each component in the following.
+In \sys, both single-thread fuzzing multi-thread fuzzing consist of
+two components, an input generator and an input executor. We explain
+details of each component in the following.
 
 
 \subsubsection{Single-thread fuzzing}
@@ -73,12 +68,12 @@ sequence of random system calls.
 And then, the single-thread executor executes $I_{ST}$ to perform two
 things.
 %
-First, it tracks code coverage of $I_{ST}$ with the purpose of
-exploring source codes residing deep inside the kernel.
+First, it tracks code coverage of $I_{ST}$ as conventional fuzzing
+does.
 %
 Second, it identifies two system calls in $I_{ST}$ that potentially
 exhibit new interleaving segment coverage.  If identified, $I_{ST}$
-will be handed to the next stage, the multi-thread fuzzing.
+will be passed to the next stage, the multi-thread fuzzing.
 
 
 \PP{Single-Thread Generator}
@@ -129,48 +124,53 @@ explored, \sys keeps $I_{ST}$, and feeds it back to the single-thread
 generator so that the single-thread generator further mutates $I_{ST}$
 to find more branch coverage.
 %
-\dr{remove:}As a result, \sys keeps a minimal set of $I_{ST}$, called
-a corpus, which may execute previously-executed branches when running
-single-thread inputs in the corpus.
+% \dr{remove:}As a result, \sys keeps a minimal set of $I_{ST}$, called
+% a corpus, which may execute previously-executed branches when running
+% single-thread inputs in the corpus.
 
 
-Second, the single-thread executor identifies a pair of system calls
-in $I_{ST}$ that potentially exposes new interleaving coverage if
-executed concurrently.
+\dr{}Second, the single-thread executor identifies a pair of system
+calls in $I_{ST}$ that potentially exposes new interleaving coverage
+if executed concurrently.
 %
-More specifically, for each system call pair ($S_i$, $S_j$), the single-thread
-executor generates interleaving segment graphs from memory accesses of the system call pair.
+More specifically, for each system call pair ($S_i$, $S_j$) in
+$I_{ST}$, the single-thread executor generates a set of interleaving
+segment graphs $G$ from memory accesses executed by ($S_i$, $S_j$).
 %
-While $S_i$ and $S_j$ was not executed concurrently, the single-thread executor does not record generated interleaving segment graphs as interleaving segment coverage, but make us of them to derive unobserved interleaving segment graphs.
+From $G$, the single-thread executor then derives a set of
+\textit{unobserved} interleaivng segments, $G_{derived}$.
 %
-If XXX, then the single-thread executor hands $I_{ST}$, ($S_i$, $S_j$), and XXX to the multi-thread fuzzing.
+If $G_{derived}$ is not empty, the single thread executor passes
+$I_{ST}$ to the next phase, the multi-thread fuzzing.
+
 
 
 \subsubsection{Multi-thread fuzzing}
 \label{sss:multithreadfuzzing}
 %
-After $I_{ST}$ is handed with ($S_i$, $S_j$) and XXX, the multi-thread generator transforms $I_{ST}$ to a
-multi-thread input $I_{MT}$.
+After $I_{ST}$ is passed with ($S_i$, $S_j$) and $G_{derived}$, the
+multi-thread generator transforms $I_{ST}$ to a multi-thread input
+$I_{MT}$.
 %
 In addition, the multi-thread generator generates \textit{schedules}
-where each schedule describes how to enforce thread interleaving (\ie,
-a set of scheduling points) during runtime.
-
-
+where each schedule describes how to enforce thread interleaving
+during runtime.
+%
 The multi-thread executor then repeatedly tests each schedule of
-$I_{MT}$ one at a time with a support of the execution engine..
+$I_{MT}$ one at a time with a support of the execution engine.
+
 
 \PP{Schedule}
 %
 A schedule is a specification of how to control thread scheduling.
 %
-It contains per-system call sequences of scheduling points, where each
-scheduling point is described as a two-tuple, (instruction address,
-scheduling order).
+It contains a starting system call and per-system call sequences of
+scheduling points, where each scheduling point is described as a
+two-tuple, (instruction address, scheduling order).
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.8\linewidth]{fig/schedule.pdf}
+  \includegraphics[width=0.75\linewidth]{fig/schedule.pdf}
   \caption{(a) Thread interleaving to run, and (b) schedule describes
     thread interleaving of (a). \dr{redraw (b)}}
   \label{fig:schedule}
@@ -208,22 +208,39 @@ these preemptions occur, annotated with the order of preemption.
 % A schedule contains an initial thread, and a set of scheduling points
 % indicating an instruction on which preemption occurs.
 %
-The multi-thread generator takes $I_{ST}$, a pair of system calls to run concurrently, and interleaving segment graphs as input. Then, it generates $I_{MT}$ from $I_{ST}$ to 
+The multi-thread generator takes $I_{ST}$, a pair of system calls to run concurrently, and interleaving segment graphs as input. Then, it generates $I_{MT}$ from $I_{ST}$ to
 
 
+\begin{figure}[t]
+  \scriptsize
+  \centering
+  \input{code/gen-mt-rcprog.py}
+  \caption{\sys's multi-thread generator algorithm}
+  \label{f:mt-conversion}
+\end{figure}
 
 
 
 
 \PP{Multi-Thread Executor}
 %
-The purpose of the multi-thread executor is to run $I_{MT}$ while enforcing a schedule given generated by the multi-thread generator.
+The purpose of the multi-thread executor is to run $I_{MT}$ while
+enforcing a schedule generated by the multi-thread generator.
 %
-To this end, the multi-thread executor invokes hypercalls to deliver a schedule to the execution engine before executing system calls of $I_{MT}$.
+To this end, the multi-thread executor gets support from the execution
+engine~(\autoref{ss:engine}), which enforces thread scheduling
+according to a given schedule.
+
+
+While controling thread scheduling
+
+In addition, the multi-thread executor detects a concurrency bug with
+various dynamic tools such as lockdep~\cite{lockdep}, and
+KAsan~\cite{kasan}.
 
 
 
-During the execution of $I_{MT}$, 
+During the execution of $I_{MT}$,
 
 For example, the Linux
 kernel employs various dynamic techniques to detect harmful
@@ -471,7 +488,7 @@ install may not be executed if the control flow changes due to kernel internal s
 %
 For example, when executing a schedule of \autoref{fig:schedule}, it is possible that thread~A may not execute \texttt{A2}, and hit a breakpoint on \texttt{A6}.
 %
-Then, we ignore all scheduling points before \texttt{A6} (\ie, \texttt{A2} and \texttt{B1}), and keep 
+Then, we ignore all scheduling points before \texttt{A6} (\ie, \texttt{A2} and \texttt{B1}), and keep
 enforcing a schedule after \texttt{A6} (\ie, \texttt{B2}).
 
 

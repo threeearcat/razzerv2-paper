@@ -1,0 +1,36 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PY{k}{def} \PY{n+nf}{Convert\PYZus{}Pst\PYZus{}to\PYZus{}Pmt}\PY{p}{(}\PY{n}{Pst}\PY{p}{,} \PY{n}{i}\PY{p}{,} \PY{n}{j}\PY{p}{,} \PY{n}{RP\PYZus{}i}\PY{p}{,} \PY{n}{RP\PYZus{}j}\PY{p}{)}\PY{p}{:}
+    \PY{c+c1}{\PYZsh{} @Pst: A singled threaded program (annotated)}
+    \PY{c+c1}{\PYZsh{} @i, @j: an index of racing syscalls within Pst}
+    \PY{c+c1}{\PYZsh{} @RP\PYZus{}i, @RP\PYZus{}j: an address of a corresponding racepair}
+    \PY{c+c1}{\PYZsh{} instruction (to syscalls[i] and syscalls[j], respectively)}
+
+    \PY{c+c1}{\PYZsh{} Get pinned threads, thr0 and thr1}
+    \PY{n}{thr0} \PY{o}{=} \PY{n}{get\PYZus{}pinned\PYZus{}thread}\PY{p}{(}\PY{n}{vCPU0}\PY{p}{)}
+    \PY{n}{thr1} \PY{o}{=} \PY{n}{get\PYZus{}pinned\PYZus{}thread}\PY{p}{(}\PY{n}{vCPU1}\PY{p}{)}
+
+    \PY{c+c1}{\PYZsh{} Assign syscalls to thr0 and thr1}
+    \PY{n}{syscalls} \PY{o}{=} \PY{n}{get\PYZus{}syscalls}\PY{p}{(}\PY{n}{Pst}\PY{p}{)}
+    \PY{n}{thr0}\PY{o}{.}\PY{n}{add\PYZus{}syscalls}\PY{p}{(}\PY{n}{syscalls}\PY{p}{[}\PY{p}{:}\PY{n}{i}\PY{p}{]}\PY{p}{)}
+    \PY{n}{thr1}\PY{o}{.}\PY{n}{add\PYZus{}syscalls}\PY{p}{(}\PY{n}{syscalls}\PY{p}{[}\PY{n}{i}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{:}\PY{n}{j}\PY{p}{]}\PY{p}{)}
+
+    \PY{c+c1}{\PYZsh{} Determine the execution order}
+    \PY{n}{r} \PY{o}{=} \PY{n}{random}\PY{p}{(}\PY{p}{[}\PY{n}{vCPU0}\PY{p}{,} \PY{n}{vCPU1}\PY{p}{]}\PY{p}{)}
+    \PY{n}{thr0}\PY{o}{.}\PY{n}{add\PYZus{}hypercall}\PY{p}{(}\PY{n}{hcall\PYZus{}order}\PY{p}{(}\PY{n}{r}\PY{p}{)}\PY{p}{)}
+
+    \PY{c+c1}{\PYZsh{} Trigger and check races}
+    \PY{n}{thr0}\PY{o}{.}\PY{n}{add\PYZus{}hypercall}\PY{p}{(}\PY{n}{hcall\PYZus{}set\PYZus{}bp}\PY{p}{(}\PY{n}{vCPU0}\PY{p}{,} \PY{n}{RP\PYZus{}i}\PY{p}{)}\PY{p}{)}
+    \PY{n}{thr0}\PY{o}{.}\PY{n}{add\PYZus{}syscalls}\PY{p}{(}\PY{n}{syscalls}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)}
+    \PY{n}{thr0}\PY{o}{.}\PY{n}{add\PYZus{}hypercall}\PY{p}{(}\PY{n}{hcall\PYZus{}check}\PY{o}{\PYZhy{}}\PY{n}{race}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+
+    \PY{n}{thr1}\PY{o}{.}\PY{n}{add\PYZus{}hypercall}\PY{p}{(}\PY{n}{hcall\PYZus{}set\PYZus{}bp}\PY{p}{(}\PY{n}{vCPU1}\PY{p}{,} \PY{n}{RP\PYZus{}j}\PY{p}{)}\PY{p}{)}
+    \PY{n}{thr1}\PY{o}{.}\PY{n}{add\PYZus{}syscalls}\PY{p}{(}\PY{n}{syscalls}\PY{p}{[}\PY{n}{j}\PY{p}{]}\PY{p}{)}
+    \PY{n}{thr1}\PY{o}{.}\PY{n}{add\PYZus{}hypercall}\PY{p}{(}\PY{n}{hcall\PYZus{}check\PYZus{}race}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+
+    \PY{c+c1}{\PYZsh{} Post\PYZhy{}race behaviors}
+    \PY{n}{thr0}\PY{o}{.}\PY{n}{add\PYZus{}syscalls}\PY{p}{(}\PY{n}{gen\PYZus{}random\PYZus{}syscalls}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+    \PY{n}{thr1}\PY{o}{.}\PY{n}{add\PYZus{}syscalls}\PY{p}{(}\PY{n}{gen\PYZus{}random\PYZus{}syscalls}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+
+    \PY{n}{Pmt} \PY{o}{=} \PY{n}{Construct\PYZus{}Pmt}\PY{p}{(}\PY{n}{thr0}\PY{p}{,} \PY{n}{thr1}\PY{p}{)}
+    \PY{k}{return} \PY{n}{Pmt}
+\end{Verbatim}

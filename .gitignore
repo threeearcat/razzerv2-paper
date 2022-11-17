@@ -12,7 +12,7 @@
 /*.pdf
 /rev.tex
 /abstract.txt
-/code/*.tex
+
 !/code/fmt.tex
 !/figs/*.pdf
 !/figs/*.eps

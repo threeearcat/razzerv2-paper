@@ -182,7 +182,7 @@ interleaving orders.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/alias-coverage.pdf}
+  \includegraphics[width=0.8\linewidth]{fig/alias-coverage.pdf}
   \caption{Two thread interleavings between thread~A and thread~B
     described in \autoref{fig:cve-2017-17712}.
     %
@@ -217,11 +217,9 @@ sees two unexplored interleaving orders (\ie,
 %
 But, when alias coverage faces \texttt{Interleaving \#2} after
 \texttt{Interleaving \#1}, it suffers from locating unobserved unique
-behaviors of \texttt{Interleaving \#2}.
-%
-In \texttt{Interleaving \#2}, there is no unobserved interleaving
-order (\ie, ($\texttt{B1} \Rightarrow \texttt{A4}$) is already
-observed in \texttt{Interleaving \#1}).
+behaviors of \texttt{Interleaving \#2} because there is no unobserved
+interleaving order (\ie, ($\texttt{B1} \Rightarrow \texttt{A4}$) is
+already observed in \texttt{Interleaving \#1}).
 %
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
@@ -240,7 +238,7 @@ place in the same function (\ie, \texttt{A2} and \texttt{A4} are
 executed in the same function).
 %
 Thus, concurrent call pair also shows the same limitation as alias
-coverage when it comes to discovering the uninitialized access bug.
+coverage when it comes to discovering this uninitialized access bug.
 
 
 % is also saturated with these two thread

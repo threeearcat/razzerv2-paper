@@ -1,10 +1,11 @@
 \section{Related work}
 \label{s:relwk}
 
-For decades, immense efforts have been made to effectively discover
-concurrency bugs in the kernel. In this section, we describe prior
-efforts in three categories, kernel fuzzing, controlled concurrency
-testing, and data race detection.
+% For decades, immense efforts have been made to effectively discover
+% concurrency bugs in the kernel.
+%
+In this section, we describe prior efforts in three categories, kernel
+fuzzing, controlled concurrency testing, and data race detection.
 
 
 \PP{Kernel fuzzing}
@@ -15,12 +16,16 @@ coverage-guided fuzzing~\cite{syzkaller, moonshine, healer, hfl, imf,
 to be practical and is widely used in industrial fields.
 %
 For example, Syzkaller~\cite{syzkaller}, a kernel fuzzer developed by
-Google, has found thousands of bugs, and kernel developers very often
-rely on Syzkaller to find vulnerabilities and test their
-implementation.
+Google, has found thousands of bugs through a few years of running.
 %
-To further improve the Syzkaller, and to find vulnerabilities deeper
-inside the kerenl, a number of attempts have been made to incorporate
+% , and kernel developers very often
+% rely on Syzkaller to find vulnerabilities and test their
+% implementation.
+%
+Then, to further improve a kernel fuzzing,
+% the Syzkaller, and to find vulnerabilities deeper inside the kerenl,
+%
+a number of attempts have been made to incorporate
 advanced techniques such as seed distillation~\cite{moonshine},
 relation learning~\cite{healer}, and symbolic execution~\cite{hfl}.
 %
@@ -44,36 +49,39 @@ Controlled concurrnecy testing~\cite{ski, pctalgorithm, sparsernr,
   chess, nagarakatte2012multicore, abdelrasoul2017promoting,
   cai2016radius, mukherjee2020learning, schedulebounding} (abbreviated
 as CCT) introduces an idea of overriding the kernel scheduler and
-testing thread interleavings methodically.
-%
-Specifically, this line of approaches aims to systematically explore
-interleavings of a \textit{given} test scenario.
+methodically testing thread interleavings of a \textit{given} test
+scenario.
 %
 In addition, they adopt various techniques to reduce the search space
-of thread interleavings such as preemption
-bounding~\cite{pctalgorithm, ski}, delay
-bounding~\cite{delaybounding}, and dynamic partial order
-reduction~\cite{dpor1, dpor2, dpor3}.
-
-
-
+of thread interleavings such as
+%
+% preemption bounding~\cite{pctalgorithm, ski}, delay
+% bounding~\cite{delaybounding}, and
+%
+dynamic partial order reduction~\cite{dpor1, dpor2, dpor3}.
+%
 To the best of our knowledge, concurrency fuzzing stems from CCT
 techniques with an idea of merging \textit{the test case generation}
 (\ie, fuzzing) and \textit{the thread interleaving exploration} (\ie,
 CCT).
 %
 Specifically, Razzer~\cite{razzer}, arguably the first concurrency
-fuzzer, states that Razzer is inspired by SKI~\cite{ski}, a CCT
-technique aiming the kernel.
+fuzzer, states that it is inspired by SKI~\cite{ski}, a CCT technique
+aiming the kernel.
 %
-Other concurrency fuzzers~\cite{krace, muzz, snowboard, conzzer} are
-also (at least indirectly) affected by CCT techniques as all of them
-consists of thread scheduling control mechanisms.
+We believe \sys takes one step further in this direction by
+incorporating informative interleaving coverage and coverage-directed
+interleaving search strategy.
 %
-We believe \sys takes one step further in adopting CCT into fuzzing by
-answering two questions, \textit{``what is the proper interleaving
-  coverage metric''} and \textit{``how to utilize interleaving
-  coverage in searching thread interleavings''}.
+% Other concurrency fuzzers~\cite{krace, muzz, snowboard, conzzer} are
+% also (at least indirectly) affected by CCT techniques as all of them
+% consists of thread scheduling control mechanisms.
+%
+% We believe \sys takes one step further in adopting CCT into fuzzing.
+% by
+% answering two questions, \textit{``what is the proper interleaving
+%   coverage metric''} and \textit{``how to utilize interleaving
+%   coverage in searching thread interleavings''}.
 
 
 
@@ -86,8 +94,8 @@ bugs~\cite{lkmm, linuxmemorymodel}.
 %
 These works detect the occurence of two instructions that access the
 same memory address without proper synchronization or ordering.
-
-In fact, data race detectors are intrinsically orthogonal to \sys,
+%
+In fact, data race detectors are essentially orthogonal to \sys,
 thus, data race detectors can be integrated into \sys to provide a
 stronger concurrency bug detection capability.
 %
