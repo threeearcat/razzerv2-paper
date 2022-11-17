@@ -11,7 +11,7 @@ properly addresses characteristics of \textit{offending thread
 %
 As a consequence, previous work either \textbf{1)} disregards a
 multi-thread input in which a concurrency bug reside~\cite{krace,
-  conzzer}, %\yj{use clearer sentence}
+  conzzer}, \yj{use clearer sentence}
 % suffers from
 % identifying whether interesting thread interleavings remain
 % untested
@@ -177,56 +177,80 @@ strategies do not satisfy \textbf{Design goal 1} and \textbf{2}.
 \PP{Less-informative interleaving coverage}
 %
 We find that previously proposed interleaving coverage metrics are
-less-informative 
-%to determine whether a multi-thread input needs to be further tested. 
-because none of them consider a combination of interleaving
-orders. 
-%
-Specifically, alias coverage tracks individual interleaving orders only.
-Concurrent call pair tracks a pair of
-concurrently-executed functions, but they do not differentiate
-interleavings taken place in the same function pair\yj{I do not get this}.
-
-
-
+less-informative because none of them consider a combination of
+interleaving orders.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.95\linewidth]{fig/alias-coverage.pdf}
+  \includegraphics[width=0.9\linewidth]{fig/alias-coverage.pdf}
   \caption{Two thread interleavings between thread~A and thread~B
-    described in \autoref{fig:cve-2017-17712}. The uninitialized
-    access bug does not manifest in both interleavings. We
-    intentionally omits bug-irrelevant memory accesses (\ie,
+    described in \autoref{fig:cve-2017-17712}.
+    %
+    The uninitialized access bug manifests only in
+    \texttt{Interleaving \#2}.
+    %
+    We intentionally omits bug-irrelevant memory accesses (\ie,
     \texttt{A6} and \texttt{B2}).}
   \label{fig:alias-coverage}
 \end{figure}
 
 
-\autoref{fig:alias-coverage} illustrates their limitations.
-It shows two different interleavings that the uninitialized access bug 
-does not manifest. 
 
-%saturate existing interleaving coverage
-%
-In the two interleavings described in this figure, we can observe all
-four individual interleaving orders regarding \texttt{inet->hdrincl}
-(\ie, $\texttt{A2} \Rightarrow \texttt{B1}$ and
-$\texttt{A4} \Rightarrow \texttt{B1}$ in Interleaving~\#1,
-$\texttt{B1} \Rightarrow \texttt{A2}$, and
-$\texttt{B1} \Rightarrow \texttt{A4}$ in Interleaving~\#2).
-%
-Therefore, alias coverage is saturated with these two thread
-interleavings.
-%
-Moreover, concurrent call pair is also saturated with these two thread
-interleavings, because once two functions \texttt{sendmsg()} and
-\texttt{setsockop()} are executed concurrently, concurrnet call pair
-does not matter how a thread interleaving occurs within the function
+For example, let us suppose we adopt alias coverage~\cite{krace},
+which tracks interleaving orders of a \textit{single} instruction
 pair.
+%
+Alias coverage determines a thread interleaving \texttt{X} exposes a
+unique behavior if \texttt{X} contains an unexplored
+directed-instruction pair ($I_W \rightarrow I_R$), where $I_R$ reads a
+value written by $I_W$ and they are executed by different threads.
 
-Therefore, they can possibly be saturated even before a concurrency
-bug is exposed, misleading a fuzzer to de-prioritize a multi-thread
-input in which a concurrency bug resides.
+Then, \autoref{fig:alias-coverage} illustrates the simplified
+explanation of why alias coverage does not satisfy the \textbf{Design
+  goal 1}.
+%
+Assuming \texttt{Interleaving \#1} is executed first, alias covereage
+identifies \texttt{Interleaving \#1} exposes unique behaviors when it
+sees two unexplored directed-instruction pairs (\ie,
+($\texttt{B1} \rightarrow \texttt{A2}$) and
+($\texttt{B1} \rightarrow \texttt{A4}$)).
+%
+But, when alias coverage faces \texttt{Interleaving \#2} after
+\texttt{Interleaving \#1}, it suffers from locating unobserved unique
+behaviors of \texttt{Interleaving \#2}.
+%
+As mentioned above, alias coverage captures a single
+directed-instruction pair.  But in \texttt{Interleaving \#2}, there is
+no unobserved directed-instruction pair (\ie,
+($\texttt{B1} \rightarrow \texttt{A4}$) is already observed in
+\texttt{Interleaving \#1}).
+%
+Therefore, alias coverage may make the wrong decision about whether a
+fuzzer needs to run these two system calls more, misleading a fuzzer
+to de-prioritize a multi-thread input in which a concurrency bug
+resides.
+
+
+Moreover, concurrent call pair~\cite{conzzer} also suffers from
+distinguishing these two thread interleavings.
+%
+While concurrent call pair tracks a concurrently-executed function
+pair, it is not aware of interleavings inside a function.
+%
+And, the two thread interleavings in \autoref{fig:alias-coverage} take
+place in the same function (\ie, \texttt{A2} and \texttt{A4} are
+executed in the same function).
+%
+Thus, concurrent call pair also shows the same limitation as alias
+coverage when it comes to discovering the uninitialized access bug.
+
+
+% is also saturated with these two thread
+% interleavings, because once two functions \texttt{sendmsg()} and
+% \texttt{setsockop()} are executed concurrently, concurrnet call pair
+% does not matter how a thread interleaving occurs within the function
+% pair.
+
 
 
 
