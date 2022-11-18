@@ -75,9 +75,9 @@ instructions) and their interleaving orders as an interleaving segment.
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
     \autoref{fig:cve-2017-17712} that does not cause the concurrency
-    bug, (b) instruction pairs that access the same memory object,
-    and (c) instruction segments composed of two instruction pairs.
-    Note that we intentionally omit instructions that do not access
+    bug, (b) instruction pairs that access the same memory object, and
+    (c) instruction segments composed of two instruction pairs.  Note
+    that we intentionally omit instructions that do not access
     globally-visible memory objects.}
   \label{fig:keyidea}
 \end{figure*}
@@ -89,7 +89,7 @@ Let us assume we execute the two system calls in
 %
 \autoref{fig:keyidea}-(a) represents the thread interleaving of the
 execution, where the uninitialized access bug does not manifest
-because \texttt{B1} is executed after \texttt{A4} (\ie,
+because \texttt{B1} is executed before \texttt{A4} (\ie,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is not satisfied).
 %
@@ -256,9 +256,9 @@ and \texttt{A4} $\rightarrow$ \texttt{B1}.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
-  \caption{\texttt{Segment \#1} and its segment graph. A
-    dotted arrow represents a program order, and solid arrows
-    represent interleaving orders.}
+  \caption{(a) \texttt{Segment \#1} from \autoref{fig:keyidea}, and
+    (b) its segment graph. In (b) a dotted arrow represents a program
+    order, and solid arrows represent interleaving orders.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
 

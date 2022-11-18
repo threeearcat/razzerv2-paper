@@ -6,9 +6,9 @@
 %bug, caused by insufficient thought of concurrent events.
 %
 
-Fuzzing is an automated vulnerability discovery technique which has
-proven its effectiveness by discovering numerous vulnerabilities in
-various softwares such as the Linux kernel.
+% Fuzzing is an automated vulnerability discovery technique which has
+% proven its effectiveness by discovering numerous vulnerabilities in
+% various softwares such as the Linux kernel.
 
 In this section, we introduce conventional fuzzing approaches to
 discover vulnerabilities in the kernel~(\autoref{ss:kernelfuzzing}),
@@ -171,10 +171,10 @@ Throughout decades, a number of fuzzing approaches~\cite{imf,
   syzkaller, moonshine, hfl, healer, janus, hydra, trinity} have been
 proposed to discover vulnerabilities in the kernel.
 %
-These approaches, specifically coverage-guided fuzzing approaches,
-execute a massive number of inputs (\ie, sequences of system calls)
-while a code coverage metric (\eg, branch coverage) tracks the
-execution path that each input explores by using.
+These approaches, specifically coverage-guided fuzzing, execute a
+massive number of inputs (\ie, sequences of system calls) while a code
+coverage metric (\eg, branch coverage) tracks the execution path that
+each input explores.
 %
 In addition, during the execution of inputs, a fuzzer detects
 vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
@@ -184,12 +184,8 @@ vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
 While conventional fuzzing techniques show the practicality even in
 large system softwares, they mostly focus on the \textit{sequential
   aspect} of the execution (\ie, the execution path of a single
-thread), while the concurrency aspect (\ie, thread interleaving) is
+thread), while the concurrency aspect (\ie, a thread interleaving) is
 left uncontrolled.
-%
-% In other words, they are designed to effectively explore source codes
-% residing deep inside the kernel without considering how threads are
-% interleaved during the execution.
 %
 As a consequence, conventional fuzzing approaches are limited in
 discovering concurrency bugs such as race conditions, data races, and
@@ -226,11 +222,11 @@ execution into the fuzzing process.
 Concurrency fuzzers generally repeat the execution of a multi-thread
 input (\eg, a multi-threaded system call sequence) while
 %
-1) capturing unique behaviors of thread interleavings with a
-\textit{interleaivng coverage metric}, and
+1) an \textit{interleaivng coverage metric} captures unique behaviors
+of thread interleavings, and
 %
-2) determining which thread interleave to run on each iteration with a
-\textit{thread interleaving search strategy}.
+2) a \textit{thread interleaving search strategy} determines which
+thread interleaving to run on each iteration.
 
 
 % \PP{Coverage-guided fuzzing}
@@ -277,10 +273,10 @@ To capture unique behaviors of thread interleavings, a few concurrency
 fuzzing approaches~\cite{conzzer, krace} come up with interleaving
 coverage metrics.
 %
-Interleaving coverage metrics are used to track the execution order of
-concurrent events between threads from a finer-granularity (\eg,
-instruction~\cite{krace}) to a coarser-granularity (\eg,
-function~\cite{conzzer}).
+Proposed interleaving coverage metrics are used to track the execution
+order of concurrent events between threads ranging from a
+finer-granularity (\eg, instruction~\cite{krace}) to a
+coarser-granularity (\eg, function~\cite{conzzer}).
 
 Concurrency fuzzers aggregate interleaving coverage while repeatedly
 executing a multi-thread input, and if the multi-thread input no

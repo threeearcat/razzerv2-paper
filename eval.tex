@@ -176,7 +176,7 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
   \caption{Result of the comparison study against various
     state-of-the-art kernel concurrency fuzzers (\ie,
     Krace~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
-    number of executions and the elapsed time (in ms) required to
+    number of executions and the elapsed time (ms) required to
     discover each concurrency bug. The \texttt{Naive} column indicates
     the kernel scheduler (\ie, no thread scheduling control applied).}
   \label{table:comparison-interleaving-search}
@@ -214,7 +214,7 @@ seeds, which are known as impediments for a fair fuzzing
 evaluation~\cite{fuzzingeval}.
 %
 In order to eliminate impacts of such impediments, we disable the
-single-thread fuzzing~(\autoref{ss:singlethreadfuzzing}), and manually
+single-thread fuzzing~(\autoref{sss:singlethreadfuzzing}), and manually
 provide a multi-thread input as well as a pair of system calls that
 can cause each concurrency bug. Then, we observe how each fuzzer
 explore thread interleavings of a given pair of system calls.
@@ -247,31 +247,44 @@ the randomness. \dr{N times of executions.}
 \autoref{table:comparison-interleaving-search} shows the comparison
 result.
 %
-As the table shows, the difficulty of discovering varies from bug to
-bug. For example, CVE-2018-12232 appears the easiest concurrency bug
-to discover since it can be discovered within 40 executions even
-without any thread scheduling control mechanism.
+In this table, \texttt{\sys}, \texttt{Snowboard}, and \texttt{Krace}
+columns display the number of executions and the elapsed time taken by
+their corresponding works, and the \texttt{Naive} column corresponds
+to the kernel scheduler without any thread scheduling control enabled.
 %
-On the other hand, three concurrency bugs, CVE-2019-6974,
-CVE-2019-11486, and \texttt{69e16d01d1de}, hard to discover with the
+
+%
+Looking at the \texttt{Naive} column, we can identify the difficulty
+of discovering varies from bug to bug.
+%
+For example, CVE-2018-12232 appears as the easiest concurrency bug to
+discover since it can be discovered within 40 executions even with the
 kernel scheduler.
+%
+On the other hand, the kernel scheduler fails to discover three
+concurrency bugs, CVE-2019-6974, CVE-2019-11486, and
+\texttt{69e16d01d1de} within 10K times of executions.
 
 
+Regardless of the difficulty of discovering concurrency bugs, however,
+\sys can discover all of concurrency bugs extremely fast.
+%
+\sys can discover a given concurrency bug in just 9.3 runs on average,
+ranging from 3 to 21.
+%
+Whereas, \dr{}
 
-Regardless of the difficulty of discovering concurrency bugs, \sys can
-discover all of concurrency bugs extremely fast.
-\dr{wip.}
+As a consequence, 
 
-Compared to the kernel scheduler (\ie, the \texttt{Naive} column)
 
 
 
 \subsubsection{Justification of interleaving segment coverage}
 \label{sss:interleavingcoverage}
 %
-We also justify the choice of our interleaving coverage by
-demonstrating what happens if a fuzzer adopts less-informative
-interleaving coverage.
+We also justify the choice of our interleaving coverage by showing
+what happens if a fuzzer adopts less-informative interleaving
+coverage.
 
 
 \PP{Comparison methodology}
@@ -280,6 +293,8 @@ interleaving coverage.
 
 \PP{Result}
 %
+
+As expected, 
 
 
 
@@ -293,6 +308,7 @@ interleaving coverage.
 % cve-2017-17712 X
 % cve-2017-2636 X
 % cve-2017-7533 X
+% cve-2018-12232 X
 % cve-2019-6974 X
 % cve-2019-11486 X
 % 69e16d01d1d O
