@@ -486,6 +486,8 @@ ready. When all threads invoke \texttt{hcall_ready()}, the execution
 engine wakes them up, and the threads start executing system calls
 (\C{3}).
 
+\dr{installing BPs}
+
 
 During the execution of system calls, only one thread is allowed to
 run. In \autoref{fig:workflow-hypervisor}, thread~A (\ie,
@@ -628,48 +630,32 @@ We implement \sys in various software layers as follows:
 The target kernel instrumentation~(\autoref{ss:instrumentation}) is
 implemented in two parts, a compiler pass and callback functions. The
 compiler pass is implemented on the LLVM compiler suite
-12.0.1~\cite{llvm} by modifying two existing LLVM passes, the
-\texttt{SanitizerCoverage} pass~\cite{kcovpass} (for tracing basic
-blocks) and the \texttt{ThreadSanitizer} pass~\cite{tsanpass} (for
-tracing memory accesses).
+12.0.1~\cite{llvm} with 323~\footnote{We use scc~\cite{scc} and
+  sloccount~\cite{sloccount} to measure LoC of GO and C, C++
+  respectively.} LoC in C++, and, the callback functions are
+implemented in the Linux kernel source tree with 265 LoC in C.
 %
-And, the callback functions are implemented in the Linux kernel source
-tree.
-%
-Thus, when compiling the kernel, our callbacks are also compiled into
-the kernel binary.
-
-
 The execution engine~(\autoref{ss:engine}) is implemented on QEMU
-6.0.0, and leverages KVM (Kernel-based Virtual Machine) to take
-advantage of hardware acceleration.
+6.0.0 with 1662 LoC in C, and leverages KVM (Kernel-based Virtual
+Machine) to take advantage of hardware acceleration.
 %
-To allow hypercalls from the guest user space, we also modify the KVM
-module of the host kernel.
+% In addition, the trampoline is enclosed into the target kernel source
+% tree as a loadable module.
 %
-In addition, the trampoline is enclosed into the target kernel source
-tree as a loadable module.
-
-
 Lastly, the \sys's userspace fuzzer~(\autoref{ss:fuzzer}) is
 implemented based on \texttt{Syzkaller}~\cite{syzkaller}, a kernel
-fuzzer developed by Google.
+fuzzer developed by Google, with 3334 LoC in GoLang and 341 LoC in C++.
 
 
 
-\PP{Lines of Code}
-%
-We use scc~\cite{scc} and sloccount~\cite{sloccount} to measure LoC of
-GO and C, C++ respectively.
-%
-To summarize, the target kernel
-instrumentation~(\autoref{ss:instrumentation}) is implemented with 323
-LoC in C++ (for the compiler pass) and 265 LoC in C (for callback
-functions).
-%
-The execution engine~(\autoref{ss:engine}) is implemented with 1662
-LoC in C. And the userspace fuzzer~(\autoref{ss:fuzzer}) is
-implemented with 3334 LoC in GoLang and 341 LoC in C++.
+% To summarize, the target kernel
+% instrumentation~(\autoref{ss:instrumentation}) is implemented with 323
+% LoC in C++ (for the compiler pass) and 265 LoC in C (for callback
+% functions).
+% %
+% The execution engine~(\autoref{ss:engine}) is implemented with 1662
+% LoC in C. And the userspace fuzzer~(\autoref{ss:fuzzer}) is
+% implemented with 3334 LoC in GoLang and 341 LoC in C++.
 
 % the compiler pass is implmented in 323 lines of C++
 % the callback functions are implmeneted in 265 lines of C
