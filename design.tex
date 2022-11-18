@@ -369,13 +369,16 @@ search unexplored \intcov.
 %
 The first step is to infer unexplored interleaving segment graphs from
 explored interleaving segment graphs.
+
+When executing a thread interleaving, we can obtain a set of
+interleaving segment graphs, and let us denote
+$G = \{g_1, g_2, ..., g_n \}$ as this set of interleaving graphs.
 %
-Let us denote $S_{new} = \{g_1, g_2, ..., g_n \}$ as a set of newly
-explored interleaving segment graphs from a given interleaving, where
-each $g_i$ denotes an interleaving segment graph.
+Since $G$ is obtained after executing the thread interleaving, all
+$g_i$s are \textit{explored}.
 %
-Then, we generates $S^{i}_{derived}$, a set of derived segment graphs
-for each segment graph $g_i$ by permuting interleaving-order edges in
+Then, for each interleaving segment graph $g_i$, we drive other
+interleaving segment graphs by permuting interleaving-order edges in
 $g_i$.
 
 
@@ -389,20 +392,22 @@ $g_i$.
   \label{fig:interleavingmutation}
 \end{figure}
 %
-
-\autoref{fig:interleavingmutation} illustrates three examples of
-derived segment graphs.
+\autoref{fig:interleavingmutation} illustrates how we derive
+interleaving segment graphs from $g_i$.
 %
-The fuzzer flips $\texttt{A4} \Rightarrow \texttt{B1}$ from a given
-\texttt{Segment \#1} to generate another segment graph described in
-(a).
+In this figure, $g_i$ is an interleaving segment graph in
+\autoref{fig:interleavingsegmentgraph}-(b).
+%
+With this $g_i$, we can \textit{flip}
+$\texttt{A4} \Rightarrow \texttt{B1}$, resutlting an interleaving
+segment graph described in (a).
 %
 The semantic behind ``\textit{flipping an interleaving edge}'' is
 simple; it changes the interleaving order of an instruction pair that
 access the shared data.
 %
-Likewise, the fuzzer generates a segment graph of (b) by flipping both
-of $\texttt{A2} \Rightarrow \texttt{B1}$ and
+Likewise, we generate a segment graph of (b) by flipping both of
+$\texttt{A2} \Rightarrow \texttt{B1}$ and
 $\texttt{A4} \Rightarrow \texttt{B1}$.
 %
 Besides (a) and (b), flipping $\texttt{A2} \Rightarrow \texttt{B1}$
@@ -410,6 +415,9 @@ can generate the segment graph described in (c). However, This segment
 graph is excluded because it contains a loop; a loop indicates a
 contradiction on the execution order that any vertex on the loop
 should be executed before itself.
+%
+Therefore, in this fugure, we can derive two \textit{unobserved}
+interleaving segment graphs.
 
 
 
@@ -425,25 +433,34 @@ should be executed before itself.
 
 
 
-After deriving interleaving segment graphs, the fuzzer unions all sets
-of derived interleaving segment graphs such that
-$S_{derived} = S^{1}_{derived} \cup S^{2}_{derived} \cup ... \cup
-S^{n}_{derived}$, and uses $S_{derived}$ later to generate scheduling
-points.
+After deriving interleaving segment graphs for all $g_i$, we aggregate
+all derived and unobserved interleaving segment graphs into
+$G_{derived}$. and uses it to generate scheduling points.
 
 
 
 
-\PP{Selecting interleaving segments to direct the fuzzer}
+\PP{Searching a thread interleaving}
 %
-As described  \autoref{fig:hint}, multiple segment graphs can be
-explored at a time (\ie, one thread interleaving comprises multiple
-interleaving segments).
+With $G_{derived}$, we could naively test unobserved interleaving
+segment graphs in $G_{derived}$ one-by-one.
 %
-Thus, our strategy to to quickly consume $S_{derived}$ (\ie, a set of
-derived and unexplored segment graphs) is selecting multiple
-interleaving segments from $S_{derived}$, and explore them altogether.
+Instead, we choose a \textit{starter} way to consume $G_{derived}$.
+%
+We select a subset of $G_{derived}$, $G^{*}_{derived}$, and search for
+a thread interleaving to explore all unobserved interleaving segment
+graphs in $G^{*}_{derived}$ at once.
 
+%
+% As described  \autoref{fig:hint}, multiple segment graphs can be
+% explored at a time (\ie, one thread interleaving comprises multiple
+% interleaving segments).
+% %
+% Thus, our strategy to to quickly consume $S_{derived}$ (\ie, a set of
+% derived and unexplored segment graphs) is selecting multiple
+% interleaving segments from $S_{derived}$, and explore them altogether.
+
+\dr{wip}
 
 
 

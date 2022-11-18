@@ -150,16 +150,16 @@ sequentially.
 %
 Instead, the single-thread executor makes use of $G_{(i,j)}$ to derive
 a set of \textit{unobserved} interleaivng segment graphs
-$G^{*}_{(i,j)}$.
+$G^{derived}_{(i,j)}$.
 %
 To this end, for each interleaving segment graph $g \in G_{(i,j)}$,
 the single-thread executor derives new interleaving segment graphs
 (refer to \autoref{fig:interleavingmutation}), and puts ones that
-unobserved before in $G^{*}_{(i,j)}$.
+unobserved before in $G^{derived}_{(i,j)}$.
 %
-Lastly, if $G^{*}_{(i,j)}$ is not empty, the single thread
+Lastly, if $G^{derived}_{(i,j)}$ is not empty, the single thread
 executor passes $I_{ST}$ as well as ($S_i$, $S_j$) and
-$G^{*}_{(i,j)}$ to the next phase, the multi-thread fuzzing.
+$G^{derived}_{(i,j)}$ to the next phase, the multi-thread fuzzing.
 
 
 
@@ -167,7 +167,7 @@ $G^{*}_{(i,j)}$ to the next phase, the multi-thread fuzzing.
 \label{sss:multithreadfuzzing}
 %
 After $I_{ST}$ is passed with ($S_i$, $S_j$) and
-$G^{*}_{(i,j)}$, the \textit{multi-thread generator} transforms
+$G^{derived}_{(i,j)}$, the \textit{multi-thread generator} transforms
 $I_{ST}$ to a multi-thread input $I_{MT}$.
 %
 In addition, the multi-thread generator produces \textit{schedules}
@@ -248,24 +248,26 @@ $I_{MT}$ which preserves all system calls in $I_{ST}$, but executes
 $S_i$ and $S_j$ concurrently.
 %
 Assuming, $0 < i < j < n$, where n is the total number of syscalls in
-$I_{ST}$, the input transformation is simply done by splitting
-$I_{ST}$ into two parts, XXX and YYY.
+$I_{ST}$, the input transformation is simply done by dividing
+$I_{ST}$ into two parts.
+
 %
 Then, the multi-thread generator assigns XXX to thread0, and YYY to
 thread1.
 
 
 
-On the other hand, the multi-thread generator keeps producing
-schedules to 
+
+On the other hand, the multi-thread generator repeatedly produces
+various schedules.
 %
 To generating schedules, the multi-thread generator takes
-$G^{*}_{(i,j)}$ as input.
+$G^{derived}_{(i,j)}$ as input.
 %
-The multi-thread generator selects interleaving segment graphs from
-$G^{*}_{(i,j)}$
+Then, for each repetition, the multi-thread generator selects a subset
+of $G^{derived}_{(i,j)}$, $G^{*}_{(i,j)}$, that are XXX.
 
-\dr{}
+
 
 
 
