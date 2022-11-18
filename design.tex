@@ -341,6 +341,9 @@ graphs.
 
 
 \PP{Utilizing interleaving segment coverage}
+%
+\dr{I think it would be clearer not to mention alias coverage}
+%
 Compared to the alias coverage, \intcov and the form of interleaving graph
 express semantically richer information. \Intcov captures combinations 
 of multiple memory-accessing instructions as a unit of an interleaving segment, which allows a fuzzer to explore the large search space more quickly than using alias coverage, which uses a single instruction interleaving. Intuitively, across two different runs, \intcov can precisely tell 
