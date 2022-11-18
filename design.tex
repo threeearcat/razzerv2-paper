@@ -26,19 +26,27 @@ to quickly saturate the coverage metric (\textbf{Design goal 2})~(\autoref{ss:sc
     %involved in the manifestation of a concurrency bug. \yj{Do we need
       %the table?} \dr{No. we can remove this.}}
   %\label{table:learningfrommistakes}
-%\end{table}
+  % \end{table}
 
+
+\dr{I mark unnatural sentences in orange}
+
+\orange{
 When fuzzing concurrency bugs with a coverage metric, the fundamental challenge is its large search space because
 the combinations of thread interleavings increase the 
-the search space exponentially. Therefore, this work seek to 
+the search space exponentially.
+}
+Therefore, this work seek to 
 strike the balance
 in the trade-off between bug-finding capability and search 
-complexity. Observed by a previous study~\cite{learningfrommistakes},
-%as shown in \autoref{table:learningfrommistakes},
+complexity.
+\orange{
+Observed by a previous study~\cite{learningfrommistakes},
 92.4\% (97 out of
 105) of concurrency bugs manifest when a bug-finding system 
 monitors instruction execution orders including \textit{at most} 
 four memory accesses referring to the same memory object.
+}
 All other memory
 accesses beyond four accesses and their execution orders do not
 meaningfully affect manifestation of a concurrency bug. 
@@ -50,12 +58,16 @@ concurrency bug.
 
 
 \PP{Segmentizing thread interleaving}
+\orange{
 To reduce the search complexity, we take the classical wisdom of problem decomposition where 
 complexity of a problem exponentially decreases as the problem size decreases.
+}
 Our key strategy is \textit{decomposing} the search space into 
 small sub-spaces. We call a sub-space \textit{interleaving segment}.
+\orange{
 Each interleaving segment consists of instructions accessing 
 the same memory addresses (i.e., conflicting instructions).
+}
 When constructing a interleaving segment, following the observation, 
 we confine the size of a interleaving segment 
 to contain interleaved instructions including at most four memory accesses,

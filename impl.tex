@@ -20,21 +20,24 @@ segments.
 The second stage is a multi-thread fuzzing to explore thread
 interleavings and discover concurrency bugs.
 %
-In both stage, \sys traces memory accesses executed by each system
-call for probing interleaving segments.
+In both stage, \sys traces timestamp-annotated memory accesses
+executed by each system call for probing unobserved interleaving
+segments.
 %
-And in the the second stage, \sys adopts a mechanism to control thread
+And in the second stage, \sys adopts a mechanism to control thread
 scheduling as desired.
 
 
 
-In the following of subsections, we provide the overall design of
+In the following, we provide the overall design of
 \sys~(\autoref{ss:fuzzer}).
 %
 Then, we describe the target kernel
 instrumentation~(\autoref{ss:instrumentation}) to trace memory
-accesses and the execution engine~(\autoref{ss:engine}) to control
-thread schedulings, followed by the implementation detail of
+accesses, and the execution engine~(\autoref{ss:engine}) to control
+thread scheduling.
+%
+Lastly, we explain the implementation detail of
 \sys~(\autoref{ss:impl}).
 
 
@@ -48,7 +51,7 @@ thread schedulings, followed by the implementation detail of
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/architecture.pdf}
-  \caption{An overview of \sys's architecture. \dr{interleaving coverage is missing}}
+  \caption{An overview of \sys's architecture.}
   \label{fig:workflow}
 \end{figure}
 
@@ -62,28 +65,26 @@ details of each component in the following.
 \subsubsection{Single-thread fuzzing}
 \label{sss:singlethreadfuzzing}
 %
-In a single-thread fuzzing stage, the single-thread generator
-generates a single-thread input (refered as $I_{ST}$) in the form of a
+In a single-thread fuzzing stage, the \textit{single-thread generator}
+produces a single-thread input (refered as $I_{ST}$) in the form of a
 sequence of random system calls.
 %
-And then, the single-thread executor executes $I_{ST}$ to perform two
-things.
+And then, the \textit{single-thread executor} runs $I_{ST}$ to perform
+two things.
 %
 First, it tracks code coverage of $I_{ST}$ as conventional fuzzing
-does.
-%
-Second, it identifies two system calls in $I_{ST}$ that potentially
-exhibit new interleaving segment coverage.  If identified, $I_{ST}$
-will be passed to the next stage, the multi-thread fuzzing.
+does. Second, it identifies two system calls in $I_{ST}$ that
+potentially exhibit new interleaving segment coverage.  If identified,
+$I_{ST}$ will be passed to the next stage, the multi-thread fuzzing.
 
 
-\PP{Single-Thread Generator}
+\PP{Single-thread generator}
 %
 The single-thread generator is similar with conventional
 fuzzing~\cite{syzkaller}.
 %
 It constructs a single-threaded system call sequence $I_{ST}$ with two
-strategies: generation and mutation.
+strategies, generation and mutation.
 %
 When using the generation strategy, \sys randomly generates a system
 call sequence based on well-formed system call description grammar
@@ -91,25 +92,27 @@ call sequence based on well-formed system call description grammar
 %
 \texttt{Syzlang} describes templates of available system calls
 including types of arguments and the type of a return value, as well
-as a range of feasible values of each arguments.
+as a range of feasible values of each argument.
 %
 According to \texttt{Syzlang}, \sys produces a single-thread system
 call sequence by repeatedly selecting a random system call and
 providing reasonable arguments of the system call.
 
 The mutation strategy is an alternative of the generation strategy.
-When using a mutation strategy, \sys picks up a already-generated
+When using a mutation strategy, \sys picks up an already-generated
 single-thread input, and modifies the single-thread input by appending
 additional system calls, removing existing system calls, or changing
 values of arguments of existing system calls.
 
 
-\PP{Single-Thread Executor}
+\PP{Single-thread executor}
 %
 Given $I_{ST}$ from the single-thread generator, the single-thread
-executor runs $I_{ST}$, and traces basic blocks and memory accesses
-executed by each system call with a support from instrumentation
-detailed in \autoref{ss:instrumentation}.
+executor runs $I_{ST}$.
+%
+During the execution, the single-thread executor traces basic blocks
+and memory accesses executed by each system call with a support from
+instrumentation detailed in \autoref{ss:instrumentation}.
 
 With traced basic blocks and memory accesses, the single-thread
 executor conducts two tasks.
@@ -124,41 +127,57 @@ Then, if $I_{ST}$ exposes new branch coverage that has not been
 explored, \sys keeps $I_{ST}$, and feeds it back to the single-thread
 generator so that the single-thread generator further mutates $I_{ST}$
 to find more branch coverage.
-%
-% \dr{remove:}As a result, \sys keeps a minimal set of $I_{ST}$, called
-% a corpus, which may execute previously-executed branches when running
-% single-thread inputs in the corpus.
 
 
-\dr{}Second, the single-thread executor identifies a pair of system
-calls in $I_{ST}$ that potentially exposes new interleaving coverage
-if executed concurrently.
+Second, the single-thread executor identifies a pair of system calls
+in $I_{ST}$ that potentially exposes new interleaving coverage if
+executed concurrently.
 %
 More specifically, for each system call pair ($S_i$, $S_j$) in
 $I_{ST}$, the single-thread executor generates a set of interleaving
-segment graphs $G$ from memory accesses executed by ($S_i$, $S_j$).
+segment graphs $G_{(i,j)}$ from memory accesses executed by $S_i$ and
+$S_j$.
 %
-From $G$, the single-thread executor then derives a set of
-\textit{unobserved} interleaivng segments, $G_{derived}$.
+It is worth noting that $S_i$ and $S_j$ were executed
+\textit{sequentially}. However, the single-thread executor still can
+generate interleaving segment graphs from $S_i$ and $S_j$ in a form
+similar to \autoref{fig:interleavingsegmentgraph}. \dr{TODO: rewrite}
+
+
+
+The single-thread executor does not record $G_{(i,j)}$ in the
+interleaving segment coverage because $S_i$ and $S_j$ were executed
+sequentially.
 %
-If $G_{derived}$ is not empty, the single thread executor passes
-$I_{ST}$ to the next phase, the multi-thread fuzzing.
+Instead, the single-thread executor makes use of $G_{(i,j)}$ to derive
+a set of \textit{unobserved} interleaivng segment graphs
+$G^{*}_{(i,j)}$.
+%
+To this end, for each interleaving segment graph $g \in G_{(i,j)}$,
+the single-thread executor derives new interleaving segment graphs
+(refer to \autoref{fig:interleavingmutation}), and puts ones that
+unobserved before in $G^{*}_{(i,j)}$.
+%
+Lastly, if $G^{*}_{(i,j)}$ is not empty, the single thread
+executor passes $I_{ST}$ as well as ($S_i$, $S_j$) and
+$G^{*}_{(i,j)}$ to the next phase, the multi-thread fuzzing.
 
 
 
 \subsubsection{Multi-thread fuzzing}
 \label{sss:multithreadfuzzing}
 %
-After $I_{ST}$ is passed with ($S_i$, $S_j$) and $G_{derived}$, the
-multi-thread generator transforms $I_{ST}$ to a multi-thread input
-$I_{MT}$.
+After $I_{ST}$ is passed with ($S_i$, $S_j$) and
+$G^{*}_{(i,j)}$, the \textit{multi-thread generator} transforms
+$I_{ST}$ to a multi-thread input $I_{MT}$.
 %
-In addition, the multi-thread generator generates \textit{schedules}
+In addition, the multi-thread generator produces \textit{schedules}
 where each schedule describes how to enforce thread interleaving
 during runtime.
 %
-The multi-thread executor then repeatedly tests each schedule of
-$I_{MT}$ one at a time with a support of the execution engine.
+The \textit{multi-thread executor} then repeatedly tests each schedule
+of $I_{MT}$ one at a time with a support of the execution
+engine~(\autoref{ss:engine}).
 
 
 \PP{Schedule}
@@ -166,8 +185,8 @@ $I_{MT}$ one at a time with a support of the execution engine.
 A schedule is a specification of how to control thread scheduling.
 %
 It contains a starting system call and per-system call sequences of
-scheduling points, where each scheduling point is described as a
-two-tuple, (instruction address, scheduling order).
+scheduling points that each scheduling point is described as a
+two-tuple (instruction address, scheduling order).
 
 \begin{figure}[t]
   \centering
@@ -182,10 +201,10 @@ to run a thread interleaving in \autoref{fig:schedule}-(a), the
 execution should start with \texttt{sendmsg()}. So the schedule states
 that a starting syscall is \texttt{sendmsg()}.
 %
-Then, in \autoref{fig:schedule}-(a), four preemptions (including the
-end of system calls) are required at \texttt{A2}, \texttt{B1},
-\texttt{A6}, and \texttt{B2}, and each schedule point denotes on which
-these preemptions occur, annotated with the order of preemption.
+Then, in \autoref{fig:schedule}-(a), three preemptions (excluding the
+end of system calls) are required at \texttt{A2}, \texttt{B1}, and
+\texttt{A4}. Each schedule point denotes an instruction on which a
+preemptions occurs, annotated with the order of preemption.
 
 
 %During fuzzing, the userspace fuzzer keeps generating different
@@ -195,7 +214,7 @@ these preemptions occur, annotated with the order of preemption.
 
 
 
-\PP{Multi-Thread Generator}
+\PP{Multi-thread generator}
 %
 % In order to use interleaving graph as interleaving coverage, we need a
 % method to store them, and compare them to a new interleaving graph.
@@ -212,25 +231,44 @@ these preemptions occur, annotated with the order of preemption.
 The multi-thread generator has two roles, transforming $I_{ST}$ into a
 multi-thread input $I_{MT}$ and generating various schedules.
 
-Transforming $I_{ST}$ into $I_{MT}$ is simple; XXX
+
+
+
+
+% \begin{figure}[t]
+%   \scriptsize
+%   \centering
+%   \input{code/gen-mt-rcprog.py}
+%   \caption{\sys's multi-thread generator algorithm. \dr{Seems too
+%       much}}
+%   \label{f:mt-conversion}
+% \end{figure}
 %
+Given $I_{ST}$ and ($S_i$, $S_j$), the multi-thread generator produces
+$I_{MT}$ which preserves all system calls in $I_{ST}$, but executes
+$S_i$ and $S_j$ concurrently.
+%
+Assuming, $0 < i < j < n$, where n is the total number of syscalls in
+$I_{ST}$, the input transformation is simply done by splitting
+$I_{ST}$ into two parts, XXX and YYY.
+%
+Then, the multi-thread generator assigns XXX to thread0, and YYY to
+thread1.
+
+
+
+To generating schedules, the multi-thread generator takes
+$G^{*}_{(i,j)}$ as input.
+%
+The multi-thread generator selects interleaving segment graphs from
+$G^{*}_{(i,j)}$
+
+\dr{}
 
 
 
 
-\begin{figure}[t]
-  \scriptsize
-  \centering
-  \input{code/gen-mt-rcprog.py}
-  \caption{\sys's multi-thread generator algorithm. \dr{Seems too
-      much}}
-  \label{f:mt-conversion}
-\end{figure}
-
-
-
-
-\PP{Multi-Thread Executor}
+\PP{Multi-thread executor}
 %
 The multi-thread executor runs $I_{MT}$ while enforcing a schedule
 generated by the multi-thread generator.
@@ -260,13 +298,16 @@ $I_{MT}$ and the executed thread interleaving.
 
 
 
-After executing $I_{MT}$, the multi-thread executor collect memory
-accesses that racing system calls executed.
+If $I_{MT}$ is executed without causing an abnormal behavior, the
+multi-thread executor collects memory accesses that racing system
+calls executed.
 %
 With these memory accesses, the multi-thread executor probes for
-interleaving segment coverage. In addition, it derives more unobserved
-interleaving segments, and feeds them to the multi-thread generator to
-further explore thread interleavings.
+interleaving segment coverage as described in
+\autoref{ss:coverage}. In addition, it derives more unobserved
+interleaving segment graphs as the single-thread executor does, and
+feeds unobserved interleaving segment graphs to the multi-thread
+generator to further explore thread interleavings.
 
 
 
@@ -280,9 +321,11 @@ further explore thread interleavings.
 \sys requires to trace basic blocks (for code coverage) and memory
 accesses (for interleaving coverage) executed by each system call.
 %
-To this end, \sys incorporates a compiler pass that inserts callback
+For this, \sys incorporates a compiler pass that inserts callback
 function calls 1) at the beginning of each basic block, and 2) before
 each instruction that accesses globally-visible memory objects.
+%
+In addition, memory accesses should be annotated with timestamps.
 %
 These callback functions records executed basic blocks and memory
 accesses into memory regions shared between the user space and the
@@ -315,12 +358,15 @@ During runtime, \texttt{trace_basicblock()} takes the starting address
 of basic block as input (\ie, \texttt{A3}), and records the starting
 address into \texttt{Basicblock record}.
 %
-On the other hand, \texttt{trace_access()} takes four parameters, the
+On the other hand, \texttt{trace_access()} takes five parameters, the
 address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
 the instruction address accessing the memory object (\ie,
-\texttt{A2}), the size of the memory access (\ie, \texttt{1}), and
-the type of the memory access (\ie, \texttt{read}), and records them
-into \texttt{Memory access record}.
+\texttt{A2}), the size of the memory access (\ie, \texttt{1}), the
+type of the memory access (\ie, \texttt{read}), and the timestamp of
+when the memory access occurrs (\ie, \texttt{ts}).
+%
+\texttt{trace_access()} then records these five arguments into
+\texttt{Memory access record}.
 
 
 
@@ -381,9 +427,7 @@ memory accesses that it executed.
 the userspace fuzzer that it can control thread scheduling.
 %
 The execution engine is implemented in the hypervisor layer to be
-non-intrusive to the kernel execution, and the userspace fuzzer can
-request the execution engine to control thread scheduling through
-hypercall interfaces.
+non-intrusive to the kernel execution.
 
 
 
@@ -415,15 +459,19 @@ calls according to the given schedule.
 engine.
 %
 At the beginning, the userspace fuzzer spawns threads, where each
-thread is assigned a system call annotated with scheduling points.
+thread is assigned a system call annotated with scheduling points
+(\C{1}).
 %
-Then, each thread invokes hypercalls (\ie,
-\texttt{hcall_scheduling_point()}) to deliver scheduling points to the
-execution engine, followed by a hypercall \texttt{hcall_ready()} that
-sleeps until all threads are ready.
+Then, each thread invokes hypercalls to deliver scheduling points to
+the execution engine (\C{2}). In \sys, three types of hypercalls are
+used; \texttt{hcall_XXX()} to inform the starting system call,
+\texttt{hcall_sched()} to deliever a single scheduling point, and
+\texttt{hcall_ready()} to notify that a calling thread is ready.
 %
 After all threads invoke \texttt{hcall_ready()}, the execution engine
-wakes them up, and the threads start executing system calls.
+wakes them up, and the threads start executing system calls (\C{3}).
+
+
 
 
 \dr{}

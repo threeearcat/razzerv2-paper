@@ -273,8 +273,8 @@ To capture unique behaviors of thread interleavings, a few concurrency
 fuzzing approaches~\cite{conzzer, krace} come up with interleaving
 coverage metrics.
 %
-Proposed interleaving coverage metrics are used to track the execution
-order of concurrent events between threads ranging from a
+These interleaving coverage metrics are used to track the execution
+order of concurrent events between threads, ranging from a
 finer-granularity (\eg, instruction~\cite{krace}) to a
 coarser-granularity (\eg, function~\cite{conzzer}).
 
@@ -346,7 +346,7 @@ fuzzer adopts a thread interleaving search strategy (shortly, an
 interleaving search strategy).
 %
 For instance, for every execution, Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard} determines the execution order of a single
+Snowboard~\cite{snowboard} enforces the execution order of a single
 pair of instructions, and Krace~\cite{krace} randomly determins a
 thread interleaving to run.
 %
