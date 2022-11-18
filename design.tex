@@ -216,10 +216,6 @@ In this way, \textit{our proposed scheduler mechanism is designed to
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-\newcommand{\mutable}{mutable edge\xspace}
-\newcommand{\mutables}{mutable edges\xspace}
-\newcommand{\immutable}{immutable edge\xspace}
-\newcommand{\immutables}{immutable edges\xspace}
 \newcommand{\intcov}{interleaving segment coverage\xspace}
 \newcommand{\Intcov}{Interleaving segment coverage\xspace}
 
@@ -359,12 +355,12 @@ but the alias coverage can tell at least one\yj{DR, it this claim OK to you?}.
 \Intcov provides guiding feedback to a fuzzer.
 \Intcov guides the fuzzer to identify that there are possibly more useful instruction interleavings remain untested. So, the fuzzer spends
 more computing power to explore more interesting (unseen) instruction interleavings from \intcov. We emphasize that our searching strategy is 
-\textit{not random} unlike previous approaches~\yj{cites}.
-We use\yj{transform? better word?} a newly found interleaving graph 
-to direct the fuzzer to systematically explore 
-the search space of instruction interleavings while minimizing
-redundant and useless search trials. \autoref{ss:scheduler} 
-discusses our search strategy.
+\textit{not random} unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz}\yj{cites}.
+%
+We use\yj{transform? better word?} a newly found interleaving graph to
+direct the fuzzer to systematically explore the search space of
+instruction interleavings while minimizing redundant and useless
+search trials. \autoref{ss:scheduler} discusses our search strategy.
 
 
 \subsection{Coverage-directed Interleaving Search}
