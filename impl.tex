@@ -257,6 +257,9 @@ thread1.
 
 
 
+On the other hand, the multi-thread generator keeps producing
+schedules to 
+%
 To generating schedules, the multi-thread generator takes
 $G^{*}_{(i,j)}$ as input.
 %
@@ -432,6 +435,16 @@ non-intrusive to the kernel execution.
 
 
 
+In order to monitor the kernel execution, \sys leverages the hardware
+breakpoint feature~\cite{hwbp} shipped in modern Intel CPU chipsets.
+%
+The execution engine installs breakpoints on instructions on which
+scheduling points refer, and recognizes that a thread of the userspace
+fuzzer reaches a scheduling point when a breakpoint is hit.
+%
+
+
+
 
 \PP{Workflow of enforcing a schedule}
 %
@@ -460,7 +473,7 @@ engine.
 %
 At the beginning, the userspace fuzzer spawns threads, where each
 thread is assigned a system call annotated with scheduling points
-(\C{1}).
+(\C{1} in \autoref{fig:workflow-hypervisor}).
 %
 Then, each thread invokes hypercalls to deliver scheduling points to
 the execution engine (\C{2}). In \sys, three types of hypercalls are
@@ -468,38 +481,57 @@ used; \texttt{hcall_XXX()} to inform the starting system call,
 \texttt{hcall_sched()} to deliever a single scheduling point, and
 \texttt{hcall_ready()} to notify that a calling thread is ready.
 %
-After all threads invoke \texttt{hcall_ready()}, the execution engine
-wakes them up, and the threads start executing system calls (\C{3}).
+Also, \texttt{hcall_ready()} sleeps until all threads all threads are
+ready. When all threads invoke \texttt{hcall_ready()}, the execution
+engine wakes them up, and the threads start executing system calls
+(\C{3}).
 
 
-
-
-\dr{}
-
-
-
-\PP{Performing preemption}
+During the execution of system calls, only one thread is allowed to
+run. In \autoref{fig:workflow-hypervisor}, thread~A (\ie,
+\texttt{sendmsg()}) runs first because it is a starting system
+call (\ie, it called \texttt{hcall_XXX()}).
 %
-In order to perform preemption, \sys leverages the hardware breakpoint
-feature~\cite{hwbp} shipped in modern Intel CPU chipsets.
+Because a breakpoint is installed on \texttt{A2}, the execution engine
+is noticed that thread~A reaches \texttt{A2}.
 %
-When the execution engine receives scheduling points, the execution
-engine installs breakpoints on instructions on which scheduling points
-refer, and recognizes that a thread of the userspace fuzzer reaches a
-scheduling point when a breakpoint is hit.
+Then, the execution engine suspends thread~A, and switches to exeucte
+thread~B.
+%
+To suspend thread~A, the execution enigne stores context information
+(\eg, register values) in the hypervisor's memory, and changes the
+program counter of thread~A to an infinite loop called a trampoline.
+%
+In the trampoline, thread~A keeps calling \texttt{cond_resched()} to
+yield a CPU without proceeding with the system call execution, thus
+thred~A is confined in the trampoline.
+%
 
 
-When a thread hits a breakpoint, the execution engine saves register
-values of the thread, and then changes the program counter of the
-thread to an infinite loop called a trampoline.
+
+While thread~A is confined in the trampoline, thread~B runs its system
+call \texttt{setsockopt()}.
 %
-In the trampoline, the thread keeps calling \texttt{cond_resched()} to
-yield a CPU without proceeding with the system call execution.
+But another breakpoint is installed on \texttt{B1}, when thread~B
+reaches a scheduling point (\texttt{B1}), the execution engine again
+suspends thread~B and switches to execute thread~A.
 %
-To resume the suspended thread, the execution engine restores
-registers with the values of registers including a program counter
-saved when the thread was suspended, and then the thread can continue
-its execution.
+Suspending thread~B is performed in the same way described above.
+%
+To resume thread~A , the execution engine restores registers with the
+values of registers including a program counter saved when thread~A
+was suspended. Then thread~A can continue its execution.
+
+
+The execution engine keeps suspending and resuming system calls until
+one of the two threads finishes its execution. In this example,
+thread~A finishes its execution first, and notifies the end of
+execution to the execution engine through \texttt{hcall_done()}.
+%
+Upon receiving \texttt{hcall_done()}, the execution engine resumes the
+suspended thread (\ie, thread~B) and lets it finish its execution.
+
+
 
 
 \PP{Restriction of hardware breakpoint}
