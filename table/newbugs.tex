@@ -1,48 +1,48 @@
-\resizebox{\linewidth}{!}{
+\resizebox{0.9\linewidth}{!}{
   \begin{tabular}{r l l l l c}
     \toprule
-    \textbf{Crash ID} & \textbf{Kernel Version} & \textbf{Subsystem} & \textbf{Crash Type} & \textbf{Crash Summary} & \textbf{Recurrent} \\
+    \textbf{ID} & \textbf{Kernel Version} & \textbf{Subsystem} & \textbf{Crash Type} & \textbf{Crash Summary} & \textbf{Recurrent} \\
     \midrule
     \#1 & 6.0-rc7 & drivers/misc/vmw_vmci & general protection fault & general protection fault in vmci_host_poll \\
-    \midrule
+    % \midrule
     \#2 & 6.0-rc7 & net/caif & use-after-free access & KASAN: use-after-free Read in cfusbl_device_notify \\
-    \midrule
+    % \midrule
     \#3 & 5.19-rc3 & kernel/trace & task hung & INFO: task hung in blk_trace_remove \\
-    \midrule
+    % \midrule
     \#4 & 5.19-rc3 & kernel/trace & task hung & INFO: task hung in blk_trace_setup \\
-    \midrule
+    % \midrule
     \#5 & 5.19-rc3 & fs/ntfs & assertion violation & kernel BUG in ntfs_read_block \\
-    \midrule
+    % \midrule
     \#6 & 5.19-rc2 & drivers/net/can/slcan & use-after-free access & KASAN: use-after-free Read in slcan_receive_buf \\
-    \midrule
+    % \midrule
     \#7 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue_exclusive \\
-    \midrule
+    % \midrule
     \#8 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue \\
-    \midrule
+    % \midrule
     \#9 & 5.19-rc2 & net/netfilter & general protection fault & general protection fault in cttimeout_net_exit \\
-    \midrule
+    % \midrule
     \#10 & 6.0-rc7 & drivers/block & general protection fault & general protection fault in reset_interrupt \\
-    \midrule
+    % \midrule
     \#11 & 6.0-rc7 & arch/x86/kernel & stack-out-of-bounds access & KASAN: stack-out-of-bounds Read in unwind_next_frame\\
-    \midrule
+    % \midrule
     \#12 & 6.0-rc7 & drivers/usb/core & task hung & INFO: task hung in usb_get_descriptor & \checkmark~\cite{usbgetdescriptor} \\
-    \midrule
+    % \midrule
     \#13 & 6.0-rc7 & net/can & warning & WARNING in isotp_tx_timer_handler & \checkmark~\cite{isotptxtimerhandler} \\
-    \midrule
+    % \midrule
     \#14 & 5.19-rc3 & fs/btfs & assertion violation& kernel BUG in assertfail & \checkmark~\cite{assertfail} \\
-    \midrule
+    % \midrule
     \#15 & 6.0-rc7 & drivers/net/slip & use-after-free access & KASAN: use-after-free Read in slip_ioctl \\
-    \midrule
+    % \midrule
     \#16 & 6.0-rc7 & sound/core/oss & use-after-free access & KASAN: use-after-free Read in snd_pcm_plug_read_transfer \\
-    \midrule
+    % \midrule
     \#17 & 5.19-rc3 & net/key & assertion violation & kernel BUG in pfkey_send_acquire \\
-    \midrule
+    % \midrule
     \#18 & 5.19-rc3 & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
-    \midrule
+    % \midrule
     \#19 & 6.0-rc7 & mm & assertion violation & Kernel BUG in find_lock_entries \\
-    \midrule
+    % \midrule
     \#20 & 6.0-rc7 & kernel & use-after-free access & KASAN: use-after-free Read in raw_notifier_call_chain \\
-    \midrule
+    % \midrule
     \#21 & 6.0-rc7 & net/ipv4 & use-after-free access & KASAN: use-after-free Read in tcp_write_timer_handler \\
     \bottomrule
   \end{tabular}

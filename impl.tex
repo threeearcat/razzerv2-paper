@@ -10,14 +10,13 @@ described in \autoref{s:design}.
 %
 
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
-fuzzing similar with recent concurrency fuzzers, Razzer~\cite{razzer}
-and Snowboard~\cite{snowboard}.
+fuzzing.
 %
-The first stage is a single-thread fuzzing, which focuses on
+The first stage is a \textit{single-thread fuzzing}, which focuses on
 identifying two system calls that may expose new interleaving
 segments.
 %
-The second stage is a multi-thread fuzzing to explore thread
+The second stage is a \textit{multi-thread fuzzing} to explore thread
 interleavings and discover concurrency bugs.
 %
 In both stage, \sys traces timestamp-annotated memory accesses
@@ -321,18 +320,18 @@ generator to further explore thread interleavings.
 \subsection{Target Kernel Instrumentation}
 \label{ss:instrumentation}
 
-\sys requires to trace basic blocks (for code coverage) and memory
-accesses (for interleaving coverage) executed by each system call.
+\sys requires to trace basic blocks (for code coverage) and
+timestamp-annotated memory accesses (for interleaving coverage)
+executed by each system call.
 %
 For this, \sys incorporates a compiler pass that inserts callback
 function calls 1) at the beginning of each basic block, and 2) before
 each instruction that accesses globally-visible memory objects.
 %
-In addition, memory accesses should be annotated with timestamps.
-%
-These callback functions records executed basic blocks and memory
-accesses into memory regions shared between the user space and the
-kernel space.
+These callback functions record executed basic blocks and memory
+accesses into per-thread memory regions shared between the user space
+and the kernel space. Thus after a thread executes a system call, the
+thread can identify basic blocks and memory accesses that it executed.
 
 
 
@@ -358,8 +357,8 @@ that accesses \texttt{inet->hdrincl}.
 
 
 During runtime, \texttt{trace_basicblock()} takes the starting address
-of basic block as input (\ie, \texttt{A3}), and records the starting
-address into \texttt{Basicblock record}.
+of basic block as input (\ie, \texttt{A3}), and records it into
+\texttt{Basicblock record}.
 %
 On the other hand, \texttt{trace_access()} takes five parameters, the
 address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
@@ -368,7 +367,7 @@ the instruction address accessing the memory object (\ie,
 type of the memory access (\ie, \texttt{read}), and the timestamp of
 when the memory access occurrs (\ie, \texttt{ts}).
 %
-\texttt{trace_access()} then records these five arguments into
+\texttt{trace_access()} then records these five parameters into
 \texttt{Memory access record}.
 
 
@@ -376,11 +375,11 @@ when the memory access occurrs (\ie, \texttt{ts}).
 
 
 
-It is worth noting that \texttt{Basicblock record} and \texttt{Memory
-  access record} are per-thread memory regions, shared between the
-user space and the kernel space. Thus, after a userspace thread
-executes a system call, the thread can identify basic blocks and
-memory accesses that it executed.
+% It is worth noting that \texttt{Basicblock record} and \texttt{Memory
+%   access record} are per-thread memory regions, shared between the
+% user space and the kernel space. Thus, after a userspace thread
+% executes a system call, the thread can identify basic blocks and
+% memory accesses that it executed.
 
 
 
