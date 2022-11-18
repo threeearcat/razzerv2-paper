@@ -8,7 +8,7 @@ We first explain the key idea of our approach~(\autoref{ss:overview}).
 Then, we illustrate our concurrency
 coverage metric to express combinatorial interleavings 
 (\textbf{Design goal 1})~(\autoref{ss:coverage}), and the interleaving search strategy
-to quickly saturate the coverage metric (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+to quickly explore thread interleavings (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 %While this section focuses only on how to explore the search space of
 %thread interleaving with a given multi-thread input, the whole design
 %of \sys will be explained later in \autoref{s:impl}.
@@ -34,7 +34,7 @@ interleavings increase the the search space exponentially.
 %
 Therefore, this work seek to strike the balance in the trade-off
 between the bug-finding capability and the search complexity.
-%
+
 Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
 out of 105) of concurrency bugs manifest when a bug-finding system
 monitors instruction execution orders including \textit{at most} four
@@ -61,10 +61,11 @@ sub-space \textit{interleaving segment}.
 Each interleaving segment consists of instructions accessing 
 the same memory addresses (\ie, conflicting instructions).
 %
-When constructing a interleaving segment, following the observation, 
+When constructing an interleaving segment, following the observation, 
 we confine the size of a interleaving segment 
 to contain interleaved instructions including at most four memory accesses,
 which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
+
 
 \PP{Building segments}
 %
@@ -89,6 +90,7 @@ instructions) and their interleaving orders as an interleaving segment.
 %
 \autoref{fig:keyidea} visualizes our key idea.
 %
+\dr{TODO: rewrite}
 Let us assume we execute the two system calls in
 \autoref{fig:cve-2017-17712} concurrently.
 %
@@ -123,12 +125,12 @@ interleaving orders of four memory access operations, (\texttt{A2},
 % \texttt{A4})$) to maximize the chance of discovering concurrency bugs.
 
 
-%
-\dr{}
-It is worth noting that interleaving segments can be overlapped; in
-this example, \texttt{Segment \#1} and \texttt{Segment \#3} are
-overlapped over an interleaving order
-$\texttt{A4} \Rightarrow \texttt{B1}$.
+% %
+% \dr{}
+% It is worth noting that interleaving segments can be overlapped; in
+% this example, \texttt{Segment \#1} and \texttt{Segment \#3} are
+% overlapped over an interleaving order
+% $\texttt{A4} \Rightarrow \texttt{B1}$.
 
 
 
@@ -244,7 +246,7 @@ graph is derived from a interleaving segment, \texttt{Segment \#1}.
 This interleaving graph contains a program-order edge from \texttt{A2} to
 \texttt{A4} representing ``\texttt{A2} is executed before \texttt{A4}
 in thread~A''.
-The interleaving graph contains two interleaving-order
+Similarly, the interleaving graph contains two interleaving-order
 edges, expressing execution orders of \texttt{A2} $\rightarrow$ \texttt{B1}
 and \texttt{A4} $\rightarrow$ \texttt{B1}.
 %It contains an interleaving-order edge from \texttt{A2} to
@@ -259,7 +261,7 @@ and \texttt{A4} $\rightarrow$ \texttt{B1}.
   \centering
   \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{(a) \texttt{Segment \#1} from \autoref{fig:keyidea}, and
-    (b) its segment graph. In (b) a dotted arrow represents a program
+    (b) its interleaving graph. In (b) a dotted arrow represents a program
     order, and solid arrows represent interleaving orders.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
@@ -317,15 +319,18 @@ and \texttt{A4} $\rightarrow$ \texttt{B1}.
 
 
 \PP{Tracking interleaving segment coverage}
+%
 We track interleaving segment coverage \textit{offline}. While
 executing a multi-thread input, a fuzzer collects memory-access
 instructions annotated with timestamps. After the execution is
-finished, the fuzzer collect segments and then builds interleaving 
+finished, the fuzzer collect segments and then builds interleaving
 graphs for each segment to compute \intcov for the given input.
+
 In practice, \intcov contains a large number of interleaving graphs, 
-whic consumes a large amount of memory even thought the size of graphs is 
+which consumes a large amount of memory even though the size of graphs is 
 small.
-To reduce memory consumption, we hash each segment graph,
+%
+To reduce memory consumption, we hash each interleaving graph,
 and interleaving segment coverage tracks a hash table of segment
 graphs.
 %
@@ -359,22 +364,22 @@ search trials. \autoref{ss:scheduler} discusses our search strategy.
 % interleaving segments that the fuzzer will search for in future
 % iterations.
 % %
-In this subsection, we explain how we utilize explored \intcov to
-search unexplored \intcov.
+In this subsection, we explain how we utilize explored interleaving
+segment graphs to search unexplored interleaving segment graphs.
 
 \PP{Deriving unexplored interleaving segement}
 %
-The first step is to infer \textit{unexplored} interleaving segment
+The first step is to derive \textit{unexplored} interleaving segment
 graphs from \textit{explored} interleaving segment graphs.
 
-When executing a thread interleaving, we can obtain a set of
-interleaving segment graphs, and let us denote
+From the executing of a thread interleaving, we obtain a set of
+multiple interleaving segment graphs, and let us denote
 $G = \{g_1, g_2, ..., g_n \}$ as this set of interleaving graphs.
 %
 Since $G$ is obtained after executing the thread interleaving, all
 graphs in $G$ are \textit{explored}.
 %
-Then, for each interleaving segment graph $g_i$, we drive other
+Then, for each interleaving segment graph $g_i \in G$, we drive other
 interleaving segment graphs by permuting interleaving-order edges in
 $g_i$.
 
@@ -390,63 +395,66 @@ $g_i$.
 \end{figure}
 %
 \autoref{fig:interleavingmutation} illustrates how we derive
-interleaving segment graphs from $g_i$.
+interleaving graphs from $g_i$.
 %
-In this figure, $g_i$ is an interleaving segment graph in
+In this figure, $g_i$ is an interleaving graph in
 \autoref{fig:interleavingsegmentgraph}-(b).
 %
-With this $g_i$, we can \textit{flip}
-$\texttt{A4} \Rightarrow \texttt{B1}$, resutlting an interleaving
-segment graph described in (a).
+With this $g_i$, we \textit{flip} interleaving-order edges, resulting
+in different interleaving graphs.
 %
-The semantic behind ``\textit{flipping an interleaving edge}'' is
-simple; it changes the interleaving order of an instruction pair that
-access the shared data.
+Here the semantic behind ``\textit{flipping an interleaving-order
+  edge}'' is simple; it changes the interleaving order of an
+instruction pair that access the shared data.
 %
-Likewise, we generate a segment graph of (b) by flipping both of
+For example, flipping $\texttt{A4} \Rightarrow \texttt{B1}$ produces
+an interleaving graph described in
+\autoref{fig:interleavingmutation}-(a).
+%
+Likewise, we generate an interleaving graph of
+\autoref{fig:interleavingmutation}-(b) by flipping both of
 $\texttt{A2} \Rightarrow \texttt{B1}$ and
 $\texttt{A4} \Rightarrow \texttt{B1}$.
 %
-Besides (a) and (b), flipping $\texttt{A2} \Rightarrow \texttt{B1}$
-can generate the segment graph described in (c). However, This segment
-graph is excluded because it contains a loop; a loop indicates a
-contradiction on the execution order that any vertex on the loop
-should be executed before itself.
 %
-Therefore, in this fugure, we can derive two \textit{unobserved}
-interleaving segment graphs.
+Besides (a) and (b), however, flipping
+$\texttt{A2} \Rightarrow \texttt{B1}$ generates an \textit{invalid}
+segment graph described in \autoref{fig:interleavingmutation}-(c).
+%
+This is because this interleaving graph contains a loop; a loop
+indicates a contradiction on the execution order that any vertex on
+the loop should be executed before itself.
 
 
 
 
-% Then, the fuzzer excludes 1) ones thas are explored before, and 2)
-% ones that contain a loop.
-% %
-% The reason why the fuzzer excludes explored interleaving segment
-% graphs is intuitive; the fuzzer wants to deprioritize interleaving
-% segment graphs already explored (such as the case of (b)).
-% %
-% The fuzzer also excludes ones that contain a loop because.
 
 
 
 After deriving interleaving segment graphs for all $g_i$, we aggregate
 all derived and unobserved interleaving segment graphs into
-$G_{derived}$. and uses it to generate scheduling points.
+$G_{derived}$. and uses it to search for a thread interleaving to run.
+
+% Therefore, in this fugure, we can derive two \textit{unobserved}
+% interleaving segment graphs.
 
 
 
 
-\PP{Searching a thread interleaving}
+
+
+\PP{Searching for a thread interleaving}
 %
 With $G_{derived}$, we could naively test unobserved interleaving
-segment graphs in $G_{derived}$ one-by-one.
+graphs in $G_{derived}$ one-by-one. But, it is inefficient. As
+described in \dr{}, a number of interleaving segments can be explored
+at once.
 %
-Instead, we choose a \textit{smarter} way to consume $G_{derived}$.
+Thus, we choose a \textit{smarter} way to consume $G_{derived}$.
 %
-We select a subset of $G_{derived}$, $G^{*}_{derived}$, and search for
-a thread interleaving to explore all unobserved interleaving segment
-graphs in $G^{*}_{derived}$ at once.
+For each iteration, we select a subset of $G_{derived}$ called
+$G^{*}_{derived}$, and search for a thread interleaving to explore all
+unobserved interleaving segment graphs in $G^{*}_{derived}$ at once.
 
 %
 % As described  \autoref{fig:hint}, multiple segment graphs can be
@@ -501,9 +509,8 @@ scheduling points to explore $\bar{S}$.
 
 \PP{Generating scheduling points}
 %
-After selecting interleaving segment graphs, generating scheduling
-points can be easily done by conducting a topological
-sort~\cite{topologicalsort}.
+Once $G^{*}_{derived}$ is given, scheduling points can be easily
+generated by conducting a topological sort~\cite{topologicalsort}.
 %
 Since an imaginary interleaving graph is acyclic, a topological sort
 always returns a sequence of vertices (\ie, instructions) that does

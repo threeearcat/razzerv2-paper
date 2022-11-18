@@ -79,10 +79,8 @@ $I_{ST}$ will be passed to the next stage, the multi-thread fuzzing.
 
 \PP{Single-thread generator}
 %
-The single-thread generator is similar with conventional
-fuzzing~\cite{syzkaller}.
-%
-It constructs a single-threaded system call sequence $I_{ST}$ with two
+Similar with a conventional fuzzing, the single-thread generator
+constructs a single-threaded system call sequence $I_{ST}$ with two
 strategies, generation and mutation.
 %
 When using the generation strategy, \sys randomly generates a system
@@ -116,16 +114,13 @@ instrumentation detailed in \autoref{ss:instrumentation}.
 With traced basic blocks and memory accesses, the single-thread
 executor conducts two tasks.
 %
-The first task is similar with what conventional kernel fuzzing
-does.
+The first task is to computes branch coverage using traced basic
+blocks.
 %
-In other words, the single-thread executor computes branch coverage
-using traced basic blocks.
-%
-Then, if $I_{ST}$ exposes new branch coverage that has not been
-explored, \sys keeps $I_{ST}$, and feeds it back to the single-thread
-generator so that the single-thread generator further mutates $I_{ST}$
-to find more branch coverage.
+If $I_{ST}$ exposes new branch coverage that has not been explored,
+\sys keeps $I_{ST}$, and feeds it back to the single-thread generator
+so that the single-thread generator further mutates $I_{ST}$ to find
+more branch coverage.
 
 
 Second, the single-thread executor identifies a pair of system calls
@@ -138,9 +133,11 @@ segment graphs $G_{(i,j)}$ from memory accesses executed by $S_i$ and
 $S_j$.
 %
 It is worth noting that $S_i$ and $S_j$ were executed
-\textit{sequentially}. However, the single-thread executor still can
-generate interleaving segment graphs from $S_i$ and $S_j$ in a form
-similar to \autoref{fig:interleavingsegmentgraph}. \dr{TODO: rewrite}
+\textit{sequentially}.
+%
+% However, the single-thread executor still can
+% generate interleaving segment graphs from $S_i$ and $S_j$ in a form
+% similar to \autoref{fig:interleavingsegmentgraph}. \dr{TODO: rewrite}
 
 
 

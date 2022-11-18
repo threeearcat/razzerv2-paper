@@ -203,7 +203,7 @@ pair.
 %
 Alias coverage determines a thread interleaving \texttt{X} exposes a
 unique behavior if \texttt{X} contains an unexplored interleaving
-order ($I_W \Rightarrow I_R$), where $I_R$ reads a value written by
+order $I_W \Rightarrow I_R$, where $I_R$ reads a value written by
 $I_W$ and they are executed by different threads.
 
 Then, \autoref{fig:alias-coverage} illustrates the simplified
@@ -232,14 +232,14 @@ Moreover, concurrent call pair~\cite{conzzer} also suffers from
 distinguishing these two thread interleavings.
 %
 While concurrent call pair tracks a concurrently-executed function
-pair, it is not aware of interleavings inside a function.
+pair, it is not aware of interleavings of instructions.
 %
-And, the two thread interleavings in \autoref{fig:alias-coverage} take
+Since two thread interleavings in \autoref{fig:alias-coverage} take
 place in the same function (\ie, \texttt{A2} and \texttt{A4} are
-executed in the same function).
-%
-Thus, concurrent call pair also shows the same limitation as alias
-coverage when it comes to discovering this uninitialized access bug.
+executed in the same function), concurrent call pair is also limited
+in distinguish the two interleavings, and shows the same limitation as
+alias coverage when it comes to discovering this uninitialized access
+bug.
 
 
 % is also saturated with these two thread
@@ -296,8 +296,13 @@ fuzzer based on interleaving coverage, but it's interleaving coverage
 metric, concurrent call pair, does not capture interleavings of
 instructions, which are true reasons of concurrency bugs.
 %
-As a consequence, none of existing approaches effectively search
-thread interleavings to run in future iterations.
+As a consequence, existing approaches do not systematically search for
+thread interleavings to run. Rather, they \textit{blindly} go through
+trial and error, making redundant executions without exploring
+meaningful thread interleavings.
+
+
+
 
 
 
