@@ -28,13 +28,12 @@ to quickly saturate the coverage metric (\textbf{Design goal 2})~(\autoref{ss:sc
   %\label{table:learningfrommistakes}
   % \end{table}
 
-
 When fuzzing concurrency bugs with a coverage metric, the fundamental
 challenge is its large search space because the combinations of thread
 interleavings increase the the search space exponentially.
 %
 Therefore, this work seek to strike the balance in the trade-off
-between bug-finding capability and search complexity.
+between the bug-finding capability and the search complexity.
 %
 Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
 out of 105) of concurrency bugs manifest when a bug-finding system
@@ -52,13 +51,15 @@ concurrency bug.
 
 
 \PP{Segmentizing thread interleaving}
-To reduce the search complexity, we take the classical wisdom of problem decomposition where 
-complexity of a problem exponentially decreases as the problem size decreases.
-Our key strategy is \textit{decomposing} the search space into 
-small sub-spaces. We call a sub-space \textit{interleaving segment}.
+%
+To reduce the search complexity, we take the classical wisdom of
+problem decomposition where complexity of a problem exponentially
+decreases as the problem size decreases.  Our key strategy is
+\textit{decomposing} the search space into small sub-spaces. We call a
+sub-space \textit{interleaving segment}.
 %
 Each interleaving segment consists of instructions accessing 
-the same memory addresses (i.e., conflicting instructions).
+the same memory addresses (\ie, conflicting instructions).
 %
 When constructing a interleaving segment, following the observation, 
 we confine the size of a interleaving segment 
@@ -123,6 +124,7 @@ interleaving orders of four memory access operations, (\texttt{A2},
 
 
 %
+\dr{}
 It is worth noting that interleaving segments can be overlapped; in
 this example, \texttt{Segment \#1} and \texttt{Segment \#3} are
 overlapped over an interleaving order
@@ -330,11 +332,6 @@ graphs.
 \dr{TODO: explain how to hash the graph}\yj{Fill this, I will edit later.}
 
 
-% \dr{heuristic}
-% %
-% size 3 and 4
-% %
-% no containing a vertex that is not connected with interleaving order
 
 
 
@@ -347,7 +344,7 @@ but the alias coverage can tell at least one\yj{DR, it this claim OK to you?}.
 \Intcov provides guiding feedback to a fuzzer.
 \Intcov guides the fuzzer to identify that there are possibly more useful instruction interleavings remain untested. So, the fuzzer spends
 more computing power to explore more interesting (unseen) instruction interleavings from \intcov. We emphasize that our searching strategy is 
-\textit{not random} unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz}\yj{cites}.
+\textit{not random} unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz}.
 %
 We use\yj{transform? better word?} a newly found interleaving graph to
 direct the fuzzer to systematically explore the search space of
@@ -367,15 +364,15 @@ search unexplored \intcov.
 
 \PP{Deriving unexplored interleaving segement}
 %
-The first step is to infer unexplored interleaving segment graphs from
-explored interleaving segment graphs.
+The first step is to infer \textit{unexplored} interleaving segment
+graphs from \textit{explored} interleaving segment graphs.
 
 When executing a thread interleaving, we can obtain a set of
 interleaving segment graphs, and let us denote
 $G = \{g_1, g_2, ..., g_n \}$ as this set of interleaving graphs.
 %
 Since $G$ is obtained after executing the thread interleaving, all
-$g_i$s are \textit{explored}.
+graphs in $G$ are \textit{explored}.
 %
 Then, for each interleaving segment graph $g_i$, we drive other
 interleaving segment graphs by permuting interleaving-order edges in
@@ -445,7 +442,7 @@ $G_{derived}$. and uses it to generate scheduling points.
 With $G_{derived}$, we could naively test unobserved interleaving
 segment graphs in $G_{derived}$ one-by-one.
 %
-Instead, we choose a \textit{starter} way to consume $G_{derived}$.
+Instead, we choose a \textit{smarter} way to consume $G_{derived}$.
 %
 We select a subset of $G_{derived}$, $G^{*}_{derived}$, and search for
 a thread interleaving to explore all unobserved interleaving segment

@@ -11,7 +11,8 @@ properly addresses characteristics of \textit{offending thread
 %
 As a consequence, previous work either \textbf{1)} disregards a
 multi-thread input in which a concurrency bug reside~\cite{krace,
-  conzzer},% \yj{use clearer sentence}
+  conzzer},
+\yj{use clearer sentence}
 % suffers from
 % identifying whether interesting thread interleavings remain
 % untested
@@ -120,10 +121,10 @@ if a fuzzer executes the two system calls \textit{sequentially}
 such that thread~A executes all instructions followed by the execution of thread~B.
 %
 Then, let us also assume that a fuzzer observes the three
-instructions, \texttt{A2}, \texttt{A4}, and \texttt{B1}, access the
-same memory object~(\ie, \texttt{inet->hdrincl}), and are executed in
-the order of
-$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$.
+instructions, \texttt{A2}, \texttt{A4}, and \texttt{B1}, are executed
+in the order of
+$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$, and
+access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
 This execution order does not cause the uninitialized access bug.
