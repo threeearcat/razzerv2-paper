@@ -53,18 +53,18 @@ thread~B may intervene in the middle of these two read operations.
 In that case, if \texttt{B1} is executed between \texttt{A2} and
 \texttt{A4}, thread~A reads different values of \texttt{inet->hdrincl}
 at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
-initializing it.
+initializing it at \texttt{A4}.
 
 
 \PP{Observation 1: Combined interleaving orders}
 %
 This example demonstrates that a concurrency bug is caused by \textit{a combined
-  result of multiple interleaving orders}, where each interleaving order
+  result of multiple interleaving orders}\footnote{A interleaving order
 denotes the execution order between an instruction pair that access
-the same memory object.
+the same memory object.}.
 %
 In the example of \autoref{fig:cve-2017-17712}, two interleaving orders
-are combined to eventually cause the uninitialized access bug.
+are combined, which eventually causes the uninitialized access bug.
 %
 First, \texttt{A2} should be executed before \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1}$\footnote{In this paper,
@@ -93,7 +93,9 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 The observation gives an insight of how to define coverage metric 
 in a concurrency fuzzer.
 To discover the uninitialized access bug, 
-interleaving coverage should not be saturated until
+interleaving coverage must distinguish orders of multiple thread interleavings. For example, 
+
+should not be saturated until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is executed.
 %
@@ -105,28 +107,28 @@ uninitialized access bug.
 
 \PP{Observation 2: Feedback from explored executions}
 %
-An explored execution that did not cause a concurrency bug provides useful feedback 
+We find that even if an explored execution does not cause 
+a concurrency bug, it provides useful feedback 
 to guide what interleaving orders should be further explored.
 
 In the example of \autoref{fig:cve-2017-17712}, let us assume 
 if a fuzzer executes the two system calls \textit{sequentially} 
-such that thread~A executes all instructions followed by the execution of thread~B.
-%
-Then, let us also assume that a fuzzer observes the three
+such that thread~A executes all instructions followed by the execution of thread~B. 
+In the explored execution, a fuzzer observes the three
 instructions, \texttt{A2}, \texttt{A4}, and \texttt{B1}, are executed
 in the order of
-$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$, and
-access the same memory object~(\ie, \texttt{inet->hdrincl}).
+$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ and
+they access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
-This execution order does not cause the uninitialized access bug.
+The interleaving orders do not cause the uninitialized access bug.
 %
 However, from the explored execution, one can easily imagine a new interleaving of these three
 instructions by changing the execution order of \texttt{A4} and
 \texttt{B1} (\ie,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
-The \yj{speculative} interleaving is what exactly we are looking for; it
+The speculative interleaving is what exactly we are looking for; it
 satisfies the combination of interleaving orders
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4}))$, and, if executed, the interleaving order triggers 
