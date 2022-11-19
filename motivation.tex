@@ -199,12 +199,11 @@ Alias coverage determines a thread interleaving \texttt{X} exposes a
 unique behavior if \texttt{X} contains an unexplored interleaving
 order $I_W \Rightarrow I_R$, where $I_R$ reads a value written by
 $I_W$ and they are executed by different threads.
-
-Then, \autoref{fig:alias-coverage} illustrates the simplified
+\autoref{fig:alias-coverage} illustrates the simplified
 explanation of why alias coverage does not satisfy the \textbf{Design
   goal 1}.
 %
-Assuming \texttt{Interleaving \#1} is executed first, alias covereage
+Assuming \texttt{Interleaving \#1} is executed first, alias coverage
 identifies \texttt{Interleaving \#1} exposes unique behaviors when it
 sees two unexplored interleaving orders (\ie,
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
