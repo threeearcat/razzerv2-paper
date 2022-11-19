@@ -6,26 +6,7 @@
 % - limitations of existing approaches
 
 This work is motivated by the observation that concurrency fuzzing 
-requires new coverage metric and better search strategy. Previous 
-work has limitations 
-
-none of previous work
-properly addresses characteristics of \textit{offending thread
-  interleaving} (\ie, one that causes a concurrency bug).
-%
-As a consequence, previous work either \textbf{1)} disregards a
-multi-thread input in which a concurrency bug reside~\cite{krace,
-  conzzer},
-% \yj{use clearer sentence}
-% suffers from
-% identifying whether interesting thread interleavings remain
-% untested
-%
-or \textbf{2)} waste the computing power by ineffectively exploring
-the search space of thread interleaving~\cite{snowboard, razzer, muzz}.
-
-
-
+requires new coverage metric and better search strategy. 
 In this section, we first study how concurrency bugs manifest
 depending on thread interleaving through a real-world concurrency bug
 example.
@@ -34,6 +15,13 @@ From the study, we elicit design goals to effectively discover concurrency
 bugs in the kernel, and discuss why existing approaches have limitations 
 in satisfying the design goals.
 
+%None of previous work properly addresses characteristics of \textit{offending thread interleaving} (\ie, one that causes a concurrency bug).
+%
+%As a consequence, previous work either \textbf{1)} disregards a
+%multi-thread input in which a concurrency bug reside~\cite{krace,
+  %conzzer},
+%or \textbf{2)} waste the computing power by ineffectively exploring
+%the search space of thread interleaving~\cite{snowboard, razzer, muzz}.
 
 \PP{Manifestation of concurrency bugs}
 %
