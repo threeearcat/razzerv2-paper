@@ -92,18 +92,15 @@ which makes the problem of defining a coverage metric tractable while maintainin
 interleaving.
 %
 Let us assume we execute the two system calls in
-\autoref{fig:cve-2017-17712} concurrently.
+\autoref{fig:cve-2017-17712} concurrently, and monitor memory accesses
+annotated with timestamps.
 %
+We then, can draw a totally-ordered instruction sequence of the thread
+inteleaving as described in \autoref{fig:keyidea}-(a).
+
+
 \dr{TODO: wip}
-
 %
-In particular, once executing threads concurrently, we firstly model
-the thread interleaving as a totally-ordered instruction sequence.
-%
-And then, we group a small number of instructions (\eg, four
-instructions) and their interleaving orders as an interleaving segment.
-
-
 \autoref{fig:keyidea}-(a) represents the thread interleaving of the
 execution, where the uninitialized access bug does not manifest
 because \texttt{B1} is executed before \texttt{A4} (\ie,
