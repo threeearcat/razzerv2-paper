@@ -205,10 +205,12 @@ explanation of why alias coverage does not satisfy the \textbf{Design
 %
 Assuming \texttt{Interleaving \#1} is executed first, alias coverage
 identifies \texttt{Interleaving \#1} exposes unique behaviors when it
-sees two unexplored interleaving orders (\ie,
+sees two unexplored interleaving orders:
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
-($\texttt{B1} \Rightarrow \texttt{A4}$)).
+($\texttt{B1} \Rightarrow \texttt{A4}$).
 %
+The \texttt{Interleaving \#2} is the bug-hitting interleaving orders.
+However, alias coverage does not 
 But, when alias coverage faces \texttt{Interleaving \#2} after
 \texttt{Interleaving \#1}, it suffers from locating unobserved unique
 behaviors of \texttt{Interleaving \#2}, because there is no unobserved
