@@ -78,7 +78,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.7\linewidth]{fig/intuition.pdf}
+  \includegraphics[width=\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
     \autoref{fig:cve-2017-17712} that does not cause the concurrency
     bug, (b) instruction pairs that access the same memory object, and
@@ -108,20 +108,21 @@ interleaved instructions, $\texttt{B1} \Rightarrow \texttt{A2}$,
 $\texttt{B1} \Rightarrow \texttt{A4}$, and
 $\texttt{A6} \Rightarrow \texttt{B2}$.
 %
-As these pairs just describe a single interleaivng order, we further
-combine them to represent a combination of interleaving orders.
+Since these pairs just describe a single interleaivng order, we
+further combine them to represent a combination of interleaving orders
+as the second step.
 %
-Since each pair contains two memory accesses, we combine two pairs to
-construct an interleaving segment.
+Since each pair contains two memory accesses, we select two pairs when
+constructing interleaving segments to make them contain at most four
+instructions.
 %
-For example, we combine two instruction pairs,
+For example, when we select two instruction pairs
 $\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{B1} \Rightarrow \texttt{A4}$, to construct \texttt{Segment
-  \#1}.
+$\texttt{B1} \Rightarrow \texttt{A4}$, there are three instructions
+\texttt{B1}, \texttt{A2}, and \texttt{A4}.
 %
-It is worth noting that all memory accesses are annontated with
-timestamps, we know that $\texttt{A2}$ is executed before
-$\texttt{A4}$, and arrange them in \texttt{Segment \#1} accordingly.
+As we assume that these memory accesses are annotated with timestmaps,
+we can arrange them in \texttt{Segment \#1} accordingly.
 %
 Likewise, \texttt{Segment \#2} and \texttt{Segment \#3} are the result
 of combining $\texttt{B1} \Rightarrow \texttt{A2}$ and
@@ -210,7 +211,7 @@ memory accesses can produce.
 Then, among enumerated interleaving orders, we can select ones that
 unexplored before, and direct the fuzzer to search them.
 %
-In this way, we can satisfy \textbf{Design goal 2}, while exploring
+In this way, we can satisfy \textbf{Design goal 2} by exploring
 meaningful thread interleavings at each iteration and minimizing
 redundant executions.
 
