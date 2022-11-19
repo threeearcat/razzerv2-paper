@@ -95,8 +95,9 @@ Let us assume we execute the two system calls in
 \autoref{fig:cve-2017-17712} concurrently, and monitor memory accesses
 annotated with timestamps.
 %
-We then, can draw a totally-ordered instruction sequence of the thread
+We can then draw a totally-ordered instruction sequence of the thread
 inteleaving as described in \autoref{fig:keyidea}-(a).
+
 
 
 \dr{TODO: wip}
@@ -351,9 +352,6 @@ executing a multi-thread input, a fuzzer collects memory-access
 instructions annotated with timestamps. After the execution is
 finished, the fuzzer collect segments and then builds interleaving
 graphs for each segment to compute \intcov for the given input.
-
-
-In particular, we first identify interleaved instructions
 
 
 In practice, \intcov contains a large number of interleaving graphs, 
