@@ -74,17 +74,8 @@ to contain interleaved instructions including at most four memory accesses,
 which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
 
 
-\PP{Building segments}
+\PP{Example of segmentizing thread interleaving}
 %
-\dr{TODO: rewrite}
-%
-In particular, once executing threads concurrently, we firstly model
-the thread interleaving as a totally-ordered instruction sequence.
-%
-And then, we group a small number of instructions (\eg, four
-instructions) and their interleaving orders as an interleaving segment.
-
-
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
@@ -97,11 +88,22 @@ instructions) and their interleaving orders as an interleaving segment.
   \label{fig:keyidea}
 \end{figure*}
 %
-\autoref{fig:keyidea} visualizes our key idea.
+\autoref{fig:keyidea} visualizes how we segmentize a thread
+interleaving.
 %
 Let us assume we execute the two system calls in
 \autoref{fig:cve-2017-17712} concurrently.
 %
+\dr{TODO: wip}
+
+%
+In particular, once executing threads concurrently, we firstly model
+the thread interleaving as a totally-ordered instruction sequence.
+%
+And then, we group a small number of instructions (\eg, four
+instructions) and their interleaving orders as an interleaving segment.
+
+
 \autoref{fig:keyidea}-(a) represents the thread interleaving of the
 execution, where the uninitialized access bug does not manifest
 because \texttt{B1} is executed before \texttt{A4} (\ie,
@@ -254,7 +256,7 @@ so \intcov cannot be presented as a single instruction interleaving
 (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
 Instead, we represent each interleaving segment as a small directed acyclic
 graph (DAG) called an interleaving segment graph (shortly, \textit{interleaving graph}), and \intcov is a collection of interleaving graphs.
-%
+
 In this graph, a vertex represents a memory-accessing instruction, 
 and an edge represents an execution ordering between two memory-access instructions. 
 Specifically, there are two types of edges, program-order edges and
@@ -272,8 +274,8 @@ This interleaving graph contains a program-order edge from \texttt{A2} to
 \texttt{A4} representing ``\texttt{A2} is executed before \texttt{A4}
 in thread~A''.
 Similarly, the interleaving graph contains two interleaving-order
-edges, expressing execution orders of \texttt{A2} $\rightarrow$ \texttt{B1}
-and \texttt{A4} $\rightarrow$ \texttt{B1}.
+edges, expressing interleaving orders of \texttt{B1} $\Rightarrow$ \texttt{A2}
+and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 %It contains an interleaving-order edge from \texttt{A2} to
 %\texttt{B1}, because 1) they access \texttt{inet->hdrincl}, 2)
 %\texttt{B1} is a write operations, and 3) they are executed by
