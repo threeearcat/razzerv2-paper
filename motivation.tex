@@ -209,9 +209,9 @@ sees two unexplored interleaving orders:
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 ($\texttt{B1} \Rightarrow \texttt{A4}$).
 %
-The \texttt{Interleaving \#2} is the bug-hitting interleaving orders.
-However, according to alias coverage, \texttt{Interleaving \#2}
-does not contain new coverage. 
+The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
+However, according to the alias coverage, \texttt{Interleaving \#2}
+does not contain any new coverage because $\texttt{B1} \Rightarrow \texttt{A4}$) is already observed in \texttt{Interleaving \#1}).
 %But, when alias coverage faces \texttt{Interleaving \#2} after
 %\texttt{Interleaving \#1}, it suffers from locating unobserved unique
 %behaviors of \texttt{Interleaving \#2}, because there is no unobserved
