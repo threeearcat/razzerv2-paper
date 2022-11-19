@@ -224,14 +224,13 @@ to explore thread interleavings further, but the \texttt{Interleaving \#2} does 
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
 to de-prioritize a multi-thread input in which a concurrency bug
-resides and pro
-
-
-Moreover, concurrent call pair~\cite{conzzer} also suffers from
+resides and switch to other seeds. In evaluation, we quantify the
+limitation in \autoref{table:comparison-interleaving-search}.
+Likewise, concurrent call pair~\cite{conzzer} coverage also suffers from
 distinguishing these two thread interleavings.
 %
 While concurrent call pair tracks a concurrently-executed function
-pair, it is not aware of interleavings of instructions.
+pair, it is not aware of the fine-grained orders of instruction interleavings within a function.
 %
 Since two thread interleavings in \autoref{fig:alias-coverage} take
 place in the same function (\ie, \texttt{A2} and \texttt{A4} are
@@ -273,32 +272,31 @@ bug.
 % here, we find that they all share the same limitation.
 
 
-\PP{Coverage-oblivious interleaving search strategy}
+\PP{Inefficient interleaving search strategy}
 %
-Stemming from less-informative coverage metrics, proposed interleaving
-search strategies are not properly directed by interleaving coverage,
-and thus, do not satisfy the \textbf{Design goal 2}.
+Stemming from the aforementioned limitations in coverage, 
+proposed interleaving search strategies do not efficiently 
+explore the search space guided by their interleaving coverage,
+not satisfying \textbf{Design goal 2}.
 
-Since Razzer~\cite{razzer} and Snowboard~\cite{snowboard} do not make
-use of interleaving coverage at all, they intrinsically cannot rely on
-explored thread interleavings in inferring unexplored thread
-interleavings.
+Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious. The do not make use of any interleaving coverage 
+and perform their randomized search.
 %
-Krace~\cite{krace} explores thread interleavings randomly without
-considering what thread interleavings are explored before. In other
-words, Krace utilizes interleaving coverage only when deciding whether
-or not to run a multi-thread input more, but not when inferring which
-thread interleavings to search in future iterations.
+Krace~\cite{krace} also explores thread interleaving orders randomly without
+considering what thread interleavings are explored before. 
+Krace limitedly utilizes interleaving coverage only when deciding whether it runs a given multi-thread input more. Whereas, we use 
+the coverage to infer which thread interleavings to search further
+in future iterations.
 %
 Conzzer~\cite{conzzer} is the only work that attempts to direct a
-fuzzer based on interleaving coverage, but it's interleaving coverage
-metric, concurrent call pair, does not capture interleavings of
-instructions, which are true reasons of concurrency bugs.
+fuzzer based on interleaving coverage, but as discussed,  
+it's interleaving coverage metric, concurrent call pair, does not capture instruction-level interleavings orders, missing important 
+search guidelines.
 %
 As a consequence, existing approaches do not systematically search for
-thread interleavings to run. Rather, they \textit{blindly} go through
-trial and error, making redundant executions without exploring
-meaningful thread interleavings.
+thread interleavings.  Rather, they \textit{blindly} go through
+trial and error, making \textit{redundant executions} without exploring
+meaningful thread interleavings\yj{Do we measure this?}.
 
 
 
