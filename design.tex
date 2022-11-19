@@ -84,7 +84,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
     the same memory object, and (c) instruction segments composed of
     two instruction pairs.  Note that we intentionally omit
     instructions that do not access globally-visible memory
-    objects. \dr{TODO: draw compactly}}
+    objects.}
   \label{fig:keyidea}
 \end{figure}
 %
@@ -402,15 +402,17 @@ The key property of the $hash(g)$ is reflecting directions of edges,
 so that a fuzzer can distinguish different interleavings of the same
 vertices.
 %
-To this end, for all vertices $v$ in $g$, we calculate the XXX score
-such that $XXX$
-
-\newcommand*\xor{\oplus}
-
-
-
-Thus, $hash(g) = xor $
-
+To this end, we adopt an idea of Merkel hashing~\cite{treehashing,
+  treehashing2}.
+%
+In particular, for all vertices $v$ in $g$, we first calculate a hash
+value of $v$ based on its out-going edges such that
+$hash(v) = \mathcal{H}(v ++ )$, where $\mathcal{H}$ denotes the
+non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and $++$
+denotes the concatenation operation.
+%
+Then, $hash(g) = \underset{v \in g}{\oplus} hash(v)$, where $\oplus$
+denotes the XOR operation.
 
 
 
@@ -440,6 +442,8 @@ search trials. \autoref{ss:scheduler} discusses our search strategy.
 \subsection{Coverage-directed Interleaving Search}
 \label{ss:scheduler}
 %
+\dr{Notation: segment mutation}
+%
 % One important role of segment graphs are to infer unexplored
 % interleaving segments that the fuzzer will search for in future
 % iterations.
@@ -447,9 +451,8 @@ search trials. \autoref{ss:scheduler} discusses our search strategy.
 In this subsection, we explain how we utilize explored interleaving
 segment graphs to search thread interleavings 
 
-\PP{Deriving unexplored interleaving segement}
+\PP{Interleaving segment mutation}
 %
-\dr{segment mutation}
 %
 The first step is to derive \textit{unexplored} interleaving segment
 graphs from \textit{explored} interleaving segment graphs.
