@@ -18,7 +18,7 @@ cleverly explore thread interleavings (\textbf{Design goal
 \subsection{Key Idea: Segmentizing thread interleaving}
 \label{ss:overview}
 
-\dr{term consistency: interleaving order <-> interleaved instruction}
+\dr{TODO: term consistency: interleaving order <-> interleaved instruction}
 
 %\begin{table}[t]
   %\centering
@@ -76,7 +76,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
 
 \PP{Example of segmentizing thread interleaving}
 %
-\begin{figure*}[t]
+\begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
@@ -86,7 +86,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
     that we intentionally omit instructions that do not access
     globally-visible memory objects.}
   \label{fig:keyidea}
-\end{figure*}
+\end{figure}
 %
 \autoref{fig:keyidea} visualizes how we segmentize a thread
 interleaving.
@@ -97,7 +97,7 @@ annotated with timestamps.
 %
 We can then draw a totally-ordered instruction sequence of the thread
 inteleaving as described in \autoref{fig:keyidea}-(a).
-
+%
 
 
 \dr{TODO: wip}
@@ -396,7 +396,7 @@ search trials. \autoref{ss:scheduler} discusses our search strategy.
 % iterations.
 % %
 In this subsection, we explain how we utilize explored interleaving
-segment graphs to search unexplored interleaving segment graphs.
+segment graphs to search thread interleavings 
 
 \PP{Deriving unexplored interleaving segement}
 %
