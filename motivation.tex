@@ -94,8 +94,8 @@ The observation gives an insight of how to define coverage metric
 in a concurrency fuzzer.
 To discover the uninitialized access bug, 
 interleaving coverage must distinguish orders of multiple thread interleavings. For example, $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4}))$ and $(\texttt{B1} \Rightarrow \texttt{A2}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4}))$ are different coverage.
+\texttt{A4})$ and $(\texttt{B1} \Rightarrow \texttt{A2}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$ are different coverage.
 The coverage metric should not be saturated until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is executed.
