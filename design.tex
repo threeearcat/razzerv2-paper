@@ -78,13 +78,13 @@ which makes the problem of defining a coverage metric tractable while maintainin
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{fig/intuition.pdf}
+  \includegraphics[width=0.8\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
-    \autoref{fig:cve-2017-17712} that does not cause the concurrency
-    bug, (b) instruction pairs that access the same memory object, and
-    (c) instruction segments composed of two instruction pairs.  Note
-    that we intentionally omit instructions that do not access
-    globally-visible memory objects. \dr{TODO: draw compactly}}
+    \autoref{fig:cve-2017-17712}, (b) instruction pairs that access
+    the same memory object, and (c) instruction segments composed of
+    two instruction pairs.  Note that we intentionally omit
+    instructions that do not access globally-visible memory
+    objects. \dr{TODO: draw compactly}}
   \label{fig:keyidea}
 \end{figure}
 %
@@ -211,9 +211,9 @@ memory accesses can produce.
 Then, among enumerated interleaving orders, we can select ones that
 unexplored before, and direct the fuzzer to search them.
 %
-In this way, we can satisfy \textbf{Design goal 2} by exploring
-meaningful thread interleavings at each iteration and minimizing
-redundant executions.
+In this way, \textit{we can satisfy \textbf{Design goal 2} by
+  exploring meaningful thread interleavings at each iteration and
+  minimizing redundant executions}.
 
 
 % 
@@ -372,26 +372,46 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 % access operation sequence.
 
 
-\PP{Tracking interleaving segment coverage}
+\PP{Interleaving segment coverage}
+%
+While executing a multi-thread input, a fuzzer monitors
+memory-accessing instructions annotated with timestamps. After the
+execution is finished, a fuzzer constructs interelaving graphs to
+compute \intcov for the given input.
 %
 
 
-We track interleaving segment coverage \textit{offline}. While
-executing a multi-thread input, a fuzzer collects memory-access
-instructions annotated with timestamps. After the execution is
-finished, the fuzzer collect segments and then builds interleaving
-graphs for each segment to compute \intcov for the given input.
+For a thread interleaving, $G = \{g_1, g_2, ..., g_n\}$
 
 
-In practice, \intcov contains a large number of interleaving graphs, 
-which consumes a large amount of memory even though the size of graphs is 
-small.
+
+
+
+In practice, \intcov contains a large number of interleaving graphs,
+which consumes a large amount of memory even though the size of graphs
+is small.
 %
 To reduce memory consumption, we hash each interleaving graph,
 and interleaving segment coverage tracks a hash table of segment
 graphs.
+
+To hash an interleaving graph, we define a hash function $hash(g)$ for
+an interleaving graph $g$.
 %
-\dr{TODO: explain how to hash the graph}\yj{Fill this, I will edit later.}
+The key property of the $hash(g)$ is reflecting directions of edges,
+so that a fuzzer can distinguish different interleavings of the same
+vertices.
+%
+To this end, for all vertices $v$ in $g$, we calculate the XXX score
+such that $XXX$
+
+\newcommand*\xor{\oplus}
+
+
+
+Thus, $hash(g) = xor $
+
+
 
 
 
@@ -428,6 +448,8 @@ In this subsection, we explain how we utilize explored interleaving
 segment graphs to search thread interleavings 
 
 \PP{Deriving unexplored interleaving segement}
+%
+\dr{segment mutation}
 %
 The first step is to derive \textit{unexplored} interleaving segment
 graphs from \textit{explored} interleaving segment graphs.
