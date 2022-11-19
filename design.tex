@@ -35,7 +35,7 @@ When fuzzing concurrency bugs with a coverage metric, the fundamental
 challenge is the large search space because the combinations of
 interleaving orders increase the search space exponentially.
 %
-Therefore, this work seek to strike the balance in the trade-off
+Therefore, this work seeks to strike the balance in the trade-off
 between the bug-finding capability and the search complexity.
 %
 Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
@@ -172,17 +172,19 @@ Accordingly, \textit{interleaving segments can act as an
 
 
 Second, explored interleaving segments can be exploited to
-infer unexplored interleaivng segments.
+systematically search thread interleavings to run in future
+iterations.
 %
 Since each interleaving segment contains only a small number of memory
 accesses, we can easily enumerate interleaving orders that these
 memory accesses can produce.
 %
-Then, among the interleaving oders, we can direct the fuzzer to search
-such interleaving segments that are unexplored before.
+Then, among enumerated interleaving orders, we can select ones that
+unexplored before, and direct the fuzzer to search them.
 %
-In this way, we can search for thread interleavings in a systematic
-and smart way, satisfying \textbf{Design goal 2}.
+In this way, we can satisfy \textbf{Design goal 2}, while exploring
+meaningful thread interleavings at each iteration and minimizing
+redundant executions.
 
 
 % 
@@ -243,11 +245,11 @@ Using a set of interleaving segments, we propose a novel concurrency coverage me
 \Intcov is designed to track interleaving orders
 within an interleaving segment and used for guiding a fuzzer to  
 efficiently search possible instruction interleavings.
-If \Intcov of a given input is saturated, 
+If \intcov of a given input is saturated, 
 a fuzzer can confidently conclude that the input unlikely causes a concurrency bug and proceed to the next input.
 
 \PP{Graph representation of interleaved instructions}
-As discussed, \Intcov contains multiple interleaved instructions, 
+As discussed, \intcov contains multiple interleaved instructions, 
 so \intcov cannot be presented as a single instruction interleaving 
 (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
 Instead, we represent each interleaving segment as a small directed acyclic
@@ -343,6 +345,8 @@ and \texttt{A4} $\rightarrow$ \texttt{B1}.
 
 \PP{Tracking interleaving segment coverage}
 %
+
+
 We track interleaving segment coverage \textit{offline}. While
 executing a multi-thread input, a fuzzer collects memory-access
 instructions annotated with timestamps. After the execution is
