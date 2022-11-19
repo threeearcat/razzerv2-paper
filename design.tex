@@ -78,13 +78,13 @@ which makes the problem of defining a coverage metric tractable while maintainin
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/intuition.pdf}
+  \includegraphics[width=0.7\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
     \autoref{fig:cve-2017-17712} that does not cause the concurrency
     bug, (b) instruction pairs that access the same memory object, and
     (c) instruction segments composed of two instruction pairs.  Note
     that we intentionally omit instructions that do not access
-    globally-visible memory objects.}
+    globally-visible memory objects. \dr{TODO: too big?}}
   \label{fig:keyidea}
 \end{figure}
 %
@@ -99,28 +99,56 @@ We can then draw a totally-ordered instruction sequence of the thread
 inteleaving as described in \autoref{fig:keyidea}-(a).
 %
 
+In this instruction sequence, we segmentize the thread interleaving in
+two steps. First, we pair up two instructions that access the same
+mermoy object.
+%
+As shown in \autoref{fig:keyidea}-(b), there are three pairs of
+interleaved instructions, $\texttt{B1} \Rightarrow \texttt{A2}$,
+$\texttt{B1} \Rightarrow \texttt{A4}$, and
+$\texttt{A6} \Rightarrow \texttt{B2}$.
+%
+As these pairs just describe a single interleaivng order, we further
+combine them to represent a combination of interleaving orders.
+%
+Since each pair contains two memory accesses, we combine two pairs to
+construct an interleaving segment.
+%
+For example, we combine two instruction pairs,
+$\texttt{B1} \Rightarrow \texttt{A2}$ and
+$\texttt{B1} \Rightarrow \texttt{A4}$, to construct \texttt{Segment
+  \#1}.
+%
+It is worth noting that all memory accesses are annontated with
+timestamps, we know that $\texttt{A2}$ is executed before
+$\texttt{A4}$, and arrange them in \texttt{Segment \#1} accordingly.
+%
+Likewise, \texttt{Segment \#2} and \texttt{Segment \#3} are the result
+of combining $\texttt{B1} \Rightarrow \texttt{A2}$ and
+$\texttt{A6} \Rightarrow \texttt{B2}$, and
+$\texttt{B1} \Rightarrow \texttt{A4}$ and
+$\texttt{A6} \Rightarrow \texttt{B2}$ respectively.
 
-\dr{TODO: wip}
 %
-\autoref{fig:keyidea}-(a) represents the thread interleaving of the
-execution, where the uninitialized access bug does not manifest
-because \texttt{B1} is executed before \texttt{A4} (\ie,
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ is not satisfied).
-%
-In order to track interleaving orders of a small number (\eg, four) of
-instructions, we decompose the thread interleaving into several
-interleaving segments as described in \autoref{fig:keyidea}-(b).
-%
-In these interleaving segments, \texttt{Segment \#1} contains three
-memory access operations (\ie, \texttt{A2}, \texttt{A4}, and
-\texttt{B1}), and describes interleaving orders such that \texttt{B1}
-is executed after \texttt{A2} and \texttt{A4}.
-%
-Similarly, \texttt{Segment \#2} and \texttt{Segment \#3} describes
-interleaving orders of four memory access operations, (\texttt{A2},
-\texttt{B1}, \texttt{B2}, \texttt{A6}) and (\texttt{A4}, \texttt{B1},
-\texttt{B2}, \texttt{A6}) respectively.
+% \autoref{fig:keyidea}-(a) represents the thread interleaving of the
+% execution, where the uninitialized access bug does not manifest
+% because \texttt{B1} is executed before \texttt{A4} (\ie,
+% $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+% \texttt{A4})$ is not satisfied).
+% %
+% In order to track interleaving orders of a small number (\eg, four) of
+% instructions, we decompose the thread interleaving into several
+% interleaving segments as described in \autoref{fig:keyidea}-(b).
+% %
+% In these interleaving segments, \texttt{Segment \#1} contains three
+% memory access operations (\ie, \texttt{A2}, \texttt{A4}, and
+% \texttt{B1}), and describes interleaving orders such that \texttt{B1}
+% is executed after \texttt{A2} and \texttt{A4}.
+% %
+% Similarly, \texttt{Segment \#2} and \texttt{Segment \#3} describes
+% interleaving orders of four memory access operations, (\texttt{A2},
+% \texttt{B1}, \texttt{B2}, \texttt{A6}) and (\texttt{A4}, \texttt{B1},
+% \texttt{B2}, \texttt{A6}) respectively.
 %
 
 % With these interleaving segments, the fuzzer can be noticed that
