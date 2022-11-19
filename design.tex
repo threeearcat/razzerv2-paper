@@ -4,11 +4,12 @@
 In this section, we describe our approach to effectively achieve
 \textbf{Design goal 1} and \textbf{2}.
 %
-We first explain the key idea of our approach~(\autoref{ss:overview}). 
-Then, we illustrate our concurrency
-coverage metric to express combinatorial interleavings 
-(\textbf{Design goal 1})~(\autoref{ss:coverage}), and the interleaving search strategy
-to quickly explore thread interleavings (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+We first explain the key idea of our approach~(\autoref{ss:overview}).
+Then, we illustrate our concurrency coverage metric to express
+combinatorial interleavings (\textbf{Design goal
+  1})~(\autoref{ss:coverage}), and the interleaving search strategy to
+cleverly explore thread interleavings (\textbf{Design goal
+  2})~(\autoref{ss:scheduler}).
 %While this section focuses only on how to explore the search space of
 %thread interleaving with a given multi-thread input, the whole design
 %of \sys will be explained later in \autoref{s:impl}.
@@ -16,6 +17,8 @@ to quickly explore thread interleavings (\textbf{Design goal 2})~(\autoref{ss:sc
 
 \subsection{Key Idea: Segmentizing thread interleaving}
 \label{ss:overview}
+
+\dr{term consistency: interleaving order <-> interleaved instruction}
 
 %\begin{table}[t]
   %\centering
@@ -29,20 +32,21 @@ to quickly explore thread interleavings (\textbf{Design goal 2})~(\autoref{ss:sc
   % \end{table}
 
 When fuzzing concurrency bugs with a coverage metric, the fundamental
-challenge is its large search space because the combinations of thread
-interleavings increase the the search space exponentially.
+challenge is the large search space because the combinations of
+interleaving orders increase the search space exponentially.
 %
 Therefore, this work seek to strike the balance in the trade-off
 between the bug-finding capability and the search complexity.
-
+%
 Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
 out of 105) of concurrency bugs manifest when a bug-finding system
-monitors instruction execution orders including \textit{at most} four
-memory accesses referring to the same memory object.
+monitors interleaving orders of \textit{at most} four memory accesses
+referring to shared memory objects.
 %
 All other memory accesses beyond four accesses and their execution
 orders do not meaningfully affect manifestation of a concurrency bug.
-The observation also is applied to the example of
+%
+The observation is also applied to the example of
 \autoref{fig:cve-2017-17712}. The uninitialized access bug is
 triggered by the execution order of three memory accesses (\eg,
 \texttt{A2}, \texttt{A4} and \texttt{B1}), while others (\eg,
@@ -53,13 +57,16 @@ concurrency bug.
 \PP{Segmentizing thread interleaving}
 %
 To reduce the search complexity, we take the classical wisdom of
-problem decomposition where complexity of a problem exponentially
-decreases as the problem size decreases.  Our key strategy is
-\textit{decomposing} the search space into small sub-spaces. We call a
-sub-space \textit{interleaving segment}.
+problem decomposition where the complexity of a problem exponentially
+decreases as the problem size decreases.
+%
+Our key strategy is \textit{decomposing} the search space into small
+sub-spaces. We call a sub-space \textit{interleaving segment}.
 %
 Each interleaving segment consists of instructions accessing 
-the same memory addresses (\ie, conflicting instructions).
+shared memory objects.
+% the same  memory objects. (\ie, conflicting instructions).
+%
 %
 When constructing an interleaving segment, following the observation, 
 we confine the size of a interleaving segment 
@@ -68,6 +75,8 @@ which makes the problem of defining a coverage metric tractable while maintainin
 
 
 \PP{Building segments}
+%
+\dr{TODO: rewrite}
 %
 In particular, once executing threads concurrently, we firstly model
 the thread interleaving as a totally-ordered instruction sequence.
@@ -90,7 +99,6 @@ instructions) and their interleaving orders as an interleaving segment.
 %
 \autoref{fig:keyidea} visualizes our key idea.
 %
-\dr{TODO: rewrite}
 Let us assume we execute the two system calls in
 \autoref{fig:cve-2017-17712} concurrently.
 %
@@ -137,75 +145,90 @@ interleaving orders of four memory access operations, (\texttt{A2},
 
 \PP{Benefits of segmentizing thread interleaving}
 %
-Segmentizing thread interleaving provides two remarkable benefits to
-the fuzzer as follows.
+Segmentizing thread interleaving provides two remarkable benefits to a
+fuzzer as follows.
 
 
 
 First, tracking interleaving segments is a befitting choice to
-determine if any interesting thread interleaving remains untested.
+determine whether to further explore thread interleavings of a
+multi-thread input.
 %
-As mentioned above, most concurrency bugs manifest depending only on
-the execution order of four memory access operations. If the fuzzer
-explores all interleaving segments with size of at most four, it is
-unlikely that the fuzzer misses a concurrency bugs.
+% As mentioned above, most concurrency bugs manifest depending only on
+% the execution order of four memory accesses.
 %
-Accordingly, \textit{interleaving segments can be act as an
-  interleaving coverage metric that allows a fuzzer to satisfy
-  \textbf{R1}}.
-  
+Considering a concurrency bug manifests depending on a combination of
+interleaving orders of at most four memory accesses (which is exactly
+represented by an interleaving segment), if a fuzzer explores all
+interleaving segments, it is unlikely that a fuzzer misses a
+concurrency bugs.
+%
+Accordingly, \textit{interleaving segments can act as an
+  interleaving coverage metric satisfying \textbf{Design goal 1}}.
+
 
 
 
 
 
 Second, explored interleaving segments can be exploited to
-\textit{direct} the fuzzer about what thread interleaving needs to be
-explored in future.
+infer unexplored interleaivng segments.
 %
-\autoref{fig:hint} demonstrates how explored interleaving segments
-can be helpful for future iterations.
+Since each interleaving segment contains only a small number of memory
+accesses, we can easily enumerate interleaving orders that these
+memory accesses can produce.
 %
-As illustrated in \autoref{fig:hint}, the fuzzer can derive
-\textit{unexplored} \texttt{Segment \#1*} by changing the execution
-order of \texttt{A4} and \texttt{B4} in \textit{explored}
-\texttt{Segment \#1}.
+Then, among the interleaving oders, we can direct the fuzzer to search
+such interleaving segments that are unexplored before.
 %
-Since \texttt{Segment \#1*} satisfies
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$, the fuzzer can discover the uninitialized access bug if
-it executes thread interleaving containing \texttt{Segment \#1*}.
-%
-In addition, the fuzzer can explore multiple interleaving segments at
-a time.
-%
-Besides \texttt{Segment \#1*}, \texttt{Segment \#3*} can also be
-derived from \texttt{Segment \#3}.
-%
-Interestingly, \texttt{Segment \#1*} and \texttt{Segment \#3*} can be
-used to compose a new thread interleaving.
-%
-By executing a thread interleaving including the two derived
-interleaving segments, the fuzzer is able to quickly test a number of
-interleaving segments.
-%
-In this way, \textit{our proposed scheduler mechanism is designed to
-  quickly explore unexplored interleaving segments, and to satisfy
-  \textbf{R2}}.
-%
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.9\linewidth]{fig/hint.pdf}
-  \caption{\texttt{Segment \#1} and \texttt{Segment \#3} are explored
-    interleaving segments in \autoref{fig:keyidea}.
-    %
-    From these two interleaving segments, our approach derives other
-    interleaving segments \texttt{Segment \#1*} and \texttt{\#3*}, and
-    schedules instructions to test the derived interleaving segments
-    at the same time.}
-  \label{fig:hint}
-\end{figure}
-%
+In this way, we can search for thread interleavings in a systematic
+and smart way, satisfying \textbf{Design goal 2}.
+
+
+% 
+% \autoref{fig:hint} demonstrates how explored interleaving segments
+% can be helpful for future iterations.
+% %
+% As illustrated in \autoref{fig:hint}, the fuzzer can derive
+% \textit{unexplored} \texttt{Segment \#1*} by changing the execution
+% order of \texttt{A4} and \texttt{B4} in \textit{explored}
+% \texttt{Segment \#1}.
+% %
+% Since \texttt{Segment \#1*} satisfies
+% $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+% \texttt{A4})$, the fuzzer can discover the uninitialized access bug if
+% it executes thread interleaving containing \texttt{Segment \#1*}.
+% %
+% In addition, the fuzzer can explore multiple interleaving segments at
+% a time.
+% %
+% Besides \texttt{Segment \#1*}, \texttt{Segment \#3*} can also be
+% derived from \texttt{Segment \#3}.
+% %
+% Interestingly, \texttt{Segment \#1*} and \texttt{Segment \#3*} can be
+% used to compose a new thread interleaving.
+% %
+% By executing a thread interleaving including the two derived
+% interleaving segments, the fuzzer is able to quickly test a number of
+% interleaving segments.
+% %
+% In this way, \textit{our proposed scheduler mechanism is designed to
+%   quickly explore unexplored interleaving segments, and to satisfy
+%   \textbf{R2}}.
+% %
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=0.9\linewidth]{fig/hint.pdf}
+%   \caption{\texttt{Segment \#1} and \texttt{Segment \#3} are explored
+%     interleaving segments in \autoref{fig:keyidea}.
+%     %
+%     From these two interleaving segments, our approach derives other
+%     interleaving segments \texttt{Segment \#1*} and \texttt{\#3*}, and
+%     schedules instructions to test the derived interleaving segments
+%     at the same time.}
+%   \label{fig:hint}
+% \end{figure}
+% %
 
 
 
@@ -325,6 +348,10 @@ executing a multi-thread input, a fuzzer collects memory-access
 instructions annotated with timestamps. After the execution is
 finished, the fuzzer collect segments and then builds interleaving
 graphs for each segment to compute \intcov for the given input.
+
+
+In particular, we first identify interleaved instructions
+
 
 In practice, \intcov contains a large number of interleaving graphs, 
 which consumes a large amount of memory even though the size of graphs is 
