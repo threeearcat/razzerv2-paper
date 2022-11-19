@@ -210,13 +210,14 @@ sees two unexplored interleaving orders:
 ($\texttt{B1} \Rightarrow \texttt{A4}$).
 %
 The \texttt{Interleaving \#2} is the bug-hitting interleaving orders.
-However, alias coverage does not 
-But, when alias coverage faces \texttt{Interleaving \#2} after
-\texttt{Interleaving \#1}, it suffers from locating unobserved unique
-behaviors of \texttt{Interleaving \#2}, because there is no unobserved
-interleaving order in \texttt{Interleaving \#2} (\ie,
-($\texttt{B1} \Rightarrow \texttt{A4}$) is already observed in
-\texttt{Interleaving \#1}).
+However, according to alias coverage, \texttt{Interleaving \#2}
+does not contain new coverage. 
+%But, when alias coverage faces \texttt{Interleaving \#2} after
+%\texttt{Interleaving \#1}, it suffers from locating unobserved unique
+%behaviors of \texttt{Interleaving \#2}, because there is no unobserved
+%interleaving order in \texttt{Interleaving \#2} (\ie,
+%($\texttt{B1} \Rightarrow \texttt{A4}$) is already observed in
+%\texttt{Interleaving \#1}).
 %
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
