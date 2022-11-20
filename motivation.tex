@@ -280,14 +280,16 @@ proposed interleaving search strategies do not efficiently
 explore the search space guided by their interleaving coverage,
 not satisfying \textbf{Design goal 2}.
 
-Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious. The do not make use of any interleaving coverage 
+Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious.
+They do not make use of any interleaving coverage 
 and perform their randomized search.
 %
-Krace~\cite{krace} also explores thread interleaving orders randomly without
-considering what thread interleavings are explored before. 
-Krace limitedly utilizes interleaving coverage only when deciding whether it runs a given multi-thread input more. Whereas, we use 
-the coverage to infer which thread interleavings to search further
-in future iterations.
+Krace~\cite{krace} also explores thread interleavings randomly without
+considering what thread interleavings are explored before.  Krace
+limitedly utilizes interleaving coverage only when deciding whether it
+runs a given multi-thread input more. Whereas, we use the coverage to
+infer which thread interleavings to search further in future
+iterations.
 %
 Conzzer~\cite{conzzer} is the only work that attempts to direct a
 fuzzer based on interleaving coverage, but as discussed,  
