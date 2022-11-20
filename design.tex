@@ -317,7 +317,7 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
+  \includegraphics[width=0.8\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{(a) \texttt{Segment \#1} from \autoref{fig:keyidea}, and
     (b) its interleaving graph. In (b), a dotted arrow represents a
     program order, and solid arrows represent interleaving orders.}
@@ -450,9 +450,10 @@ If it is the case, a fuzzer forms a subgraph $g_k = (V_k, E_k)$ where
 $V_k$ is a set of vertices that $e_x$ and $e_y$ connect, and $E_k$ is
 a set of edges connecting vertices in $V_k$.
 %
-\dr{more precise explanation and take example of figure 4}
+\dr{TODO: more precise explanation and take example of figure 4}
 
 
+\dr{TODO:}
 Lastly, a fuzzer gathers interelaving graphs to form a set of
 interleaving graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to
 track interleaving segment coverage and to search unexplored thread
@@ -544,27 +545,36 @@ instructions.
 These two seemingly-conflicting characteristics of interleaving graphs
 enables the systematic exploration of thread interleaving.
 %
-In other words, it is practically impossible to thoroughly explore
+In other words, it is practically impossible to thoroughly explore all
 thread interleavings because of the astronomical number of possible
 thread interleavings.
 %
-However, it is \textit{easily possible} explore interleavings inside
-an interleaving segment. More importantly, it is still enough to
-discover concurrency bugs (as mentioned in \autoref{ss:overview}).
+However, it is \textit{easily possible} to explore interleavings
+\textit{inside} interleaving segments due to their small size. More
+importantly, exploring inside interleaving segments is still enough to
+discover most concurrency bugs (as mentioned in
+\autoref{ss:overview}).
+
+Taking these advantages of \intcov, our interleaving search strategy
+is \textit{not random} unlike previous approaches~\cite{krace, ski,
+  pctalgorithm, muzz}, Rather, it is a systematic exploration directed
+by interleaving coverage.
 %
+\autoref{ss:scheduler} discusses our search strategy.
 
 
-\Intcov can guide the fuzzer to identify that there are possibly more
-useful instruction interleavings remain untested. So, the fuzzer
-spends more computing power to explore more interesting (unseen)
-instruction interleavings from \intcov. We emphasize that our
-searching strategy is \textit{not random} unlike previous
-approaches~\cite{krace, ski, pctalgorithm, muzz}.
-%
-We mutate a newly found interleaving graph to direct the fuzzer to
-systematically explore the search space of instruction interleavings
-while minimizing redundant and useless search
-trials. \autoref{ss:scheduler} discusses our search strategy.
+% \Intcov can guide the fuzzer to identify that there are possibly more
+% useful instruction interleavings remain untested. So, the fuzzer
+% spends more computing power to explore more interesting (unseen)
+% instruction interleavings from \intcov. We emphasize that our
+% searching strategy is \textit{not random} unlike previous
+% approaches~\cite{krace, ski, pctalgorithm, muzz}.
+% %
+% We mutate a newly found interleaving graph to direct the fuzzer to
+% systematically explore the search space of instruction interleavings
+% while minimizing redundant and useless search
+% trials.
+
 
 
 \subsection{Coverage-directed Interleaving Search}
@@ -574,8 +584,8 @@ trials. \autoref{ss:scheduler} discusses our search strategy.
 % interleaving segments that the fuzzer will search for in future
 % iterations.
 % %
-In this subsection, we explain how we utilize explored interleaving
-segment graphs to systematically explore thread interleavings.
+In this subsection, we explain how we utilize explored \intcov to
+systematically explore thread interleavings.
 
 \PP{Interleaving segment mutation}
 %
@@ -588,8 +598,8 @@ Suppose $G = \{g_1, g_2, ..., g_n \}$ is given for a thread
 interleaving. Since $G$ is obtained after executing the thread
 interleaving, all graphs in $G$ are \textit{explored}.
 %
-Then, a fuzzer mutates each $g_i \in G$ to drive other interleaving
-graphs.
+Then, a fuzzer mutates each $g_i \in G$ to drive other (and
+unexplored) interleaving graphs.
 
 
 
@@ -635,8 +645,7 @@ graph indicates a contradiction on the execution order that any vertex
 on the loop should be executed before itself.
 
 
-
-
+\dr{TODO:}
 In this way, a fuzzers mutates all $g_i \in G$, and aggregate all
 mutated and unobserved interleaving segment graphs into $G_{mutated}$,
 and uses it to search for a thread interleaving to run.
@@ -686,7 +695,7 @@ unobserved interleaving segment graphs in $G^{*}_{mutated}$ at once.
 
 
 
-
+\dr{wip}
 It may require a heavy computation to identify the largest
 contradiction-free subset of $G_{mutated}$.
 %
