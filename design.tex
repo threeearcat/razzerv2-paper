@@ -315,8 +315,8 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
   \centering
   \includegraphics[width=0.9\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{(a) \texttt{Segment \#1} from \autoref{fig:keyidea}, and
-    (b) its interleaving graph. In (b) a dotted arrow represents a program
-    order, and solid arrows represent interleaving orders.}
+    (b) its interleaving graph. In (b), a dotted arrow represents a
+    program order, and solid arrows represent interleaving orders.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
 
@@ -381,7 +381,35 @@ compute \intcov for the given input.
 %
 
 
-For a thread interleaving, $G = \{g_1, g_2, ..., g_n\}$
+Here, we formally explain how to construct interleaving graphs. Let us
+assume all memory-accessing instructions are uniquely labeled such as
+$i_1$, $i_2$, ..., $i_k$.
+%
+A fuzzer generates vertices $v_1$, $v_2$, ..., $v_k$ for each
+memory-accessing instructions that are also labeled with their
+corresponding instructions.
+%
+Then, for two vertices $v_x$ and $v_y$ that $i_x$ was executed before
+$i_y$, a fuzzer generates directed edges $v_x$ $\rightarrow$ $v_y$ if
+1) $v_x$ and $v_y$ were executed in the same thread (\ie, a
+program-order edge), or 2) $v_x$ and $v_y$ accessed the same memory
+object (\ie, an interleaving-order edge).
+
+
+
+%
+The generated vertices $V = (v_i, v_2, ..., v_k$) and edges
+$E = (e_1, e_2, ... e_l)$ altogether represent the entire thread
+interleaving.
+
+
+
+Then, $g_i$ is a subgraph of $g$ that contain two interleaving edges.
+%
+For a thread interleaving, a fuzzer computes a set of interleaving
+graphs $G = \{g_1, g_2, ..., g_n\}$.
+
+
 
 
 
@@ -395,24 +423,37 @@ To reduce memory consumption, we hash each interleaving graph,
 and interleaving segment coverage tracks a hash table of segment
 graphs.
 
-To hash an interleaving graph, we define a hash function $hash(g)$ for
-an interleaving graph $g$.
+
+
+To hash an interleaving graph, we define a hash function $hash(g_i)$
+for an interleaving graph $g_i = (V_i, E_i)$.
 %
-The key property of the $hash(g)$ is reflecting directions of edges,
+The key property of the $hash(g_i)$ is reflecting directions of edges,
 so that a fuzzer can distinguish different interleavings of the same
 vertices.
 %
 To this end, we adopt an idea of Merkel hashing~\cite{treehashing,
   treehashing2}.
 %
-In particular, for all vertices $v$ in $g$, we first calculate a hash
-value of $v$ based on its out-going edges such that
-$hash(v) = \mathcal{H}(v ++ )$, where $\mathcal{H}$ denotes the
-non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and $++$
-denotes the concatenation operation.
+In particular, for all vertices $v$ in $V_i$, we first calculate a
+hash value of $v$, $hash(v)$, which reflects its out-going edges. With
+$o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
 %
-Then, $hash(g) = \underset{v \in g}{\oplus} hash(v)$, where $\oplus$
-denotes the XOR operation.
+
+\[ hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
+  o_m.label) \]
+
+where $\mathcal{H}$ denotes the
+non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and ${++}$
+denotes the label-concatenation operation.
+%
+Then,
+
+\[
+  hash(g) = \underset{v \in V_i}{\oplus} hash(v)
+\]
+
+where $\oplus$ denotes the XOR operation.
 
 
 
@@ -442,24 +483,21 @@ search trials. \autoref{ss:scheduler} discusses our search strategy.
 \subsection{Coverage-directed Interleaving Search}
 \label{ss:scheduler}
 %
-\dr{Notation: segment mutation}
-%
 % One important role of segment graphs are to infer unexplored
 % interleaving segments that the fuzzer will search for in future
 % iterations.
 % %
 In this subsection, we explain how we utilize explored interleaving
-segment graphs to search thread interleavings 
+segment graphs to systematically explor thread interleavings.
 
 \PP{Interleaving segment mutation}
 %
 %
-The first step is to derive \textit{unexplored} interleaving segment
-graphs from \textit{explored} interleaving segment graphs.
-
-From the executing of a thread interleaving, we obtain a set of
-multiple interleaving segment graphs, and let us denote
-$G = \{g_1, g_2, ..., g_n \}$ as this set of interleaving graphs.
+The first step is to infer \textit{unexplored} interleaving graphs
+from \textit{explored} interleaving graphs.
+%
+Suppose $G = \{g_1, g_2, ..., g_n \}$ is given for a thread
+interleaving.
 %
 Since $G$ is obtained after executing the thread interleaving, all
 graphs in $G$ are \textit{explored}.
@@ -528,7 +566,7 @@ $G_{derived}$. and uses it to search for a thread interleaving to run.
 
 
 
-\PP{Searching for a thread interleaving}
+\PP{Composing a thread interleaving}
 %
 With $G_{derived}$, we could naively test unobserved interleaving
 graphs in $G_{derived}$ one-by-one. But, it is inefficient. As
