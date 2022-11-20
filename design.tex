@@ -379,22 +379,22 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 \PP{Constructing interleaving graphs}
 %
 Let us assume executed memory accesses are represented in a list
-($M_1$, $M_2$, ..., $M_k$). Without loss of generality, let us also
-assume $M_i$ is executed before $M_j$ if $i<j$ (\ie, the list is
+($m_1$, $m_2$, ..., $m_k$). Without loss of generality, let us also
+assume $m_i$ is executed before $m_j$ if $i<j$ (\ie, the list is
 sorted in order of execution).
-%
+
 Given a list of memory accesses, a fuzzer firstly generates vertices
-$v_1$, $v_2$, ..., $v_k$ that correspond to all memory accesses.
+$v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
 %
-Then, for all $M_i, M_j$ such that $i<j$, a fuzzer generates a
-directed edge $M_i \rightarrow M_j$ in two cases. A program-order edge
-is generated if $M_i$ and $M_j$ are executed by the same thread.
+Then, for all $m_i, m_j$ such that $i<j$, a fuzzer generates a
+directed edge $v_i \rightarrow v_j$ in two cases. A program-order edge
+is generated if $m_i$ and $m_j$ are executed by the same thread.
 %
-On the other hand, an interleaving-order edge is generated if $M_i$
-and $M_j$ are executed by different threads, they access the same
+On the other hand, an interleaving-order edge is generated if $m_i$
+and $m_j$ are executed by different threads, they access the same
 memory object, and one of them is a write operation.
 %
-As a result, a fuzzer constructs a set of vertices $V$ and a set of
+As a result, a fuzzer generates a set of vertices $V$ and a set of
 edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
 thread interleaving.
 
@@ -442,8 +442,15 @@ interleaving-order edges.
 % $\{v_{x}, v_{y}, v_{z}, v_{w}\}$, and $E_i$ is a set of edges
 % connecting vertices in $V_i$.
 %
-To this end, a fuzzer selects two edges $e_i, e_j \in E$ such that
-$e_i \neq e_j$.
+To this end, a fuzzer selects two edges $e_x, e_y \in E$ such that
+$e_x \neq e_y$, and checks that both $e_x$ and $e_y$ are
+interleaving-order edges.
+%
+If it is the case, a fuzzer forms a subgraph $g_k = (V_k, E_k)$ where
+$V_k$ is a set of vertices that $e_x$ and $e_y$ connect, and $E_k$ is
+a set of edges connecting vertices in $V_k$.
+%
+\dr{more precise explanation and take example of figure 4}
 
 
 Lastly, a fuzzer gathers interelaving graphs to form a set of
@@ -478,6 +485,7 @@ vertices.
 To this end, we adopt an idea of Merkel hashing~\cite{treehashing,
   treehashing2}.
 %
+\dr{I want to discuss about this part:}
 In particular, for all vertices $v$ in $V_i$, we first calculate a
 hash value of $v$, $hash(v)$, which reflects its out-going edges. With
 $o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
@@ -524,21 +532,22 @@ interleavings of the same vertices of
 % \dr{no.. the search space of \intcov is larger than alias coverage. We
 %   quickly explore the search space of \intcov because our search
 %   strategy is clever, it is not because of the interleaving coverage.}
-
-
-
-\Intcov and the form of interleaving graph express semantically richer
-information. \Intcov captures combinations of multiple
-memory-accessing instructions as a unit of an interleaving segment
-
-\Intcov can guide the fuzzer to identify that there are possibly more useful instruction interleavings remain untested. So, the fuzzer spends
-more computing power to explore more interesting (unseen) instruction interleavings from \intcov. We emphasize that our searching strategy is 
-\textit{not random} unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz}.
 %
-We use\yj{transform? better word?} a newly found interleaving graph to
-direct the fuzzer to systematically explore the search space of
-instruction interleavings while minimizing redundant and useless
-search trials. \autoref{ss:scheduler} discusses our search strategy.
+\Intcov and the form of interleaving graph express semantically rich
+information; it captures combinations of multiple memory-accessing
+instructions as a unit of an interleaving segment
+
+\Intcov can guide the fuzzer to identify that there are possibly more
+useful instruction interleavings remain untested. So, the fuzzer
+spends more computing power to explore more interesting (unseen)
+instruction interleavings from \intcov. We emphasize that our
+searching strategy is \textit{not random} unlike previous
+approaches~\cite{krace, ski, pctalgorithm, muzz}.
+%
+We mutate a newly found interleaving graph to direct the fuzzer to
+systematically explore the search space of instruction interleavings
+while minimizing redundant and useless search
+trials. \autoref{ss:scheduler} discusses our search strategy.
 
 
 \subsection{Coverage-directed Interleaving Search}
