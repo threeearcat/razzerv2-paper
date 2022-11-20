@@ -69,7 +69,7 @@ shared memory objects.
 %
 When constructing an interleaving segment, following the observation, 
 we confine the size of a interleaving segment 
-to contain interleaved instructions including at most four memory accesses,
+to contain at most four memory-accessing instructions,
 which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
 
 
@@ -566,7 +566,7 @@ itself.
 
 In this way, a fuzzers mutates for all $g_i \in G$, and aggregate all
 derived and unobserved interleaving segment graphs into
-$G_{derived}$. and uses it to search for a thread interleaving to run.
+$G_{mutated}$. and uses it to search for a thread interleaving to run.
 
 % Therefore, in this fugure, we can derive two \textit{unobserved}
 % interleaving segment graphs.
@@ -578,12 +578,14 @@ $G_{derived}$. and uses it to search for a thread interleaving to run.
 
 \PP{Composing a thread interleaving}
 %
-While we could naively test unexplored interleaving graphs in
-$G_{derived}$ one-by-one, we choose to test multiple unexplored
-interleaving graphs altogether.
+One could naively test unexplored interleaving graphs in $G_{mutated}$
+one-by-one
+
+we choose to test multiple unexplored interleaving graphs
+altogether.
 
 
-\dr{wip.}
+
 For each iteration, we select a subset of $G_{derived}$ called
 $G^{*}_{derived}$, and search for a thread interleaving to explore all
 unobserved interleaving segment graphs in $G^{*}_{derived}$ at once.
