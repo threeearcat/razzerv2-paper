@@ -210,10 +210,10 @@ sees two unexplored interleaving orders:
 ($\texttt{B1} \Rightarrow \texttt{A4}$).
 %
 The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
-However, according to the alias coverage, \texttt{Interleaving \#2}
-does not contain any new coverage because $\texttt{B1} \Rightarrow \texttt{A4}$) is already observed in \texttt{Interleaving \#1}).
-KRace considers that growing the alias coverage is a promising signal 
-to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase the alias coverage in this scenario.
+However, according to alias coverage, \texttt{Interleaving \#2}
+does not contain any new coverage because ($\texttt{B1} \Rightarrow \texttt{A4}$) is already observed in \texttt{Interleaving \#1}.
+Krace considers that growing alias coverage is a promising signal 
+to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase alias coverage in this scenario.
 %But, when alias coverage faces \texttt{Interleaving \#2} after
 %\texttt{Interleaving \#1}, it suffers from locating unobserved unique
 %behaviors of \texttt{Interleaving \#2}, because there is no unobserved
@@ -238,9 +238,6 @@ executed in the same function), concurrent call pair is also limited
 in distinguish the two interleavings, and shows the same limitation as
 alias coverage when it comes to discovering this uninitialized access
 bug.
-
-\dr{TODO: respect conzzer}
-
 
 % is also saturated with these two thread
 % interleavings, because once two functions \texttt{sendmsg()} and
