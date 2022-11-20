@@ -376,27 +376,24 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 
 \PP{Constructing interleaving segment coverage}
 %
-% While executing a multi-thread input, a fuzzer monitors
-% memory-accessing instructions annotated with timestamps. After the
-% execution is finished, a fuzzer constructs interelaving graphs to
-% compute \intcov for the given input.
-%
-Here, we formally explain how a fuzzer constructs interleaving
-graphs. Let us assume all memory-accessing instructions are uniquely
+In order to formally explain how a fuzzer constructs interleaving
+graphs, let us assume all memory-accessing instructions are uniquely
 labeled such as $i_1$, $i_2$, ..., $i_k$.
 %
 A fuzzer generates vertices $v_1$, $v_2$, ..., $v_k$ for each
 memory-accessing instructions, and also label them with their
 corresponding instructions.
 %
-Then, for two vertices $v_x$ and $v_y$ such that $i_x$ was executed
-before $i_y$, a fuzzer generates directed edges $v_x$ $\rightarrow$
-$v_y$ if 1) $v_x$ and $v_y$ were executed in the same thread (\ie, a
-program-order edge), or 2) $v_x$ and $v_y$ accessed the same memory
-object (\ie, an interleaving-order edge).
+Then, for two vertices $v_{x1}$ and $v_{x2}$ such that $i_{x1}$ was
+executed before $i_{x2}$, a fuzzer generates directed edges $v_{x1}$
+$\rightarrow$ $v_{x2}$ if 1) $v_{x1}$ and $v_{x2}$ were executed in
+the same thread (\ie, a program-order edge), or 2) $v_{x1}$ and
+$v_{x2}$ accessed the same memory object (\ie, an interleaving-order
+edge).
 %
-As a result, a fuzzer constructs a graph $g = (V, E)$ representing a
-\textit{whole} thread interleaving.
+By denonting $V$ as a generated vertices and $E$ as a generated edges,
+a fuzzer constructs a graph $g = (V, E)$ representing a \textit{whole}
+thread interleaving.
 
 
 
