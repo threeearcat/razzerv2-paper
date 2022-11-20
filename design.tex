@@ -36,7 +36,7 @@ exponentially.
 %
 Therefore, this work seeks to strike the balance in the trade-off
 between the bug-finding capability and the search complexity.
-%
+
 Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
 out of 105) of concurrency bugs manifest when a bug-finding system
 monitors interleaving orders of \textit{at most} four memory accesses
@@ -98,9 +98,10 @@ We can then draw a totally-ordered instruction sequence of the thread
 inteleaving as described in \autoref{fig:keyidea}-(a).
 %
 
-In this instruction sequence, we segmentize the thread interleaving in
-two steps. First, we pair up two instructions that access the same
-mermoy object.
+In this instruction sequence, segmentizing the thread interleaving is
+performed in two steps.
+%
+First, we pair up two instructions that access the same mermoy object.
 %
 As shown in \autoref{fig:keyidea}-(b), there are three pairs of
 interleaved instructions, $\texttt{B1} \Rightarrow \texttt{A2}$,
@@ -573,40 +574,17 @@ $G_{derived}$. and uses it to search for a thread interleaving to run.
 
 \PP{Composing a thread interleaving}
 %
-With $G_{derived}$, we could naively test unobserved interleaving
-graphs in $G_{derived}$ one-by-one. But, it is inefficient. As
-described in \dr{}, a number of interleaving segments can be explored
-at once.
-%
-Thus, we choose a \textit{smarter} way to consume $G_{derived}$.
-%
+While we could naively test unexplored interleaving graphs in
+$G_{derived}$ one-by-one, we choose to test multiple unexplored
+interleaving graphs altogether.
+
+
+
 For each iteration, we select a subset of $G_{derived}$ called
 $G^{*}_{derived}$, and search for a thread interleaving to explore all
 unobserved interleaving segment graphs in $G^{*}_{derived}$ at once.
 
-%
-% As described  \autoref{fig:hint}, multiple segment graphs can be
-% explored at a time (\ie, one thread interleaving comprises multiple
-% interleaving segments).
-% %
-% Thus, our strategy to to quickly consume $S_{derived}$ (\ie, a set of
-% derived and unexplored segment graphs) is selecting multiple
-% interleaving segments from $S_{derived}$, and explore them altogether.
 
-\dr{wip}
-
-
-
-However, not all interleaving segments cannot be explored together.
-%
-For example, in \autoref{fig:hint}, (a) and (b) cannot be explored
-together; the segment graph (a) requires \texttt{A2} to be executed
-before \texttt{B1} while the segment graph (b) requires the opposite
-execution order between \texttt{A2} and \texttt{B1}.
-%
-Therefore, the fuzzer repeatedly selects and tests a subset of
-$S_{derived}$ that is contradiction-free (\ie, does not make a
-contradiction on the execution order) until $S_{derived}$ is empty.
 
 
 It may require a heavy computation to identify the largest
