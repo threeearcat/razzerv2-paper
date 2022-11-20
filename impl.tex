@@ -128,12 +128,17 @@ in $I_{ST}$ that potentially exposes new interleaving coverage if
 executed concurrently.
 %
 More specifically, for each system call pair ($S_i$, $S_j$) in
-$I_{ST}$, the single-thread executor generates a set of interleaving
-segment graphs $G_{(i,j)}$ from memory accesses executed by $S_i$ and
-$S_j$.
+$I_{ST}$, the single-thread executor constructs a set of unexplored
+interleaving segment graphs $G_{mutated}$ from memory accesses
+executed by $S_i$ and $S_j$.
 %
-It is worth noting that $S_i$ and $S_j$ were executed
-\textit{sequentially}.
+Lastly, if $G_{mutated}$ is not empty, the single thread executor
+passes $I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the
+next phase, the multi-thread fuzzing.
+
+
+% It is worth noting that $S_i$ and $S_j$ were executed
+% \textit{sequentially}.
 %
 % However, the single-thread executor still can
 % generate interleaving segment graphs from $S_i$ and $S_j$ in a form
@@ -141,23 +146,23 @@ It is worth noting that $S_i$ and $S_j$ were executed
 
 
 
-The single-thread executor does not record $G_{(i,j)}$ in the
-interleaving segment coverage because $S_i$ and $S_j$ were executed
-sequentially.
-%
-Instead, the single-thread executor makes use of $G_{(i,j)}$ to derive
-a set of \textit{unobserved} interleaivng segment graphs
-$G^{derived}_{(i,j)}$.
-%
-To this end, for each interleaving segment graph $g \in G_{(i,j)}$,
-the single-thread executor derives new interleaving segment graphs
-(refer to \autoref{fig:interleavingmutation}), and puts ones that
-unobserved before in $G^{derived}_{(i,j)}$.
-%
-Lastly, if $G^{derived}_{(i,j)}$ is not empty, the single thread
-executor passes $I_{ST}$ as well as ($S_i$, $S_j$) and
-$G^{derived}_{(i,j)}$ to the next phase, the multi-thread fuzzing.
+% Instead, the single-thread executor makes use of $G$ to derive
+% a set of \textit{unobserved} interleaivng segment graphs
+% $G^{derived}$.
+% %
+% To this end, for each interleaving segment graph $g \in G$,
+% the single-thread executor derives new interleaving segment graphs
+% (refer to \autoref{fig:interleavingmutation}), and puts ones that
+% unobserved before in $G^{derived}$.
+% %
+% Lastly, if $G^{derived}$ is not empty, the single thread executor
+% passes $I_{ST}$ as well as ($S_i$, $S_j$) and $G^{derived}$ to the
+% next phase, the multi-thread fuzzing.
 
+
+% The single-thread executor does not record $G$ in the
+% interleaving segment coverage because $S_i$ and $S_j$ were executed
+% sequentially.
 
 
 \subsubsection{Multi-thread fuzzing}
