@@ -18,8 +18,6 @@ cleverly explore thread interleavings (\textbf{Design goal
 \subsection{Key Idea: Segmentizing thread interleaving}
 \label{ss:overview}
 
-\dr{TODO: term consistency: interleaving order <-> interleaved instruction}
-
 %\begin{table}[t]
   %\centering
   %input{table/learningfrommistakes.tex}
@@ -379,17 +377,17 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 % execution is finished, a fuzzer constructs interelaving graphs to
 % compute \intcov for the given input.
 %
-Here, we formally explain how to construct interleaving graphs. Let us
-assume all memory-accessing instructions are uniquely labeled such as
-$i_1$, $i_2$, ..., $i_k$.
+Here, we formally explain how a fuzzer constructs interleaving
+graphs. Let us assume all memory-accessing instructions are uniquely
+labeled such as $i_1$, $i_2$, ..., $i_k$.
 %
 A fuzzer generates vertices $v_1$, $v_2$, ..., $v_k$ for each
 memory-accessing instructions, and also label them with their
 corresponding instructions.
 %
-Then, for two vertices $v_x$ and $v_y$ that $i_x$ was executed before
-$i_y$, a fuzzer generates directed edges $v_x$ $\rightarrow$ $v_y$ if
-1) $v_x$ and $v_y$ were executed in the same thread (\ie, a
+Then, for two vertices $v_x$ and $v_y$ such that $i_x$ was executed
+before $i_y$, a fuzzer generates directed edges $v_x$ $\rightarrow$
+$v_y$ if 1) $v_x$ and $v_y$ were executed in the same thread (\ie, a
 program-order edge), or 2) $v_x$ and $v_y$ accessed the same memory
 object (\ie, an interleaving-order edge).
 %
@@ -497,74 +495,73 @@ search trials. \autoref{ss:scheduler} discusses our search strategy.
 % iterations.
 % %
 In this subsection, we explain how we utilize explored interleaving
-segment graphs to systematically explor thread interleavings.
+segment graphs to systematically explore thread interleavings.
 
 \PP{Interleaving segment mutation}
 %
-%
-The first step is to infer \textit{unexplored} interleaving graphs
-from \textit{explored} interleaving graphs.
+The first step is to derive \textit{unexplored} interleaving graphs
+from \textit{explored} interleaving graphs. We call this derivation
+operation \textit{interleaving segment mutation} (shortly segment
+mutation).
 %
 Suppose $G = \{g_1, g_2, ..., g_n \}$ is given for a thread
-interleaving.
+interleaving. Since $G$ is obtained after executing the thread
+interleaving, all graphs in $G$ are \textit{explored}.
 %
-Since $G$ is obtained after executing the thread interleaving, all
-graphs in $G$ are \textit{explored}.
-%
-Then, for each interleaving segment graph $g_i \in G$, we drive other
-interleaving segment graphs by permuting interleaving-order edges in
-$g_i$.
+Then, we mutate each $g_i \in G$ to drive other interleaving graphs.
 
 
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/interleavingmutation.pdf}
-  \caption{Example interleaving segment graphs derived from
-    \texttt{Segment \#1}. The fuzzer will explore (a) and (b), but
-    will not explore (c) contains a loop.}
+  \includegraphics[width=0.7\linewidth]{fig/interleavingmutation.pdf}
+  \caption{Example of interleaving segment mutation. In this example,
+    (a) represents an interleaving segment graph of
+    \autoref{fig:interleavingsegmentgraph} while (b) and (c) represent
+    \textit{valid} mutations of (a). Whereas (d) is an
+    \textit{invalid} mutation of (a) because it contains a loop.}
   \label{fig:interleavingmutation}
 \end{figure}
 %
-\autoref{fig:interleavingmutation} illustrates how we derive
-interleaving graphs from $g_i$.
+\autoref{fig:interleavingmutation} illustrates how we mutate an
+interleaving graph to derive other interleaving graphs.
 %
-In this figure, $g_i$ is an interleaving graph in
-\autoref{fig:interleavingsegmentgraph}-(b).
+Given an interelaving graph described in
+\autoref{fig:interleavingmutation}-(a), We \textit{flip}
+interleaving-order edges (\ie, solid arrows) in this interleaving
+graph, resulting in different interleaving graphs.
 %
-With this $g_i$, we \textit{flip} interleaving-order edges, resulting
-in different interleaving graphs.
+The semantic behind ``\textit{flipping an interleaving-order edge}''
+is simple; it changes the interleaving order of an instruction pair
+that access the shared data.
 %
-Here the semantic behind ``\textit{flipping an interleaving-order
-  edge}'' is simple; it changes the interleaving order of an
-instruction pair that access the shared data.
-%
-For example, flipping $\texttt{A4} \Rightarrow \texttt{B1}$ produces
-an interleaving graph described in
-\autoref{fig:interleavingmutation}-(a).
+For example, flipping $\texttt{B1} \Rightarrow \texttt{A4}$ of
+\autoref{fig:interleavingmutation}-(a) produces an interleaving graph
+described in \autoref{fig:interleavingmutation}-(b), which describes
+different interleaving that \texttt{A2} is executed before
+\texttt{B1}.
 %
 Likewise, we generate an interleaving graph of
-\autoref{fig:interleavingmutation}-(b) by flipping both of
-$\texttt{A2} \Rightarrow \texttt{B1}$ and
-$\texttt{A4} \Rightarrow \texttt{B1}$.
+\autoref{fig:interleavingmutation}-(c) by flipping both of
+$\texttt{B1} \Rightarrow \texttt{A2}$ and
+$\texttt{B1} \Rightarrow \texttt{A4}$.
 %
 %
 Besides (a) and (b), however, flipping
-$\texttt{A2} \Rightarrow \texttt{B1}$ generates an \textit{invalid}
-segment graph described in \autoref{fig:interleavingmutation}-(c).
+$\texttt{B1} \Rightarrow \texttt{A4}$ of
+\autoref{fig:interleavingmutation}-(b) generates an \textit{invalid}
+segment graph described in \autoref{fig:interleavingmutation}-(d).
 %
-This is because this interleaving graph contains a loop; a loop
-indicates a contradiction on the execution order that any vertex on
-the loop should be executed before itself.
+This is because \autoref{fig:interleavingmutation}-(d) contains a
+loop; a loop in an interleaving graph indicates a contradiction on the
+execution order that any vertex on the loop should be executed before
+itself.
 
 
 
 
-
-
-
-After deriving interleaving segment graphs for all $g_i$, we aggregate
-all derived and unobserved interleaving segment graphs into
+In this way, a fuzzers mutates for all $g_i \in G$, and aggregate all
+derived and unobserved interleaving segment graphs into
 $G_{derived}$. and uses it to search for a thread interleaving to run.
 
 % Therefore, in this fugure, we can derive two \textit{unobserved}
