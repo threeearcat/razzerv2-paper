@@ -96,21 +96,21 @@ annotated with timestamps.
 %
 We can then draw a totally-ordered instruction sequence of the thread
 inteleaving as described in \autoref{fig:keyidea}-(a).
-%
 
-In this instruction sequence, segmentizing the thread interleaving is
-performed in two steps.
+
+Segmentizing this thread interleaving is performed in two steps.
 %
 First, we pair up two instructions that access the same mermoy object.
 %
-As shown in \autoref{fig:keyidea}-(b), there are three pairs of
-interleaved instructions, $\texttt{B1} \Rightarrow \texttt{A2}$,
+As shown in \autoref{fig:keyidea}-(b), there are three pairs of such
+interleaved instructions in \autoref{fig:keyidea}-(a),
+$\texttt{B1} \Rightarrow \texttt{A2}$,
 $\texttt{B1} \Rightarrow \texttt{A4}$, and
 $\texttt{A6} \Rightarrow \texttt{B2}$.
 %
-Since these pairs just describe a single interleaivng order, we
-further combine them to represent a combination of interleaving orders
-as the second step.
+Since these pairs describe just a single interleaivng order, the
+second step is to further combine them to represent a combination of
+interleaving orders.
 %
 Since each pair contains two memory accesses, we select two pairs when
 constructing interleaving segments to make them contain at most four
@@ -579,7 +579,7 @@ $G_{derived}$ one-by-one, we choose to test multiple unexplored
 interleaving graphs altogether.
 
 
-
+\dr{wip.}
 For each iteration, we select a subset of $G_{derived}$ called
 $G^{*}_{derived}$, and search for a thread interleaving to explore all
 unobserved interleaving segment graphs in $G^{*}_{derived}$ at once.
