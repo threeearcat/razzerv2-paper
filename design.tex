@@ -395,20 +395,24 @@ the same thread (\ie, a program-order edge), or 2) $v_{x1}$ and
 $v_{x2}$ accessed the same memory object (\ie, an interleaving-order
 edge).
 %
-By denonting $V$ as a generated vertices and $E$ as a generated edges,
-a fuzzer constructs a graph $g = (V, E)$ representing a \textit{whole}
+As a result, a fuzzer constructs a set of vertices $V$ and a set of
+edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
 thread interleaving.
 
 
 
-Then, $g_i$ is a subgraph of $g$ that contains two interleaving-order
-edges.
+\dr{I keep refining belows}
 %
-For all $e_z (v_a \rightarrow v_b), e_w (v_c \rightarrow v_d) \in E$
-where both $e_z$ and $e_w$ are interleaving-order edges and
+Afterwards, a fuzzer takes out $g_i$, a subgraph of $g$, that contains
+two interleaving-order edges.
+%
+For all
+$e_z (v_{y1} \rightarrow v_{y2}), e_w (v_{y3} \rightarrow v_{y4}) \in
+E$ where both $e_z$ and $e_w$ are interleaving-order edges and
 $e_z \neq e_w$, a fuzzer constructs an interleaving graph
-$g_i = (V_i, E_i)$, where $V_i$ is a set of $\{v_a, v_b, v_c, v_d\}$,
-and $E_i$ ia set of edges connecting vertices in $V_i$.
+$g_i = (V_i, E_i)$, where $V_i$ is a set of
+$\{v_{y1}, v_{y2}, v_{y3}, v_{y4}\}$, and $E_i$ ia set of edges
+connecting vertices in $V_i$.
 %
 Lastly, a fuzzer gathers interelaving graphs to a set of interleaving
 graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track
@@ -446,27 +450,30 @@ In particular, for all vertices $v$ in $V_i$, we first calculate a
 hash value of $v$, $hash(v)$, which reflects its out-going edges. With
 $o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
 %
-
-\[ hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
-  o_m.label) \]
-
+%
+\\[1pt]
+\[
+  hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
+  o_m.label)
+\]
+\\[1pt]
+%
 where $\mathcal{H}$ denotes the
 non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and ${++}$
 denotes the label-concatenation operation.
 %
 Then,
-
+%
+\\[1pt]
 \[
-  hash(g) = \underset{v \in V_i}{\oplus} hash(v)
+  hash(g_i) = \underset{v \in V_i}{\oplus} hash(v)
 \]
-
-where $\oplus$ denotes the XOR operation.
-
-\dr{I want to explain why this hash function can be used to
-  differentiate different interleavings with an example of
-  \autoref{fig:interleavingmutation}, but we don't have much
-  spaces. What about explaining this in appendix?}
-
+\\[1pt]
+%
+where $\oplus$ denotes the XOR operation. Due to space constraints, we
+present how $hash(g_i)$ can be used to distinguish different
+interleavings of the same vertices of
+\autoref{fig:interleavingmutation} in \autoref{s:appendix:hash}.
 
 
 
@@ -513,7 +520,8 @@ Suppose $G = \{g_1, g_2, ..., g_n \}$ is given for a thread
 interleaving. Since $G$ is obtained after executing the thread
 interleaving, all graphs in $G$ are \textit{explored}.
 %
-Then, we mutate each $g_i \in G$ to drive other interleaving graphs.
+Then, a fuzzer mutates each $g_i \in G$ to drive other interleaving
+graphs.
 
 
 
@@ -531,16 +539,16 @@ Then, we mutate each $g_i \in G$ to drive other interleaving graphs.
 \autoref{fig:interleavingmutation} illustrates how we mutate an
 interleaving graph to derive other interleaving graphs.
 %
-Given an interelaving graph described in
-\autoref{fig:interleavingmutation}-(a), We \textit{flip}
-interleaving-order edges (\ie, solid arrows) in this interleaving
-graph, resulting in different interleaving graphs.
+We \textit{flip} interleaving-order edges (\ie, solid arrows) in an
+interelaving graph described in
+\autoref{fig:interleavingmutation}-(a), resulting in different
+interleaving graphs.
 %
 The semantic behind ``\textit{flipping an interleaving-order edge}''
 is simple; it changes the interleaving order of an instruction pair
 that access the shared data.
 %
-For example, flipping $\texttt{B1} \Rightarrow \texttt{A2}$ of
+For example, flipping ($\texttt{B1} \Rightarrow \texttt{A2}$) of
 \autoref{fig:interleavingmutation}-(a) produces an interleaving graph
 described in \autoref{fig:interleavingmutation}-(b), which describes a
 different interleaving that \texttt{A2} is executed before
@@ -552,20 +560,18 @@ graph of \autoref{fig:interleavingmutation}-(c).
 %
 Besides (a) and (b), however, flipping
 $\texttt{B1} \Rightarrow \texttt{A4}$ of
-\autoref{fig:interleavingmutation}-(b) generates an \textit{invalid}
-segment graph described in \autoref{fig:interleavingmutation}-(d).
-%
-This is because \autoref{fig:interleavingmutation}-(d) contains a
-loop; a loop in an interleaving graph indicates a contradiction on the
-execution order that any vertex on the loop should be executed before
-itself.
+\autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
+segment graph that contains a loop as described in
+\autoref{fig:interleavingmutation}-(d); a loop in an interleaving
+graph indicates a contradiction on the execution order that any vertex
+on the loop should be executed before itself.
 
 
 
 
-In this way, a fuzzers mutates for all $g_i \in G$, and aggregate all
-derived and unobserved interleaving segment graphs into
-$G_{mutated}$. and uses it to search for a thread interleaving to run.
+In this way, a fuzzers mutates all $g_i \in G$, and aggregate all
+mutated and unobserved interleaving segment graphs into $G_{mutated}$,
+and uses it to search for a thread interleaving to run.
 
 % Therefore, in this fugure, we can derive two \textit{unobserved}
 % interleaving segment graphs.
@@ -578,7 +584,7 @@ $G_{mutated}$. and uses it to search for a thread interleaving to run.
 \PP{Composing a thread interleaving}
 %
 One could naively test unexplored interleaving graphs in $G_{mutated}$
-one-by-one
+one-by-one.
 
 we choose to test multiple unexplored interleaving graphs
 altogether.
