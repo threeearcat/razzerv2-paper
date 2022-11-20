@@ -1,4 +1,4 @@
-\section{Exploring Thread Interleaving Space}
+\section {Exploring Thread Interleaving Space}
 \label{s:design}
 
 In this section, we describe our approach to effectively achieve
@@ -390,9 +390,9 @@ Then, for all $m_i, m_j$ such that $i<j$, a fuzzer generates a
 directed edge $v_i \rightarrow v_j$ in two cases. A program-order edge
 is generated if $m_i$ and $m_j$ are executed by the same thread.
 %
-On the other hand, an interleaving-order edge is generated if $m_i$
-and $m_j$ are executed by different threads, they access the same
-memory object, and one of them is a write operation.
+Otherwise, an interleaving-order edge is generated if $m_i$ and $m_j$
+are executed by different threads, they access the same memory object,
+and one of them is a write operation.
 %
 As a result, a fuzzer generates a set of vertices $V$ and a set of
 edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
@@ -485,7 +485,9 @@ vertices.
 To this end, we adopt an idea of Merkel hashing~\cite{treehashing,
   treehashing2}.
 %
-\dr{I want to discuss about this part:}
+\dr{I want to discuss about this part. I'm thinking taking this part
+  out to the appendix section:}
+%
 In particular, for all vertices $v$ in $V_i$, we first calculate a
 hash value of $v$, $hash(v)$, which reflects its out-going edges. With
 $o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
@@ -534,8 +536,23 @@ interleavings of the same vertices of
 %   strategy is clever, it is not because of the interleaving coverage.}
 %
 \Intcov and the form of interleaving graph express semantically rich
-information; it captures combinations of multiple memory-accessing
-instructions as a unit of an interleaving segment
+information; it captures combinations of multiple pairs of interleaved
+instructions. At the same time, interleaving graphs are represented
+simply; each interleaving graph contains only at most four
+instructions.
+
+These two seemingly-conflicting characteristics of interleaving graphs
+enables the systematic exploration of thread interleaving.
+%
+In other words, it is practically impossible to thoroughly explore
+thread interleavings because of the astronomical number of possible
+thread interleavings.
+%
+However, it is \textit{easily possible} explore interleavings inside
+an interleaving segment. More importantly, it is still enough to
+discover concurrency bugs (as mentioned in \autoref{ss:overview}).
+%
+
 
 \Intcov can guide the fuzzer to identify that there are possibly more
 useful instruction interleavings remain untested. So, the fuzzer
