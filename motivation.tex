@@ -27,7 +27,7 @@ in satisfying the design goals.
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/cve-2017-10661.pdf}
+  \includegraphics[width=0.85\linewidth]{fig/cve-2017-10661.pdf}
   \caption{Simplified code snippet of CVE-2017-17712. If \texttt{B1}
     is executed between \texttt{A2} and \texttt{A4}, concurrenct
     accesses on \texttt{inet->hdrincl} leads to uninitialized stack
@@ -282,7 +282,7 @@ not satisfying \textbf{Design goal 2}.
 
 Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious.
 They do not make use of any interleaving coverage 
-and perform their randomized search.
+and perform their randomized search. \dr{}
 %
 Krace~\cite{krace} also explores thread interleavings randomly without
 considering what thread interleavings are explored before.  Krace

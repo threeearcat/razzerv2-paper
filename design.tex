@@ -77,13 +77,11 @@ which makes the problem of defining a coverage metric tractable while maintainin
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.8\linewidth]{fig/intuition.pdf}
+  \includegraphics[width=0.99\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
-    \autoref{fig:cve-2017-17712}, (b) instruction pairs that access
-    the same memory object, and (c) instruction segments composed of
-    two instruction pairs.  Note that we intentionally omit
-    instructions that do not access globally-visible memory
-    objects.}
+    \autoref{fig:cve-2017-17712}, and (b) instruction segments
+    contained in (a).  Note that we intentionally omit instructions
+    that do not access globally-visible memory objects.}
   \label{fig:keyidea}
 \end{figure}
 %
@@ -103,8 +101,8 @@ Segmentizing this thread interleaving is performed in two steps.
 %
 First, we pair up two instructions that access the same mermoy object.
 %
-As shown in \autoref{fig:keyidea}-(b), there are three pairs of such
-interleaved instructions in \autoref{fig:keyidea}-(a) such as
+In \autoref{fig:keyidea}-(a), there are three pairs of such
+interleaved instructions such as
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 ($\texttt{B1} \Rightarrow \texttt{A4}$) (accessing
 \texttt{inet->hdrincl}), and ($\texttt{A6} \Rightarrow \texttt{B2}$)
@@ -380,43 +378,77 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 
 \PP{Constructing interleaving graphs}
 %
-In order to formally explain how a fuzzer constructs interleaving
-graphs, let us assume all memory-accessing instructions are uniquely
-labeled such as $i_1$, $i_2$, ..., $i_k$.
+Let us assume executed memory accesses are represented in a list
+($M_1$, $M_2$, ..., $M_k$). Without loss of generality, let us also
+assume $M_i$ is executed before $M_j$ if $i<j$ (\ie, the list is
+sorted in order of execution).
 %
-A fuzzer generates vertices $v_1$, $v_2$, ..., $v_k$ for each
-memory-accessing instructions, and also label them with their
-corresponding instructions.
+Given a list of memory accesses, a fuzzer firstly generates vertices
+$v_1$, $v_2$, ..., $v_k$ that correspond to all memory accesses.
 %
-Then, for two vertices $v_{x1}$ and $v_{x2}$ such that $i_{x1}$ was
-executed before $i_{x2}$, a fuzzer generates directed edges $v_{x1}$
-$\rightarrow$ $v_{x2}$ if 1) $v_{x1}$ and $v_{x2}$ were executed in
-the same thread (\ie, a program-order edge), or 2) $v_{x1}$ and
-$v_{x2}$ accessed the same memory object (\ie, an interleaving-order
-edge).
+Then, for all $M_i, M_j$ such that $i<j$, a fuzzer generates a
+directed edge $M_i \rightarrow M_j$ in two cases. A program-order edge
+is generated if $M_i$ and $M_j$ are executed by the same thread.
+%
+On the other hand, an interleaving-order edge is generated if $M_i$
+and $M_j$ are executed by different threads, they access the same
+memory object, and one of them is a write operation.
 %
 As a result, a fuzzer constructs a set of vertices $V$ and a set of
 edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
 thread interleaving.
 
 
+% \dr{I think formally describing how to construct interleaving graphs
+%   is not a good idea.}
+% %
+% In order to formally explain how a fuzzer constructs interleaving
+% graphs, let us assume executed memory accesses are represented in a
+% list of four tuples, ($i_1$, $m_1$, $tid_i$, $ts_1$), ($i_2$, $m_2$,
+% $tid_2$, $ts_2$), ..., ($i_k$, $m_k$, $tid_k$, $ts_k$), where $i$ is
+% an instruction address, $m$ is an accessed memory object, $tid$ is a
+% thread ID, and $t$ is a timestamp.
+% %
+% Without loss of generality, we also assume that the list is sorted
+% according to timestamps (\ie, $ts_i < ts_j$ if $i < j$).
 
-\dr{I keep refining belows}
+
+% Given a list of memory accesses, a fuzzer firstly generates vertices
+% $v_1$, $v_2$, ..., $v_k$ for each memory accesses.
+% %
+% Then, for two vertices $v_{x}$ and $v_{y}$ such that $x < y$, a fuzzer
+% generates directed edges $e = v_{x}$ $\rightarrow$ $v_{y}$ in two
+% cases.
+% %
+% Otherwise, if $tid_{x} = tid_{y}$, then $e$ is generated as a
+% program-order edge. If $m_{x}$ and $m_{y}$ are overlapped, then $e$ is
+% generated as an interleaving-order edge.
+% %
+% As a result, a fuzzer constructs a set of vertices $V$ and a set of
+% edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
+% thread interleaving.
+
+
+
+
+Afterwards, a fuzzer computes a set of subgraphs of $g$,
+$G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ has two
+interleaving-order edges.
 %
-Afterwards, a fuzzer computes $g_i$, a subgraph of $g$, that contains
-two interleaving-order edges.
+% For all $e_i, e_j \in E$ where
+% $e_i = v_{x} \rightarrow v_{y}, e_j = v_{z} \rightarrow v_{w}, e_i
+% \neq e_j$, a fuzzer constructs an interleaving graph
+% $g_i = (V_i, E_i)$ such that $V_i$ is a set of
+% $\{v_{x}, v_{y}, v_{z}, v_{w}\}$, and $E_i$ is a set of edges
+% connecting vertices in $V_i$.
 %
-For all
-$e_z (v_{y1} \rightarrow v_{y2}), e_w (v_{y3} \rightarrow v_{y4}) \in
-E$ where both $e_z$ and $e_w$ are interleaving-order edges and
-$e_z \neq e_w$, a fuzzer constructs an interleaving graph
-$g_i = (V_i, E_i)$, where $V_i$ is a set of
-$\{v_{y1}, v_{y2}, v_{y3}, v_{y4}\}$, and $E_i$ ia set of edges
-connecting vertices in $V_i$.
-%
-Lastly, a fuzzer gathers interelaving graphs to a set of interleaving
-graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track
-interleaving segment coverage and to search unexplored thread
+To this end, a fuzzer selects two edges $e_i, e_j \in E$ such that
+$e_i \neq e_j$.
+
+
+Lastly, a fuzzer gathers interelaving graphs to form a set of
+interleaving graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to
+track interleaving segment coverage and to search unexplored thread
 interleavings.
 
 
@@ -481,20 +513,25 @@ interleavings of the same vertices of
 
 \PP{Utilizing interleaving segment coverage}
 %
-\dr{I think it would be clearer not to mention alias coverage}
-%
-Compared to the alias coverage, \intcov and the form of interleaving graph
-express semantically richer information. \Intcov captures combinations 
-of multiple memory-accessing instructions as a unit of an interleaving segment, which allows a fuzzer to explore the large search space more quickly than using alias coverage, which uses a single instruction interleaving. Intuitively, across two different runs, \intcov can precisely tell 
-their differences in terms of at least two instruction interleavings, 
-but the alias coverage can tell at least one\yj{DR, it this claim OK to you?}.
-%
-\dr{no.. the search space of \intcov is larger than alias coverage. We
-  quickly explore the search space of \intcov because our search
-  strategy is clever, it is not because of the interleaving coverage.}
-%
-\Intcov provides guiding feedback to a fuzzer.
-\Intcov guides the fuzzer to identify that there are possibly more useful instruction interleavings remain untested. So, the fuzzer spends
+% \dr{I think it would be clearer not to mention alias coverage}
+% %
+% Compared to the alias coverage, \intcov and the form of interleaving graph
+% express semantically richer information. \Intcov captures combinations 
+% of multiple memory-accessing instructions as a unit of an interleaving segment, which allows a fuzzer to explore the large search space more quickly than using alias coverage, which uses a single instruction interleaving. Intuitively, across two different runs, \intcov can precisely tell 
+% their differences in terms of at least two instruction interleavings, 
+% but the alias coverage can tell at least one\yj{DR, it this claim OK to you?}.
+% %
+% \dr{no.. the search space of \intcov is larger than alias coverage. We
+%   quickly explore the search space of \intcov because our search
+%   strategy is clever, it is not because of the interleaving coverage.}
+
+
+
+\Intcov and the form of interleaving graph express semantically richer
+information. \Intcov captures combinations of multiple
+memory-accessing instructions as a unit of an interleaving segment
+
+\Intcov can guide the fuzzer to identify that there are possibly more useful instruction interleavings remain untested. So, the fuzzer spends
 more computing power to explore more interesting (unseen) instruction interleavings from \intcov. We emphasize that our searching strategy is 
 \textit{not random} unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz}.
 %
@@ -599,7 +636,6 @@ subset of $G_{mutated}$, and by running the re-composed thread
 interleaving, we test multiple unexlored interleaving graphs at once.
 
 
-
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\linewidth]{fig/hint.pdf}
@@ -613,7 +649,9 @@ interleaving graphs in \autoref{fig:hint}-(a), and
 \autoref{fig:hint}-(b) represents examples of mutated interleaving
 segments, \texttt{Segment \#1*} and \texttt{Segment \#2*}.
 %
-We can then re-compose a new thread interleaving by
+We can then re-compose a new thread interleaving
+\autoref{fig:hint}-(c) from \texttt{Segment \#1*} and \texttt{Segment
+  \#2*}.
 
 
 For each iteration, we select a subset of $G_{mutated}$ called
@@ -630,15 +668,15 @@ Instead of finding an optimal solution, we choose to adopt a greedy
 heuristic.
 %
 Specifically, we start with an empty set $\bar{G}$. Then, we iterate
-over mutated segment graphs contained in given $S_{mutated}$, and
+over mutated segment graphs contained in given $G_{mutated}$, and
 determine adding each segment graph into $\bar{G}$ forms a loop or
 not. If it does not form a loop, we add the segment graph into
 $\bar{G}$.
 %
-After iterating all mutated segment graphs in $S_{mutated}$, $\bar{G}$
+After iterating all mutated segment graphs in $G_{mutated}$, $\bar{G}$
 does not contain a loop. The fuzzer then excludes selected segment
 graphs from the set of all mutated segment graphs (\ie,
-$S_{mutated} = S_{mutated} \setminus \bar{G}$), and generates
+$G_{mutated} = S_{mutated} \setminus \bar{G}$), and generates
 scheduling points to explore $\bar{G}$.
 
 

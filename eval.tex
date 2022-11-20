@@ -74,10 +74,10 @@ detectors~\cite{kcsan, tsan}, all concurrency bugs are found by
 observable and harmful incidents such as kernel panics or KASAN
 reports.
 %
-\dr{}
-We believe data race detectors and our approach are complementary in
-finding concurrency bugs. We discuss this in the discussion
-section~(\autoref{s:discussion}).
+% \dr{}
+% We believe data race detectors and our approach are complementary in
+% finding concurrency bugs. We discuss this in the discussion
+% section~(\autoref{s:discussion}).
 
 Interestingly, we find that many of bugs was previously found and
 addressed, but they reoccur possibly because of their incomplete
@@ -206,6 +206,7 @@ the baseline.
 
 \PP{Comparison method}
 %
+\dr{}
 With these kernel concurrency fuzzers, we measure the number of
 executions and the elapsed time required to discover concurrency bugs.
 %
@@ -267,14 +268,19 @@ concurrency bugs, CVE-2019-6974, CVE-2019-11486, and
 
 
 Regardless of the difficulty of discovering concurrency bugs, however,
-\sys can discover all of concurrency bugs extremely fast.
+\sys can discover all of concurrency bugs very effectively.
 %
-\sys can discover a given concurrency bug in just 9.3 runs on average,
+\sys can discover given concurrency bugs in just 9.3 runs on average,
 ranging from 3 to 21.
 %
-Whereas, \dr{}
-
-As a consequence, 
+\dr{}Whereas, Snowboard discovers concurrency bugs in XXX runs on
+average, ragning from YYY to ZZZ, and Krace discovers given
+concurrency bugs in KKK runs on average, raning from AAA to
+BBB. Moreover, Krace even fails to discover CVE-2019-6974 in our
+experiment.
+%
+As a consequence, we confirm that our approaches and \sys is effective
+in designing concurrency bugs.
 
 
 
@@ -398,8 +404,6 @@ VM rebooting or kernel crashes.
 
 
 
-\dr{}
-%
 \autoref{table:throughput} shows the result. As expected, \sys shows
 the lower throughput than \texttt{Syzkaller}. In particular, the
 \sys's throughput is about 54\% of the \texttt{Syzkaller}'s
@@ -463,11 +467,13 @@ accesses~(\autoref{ss:instrumentation}) and controlling thread
 scheduling~(\autoref{ss:engine}).
 
 
-\dr{}
-%
 To closely examine these overheads, we measure the elapsed time for
 executing a single multi-thread input, and break down the elapsed time
-into time taken by each steps.
+into time taken by each components (\ie, tracking interleaving segment
+coverage~(\autoref{ss:coverage}), searching a thrad
+interleaving~(\autoref{ss:scheduler}), tracing memory
+accesses~(\autoref{ss:instrumentation}), and controlling thread
+scheduling~(\autoref{ss:engine})).
 %
 For this measurement, we run 10 thousands times and take an average.
 
