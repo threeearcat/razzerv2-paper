@@ -29,9 +29,10 @@ cleverly explore thread interleavings (\textbf{Design goal
   %\label{table:learningfrommistakes}
   % \end{table}
 
-When fuzzing concurrency bugs with a coverage metric, the fundamental
-challenge is the large search space because the combinations of
-interleaving orders increase the search space exponentially.
+When fuzzing for discovering concurrency bugs with a coverage metric,
+the fundamental challenge is the large search space because the
+combinations of interleaving orders increase the search space
+exponentially.
 %
 Therefore, this work seeks to strike the balance in the trade-off
 between the bug-finding capability and the search complexity.
@@ -535,17 +536,15 @@ The semantic behind ``\textit{flipping an interleaving-order edge}''
 is simple; it changes the interleaving order of an instruction pair
 that access the shared data.
 %
-For example, flipping $\texttt{B1} \Rightarrow \texttt{A4}$ of
+For example, flipping $\texttt{B1} \Rightarrow \texttt{A2}$ of
 \autoref{fig:interleavingmutation}-(a) produces an interleaving graph
-described in \autoref{fig:interleavingmutation}-(b), which describes
+described in \autoref{fig:interleavingmutation}-(b), which describes a
 different interleaving that \texttt{A2} is executed before
 \texttt{B1}.
 %
-Likewise, we generate an interleaving graph of
-\autoref{fig:interleavingmutation}-(c) by flipping both of
-$\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{B1} \Rightarrow \texttt{A4}$.
-%
+Likewise, we flip both of $\texttt{B1} \Rightarrow \texttt{A2}$ and
+$\texttt{B1} \Rightarrow \texttt{A4}$ to generate an interleaving
+graph of \autoref{fig:interleavingmutation}-(c).
 %
 Besides (a) and (b), however, flipping
 $\texttt{B1} \Rightarrow \texttt{A4}$ of
