@@ -120,7 +120,7 @@ so that interleaving segments contain at most four instructions.
 For example, we combine two instruction pairs
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 ($\texttt{B1} \Rightarrow \texttt{A4}$) to construct \texttt{Segment
-  \#1} where three instructions \texttt{B1}, \texttt{A2}, and
+  \#1} in which three instructions \texttt{B1}, \texttt{A2}, and
 \texttt{A4} are included.
 %
 In accordance with timestamps annotated in these instructions, we can
@@ -279,11 +279,15 @@ efficiently search possible instruction interleavings.
 If \intcov of a given input is saturated, 
 a fuzzer can confidently conclude that the input unlikely causes a concurrency bug and proceed to the next input.
 
-\PP{Graph representation of interleaved instructions}
+
+\PP{Graph representation of interleaving segment}
+% \PP{Graph representation of interleaved instructions}
 As discussed, \intcov contains multiple interleaved instructions, 
-so \intcov cannot be presented as a single instruction interleaving 
-(e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
-Instead, we represent each interleaving segment as a small directed acyclic
+so
+% \intcov cannot be presented as a single instruction interleaving 
+% (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
+% Instead,
+we represent each interleaving segment as a small directed acyclic
 graph (DAG) called an interleaving segment graph (shortly, \textit{interleaving graph}), and \intcov is a collection of interleaving graphs.
 
 In this graph, a vertex represents a memory-accessing instruction, 
