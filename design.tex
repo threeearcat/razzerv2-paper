@@ -105,9 +105,9 @@ First, we pair up two instructions that access the same mermoy object.
 %
 As shown in \autoref{fig:keyidea}-(b), there are three pairs of such
 interleaved instructions in \autoref{fig:keyidea}-(a) such as
-$\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{B1} \Rightarrow \texttt{A4}$ (accessing
-\texttt{inet->hdrincl}), and $\texttt{A6} \Rightarrow \texttt{B2}$
+($\texttt{B1} \Rightarrow \texttt{A2}$) and
+($\texttt{B1} \Rightarrow \texttt{A4}$) (accessing
+\texttt{inet->hdrincl}), and ($\texttt{A6} \Rightarrow \texttt{B2}$)
 (accessing \texttt{sk->owned}).
 %
 As we want to represent a combination of interleaving orders, the
@@ -118,10 +118,10 @@ Each interleaving segment is formed by combining two instruction pairs
 so that interleaving segments contain at most four instructions.
 %
 For example, we combine two instruction pairs
-$\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{B1} \Rightarrow \texttt{A4}$ to construct \texttt{Segment
-  \#1}, where there are three instructions \texttt{B1}, \texttt{A2},
-and \texttt{A4} are included.
+($\texttt{B1} \Rightarrow \texttt{A2}$) and
+($\texttt{B1} \Rightarrow \texttt{A4}$) to construct \texttt{Segment
+  \#1} where three instructions \texttt{B1}, \texttt{A2}, and
+\texttt{A4} are included.
 %
 In accordance with timestamps annotated in these instructions, we can
 arrange the instructions in \texttt{Segment \#1}.
