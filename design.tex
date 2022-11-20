@@ -407,8 +407,10 @@ $e_z \neq e_w$, a fuzzer constructs an interleaving graph
 $g_i = (V_i, E_i)$, where $V_i$ is a set of $\{v_a, v_b, v_c, v_d\}$,
 and $E_i$ ia set of edges connecting vertices in $V_i$.
 %
-Lastly, a fuzzer gathers interelaving graphs in to a set of
-interleaving graphs $G = \{g_1, g_2, ..., g_n\}$.
+Lastly, a fuzzer gathers interelaving graphs to a set of interleaving
+graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track
+interleaving segment coverage and to search unexplored thread
+interleavings.
 
 
 
