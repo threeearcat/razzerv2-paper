@@ -650,9 +650,9 @@ interleaving to run in future iterations.
 \PP{Re-composing a thread interleaving}
 %
 A naive approach to explore segment graphs in given $G_{mutated}$
-could select one segment graph in $G_{mutated}$, and run a
+could be selecting one segment graph in $G_{mutated}$, and running a
 multi-thread input while enforcing the execution order of instructions
-describing in the mutation.
+describing in the segment graph.
 %
 However, it might require many executions because the size of
 $G_{mutated}$ could be large.
@@ -672,9 +672,13 @@ segment graphs in $\bar{G}$ at once.
 
 
 \autoref{fig:hint} demonstrates an idea of re-composing a thread
-interleaving. Suppose we mutate explored segment graphs in
-\autoref{fig:hint}-(a), and \autoref{fig:hint}-(b) represents examples
-of their mutations, \texttt{Segment \#1*} and \texttt{Segment \#2*}.
+interleaving. Suppose two unexplored segment graphs are given as
+described in \autoref{fig:hint}-(a).
+
+
+, and \autoref{fig:hint}-(b)
+represents examples of their mutations, \texttt{Segment \#1*} and
+\texttt{Segment \#2*}.
 %
 We can then re-compose a new thread interleaving
 \autoref{fig:hint}-(c) from \texttt{Segment \#1*} and \texttt{Segment

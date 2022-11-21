@@ -263,10 +263,8 @@ thread interleaving to run on each iteration.
 %
 As Krace~\cite{krace} reveals, code coverage metrics (\eg, branch
 coverage) are not enough to capture unique behaviors of thread
-interleavings. This is because code coverage metrics only track
-behaviors in a single thread without paying attention to thread
-interleavings (\eg, branch coverage tracks whether a branch is taken
-or not in a single thread).
+interleavings, because code coverage metrics only track behaviors in a
+single thread without paying attention to thread interleavings.
 
 
 To capture unique behaviors of thread interleavings, a few concurrency
@@ -277,7 +275,7 @@ These interleaving coverage metrics are used to track the execution
 order of concurrent events between threads, ranging from a
 finer-granularity (\eg, instruction~\cite{krace}) to a
 coarser-granularity (\eg, function~\cite{conzzer}).
-
+%
 Concurrency fuzzers aggregate interleaving coverage while repeatedly
 executing a multi-thread input, and if the multi-thread input no
 longer provides new interleaving coverage, the fuzzer moves on to
@@ -347,26 +345,13 @@ interleaving search strategy).
 %
 For instance, for every execution, Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} enforces the execution order of a single
-pair of instructions, and Krace~\cite{krace} randomly determins a
-thread interleaving to run.
+pair of instructions, Krace~\cite{krace} randomly scheduling
+instructions, and Conzzer~\cite{conzzer} designates two functions to
+run concurrently.
 %
-Whereas Conzzer~\cite{conzzer} designates two functions to run
-concurrently.
-%
-
-
-
 After determining a thread interleaving to run, concurrency fuzzing
-overrides the kernel scheduler, and controls thread scheduling as
-desired.
-%
-To this end, various thread scheduling control mechanisms are used,
-such as suspending/resuming virtual CPUs~\cite{razzer, snowboard}, or
-injecting delays via instrumentation~\cite{krace} or the breakpoint
-feature~\cite{conzzer}.
-%
-While these mechanisms are designed differently, all of them allow a
-fuzzer to control thread scheduling.
+overrides the kernel scheduler, and controls thread scheduling to run
+a thread interleaving as desired.
 
 
 
