@@ -455,9 +455,9 @@ non-intrusive to the kernel execution.
 
 \PP{Enforcing a schedule}
 %
-In order for the userspace fuzzer to request the execution engine to
-enforce a schedule, the userspace fuzzer sends a schedule to run
-before executing system calls.
+In order to request the execution engine to enforce a schedule, the
+userspace fuzzer sends a schedule to run before executing system
+calls.
 %
 After that, the threads notify the execution engine that they are
 ready to execute system calls, and start executing system calls,
@@ -469,9 +469,8 @@ schedule.
 %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/workflow-hypervisor.pdf}
-  \caption{The workflow of the execution engine. \red{IMPORTANT: this
-      is copied from AITIA. Need to redraw}}
+  \includegraphics[width=0.99\linewidth]{fig/workflow-hypervisor.pdf}
+  \caption{The workflow of the execution engine.}
   \label{fig:workflow-hypervisor}
 \end{figure}
 %
@@ -479,23 +478,30 @@ schedule.
 engine.
 %
 At the beginning, the userspace fuzzer spawns threads, where each
-thread is assigned a system call annotated with scheduling points.
+thread is assigned a system call annotated with scheduling points
+(\C{1} in \autoref{fig:workflow-hypervisor}).
 %
-Then, each thread invokes hypercalls (\ie,
-\texttt{hcall_scheduling_point()}) to deliver scheduling points to the
-execution engine, followed by a hypercall \texttt{hcall_ready()} that
-sleeps until all threads call are ready.
+Then, each thread invokes hypercalls (\ie, \texttt{hcall_sched()}) to
+deliver scheduling points to the execution engine, followed by a
+hypercall \texttt{hcall_ready()} that sleeps until all threads call
+are ready (\ie, \C{2}).
+%
+Meanwhile, when the execution engine receives a scheduling point, the
+execution engine installs a breakpoint on an instruction on which the
+scheduling point (\ie, \C{2}-1).
 %
 After all threads call \texttt{hcall_ready()}, the execution engine
-wakes up them, and the threads start executing system calls.
+wakes up them, and the threads start executing system calls (\ie,
+\C{3}).
 
 
 While executing system calls, the execution engine keeps only one
 thread to run.
 %
 When the running thread reaches a scheduling point, the execution
-engine performs preemption by suspending the running thread and
-resuming the next thread to run as specified in the given schedule.
+engine performs preemption (\ie, \C{4}) by suspending the running
+thread and resuming the next thread to run as specified in the given
+schedule (\ie, \C{4}-1).
 
 
 
@@ -612,9 +618,8 @@ In the trampoline, the thread keeps calling \texttt{cond_resched()} to
 yield a CPU without proceeding with the system call execution.
 %
 To resume the suspended thread, the execution engine restores
-registers with the values of registers including a program counter
-saved when the thread was suspended, and then the thread can continue
-its execution.
+registers including a program counter with the values stored when the
+thread was suspended, and then the thread can continue its execution.
 
 
 
@@ -660,21 +665,26 @@ number of breakpoints.
 \PP{Handling missing scheduling points}
 %
 It is worth noting that instructions on which scheduling points
-install may not be executed if the control flow changes due to kernel internal states.
+install may not be executed if the control flow changes due to kernel
+internal states.
 %
-\dr{}In such case, we keep the order of scheduling points.
+In such case, the execution engine keeps the order of scheduling
+points.
 %
-For example, when executing a schedule of \autoref{fig:schedule}, it is possible that thread~A may not execute \texttt{A2}, and hit a breakpoint on \texttt{A6}.
+\dr{}
+For example, when executing a schedule of \autoref{fig:schedule}, it
+is possible that thread~A may not execute \texttt{A2}, and hit a
+breakpoint on \texttt{A6}.
 %
-Then, we ignore all scheduling points before \texttt{A6} (\ie, \texttt{A2} and \texttt{B1}), and keep
-enforcing a schedule after \texttt{A6} (\ie, \texttt{B2}).
+Then, we ignore all scheduling points before \texttt{A6} (\ie,
+\texttt{A2} and \texttt{B1}), and keep enforcing a schedule after
+\texttt{A6} (\ie, \texttt{B2}).
 
 
 
 \PP{Virtual Machine Instrospection}
 %
-While controlling thread scheduling, the execution engine introspects
-the target kernel for two reasons.
+The execution engine introspects the target kernel for two reasons.
 %
 First, because a hardware breakpoint does not distinguish which thread
 hits the breakpoint, the execution engine needs to determine whether
