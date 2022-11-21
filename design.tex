@@ -701,7 +701,7 @@ we add the segment graph into $G^*_{mutated}$.
 After iterating all mutated segment graphs in $G_{mutated}$,
 $G^*_{mutated}$ does not contain a loop. The fuzzer then excludes
 selected segment graphs from the set of all mutated segment graphs
-(\ie, $G_{mutated} = S_{mutated} \setminus G^*_{mutated}$), and
+(\ie, $G_{mutated} = G_{mutated} \setminus G^*_{mutated}$), and
 generates scheduling points to explore $G^*_{mutated}$.
 
 

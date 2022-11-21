@@ -88,10 +88,10 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4}))$ in \autoref{fig:cve-2017-17712}.
 
 
-\PP{Design goal 1: Informative interleaving coverage}
-The observation gives an insight of how to define interleaving coverage metric.
-To discover the uninitialized access bug, 
-an interleaving coverage metric must distinguish combinations of multiple interleaving orders.
+\PP{Design goal 1: Informative interleaving coverage} The observation
+gives an insight of how to define interleaving coverage metric.  To
+discover the uninitialized access bug, an interleaving coverage metric
+should distinguish combinations of multiple interleaving orders.
 %
 For example,
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
@@ -124,7 +124,7 @@ $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ and
 they access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
-The interleaving orders do not cause the uninitialized access bug.
+This execution orders do not cause the uninitialized access bug.
 %
 However, from the explored execution, one can easily imagine a new interleaving of these three
 instructions by changing the execution order of \texttt{A4} and
