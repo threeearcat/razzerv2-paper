@@ -471,7 +471,7 @@ edges ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 %
 
 Lastly, a fuzzer gathers interelaving graphs to form a set of
-interleaving graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to
+segment graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to
 track interleaving segment coverage and to search unexplored thread
 interleavings.
 
@@ -551,31 +551,30 @@ vertices.
 %   quickly explore the search space of \intcov because our search
 %   strategy is clever, it is not because of the interleaving coverage.}
 %
-\Intcov and the form of interleaving graph express semantically rich
+\Intcov and the form of segment graph express semantically rich
 information; it captures combinations of multiple pairs of interleaved
-instructions. At the same time, interleaving graphs are represented
-simply; each interleaving graph contains only at most four
-instructions.
+instructions. At the same time, segment graphs are represented simply;
+each segment graph contains only at most four instructions.
 
-These two seemingly-conflicting characteristics of interleaving graphs
+These two seemingly-conflicting characteristics of segment graphs
 enables the systematic exploration of thread interleaving.
 %
 In other words, it is practically impossible to thoroughly explore all
-thread interleavings because of the astronomical number of possible
-thread interleavings.
+thread interleavings of a given multi-thread input because of the
+astronomical number of possible thread interleavings.
 %
-However, it is \textit{easily possible} to explore interleavings
-\textit{inside} interleaving segments due to their small size. More
-importantly, exploring inside interleaving segments is still enough to
-discover most concurrency bugs (as mentioned in
+However, it is \textit{easily possible} to throughly explore
+interleavings \textit{inside} interleaving segments due to their small
+size. More importantly, exploring inside interleaving segments is
+still enough to discover most concurrency bugs (as mentioned in
 \autoref{ss:overview}).
 
 Taking these advantages of \intcov, our interleaving search strategy
 is \textit{not random} unlike previous approaches~\cite{krace, ski,
-  pctalgorithm, muzz}, Rather, it is a systematic exploration directed
-by interleaving coverage.
+  pctalgorithm, muzz}, Rather, it is a systematic exploration
+\textit{directed by explored interleaving coverage}.
 %
-\autoref{ss:scheduler} discusses our search strategy.
+\autoref{ss:scheduler} discusses our interleaving search strategy.
 
 
 % \Intcov can guide the fuzzer to identify that there are possibly more
@@ -648,14 +647,14 @@ different interleaving that \texttt{A2} is executed before
 \texttt{B1}.
 %
 Likewise, we flip both of $\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{B1} \Rightarrow \texttt{A4}$ to generate an interleaving
+$\texttt{B1} \Rightarrow \texttt{A4}$ to generate an segment
 graph of \autoref{fig:interleavingmutation}-(c).
 %
 Besides (a) and (b), however, flipping
 $\texttt{B1} \Rightarrow \texttt{A4}$ of
 \autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
 segment graph that contains a loop as described in
-\autoref{fig:interleavingmutation}-(d); a loop in an interleaving
+\autoref{fig:interleavingmutation}-(d); a loop in an segment
 graph indicates a contradiction on the execution order that any vertex
 on the loop should be executed before itself.
 
