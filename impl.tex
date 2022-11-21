@@ -324,18 +324,18 @@ generator to further explore thread interleavings.
 \subsection{Target Kernel Instrumentation}
 \label{ss:instrumentation}
 
-\sys requires to trace basic blocks (for code coverage) and
-timestamp-annotated memory accesses (for interleaving coverage)
-executed by each system call.
+\sys requires to trace basic blocks (for tracking code coverage) and
+timestamp-annotated memory accesses (for tracking interleaving
+coverage) executed by each system call.
 %
 For this, \sys incorporates a compiler pass that inserts callback
 function calls 1) at the beginning of each basic block, and 2) before
 each instruction that accesses globally-visible memory objects.
 %
-These callback functions record executed basic blocks and memory
-accesses into per-thread memory regions shared between the user space
-and the kernel space. Thus after a thread executes a system call, the
-thread can identify basic blocks and memory accesses that it executed.
+% These callback functions record executed basic blocks and memory
+% accesses into per-thread memory regions shared between the user space
+% and the kernel space. Thus after a thread executes a system call, the
+% thread can identify basic blocks and memory accesses that it executed.
 
 
 
@@ -449,7 +449,7 @@ fuzzer reaches a scheduling point when a breakpoint is hit.
 
 
 
-\PP{Workflow of enforcing a schedule}
+\PP{Enforcing a schedule}
 %
 In order for the userspace fuzzer to ask the execution engine to
 enforce a schedule, the userspace fuzzer sends a schedule to run
@@ -511,6 +511,8 @@ In the trampoline, thread~A keeps calling \texttt{cond_resched()} to
 yield a CPU without proceeding with the system call execution, thus
 thred~A is confined in the trampoline.
 %
+
+\PP{Performing preemption}
 
 
 

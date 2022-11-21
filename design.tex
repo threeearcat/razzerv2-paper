@@ -199,7 +199,7 @@ Accordingly, \textit{interleaving segments can act as an
 
 
 
-
+\dr{}
 Second, explored interleaving segments can be exploited to
 systematically search thread interleavings to run in future
 iterations.
@@ -376,7 +376,7 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 % access operation sequence.
 
 
-\PP{Constructing interleaving graphs}
+\PP{Tracking interleaving segment coverage}
 %
 Let us assume executed memory accesses are represented in a list
 ($m_1$, $m_2$, ..., $m_k$). Without loss of generality, let us also
@@ -464,8 +464,6 @@ interleavings.
 
 
 
-\PP{Tracking interleaving segment coverage}
-%
 In practice, \intcov contains a large number of interleaving graphs,
 which consumes a large amount of memory even though the size of graphs
 is small.
@@ -473,50 +471,51 @@ is small.
 To reduce memory consumption, we hash each interleaving graph,
 and interleaving segment coverage tracks a hash table of segment
 graphs.
-
-
-
-To hash an interleaving graph, we define a hash function $hash(g_i)$
-for an interleaving graph $g_i = (V_i, E_i)$.
 %
-The key property of the $hash(g_i)$ is reflecting directions of edges,
+To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
+%
+The key property of Merkel hashing is reflecting directions of edges,
 so that a fuzzer can distinguish different interleavings of the same
 vertices.
 %
-To this end, we adopt an idea of Merkel hashing~\cite{treehashing,
-  treehashing2}.
-%
-\dr{I want to discuss about this part. I'm thinking taking this part
-  out to the appendix section:}
-%
-In particular, for all vertices $v$ in $V_i$, we first calculate a
-hash value of $v$, $hash(v)$, which reflects its out-going edges. With
-$o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
-%
-%
-\\[1pt]
-\[
-  hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
-  o_m.label)
-\]
-\\[1pt]
-%
-where $\mathcal{H}$ denotes the
-non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and ${++}$
-denotes the label-concatenation operation.
-%
-Then,
-%
-\\[1pt]
-\[
-  hash(g_i) = \underset{v \in V_i}{\oplus} hash(v)
-\]
-\\[1pt]
-%
-where $\oplus$ denotes the XOR operation. Due to space constraints, we
-present how $hash(g_i)$ can be used to distinguish different
-interleavings of the same vertices of
-\autoref{fig:interleavingmutation} in \autoref{s:appendix:hash}.
+Due to space constraints, we
+% present how $hash(g_i)$ can be used to distinguish different
+% interleavings of the same vertices of
+% \autoref{fig:interleavingmutation} in \autoref{s:appendix:hash}.
+
+
+
+% \dr{I want to discuss about this part. I'm thinking taking this part
+%   out to the appendix section:}
+% %
+% In particular, for all vertices $v$ in $V_i$, we first calculate a
+% hash value of $v$, $hash(v)$, which reflects its out-going edges. With
+% $o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
+% %
+% %
+% \\[1pt]
+% \[
+%   hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
+%   o_m.label)
+% \]
+% \\[1pt]
+% %
+% where $\mathcal{H}$ denotes the
+% non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and ${++}$
+% denotes the label-concatenation operation.
+% %
+% Then,
+% %
+% \\[1pt]
+% \[
+%   hash(g_i) = \underset{v \in V_i}{\oplus} hash(v)
+% \]
+% \\[1pt]
+% %
+% where $\oplus$ denotes the XOR operation. Due to space constraints, we
+% present how $hash(g_i)$ can be used to distinguish different
+% interleavings of the same vertices of
+% \autoref{fig:interleavingmutation} in \autoref{s:appendix:hash}.
 
 
 
