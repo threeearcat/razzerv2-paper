@@ -124,17 +124,19 @@ more branch coverage.
 
 
 Second, the single-thread executor identifies a pair of system calls
-in $I_{ST}$ that potentially exposes new interleaving coverage if
-executed concurrently.
+in $I_{ST}$ that potentially exposes new interleaving segment coverage
+if executed concurrently.
 %
 More specifically, for each system call pair ($S_i$, $S_j$) in
-$I_{ST}$, the single-thread executor constructs a set of unexplored
-interleaving segment graphs $G_{mutated}$ from memory accesses
-executed by $S_i$ and $S_j$.
+$I_{ST}$, the single-thread executor constructs a set of explored
+interleaving segment graphs $G$ (as described in
+\autoref{ss:coverage}). Then, by mutating $g \in G$ (as described in
+\autoref{ss:scheduler}), the single-thread executor generates a set of
+unexplored segment graphs $G_{mutated}$ between ($S_i$, $S_j$).
 %
-Lastly, if $G_{mutated}$ is not empty, the single thread executor
-passes $I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the
-next phase, the multi-thread fuzzing.
+If $G_{mutated}$ is not empty, the single thread executor passes
+$I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the next
+phase, the multi-thread fuzzing.
 
 
 % It is worth noting that $S_i$ and $S_j$ were executed

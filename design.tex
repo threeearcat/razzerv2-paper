@@ -8,7 +8,7 @@ We first explain the key idea of our approach~(\autoref{ss:overview}).
 Then, we illustrate our concurrency coverage metric to express
 combinatorial interleavings (\textbf{Design goal
   1})~(\autoref{ss:coverage}), and the interleaving search strategy to
-cleverly explore thread interleavings (\textbf{Design goal
+effectively explore thread interleavings (\textbf{Design goal
   2})~(\autoref{ss:scheduler}).
 %While this section focuses only on how to explore the search space of
 %thread interleaving with a given multi-thread input, the whole design
@@ -30,7 +30,7 @@ cleverly explore thread interleavings (\textbf{Design goal
   % \end{table}
 
 When fuzzing for discovering concurrency bugs with a coverage metric,
-the fundamental challenge is the large search space because the
+the fundamental challenge is the large search space because
 combinations of interleaving orders increase the search space
 exponentially.
 %
@@ -39,8 +39,8 @@ between the bug-finding capability and the search complexity.
 
 Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
 out of 105) of concurrency bugs manifest when a bug-finding system
-monitors interleaving orders of \textit{at most} four memory accesses
-referring to shared memory objects.
+monitors specific interleaving orders of \textit{at most} four memory
+accesses referring to shared memory objects.
 %
 All other memory accesses beyond four accesses and their execution
 orders do not meaningfully affect manifestation of a concurrency bug.
@@ -49,8 +49,8 @@ The observation is also applied to the example of
 \autoref{fig:cve-2017-17712}. The uninitialized access bug is
 triggered by the execution order of three memory accesses (\eg,
 \texttt{A2}, \texttt{A4} and \texttt{B1}), while others (\eg,
-\texttt{A6} and \texttt{B2}) are irrelevant to manifest the
-concurrency bug.
+\texttt{A6} and \texttt{B2}) are irrelevant to the manifestation of
+the concurrency bug.
 
 
 \PP{Segmentizing thread interleaving}
@@ -186,11 +186,10 @@ multi-thread input.
 % As mentioned above, most concurrency bugs manifest depending only on
 % the execution order of four memory accesses.
 %
-Considering a concurrency bug manifests depending on a combination of
-interleaving orders of at most four memory accesses (which is exactly
-represented by an interleaving segment), if a fuzzer explores all
-interleaving segments, it is unlikely that a fuzzer misses a
-concurrency bugs.
+Considering a concurrency bug manifests depending on interleaving
+orders of at most four memory accesses (which is exactly represented
+by an interleaving segment), if a fuzzer explores all interleaving
+segments, it is unlikely that a fuzzer misses a concurrency bug.
 %
 Accordingly, \textit{interleaving segments can act as an
   interleaving coverage metric satisfying \textbf{Design goal 1}}.
@@ -199,17 +198,17 @@ Accordingly, \textit{interleaving segments can act as an
 
 
 
-\dr{}
 Second, explored interleaving segments can be exploited to
 systematically search thread interleavings to run in future
 iterations.
 %
 Since each interleaving segment contains only a small number of memory
-accesses, we can easily enumerate interleaving orders that these
-memory accesses can produce.
+accesses, we can easily enumerate interleavings that these memory
+accesses can produce.
 %
-Then, among enumerated interleaving orders, we can select ones that
-unexplored before, and direct the fuzzer to search them.
+If we figure out which of the enumerated interleavings have not been
+explored, we can direct a fuzzer to straightly explore the unexplored
+interleavings.
 %
 In this way, \textit{we can satisfy \textbf{Design goal 2} by
   exploring meaningful thread interleavings at each iteration and
@@ -380,13 +379,12 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 \PP{Generating interleaving segment graph}
 %
 Let us assume executed memory accesses are represented in a list
-($m_1$, $m_2$, ..., $m_k$). Without loss of generality, let us also
-assume $m_i$ is executed before $m_j$ if $i<j$ (\ie, the list is
-sorted in order of execution of memory accesses).
+($m_1$, $m_2$, ..., $m_k$), which is sorted in order of execution of
+memory accesses. (\ie, $m_i$ is executed before $m_j$ if $i<j$).
 %
 With this list of memory accesses, a fuzzer computes segment graphs in
-two steps: generating a graph $g^*$ representing a whole thread
-interleaving, and segmentizing the graph $g^*$ into subgraphs (\ie,
+two steps: generating a graph $g$ representing a whole thread
+interleaving, and segmentizing the graph $g$ into subgraphs (\ie,
 segment graphs).
 
 Given a list of memory accesses, a fuzzer firstly generates vertices
@@ -403,9 +401,9 @@ and one of them is a write operation.
 After two types of edges are generated, some vertices are not
 connected by any interleaving-order edge (in either direction), which
 indicates that instructions corresponding to these vertices did not
-access shared memory objects. And thus, these vertices and
-corresponding instructions are not interesting when tracking thread
-interleaving, and a fuzzer discards such vertices.
+access shared memory objects. And thus, these vertices are not
+interesting when tracking thread interleaving, and a fuzzer discards
+such vertices.
 %
 As a result, a fuzzer generates a set of vertices $V$ and a set of
 edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
@@ -444,7 +442,7 @@ thread interleaving.
 
 
 
-Afterwards, a fuzzer computes a set of subgraphs of $g^*$,
+Afterwards, a fuzzer computes a set of subgraphs of $g$,
 $G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ has two
 interleaving-order edges.
 %
@@ -462,18 +460,16 @@ $e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
 \autoref{fig:interleavingsegmentgraph}-(b)).
 %
 A fuzzer then forms a subgraph $g_i = (V_i, E_i)$ where $V_i$ is a set
-of vertices that $e_x$ and $e_y$ connect (\ie, \texttt{B1},
+of vertices that are connected by $e_x$ and $e_y$ (\ie, \texttt{B1},
 \texttt{A2}, and \texttt{A4}), and $E_i$ is a set of edges connecting
 vertices in $V_i$ (\ie, one program-order edge
 ($\texttt{A2} \Rightarrow \texttt{A4}$), and two interleaving-order
 edges ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 ($\texttt{B1} \Rightarrow \texttt{A4}$)).
 %
-
-Lastly, a fuzzer gathers interelaving graphs to form a set of
-segment graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to
-track interleaving segment coverage and to search unexplored thread
-interleavings.
+Lastly, a fuzzer gathers segment graphs into a set of segment graphs
+$G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track interleaving
+segment coverage and to search unexplored thread interleavings.
 
 
 
@@ -492,7 +488,8 @@ To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
 %
 The key property of Merkel hashing is reflecting directions of edges,
 so that a fuzzer can distinguish different interleavings of the same
-vertices.
+vertices. For example, four segment graphs described in
+\autoref{fig:interleavingmutation} are hashed into different values.
 %
 % Due to space constraints, we
 % present how $hash(g_i)$ can be used to distinguish different
@@ -591,7 +588,7 @@ is \textit{not random} unlike previous approaches~\cite{krace, ski,
 
 
 
-\subsection{Coverage-directed Interleaving Search}
+\subsection{Directed Interleaving Search}
 \label{ss:scheduler}
 %
 % One important role of segment graphs are to infer unexplored
@@ -599,21 +596,26 @@ is \textit{not random} unlike previous approaches~\cite{krace, ski,
 % iterations.
 % %
 In this subsection, we explain how we utilize explored \intcov to
-systematically explore thread interleavings.
+systematically and effectively explore thread interleavings.
+
+
 
 \PP{Interleaving segment mutation}
 %
-The first step is to derive \textit{unexplored} interleaving graphs
-from \textit{explored} interleaving graphs. We call this derivation
-operation \textit{interleaving segment mutation} (shortly segment
-mutation).
+The first step is to derive \textit{unexplored} segment graphs from
+\textit{explored} segment graphs. We call this derivation operation
+\textit{interleaving segment mutation} (shortly segment mutation).
 %
-Suppose $G = \{g_1, g_2, ..., g_n \}$ is given for a thread
-interleaving. Since $G$ is obtained after executing the thread
-interleaving, all graphs in $G$ are \textit{explored}.
+Suppose $G = \{g_1, g_2, ..., g_n \}$, a set of \textit{explored}
+segmeng graphs is given for a thread interleaving.
 %
-Then, a fuzzer mutates each $g_i \in G$ to drive other (and
-unexplored) interleaving graphs.
+For each $g_i \in G$, we can then enumerate possible interleavings
+inside $g_i$ called mutations of $g_i$.
+%
+By hashing mutation of $g_i$ and comparing it to collected \intcov, a
+fuzzer can identify whay mutations of $g_i$ have not been explored
+yet.
+
 
 
 
@@ -628,44 +630,47 @@ unexplored) interleaving graphs.
   \label{fig:interleavingmutation}
 \end{figure}
 %
-\autoref{fig:interleavingmutation} illustrates how we mutate an
-interleaving graph to derive other interleaving graphs.
+\autoref{fig:interleavingmutation} illustrates how we mutate a segment
+graph to derive other segment graphs.
 %
-We \textit{flip} interleaving-order edges (\ie, solid arrows) in an
-interelaving graph described in
-\autoref{fig:interleavingmutation}-(a), resulting in different
-interleaving graphs.
+We \textit{flip} interleaving-order edges (\ie, solid arrows) in a
+segment graph described in \autoref{fig:interleavingmutation}-(a),
+resulting in different segment graphs.
 %
 The semantic behind ``\textit{flipping an interleaving-order edge}''
 is simple; it changes the interleaving order of an instruction pair
 that access the shared data.
 %
 For example, flipping ($\texttt{B1} \Rightarrow \texttt{A2}$) of
-\autoref{fig:interleavingmutation}-(a) produces an interleaving graph
+\autoref{fig:interleavingmutation}-(a) produces a segment graph
 described in \autoref{fig:interleavingmutation}-(b), which describes a
 different interleaving that \texttt{A2} is executed before
 \texttt{B1}.
 %
 Likewise, we flip both of $\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{B1} \Rightarrow \texttt{A4}$ to generate an segment
+$\texttt{B1} \Rightarrow \texttt{A4}$ to generate a segment
 graph of \autoref{fig:interleavingmutation}-(c).
 %
 Besides (a) and (b), however, flipping
 $\texttt{B1} \Rightarrow \texttt{A4}$ of
 \autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
 segment graph that contains a loop as described in
-\autoref{fig:interleavingmutation}-(d); a loop in an segment
-graph indicates a contradiction on the execution order that any vertex
-on the loop should be executed before itself.
+\autoref{fig:interleavingmutation}-(d); a loop in a segment graph
+indicates a contradiction on the execution order that any vertex on
+the loop should be executed before itself.
 
 
-\dr{TODO:}
-In this way, a fuzzers mutates all $g_i \in G$, and aggregate all
-mutated and unobserved interleaving segment graphs into $G_{mutated}$,
-and uses it to search for a thread interleaving to run.
 
-% Therefore, in this fugure, we can derive two \textit{unobserved}
-% interleaving segment graphs.
+In this way, a fuzzer generates mutations of all $g_i \in G$, which
+include both explored and unexplored segment.
+%
+To exclude explored mutations, for each mutation $g^*$, a fuzzer
+calculates its hash value, and compare it to collected \intcov. If the
+hash value has not been recorded in the hash table, a fuzzer includes
+$g^*$ into a set of mutations $G_{mutated}$.
+%
+In the next step, a fuzzer utilizes $G_{mutated}$ to determine what
+thread interleaving to run in future iterations.
 
 
 
@@ -687,41 +692,34 @@ interleaving, we test multiple unexlored interleaving graphs at once.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.8\linewidth]{fig/hint.pdf}
+  \includegraphics[width=\linewidth]{fig/hint.pdf}
   \caption{}
   \label{fig:hint}
 \end{figure}
 
 
 \autoref{fig:hint} demonstrates an idea. Suppose we mutate explored
-interleaving graphs in \autoref{fig:hint}-(a), and
-\autoref{fig:hint}-(b) represents examples of mutated interleaving
-segments, \texttt{Segment \#1*} and \texttt{Segment \#2*}.
+segment graphs in \autoref{fig:hint}-(a), and \autoref{fig:hint}-(b)
+represents examples of their mutations, \texttt{Segment \#1*} and
+\texttt{Segment \#2*}.
 %
 We can then re-compose a new thread interleaving
 \autoref{fig:hint}-(c) from \texttt{Segment \#1*} and \texttt{Segment
-  \#2*}.
-
-
-\dr{wip}
+  \#2*}, which tests \textit{both} \texttt{Segment \#1*} and
+\texttt{Segment \#2*} at once.
 %
-For each iteration, we select a subset of $G_{mutated}$ called
-$G^{*}_{mutated}$, and search for a thread interleaving to explore all
-unobserved interleaving segment graphs in $G^{*}_{mutated}$ at once.
 
 
 
-It may require a heavy computation to identify the largest
-contradiction-free subset of $G_{mutated}$.
-%
-Instead of finding an optimal solution, we choose to adopt a greedy
-heuristic.
+To re-compose a thread interleaving from $G_{mutated}$, we select a
+subset of $G_{mutated}$, $\bar{G}$.
 %
 Specifically, we start with an empty set $\bar{G}$. Then, we iterate
-over mutated segment graphs contained in given $G_{mutated}$, and
-determine adding each segment graph into $\bar{G}$ forms a loop or
-not. If it does not form a loop, we add the segment graph into
-$\bar{G}$.
+over mutations in $g^* \`in G_{mutated}$. With $g^*$, we determine 
+
+and determine adding each
+segment graph into $\bar{G}$ forms a loop or not. If it does not form
+a loop, we add the segment graph into $\bar{G}$.
 %
 After iterating all mutated segment graphs in $G_{mutated}$, $\bar{G}$
 does not contain a loop. The fuzzer then excludes selected segment
