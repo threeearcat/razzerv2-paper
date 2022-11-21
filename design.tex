@@ -444,16 +444,9 @@ thread interleaving.
 
 
 
-Afterwards, a fuzzer computes a set of subgraphs of $g$,
+Afterwards, a fuzzer computes a set of segment graphs of $g$,
 $G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ has two
 interleaving-order edges.
-%
-% For all $e_i, e_j \in E$ where
-% $e_i = v_{x} \rightarrow v_{y}, e_j = v_{z} \rightarrow v_{w}, e_i
-% \neq e_j$, a fuzzer constructs an interleaving graph
-% $g_i = (V_i, E_i)$ such that $V_i$ is a set of
-% $\{v_{x}, v_{y}, v_{z}, v_{w}\}$, and $E_i$ is a set of edges
-% connecting vertices in $V_i$.
 %
 To this end, a fuzzer selects two interleaving-order edges
 $e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
@@ -461,15 +454,15 @@ $e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
 ($\texttt{B1} \Rightarrow \texttt{A4}$) in
 \autoref{fig:interleavingsegmentgraph}-(b)).
 %
-A fuzzer then forms a subgraph $g_i = (V_i, E_i)$ where $V_i$ is a set
-of vertices that are connected by $e_x$ and $e_y$ (\ie, \texttt{B1},
-\texttt{A2}, and \texttt{A4}), and $E_i$ is a set of edges connecting
-vertices in $V_i$ (\ie, one program-order edge
+A fuzzer then forms a segment graph $g_i = (V_i, E_i)$ where $V_i$ is
+a set of vertices that are connected by $e_x$ and $e_y$ (\ie,
+\texttt{B1}, \texttt{A2}, and \texttt{A4}), and $E_i$ is a set of
+edges connecting vertices in $V_i$ (\ie, one program-order edge
 ($\texttt{A2} \Rightarrow \texttt{A4}$), and two interleaving-order
 edges ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 ($\texttt{B1} \Rightarrow \texttt{A4}$)).
 %
-Lastly, a fuzzer gathers subgraphs into a set of segment graphs
+Lastly, a fuzzer gathers segment graphs into a set
 $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track interleaving
 segment coverage and to search unexplored thread interleavings.
 
