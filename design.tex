@@ -658,9 +658,9 @@ However, it might require many executions because the size of
 $G_{mutated}$ could be large.
 %
 Instead, we choose a more efficient way. We \textit{re-compose} a new
-thread interleaving from $G^* \subseteq G_{mutated}$, and by running
+thread interleaving from $G^*_{mutated} \subseteq G_{mutated}$, and by running
 the re-composed thread interleaving, we test multiple unexlored
-segment graphs in $G^*$ at once.
+segment graphs in $G^*_{mutated}$ at once.
 
 
 \begin{figure}[t]
@@ -672,13 +672,9 @@ segment graphs in $G^*$ at once.
 
 
 \autoref{fig:hint} demonstrates an idea of re-composing a thread
-interleaving. Suppose two unexplored segment graphs are given as
-described in \autoref{fig:hint}-(a).
-
-
-, and \autoref{fig:hint}-(b)
-represents examples of their mutations, \texttt{Segment \#1*} and
-\texttt{Segment \#2*}.
+interleaving. Suppose we mutate explored segment graphs in
+\autoref{fig:hint}-(a), and \autoref{fig:hint}-(b) represents examples
+of their mutations, \texttt{Segment \#1*} and \texttt{Segment \#2*}.
 %
 We can then re-compose a new thread interleaving
 \autoref{fig:hint}-(c) from \texttt{Segment \#1*} and \texttt{Segment
@@ -688,25 +684,26 @@ We can then re-compose a new thread interleaving
 
 
 
-\dr{wip.}
 
-To re-compose a thread interleaving from $G_{mutated}$, we select a
-subset of $G_{mutated}$, $G^*$.
+When re-composing a thread interleaving, one important constraint is
+that it should not contain a loop. Otherwise, a contradiction on the
+execution order arises similar with invalid mutation; an instruction
+should be executed before itself.
 %
-Specifically, we start with an empty set $G^*$. Then, we iterate
-over mutations in $g^* \`in G_{mutated}$. With $g^*$, we determine 
-
-and determine adding each segment graph into $G^*$ forms a loop or
-not. If it does not form a loop, we add the segment graph into $G^*$.
+To select a subset $G^*_{mutated}$, we start with an empty set
+$G^*_{mutated}$. Then, we iterate over mutations in
+$g^* \in G_{mutated}$. With $g^*$, we determine adding edges in $g^*$
+into $G^*_{mutated}$ forms a loop or not. If it does not form a loop,
+we add the segment graph into $G^*_{mutated}$.
 %
-After iterating all mutated segment graphs in $G_{mutated}$, $G^*$
-does not contain a loop. The fuzzer then excludes selected segment
-graphs from the set of all mutated segment graphs (\ie,
-$G_{mutated} = S_{mutated} \setminus G^*$), and generates scheduling
-points to explore $G^*$.
+After iterating all mutated segment graphs in $G_{mutated}$,
+$G^*_{mutated}$ does not contain a loop. The fuzzer then excludes
+selected segment graphs from the set of all mutated segment graphs
+(\ie, $G_{mutated} = S_{mutated} \setminus G^*_{mutated}$), and
+generates scheduling points to explore $G^*_{mutated}$.
 
 
-One important constraint of $G^*$ is 
+
 
 
 
