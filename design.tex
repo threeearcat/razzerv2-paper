@@ -270,7 +270,7 @@ In this way, \textit{we can satisfy \textbf{Design goal 2} by
 \newcommand{\Intcov}{Interleaving segment coverage\xspace}
 
 
-Using a set of interleaving segments, we propose a novel concurrency coverage metric called \textit{\intcov}.
+Using a set of interleaving segments, we propose a novel interleaving coverage metric called \textit{\intcov}.
 \Intcov is designed to track interleaving orders
 within an interleaving segment and used for guiding a fuzzer to  
 efficiently search possible instruction interleavings.
@@ -286,7 +286,7 @@ so
 % (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
 % Instead,
 we represent each interleaving segment as a small directed acyclic
-graph (DAG) called an interleaving segment graph (shortly, \textit{interleaving graph}), and \intcov is a collection of interleaving graphs.
+graph (DAG) called an interleaving segment graph (shortly, \textit{segment graph}), and \intcov is a collection of segment graphs.
 
 In this graph, a vertex represents a memory-accessing instruction, 
 and an edge represents an execution ordering between two memory-access instructions. 
@@ -299,12 +299,12 @@ Whereas, an interleaving-order edge indicates the execution
 order between two memory-access instructions that 1) access the same
 shared data, 2) at least one of them is a write operation, and 3) are
 executed by different threads.
-\autoref{fig:interleavingsegmentgraph} illustrates how a interleaving 
+\autoref{fig:interleavingsegmentgraph} illustrates how a segment
 graph is derived from a interleaving segment, \texttt{Segment \#1}.
-This interleaving graph contains a program-order edge from \texttt{A2} to
+This segment graph contains a program-order edge from \texttt{A2} to
 \texttt{A4} representing ``\texttt{A2} is executed before \texttt{A4}
 in thread~A''.
-Similarly, the interleaving graph contains two interleaving-order
+Similarly, the segment graph contains two interleaving-order
 edges, expressing interleaving orders of \texttt{B1} $\Rightarrow$ \texttt{A2}
 and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 %It contains an interleaving-order edge from \texttt{A2} to
@@ -319,8 +319,9 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
   \centering
   \includegraphics[width=0.8\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{(a) \texttt{Segment \#1} from \autoref{fig:keyidea}, and
-    (b) its interleaving graph. In (b), a dotted arrow represents a
-    program order, and solid arrows represent interleaving orders.}
+    (b) its segment graph. In (b), a dotted arrow represents a
+    program-order edge, and solid arrows represent interleaving-order
+    edges.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
 
@@ -376,12 +377,17 @@ and \texttt{B1} $\Rightarrow$ \texttt{A4}.
 % access operation sequence.
 
 
-\PP{Tracking interleaving segment coverage}
+\PP{Generating interleaving segment graph}
 %
 Let us assume executed memory accesses are represented in a list
 ($m_1$, $m_2$, ..., $m_k$). Without loss of generality, let us also
 assume $m_i$ is executed before $m_j$ if $i<j$ (\ie, the list is
-sorted in order of execution).
+sorted in order of execution of memory accesses).
+%
+With this list of memory accesses, a fuzzer computes segment graphs in
+two steps: generating a graph $g^*$ representing a whole thread
+interleaving, and segmentizing the graph $g^*$ into subgraphs (\ie,
+segment graphs).
 
 Given a list of memory accesses, a fuzzer firstly generates vertices
 $v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
@@ -393,6 +399,13 @@ is generated if $m_i$ and $m_j$ are executed by the same thread.
 Otherwise, an interleaving-order edge is generated if $m_i$ and $m_j$
 are executed by different threads, they access the same memory object,
 and one of them is a write operation.
+%
+After two types of edges are generated, some vertices are not
+connected by any interleaving-order edge (in either direction), which
+indicates that instructions corresponding to these vertices did not
+access shared memory objects. And thus, these vertices and
+corresponding instructions are not interesting when tracking thread
+interleaving, and a fuzzer discards such vertices.
 %
 As a result, a fuzzer generates a set of vertices $V$ and a set of
 edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
@@ -431,7 +444,7 @@ thread interleaving.
 
 
 
-Afterwards, a fuzzer computes a set of subgraphs of $g$,
+Afterwards, a fuzzer computes a set of subgraphs of $g^*$,
 $G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ has two
 interleaving-order edges.
 %
@@ -442,18 +455,21 @@ interleaving-order edges.
 % $\{v_{x}, v_{y}, v_{z}, v_{w}\}$, and $E_i$ is a set of edges
 % connecting vertices in $V_i$.
 %
-To this end, a fuzzer selects two edges $e_x, e_y \in E$ such that
-$e_x \neq e_y$, and checks that both $e_x$ and $e_y$ are
-interleaving-order edges.
+To this end, a fuzzer selects two interleaving-order edges
+$e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
+($\texttt{B1} \Rightarrow \texttt{A2}$) and
+($\texttt{B1} \Rightarrow \texttt{A4}$) in
+\autoref{fig:interleavingsegmentgraph}-(b)).
 %
-If it is the case, a fuzzer forms a subgraph $g_k = (V_k, E_k)$ where
-$V_k$ is a set of vertices that $e_x$ and $e_y$ connect, and $E_k$ is
-a set of edges connecting vertices in $V_k$.
+A fuzzer then forms a subgraph $g_i = (V_i, E_i)$ where $V_i$ is a set
+of vertices that $e_x$ and $e_y$ connect (\ie, \texttt{B1},
+\texttt{A2}, and \texttt{A4}), and $E_i$ is a set of edges connecting
+vertices in $V_i$ (\ie, one program-order edge
+($\texttt{A2} \Rightarrow \texttt{A4}$), and two interleaving-order
+edges ($\texttt{B1} \Rightarrow \texttt{A2}$) and
+($\texttt{B1} \Rightarrow \texttt{A4}$)).
 %
-\dr{TODO: more precise explanation and take example of figure 4}
 
-
-\dr{TODO:}
 Lastly, a fuzzer gathers interelaving graphs to form a set of
 interleaving graphs $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to
 track interleaving segment coverage and to search unexplored thread
@@ -463,14 +479,14 @@ interleavings.
 
 
 
-
-In practice, \intcov contains a large number of interleaving graphs,
+\PP{Tracking interleaving segment coverage}
+%
+In practice, \intcov contains a large number of segment graphs,
 which consumes a large amount of memory even though the size of graphs
 is small.
 %
-To reduce memory consumption, we hash each interleaving graph,
-and interleaving segment coverage tracks a hash table of segment
-graphs.
+To reduce memory consumption, we hash each segment graph, and
+interleaving segment coverage tracks a hash table of segment graphs.
 %
 To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
 %
