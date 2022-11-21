@@ -10,7 +10,8 @@ described in \autoref{s:design}.
 %
 
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
-fuzzing.
+fuzzing similar with recent concurrency fuzzings~\cite{razzer,
+  snowboard}.
 %
 The first stage is a \textit{single-thread fuzzing}, which focuses on
 identifying two system calls that may expose new interleaving
@@ -139,6 +140,8 @@ $I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the next
 phase, the multi-thread fuzzing.
 
 
+
+
 % It is worth noting that $S_i$ and $S_j$ were executed
 % \textit{sequentially}.
 %
@@ -231,8 +234,9 @@ preemptions occurs, annotated with the order of preemption.
 % A schedule contains an initial thread, and a set of scheduling points
 % indicating an instruction on which preemption occurs.
 %
-The multi-thread generator has two roles, transforming $I_{ST}$ into a
-multi-thread input $I_{MT}$ and generating various schedules.
+The multi-thread generator has two roles, 1) transforming $I_{ST}$
+into a multi-thread input $I_{MT}$ and 2) generating various
+schedules.
 
 
 

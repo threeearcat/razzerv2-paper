@@ -18,6 +18,39 @@
 %designed to suspends and resumes a guest thread.
 
 
+\subsection{Hashing segment graph}
+\label{s:appendix:hash}
+% \dr{I want to discuss about this part. I'm thinking taking this part
+%   out to the appendix section:}
+% %
+In particular, for all vertices $v$ in $V_i$, we first calculate a
+hash value of $v$, $hash(v)$, which reflects its out-going edges. With
+$o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
+%
+%
+\\[1pt]
+\[
+  hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
+  o_m.label)
+\]
+\\[1pt]
+%
+where $\mathcal{H}$ denotes the
+non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and ${++}$
+denotes the label-concatenation operation.
+%
+Then,
+%
+\\[1pt]
+\[
+  hash(g_i) = \underset{v \in V_i}{\oplus} hash(v)
+\]
+\\[1pt]
+%
+where $\oplus$ denotes the XOR operation.
+
+
+
 
 \subsection{Virtual Machine Introspection}
 \label{s:appendix:vmi}
