@@ -650,16 +650,17 @@ interleaving to run in future iterations.
 \PP{Re-composing a thread interleaving}
 %
 A naive approach to explore segment graphs in given $G_{mutated}$
-could 
-
-
+could select one segment graph in $G_{mutated}$, and run a
+multi-thread input while enforcing the execution order of instructions
+describing in the mutation.
 %
 However, it might require many executions because the size of
 $G_{mutated}$ could be large.
 %
-Instead, we \textit{re-compose} a new thread interleaving from a
-subset of $G_{mutated}$, and by running the re-composed thread
-interleaving, we test multiple unexlored interleaving graphs at once.
+Instead, we choose a more efficient way. We \textit{re-compose} a new
+thread interleaving from $G^* \subseteq G_{mutated}$, and by running
+the re-composed thread interleaving, we test multiple unexlored
+segment graphs in $\bar{G}$ at once.
 
 
 \begin{figure}[t]
@@ -670,10 +671,10 @@ interleaving, we test multiple unexlored interleaving graphs at once.
 \end{figure}
 
 
-\autoref{fig:hint} demonstrates an idea. Suppose we mutate explored
-segment graphs in \autoref{fig:hint}-(a), and \autoref{fig:hint}-(b)
-represents examples of their mutations, \texttt{Segment \#1*} and
-\texttt{Segment \#2*}.
+\autoref{fig:hint} demonstrates an idea of re-composing a thread
+interleaving. Suppose we mutate explored segment graphs in
+\autoref{fig:hint}-(a), and \autoref{fig:hint}-(b) represents examples
+of their mutations, \texttt{Segment \#1*} and \texttt{Segment \#2*}.
 %
 We can then re-compose a new thread interleaving
 \autoref{fig:hint}-(c) from \texttt{Segment \#1*} and \texttt{Segment
@@ -682,6 +683,8 @@ We can then re-compose a new thread interleaving
 %
 
 
+
+\dr{wip.}
 
 To re-compose a thread interleaving from $G_{mutated}$, we select a
 subset of $G_{mutated}$, $\bar{G}$.
