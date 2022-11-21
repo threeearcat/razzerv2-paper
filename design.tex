@@ -564,21 +564,20 @@ In this subsection, we explain how we utilize a set of explored
 segment graphs $G$ to systematically and effectively explore thread
 interleavings.
 
-\dr{I'm refining this subsection}
-
 
 
 \PP{Interleaving segment mutation}
 %
 The first step is to derive \textit{unexplored} segment graphs from
 \textit{explored} segment graphs. We call this derivation operation
-\textit{interleaving segment mutation} (shortly segment mutation).
+\textit{mutating a segment graph}.
 %
 Suppose a set of \textit{explored} segment graphs
 $G = \{g_1, g_2, ..., g_n \}$ is given for a thread interleaving.
 %
-For each $g_i \in G$, we can then \textit{flip} interleaving-order
-edges in $g_i$, resulting in a different segment graph.
+For each $g_i \in G$, we mutate $g_i$ by \textit{flipping}
+interleaving-order edges in $g_i$, resulting in a different segment
+graph.
 %
 The semantic behind ``\textit{flipping an interleaving-order edge}''
 is simple; it changes the interleaving order of an instruction pair
@@ -607,12 +606,13 @@ described in \autoref{fig:interleavingmutation}-(b), which describes
 an interleaving different than \autoref{fig:interleavingmutation}-(a).
 %
 In \autoref{fig:interleavingmutation}-(a), \texttt{B1} is executed
-before \texttt{A2}, while \texttt{A2} is executed before \texttt{B1}
-in \autoref{fig:interleavingmutation}-(b).
+before \texttt{A2} (\ie, $\texttt{B1} \Rightarrow \texttt{A2}$), while
+in \autoref{fig:interleavingmutation}-(b), \texttt{A2} is executed
+before \texttt{B1} (\ie, $\texttt{A2} \Rightarrow \texttt{B1}$).
 %
 Likewise, flipping both of $(\texttt{B1} \Rightarrow \texttt{A2})$ and
-$(\texttt{B1} \Rightarrow \texttt{A4})$ generates a segment graph of
-\autoref{fig:interleavingmutation}-(c).
+$(\texttt{B1} \Rightarrow \texttt{A4})$ generates another segment
+graph of \autoref{fig:interleavingmutation}-(c).
 %
 Besides (b) and (c), however, flipping
 $(\texttt{B1} \Rightarrow \texttt{A4})$ of
@@ -625,7 +625,8 @@ $\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}
 %
 Since edges represent execution orderings, a loop in a segment graph
 indicates a contradiction on the execution order, stating that any
-vertex on the loop should be executed before itself.
+vertex on the loop should be executed before itself. Therefore, when a
+mutation contains a loop, a fuzzer discards it.
 %
 
 
@@ -666,6 +667,7 @@ segment graphs in $G^*_{mutated}$ at once.
 \end{figure}
 
 
+\dr{}
 \autoref{fig:hint} demonstrates an idea of re-composing a thread
 interleaving. Suppose we mutate explored segment graphs in
 \autoref{fig:hint}-(a), and \autoref{fig:hint}-(b) represents examples
@@ -682,8 +684,8 @@ We can then re-compose a new thread interleaving
 
 When re-composing a thread interleaving, one important constraint is
 that it should not contain a loop. Otherwise, a contradiction on the
-execution order arises similar with invalid mutation; an instruction
-should be executed before itself.
+execution order arises similar with invalid mutation (\ie, an
+instruction should be executed before itself).
 %
 To select a subset $G^*_{mutated}$, we start with an empty set
 $G^*_{mutated}$. Then, we iterate over mutations in

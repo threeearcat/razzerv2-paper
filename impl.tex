@@ -131,9 +131,9 @@ if executed concurrently.
 More specifically, for each system call pair ($S_i$, $S_j$) in
 $I_{ST}$, the single-thread executor constructs a set of explored
 interleaving segment graphs $G$ (as described in
-\autoref{ss:coverage}). Then, by mutating $g \in G$ (as described in
-\autoref{ss:scheduler}), the single-thread executor generates a set of
-unexplored segment graphs $G_{mutated}$ between ($S_i$, $S_j$).
+\autoref{ss:coverage}). Then, by mutating $g \in G$, the single-thread
+executor generates a set of unexplored segment graphs $G_{mutated}$
+(as described in \autoref{ss:scheduler}).
 %
 If $G_{mutated}$ is not empty, the single thread executor passes
 $I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the next
