@@ -637,7 +637,7 @@ vertex on the loop should be executed before itself.
 In this way, a fuzzer generates mutations of all $g_i \in G$. After
 that, from generated mutations, a fuzzer excludes 1) invalid mutations
 (\ie, ones that contain a loop), and 2) explored mutations (\ie, ones
-that their hash value are recorded in the hash table).
+that their hash values are recorded in the hash table).
 %
 As a result, a fuzzer forms a set of \textit{unexplored} mutations
 $G_{mutated}$, and utilizes $G_{mutated}$ to determine what thread
@@ -660,7 +660,7 @@ $G_{mutated}$ could be large.
 Instead, we choose a more efficient way. We \textit{re-compose} a new
 thread interleaving from $G^* \subseteq G_{mutated}$, and by running
 the re-composed thread interleaving, we test multiple unexlored
-segment graphs in $\bar{G}$ at once.
+segment graphs in $G^*$ at once.
 
 
 \begin{figure}[t]
@@ -691,20 +691,22 @@ We can then re-compose a new thread interleaving
 \dr{wip.}
 
 To re-compose a thread interleaving from $G_{mutated}$, we select a
-subset of $G_{mutated}$, $\bar{G}$.
+subset of $G_{mutated}$, $G^*$.
 %
-Specifically, we start with an empty set $\bar{G}$. Then, we iterate
+Specifically, we start with an empty set $G^*$. Then, we iterate
 over mutations in $g^* \`in G_{mutated}$. With $g^*$, we determine 
 
-and determine adding each
-segment graph into $\bar{G}$ forms a loop or not. If it does not form
-a loop, we add the segment graph into $\bar{G}$.
+and determine adding each segment graph into $G^*$ forms a loop or
+not. If it does not form a loop, we add the segment graph into $G^*$.
 %
-After iterating all mutated segment graphs in $G_{mutated}$, $\bar{G}$
+After iterating all mutated segment graphs in $G_{mutated}$, $G^*$
 does not contain a loop. The fuzzer then excludes selected segment
 graphs from the set of all mutated segment graphs (\ie,
-$G_{mutated} = S_{mutated} \setminus \bar{G}$), and generates
-scheduling points to explore $\bar{G}$.
+$G_{mutated} = S_{mutated} \setminus G^*$), and generates scheduling
+points to explore $G^*$.
+
+
+One important constraint of $G^*$ is 
 
 
 

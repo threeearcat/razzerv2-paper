@@ -455,7 +455,7 @@ non-intrusive to the kernel execution.
 
 \PP{Enforcing a schedule}
 %
-In order for the userspace fuzzer to ask the execution engine to
+In order for the userspace fuzzer to request the execution engine to
 enforce a schedule, the userspace fuzzer sends a schedule to run
 before executing system calls.
 %
@@ -623,24 +623,23 @@ its execution.
 
 \PP{Restriction of hardware breakpoint}
 %
-While a hardware breakpoint feature is well-fitting for our pupose, it
-has a restriction on the number of breakpoints that can be installed
-at the same time.
+While the breakpoint feature is well-fitting for our pupose, it has a
+restriction on the number of breakpoints that can be installed at the
+same time.
 %
 In Intel CPU chipsets, at most four hardware breakpoints can be
 installed simultaneously, and the number of scheduling points can be
 larger than four.
-%
-\sys overcomes this restriction by leveraging the fact that
-scheduling points are ordered. In other words, the execution engine
-installs breakpoints on a first few (\eg, four) scheduling points,
-and when a installed breakpoint is hit, the execution engine moves a
-breakpoint onto the next scheduling point.
+
+\sys overcomes this restriction by leveraging the fact that scheduling
+points are ordered. Specifically, the execution engine installs
+breakpoints on a first few (\eg, four) scheduling points, and when a
+installed breakpoint is hit, the execution engine moves a breakpoint
+onto the next scheduling point.
 %
 Also we expect that this restriction can be further mitigated by using
-architectures with more hardware breakpoints (\eg, ARM v7 equipped six
-hardware breakpoints), or using a software breakpoint feature that
-does not have a restriction on the number of breakpoints.
+a software breakpoint feature that does not have a restriction on the
+number of breakpoints.
 
 
 
@@ -674,8 +673,8 @@ enforcing a schedule after \texttt{A6} (\ie, \texttt{B2}).
 
 \PP{Virtual Machine Instrospection}
 %
-While controlling thread scheduling of system calls, the execution
-engine introspects the target kernel for two reasons.
+While controlling thread scheduling, the execution engine introspects
+the target kernel for two reasons.
 %
 First, because a hardware breakpoint does not distinguish which thread
 hits the breakpoint, the execution engine needs to determine whether
