@@ -233,7 +233,7 @@ sees two unexplored directed-instruction pair:
 % The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
 However, according to alias coverage, \texttt{Interleaving \#2}, which
 causes the uninitialized access bug, does not contain any new coverage
-because ($\texttt{B1} \rightarrow \texttt{A4}$) is already observed in
+because ($\texttt{B1} \rightarrow \texttt{A4}$) is already explored in
 \texttt{Interleaving \#1}.
 % Krace considers that growing alias coverage is a promising signal 
 % to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase alias coverage in this scenario.

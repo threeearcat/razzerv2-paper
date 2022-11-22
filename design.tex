@@ -11,15 +11,15 @@ In this section, we describe our approach to effectively achieve
 Unlike previous approaches, we propose a novel perspective on
 exploring thread interleavings.
 %
-Specifically, our key insight is in three steps:
+Specifically, our key insight lies in three steps:
 
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
-\item \textbf{\textit{Decomposing}} a thread interleaivng into small
-  segments of a few instructions
-\item \textbf{\textit{Mutating}} segments to infer unexplored
-interleaving of instructions
+\item \textbf{\textit{Decomposing}} an explored thread interleaving
+  into segments of a small number of instructions.
+\item \textbf{\textit{Mutating}} those segments to infer unexplored
+  interleaving of a small number of instructions.
 \item \textbf{\textit{Recomposing}} a new thread interleaving from
-  mutated segments
+  mutated segments to further discover unexplored segments.
 \end{enumerate}
 
 
@@ -28,18 +28,17 @@ interleaving of instructions
 
 
 
-In the following, we first explain the unit of decomposition called
-\textit{interleaving segment}~(\autoref{ss:overview}).
+In the following, we first explain our key idea behind why we
+decompose thread interleaving into \textit{interleaving
+  segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we decompose thread interleavings into
-interleaving segments, and use interleaving segments as coverage to
-express combinatorial interleavings (\textbf{Design goal
-  1})~(\autoref{ss:coverage}).
+Then, we illustrate how we design an interleaving coverage metric with
+interleaving segments to express combinatorial interleavings
+(\textbf{Design goal 1})~(\autoref{ss:coverage}).
 %
-Lastly, we explain how we mutate interleaving segments and recompose a
-new thread interleaving using mutated segments to effectively explore
-thread interleavings (\textbf{Design goal
-  2})~(\autoref{ss:scheduler}).
+Lastly, we explain how mutating interleaving segments and recomposing
+a new thread interleaving can help discover thread interleavings
+effectively (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
 
 
@@ -576,6 +575,7 @@ to distinguish different interleavings of the same vertices of
 \subsection{Coverage-directed Interleaving Search}
 \label{ss:scheduler}
 
+\dr{}
 Taking these advantages of \intcov, our interleaving search strategy
 is \textit{not random} unlike previous approaches~\cite{krace, ski,
   pctalgorithm, muzz}, Rather, it is a systematic exploration
