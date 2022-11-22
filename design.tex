@@ -316,12 +316,13 @@ In this way, \textit{we can satisfy \textbf{Design goal 2} by
 
 
 
-Using a set of interleaving segments, we propose a novel interleaving coverage metric called \textit{\intcov}.
-\Intcov is designed to track interleaving orders
-within an interleaving segment and used for guiding a fuzzer to  
-efficiently search possible instruction interleavings.
-If \intcov of a given input is saturated, 
-a fuzzer can confidently conclude that the input unlikely causes a concurrency bug and proceed to the next input.
+Using a set of interleaving segments, we propose a novel interleaving
+coverage metric called \textit{\intcov}.  \Intcov is designed to track
+interleaving orders within an interleaving segment and used for
+guiding a fuzzer to efficiently search possible instruction
+interleavings.  If per-input \intcov is saturated, a fuzzer can
+confidently conclude that the current input unlikely causes a
+concurrency bug and proceed to the next input.
 
 
 \PP{Graph representation of interleaving segment}
@@ -574,6 +575,27 @@ to distinguish different interleavings of the same vertices of
 
 \subsection{Coverage-directed Interleaving Search}
 \label{ss:scheduler}
+
+
+% \Intcov and the form of segment graph express semantically rich
+% information; it captures combinations of multiple pairs of interleaved
+% instructions. At the same time, segment graphs are represented simply;
+% each segment graph contains only at most four instructions.
+
+% These two seemingly-conflicting characteristics of segment graphs
+% enables the systematic exploration of thread interleaving.
+% %
+% In other words, it is practically impossible to thoroughly explore all
+% thread interleavings of a given multi-thread input because of the
+% astronomical number of possible thread interleavings.
+% %
+% However, it is \textit{easily possible} to throughly explore
+% interleavings \textit{inside} interleaving segments due to their small
+% size. More importantly, exploring inside interleaving segments is
+% still enough to discover most concurrency bugs (as mentioned in
+% \autoref{ss:overview}).
+
+
 
 \dr{}
 Taking these advantages of \intcov, our interleaving search strategy
