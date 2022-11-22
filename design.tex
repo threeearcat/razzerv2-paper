@@ -28,13 +28,17 @@ interleaving of instructions
 
 
 
-\dr{wip.}
-In the following, we first explain the key idea of our
-approach~(\autoref{ss:overview}).  Then, we illustrate our concurrency
-coverage metric to express combinatorial interleavings (\textbf{Design
-  goal 1})~(\autoref{ss:coverage}), and the interleaving search
-strategy to effectively explore thread interleavings (\textbf{Design
-  goal 2})~(\autoref{ss:scheduler}).
+In the following, we first explain the unit of decomposition called
+\textit{interleaving segment}~(\autoref{ss:overview}).
+%
+Then, we illustrate how we decompose thread interleavings into
+interleaving segments, and use interleaving segments as coverage to
+express combinatorial interleavings (\textbf{Design goal
+  1})~(\autoref{ss:coverage}).
+%
+Lastly, we explain our interleaving exploration scheme, mutating and
+recomposing, tailored to effectively explore thread interleavings
+(\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
 
 
@@ -552,14 +556,6 @@ to distinguish different interleavings of the same vertices of
 %
 %
 
-Taking these advantages of \intcov, our interleaving search strategy
-is \textit{not random} unlike previous approaches~\cite{krace, ski,
-  pctalgorithm, muzz}, Rather, it is a systematic exploration
-\textit{directed by explored interleaving coverage}.
-%
-\autoref{ss:scheduler} discusses our interleaving search strategy.
-
-
 % \Intcov can guide the fuzzer to identify that there are possibly more
 % useful instruction interleavings remain untested. So, the fuzzer
 % spends more computing power to explore more interesting (unseen)
@@ -576,6 +572,15 @@ is \textit{not random} unlike previous approaches~\cite{krace, ski,
 
 \subsection{Coverage-directed Interleaving Search}
 \label{ss:scheduler}
+
+Taking these advantages of \intcov, our interleaving search strategy
+is \textit{not random} unlike previous approaches~\cite{krace, ski,
+  pctalgorithm, muzz}, Rather, it is a systematic exploration
+\textit{directed by explored interleaving coverage}.
+%
+
+
+
 %
 % One important role of segment graphs are to infer unexplored
 % interleaving segments that the fuzzer will search for in future
