@@ -225,8 +225,8 @@ input (\eg, a multi-threaded system call sequence) while
 1) an \textit{interleaivng coverage metric} captures unique behaviors
 of thread interleavings, and
 %
-2) a \textit{thread interleaving search strategy} determines which
-thread interleaving to run on each iteration.
+2) a \textit{thread interleaving exploration scheme} determines
+which thread interleaving to run on each iteration.
 
 
 % \PP{Coverage-guided fuzzing}
@@ -333,15 +333,15 @@ explore thread interleavings of other multi-thread inputs.
 % \dr{TODO: MUZZ, and conzzer?}
 
 
-\PP{Thread interleaving search strategy}
+\PP{Thread interleaving exploration scheme}
 %
 Unlike conventional fuzzers, concurrency fuzzers consider thread
 scheduling is another input domain that a fuzzer needs to explore.
 %
 
 To determine which thread interleaving to run for each iteration, a
-fuzzer adopts a thread interleaving search strategy (shortly, an
-interleaving search strategy).
+fuzzer adopts a thread interleaving exploration scheme (shortly, an
+interleaving exploration scheme).
 %
 For instance, for every execution, Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} enforces the execution order of a single

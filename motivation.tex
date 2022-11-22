@@ -6,8 +6,8 @@
 % - limitations of existing approaches
 
 This work is motivated by the observation that concurrency fuzzing
-requires new interleaving coverage metric and better search strategy.
-In this section, we first study how concurrency bugs manifest
+requires new interleaving coverage metric and better exploration
+scheme.  In this section, we first study how concurrency bugs manifest
 depending on thread interleaving through a real-world concurrency bug
 example.
 %
@@ -112,7 +112,7 @@ uninitialized access bug.
 %
 We find that even if an explored execution does not cause 
 a concurrency bug, it provides useful feedback 
-to guide what interleaving orders should be further explored.
+to guide what interleavings should be further explored.
 
 In the example of \autoref{fig:cve-2017-17712}, let us assume 
 if a fuzzer executes the two system calls \textit{sequentially} 
@@ -137,9 +137,12 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4}))$, and, if executed, the interleaving triggers the
 uninitialized access bug.
 
-\PP{Design goal 2: Coverage-based interleaving search strategy}
+\PP{Design goal 2: Coverage-based interleaving exploration scheme}
 %
-\dr{history-based? coverage-based?}
+\dr{I change the term ``search strategy'' to ``exploration
+  scheme''. Does it seem fine?}
+%
+\dr{history-based? or coverage-based?}
 %
 The observation gives a direction that how a fuzzer should explore 
 the search space using a coverage metric.
@@ -150,21 +153,24 @@ coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 This allows a systematic way to explore the search space rather than
-performing randomized search pervasively used in previous
+performing randomized exploration pervasively used in previous
 approaches~\cite{ski, krace, pctalgorithm, muzz}.%\yj{cite}
 %
 \blue{
   %
   Considering a concurrency bugs often manifest with a thread
-  interleaving that rarely happen, the systematic interleaving search
-  boosts up the concurrency bug discovery because it can direct the
-  fuzzer to execute a specific interleaving instead of executing
-  random thread interleavings thousands of times.
+  interleaving that rarely happen, the systematic interleaving
+  exploration boosts up the concurrency bug discovery because it can
+  direct the fuzzer to execute a specific interleaving instead of
+  executing random thread interleavings thousands of times.
   %
 }
 
-In summary, using the coverage metric expressing combinations of interleaving orders and the coverage-based search strategy, a fuzzer can effectively determine what to execute in future iterations, and quickly discover concurrency bugs
-without redundantly executing thread interleavings.
+In summary, using the coverage metric expressing combinations of
+interleaving orders and the coverage-based exploration scheme, a
+fuzzer can effectively determine what to execute in future iterations,
+and quickly discover concurrency bugs without redundantly executing
+thread interleavings.
 
 \subsection{Limitation of prior approaches}
 \label{ss:existingapproaches}
@@ -183,8 +189,8 @@ without redundantly executing thread interleavings.
 % interleaving search strategies of prior approaches.
 %
 Altough prior approaches achieve their own successes, we find that
-their interleaving coverage metrics and interleaving search strategies
-do not satisfy \textbf{Design goal 1} and \textbf{2}.
+their interleaving coverage metrics and interleaving exploration
+scheme do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
 \PP{Less informative interleaving coverage}
@@ -292,7 +298,7 @@ access bug.
 % here, we find that they all share the same limitation.
 
 
-\PP{Inefficient interleaving search strategy}
+\PP{Ineffective interleaving exploration scheme}
 %
 Stemming from the aforementioned limitations in coverage, 
 proposed interleaving search strategies do not efficiently 
@@ -301,7 +307,7 @@ not satisfying \textbf{Design goal 2}.
 
 Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious.
 They do not make use of any interleaving coverage 
-and perform their randomized search. \dr{}
+and perform their randomized interleaving exploration.
 %
 Krace~\cite{krace} also explores thread interleavings randomly without
 considering what thread interleavings are explored before.  Krace
