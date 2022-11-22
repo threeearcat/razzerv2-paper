@@ -74,8 +74,8 @@ $\texttt{A2} \Rightarrow \texttt{B1}$\footnote{In this paper,
 %
 Second, \texttt{B1} should be executed before \texttt{A4} (\ie,
 $\texttt{B1} \Rightarrow \texttt{A4}$) to make thread~A dereference
-uninitialized \texttt{rfv} while other interleavings do not 
-contribute to the bug.
+uninitialized \texttt{rfv} while other instructions do not contribute
+to the bug.
 %
 %Therefore, thread interleavings satisfying a combination of the two
 %interleaving orders (\ie,
@@ -94,11 +94,12 @@ discover the uninitialized access bug, an interleaving coverage metric
 should distinguish combinations of multiple interleaving orders.
 %
 For example,
-$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ and
 $(\texttt{B1} \Rightarrow \texttt{A2}) \wedge (\texttt{B1} \Rightarrow
-\texttt{A4})$ should be distinguished, and thus, interleaving coverage
-should not be saturated until
+\texttt{A4})$ (\ie, \autoref{fig:alias-coverage}-(a)) and
+$(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
+\texttt{A4})$ (\ie, \autoref{fig:alias-coverage}-(b)) should be
+distinguished, and thus, interleaving coverage should not be saturated
+until
 $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4})$ is executed.
 %
@@ -106,6 +107,20 @@ Otherwise, a fuzzer may think that there is no more interesting thread
 interleaving in the multi-thread input, and stop searching for new
 thread interleavings of the multi-thread input, missing the
 uninitialized access bug.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{fig/alias-coverage.pdf}
+  \caption{Two thread interleavings between thread~A and thread~B
+    described in \autoref{fig:cve-2017-17712}.
+    %
+    The uninitialized access bug manifests only in
+    \texttt{Interleaving \#2}.
+    %
+    We intentionally omits bug-irrelevant memory accesses (\ie,
+    \texttt{A6} and \texttt{B2}).}
+  \label{fig:alias-coverage}
+\end{figure}
 
 
 \PP{Observation 2: Feedback from explored executions}
@@ -115,20 +130,22 @@ a concurrency bug, it provides useful feedback
 to guide what interleavings should be further explored.
 
 In the example of \autoref{fig:cve-2017-17712}, let us assume a fuzzer
-executes the two system calls \textit{sequentially} such that thread~A
-executes all instructions followed by the execution of thread~B.  In
-the explored execution, a fuzzer observes the three instructions,
-\texttt{A2}, \texttt{A4}, and \texttt{B1}, are executed in the order
-of $\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ and
+executes the two system calls \textit{sequentially} such that thread~B
+executes all instructions followed by the execution of thread~A (\ie,
+\autoref{fig:alias-coverage}-(a)).  In the explored execution, a
+fuzzer observes the three instructions, \texttt{B1}, \texttt{A2}, and
+\texttt{A4}, are executed in the order of
+($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$) and
 they access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
 This execution orders do not cause the uninitialized access bug.
 %
-However, from the explored execution, one can easily imagine a new interleaving of these three
-instructions by changing the execution order of \texttt{A4} and
-\texttt{B1} (\ie,
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
+However, from the explored execution, one can easily imagine a new
+interleaving of these three instructions by changing the execution
+order of \texttt{B1} and \texttt{A2}, resulting in
+\autoref{fig:alias-coverage}-(b).
+% $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 The speculative interleaving is what exactly we are looking for; it
 satisfies the combination of interleaving orders
@@ -138,12 +155,10 @@ uninitialized access bug.
 
 \PP{Design goal 2: Coverage-based interleaving exploration scheme}
 %
-\dr{history-based? or coverage-based?}
-%
 The observation gives a direction that how a fuzzer should explore 
 the search space using a coverage metric.
 If interleaving coverage tracks that
-$\texttt{A2} \Rightarrow \texttt{A4} \Rightarrow \texttt{B1}$ is
+$\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$ is
 \textit{explored} before, a fuzzer can utilize interleaving
 coverage as feedback to infer \textit{unexplored} thread interleavings (\eg,
 $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
@@ -195,21 +210,6 @@ scheme do not satisfy \textbf{Design goal 1} and \textbf{2}.
 We find that previously proposed interleaving coverage metrics are
 less-informative because none of them consider a combination of
 interleaving orders.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.8\linewidth]{fig/alias-coverage.pdf}
-  \caption{Two thread interleavings between thread~A and thread~B
-    described in \autoref{fig:cve-2017-17712}.
-    %
-    The uninitialized access bug manifests only in
-    \texttt{Interleaving \#2}.
-    %
-    We intentionally omits bug-irrelevant memory accesses (\ie,
-    \texttt{A6} and \texttt{B2}).}
-  \label{fig:alias-coverage}
-\end{figure}
-
 
 
 For example, let us suppose we adopt alias coverage~\cite{krace},

@@ -10,9 +10,9 @@
 % proven its effectiveness by discovering numerous vulnerabilities in
 % various softwares such as the Linux kernel.
 
-In this section, we introduce conventional fuzzing approaches to
-discover vulnerabilities in the kernel~(\autoref{ss:kernelfuzzing}),
-followed by recent improvements in discovering concurrency
+In this section, we introduce conventional fuzzing to discover
+vulnerabilities in the kernel~(\autoref{ss:kernelfuzzing}), followed
+by recent improvements in discovering concurrency
 bugs~(\autoref{ss:concurrencyfuzzing}).
 
 
@@ -187,8 +187,8 @@ large system softwares, they mostly focus on the \textit{sequential
 thread), while the concurrency aspect (\ie, a thread interleaving) is
 left uncontrolled.
 %
-As a consequence, conventional fuzzing approaches are limited in
-discovering concurrency bugs such as race conditions, data races, and
+As a consequence, conventional fuzzing is limited in discovering
+concurrency bugs such as race conditions, data races, and
 deadlocks~\cite{covcon, terragni2018effectiveness}.
 
 
@@ -340,14 +340,12 @@ scheduling is another input domain that a fuzzer needs to explore.
 %
 
 To determine which thread interleaving to run for each iteration, a
-fuzzer adopts a thread interleaving exploration scheme (shortly, an
-interleaving exploration scheme).
+fuzzer adopts a thread interleaving exploration scheme.
 %
 For instance, for every execution, Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} enforces the execution order of a single
-pair of instructions,
-% Krace~\cite{krace} randomly scheduling instructions,
-and Conzzer~\cite{conzzer} designates two functions to
+pair of instructions, Krace~\cite{krace} randomly schedules
+instructions, and Conzzer~\cite{conzzer} designates two functions to
 run concurrently.
 %
 After determining a thread interleaving to run, concurrency fuzzing
