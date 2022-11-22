@@ -208,6 +208,8 @@ Segmentizing thread interleaving provides two remarkable benefits to a
 fuzzer as follows.
 
 
+\dr{TODO: explain with fig3}
+
 
 First, tracking interleaving segments is a befitting choice to
 determine whether to further explore thread interleavings of a
@@ -220,8 +222,6 @@ Considering a concurrency bug manifests depending on interleaving
 orders of at most four memory accesses (which is exactly represented
 by an interleaving segment), if a fuzzer explores all interleaving
 segments, it is unlikely that a fuzzer misses a concurrency bug.
-%
-\dr{TODO: fig3}
 %
 Accordingly, \textit{interleaving segments can act as an
   interleaving coverage metric satisfying \textbf{Design goal 1}}.
@@ -590,7 +590,7 @@ is \textit{not random} unlike previous approaches~\cite{krace, ski,
 % iterations.
 % %
 In this subsection, we explain how we utilize a set of explored
-segment graphs $G$ to systematically and effectively explore thread
+segment graphs to systematically and effectively explore thread
 interleavings.
 
 
@@ -672,7 +672,7 @@ interleaving to run in future iterations.
 
 
 
-\PP{Re-composing a thread interleaving}
+\PP{Recomposing a thread interleaving}
 %
 A naive approach to explore segment graphs in given $G_{mutated}$
 could be selecting one segment graph in $G_{mutated}$, and running a
@@ -682,9 +682,9 @@ describing in the segment graph.
 However, it might require many executions because the size of
 $G_{mutated}$ could be large.
 %
-Instead, we choose a more efficient way. We \textit{re-compose} a new
+Instead, we choose a more efficient way. We \textit{recompose} a new
 thread interleaving from $G^*_{mutated} \subseteq G_{mutated}$, and by running
-the re-composed thread interleaving, we test multiple unexlored
+the recomposed thread interleaving, we test multiple unexlored
 segment graphs in $G^*_{mutated}$ at once.
 
 
@@ -696,31 +696,36 @@ segment graphs in $G^*_{mutated}$ at once.
 \end{figure}
 
 
-\dr{}
-\autoref{fig:hint} demonstrates an idea of re-composing a thread
-interleaving. Suppose we mutate explored segment graphs in
-\autoref{fig:hint}-(a), and \autoref{fig:hint}-(b) represents examples
-of their mutations, \texttt{Segment \#1*} and \texttt{Segment \#2*}.
+
+\autoref{fig:hint} demonstrates an idea of recomposing a thread
+interleaving. Suppose we have two segment mutations \texttt{Segment
+  \#1*} and \texttt{Segment \#2*} described in \autoref{fig:hint}-(b).
 %
-We can then re-compose a new thread interleaving
-\autoref{fig:hint}-(c) from \texttt{Segment \#1*} and \texttt{Segment
-  \#2*}, which tests \textit{both} \texttt{Segment \#1*} and
-\texttt{Segment \#2*} at once.
+We can then draw a graph which contains all vertices and all edges
+from \texttt{Segment \#1*} and \texttt{Segment \#2*} as described in
+\autoref{fig:hint}-(c).
 %
-
-
-
-
-When re-composing a thread interleaving, one important constraint is
-that it should not contain a loop. Otherwise, a contradiction on the
-execution order arises similar with invalid mutation (\ie, an
-instruction should be executed before itself).
+It is worth noting that \autoref{fig:hint}-(c) contains five vertices,
+and six edges, which is a superset of vertices and edges from
+\texttt{Segment \#1*} and \texttt{Segment \#2*} respectively.
 %
-To select a subset $G^*_{mutated}$, we start with an empty set
-$G^*_{mutated}$. Then, we iterate over mutations in
-$g^* \in G_{mutated}$. With $g^*$, we determine adding edges in $g^*$
-into $G^*_{mutated}$ forms a loop or not. If it does not form a loop,
-we add the segment graph into $G^*_{mutated}$.
+Therefore, when we execute a thread interleaving corresponding to this
+graph, we can test both \texttt{Segment \#1*} and \texttt{Segment
+  \#2*} at once (\autoref{fig:hint}-(d)).
+
+
+
+When recomposing a thread interleaving, one important constraint is
+that it should not contain a loop (\ie, \autoref{fig:hint}-(c) should
+not contain a loop). Otherwise, a contradiction on the execution order
+arises similar with invalid mutation (\ie, an instruction should be
+executed before itself).
+%
+To select a subset $G^*_{mutated}$ without making a loop, we start
+with an empty set of $G^*_{mutated}$. Then, we iterate over mutations
+in $g^* \in G_{mutated}$. With $g^*$, we determine adding edges in
+$g^*$ into $G^*_{mutated}$ forms a loop or not. If it does not form a
+loop, we add the segment graph into $G^*_{mutated}$.
 %
 After iterating all mutated segment graphs in $G_{mutated}$,
 $G^*_{mutated}$ does not contain a loop. The fuzzer then excludes

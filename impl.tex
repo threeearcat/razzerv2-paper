@@ -456,8 +456,8 @@ non-intrusive to the kernel execution.
 \PP{Enforcing a schedule}
 %
 In order to request the execution engine to enforce a schedule, the
-userspace fuzzer sends a schedule to run before executing system
-calls.
+userspace fuzzer sends a schedule to run through hypercall interfaces
+before executing system calls.
 %
 After that, the threads notify the execution engine that they are
 ready to execute system calls, and start executing system calls,
@@ -488,13 +488,12 @@ are ready (\ie, \C{2}).
 %
 Meanwhile, when the execution engine receives a scheduling point, the
 execution engine installs a breakpoint on an instruction on which the
-scheduling point (\ie, \C{2}-1).
+scheduling point indicates (\ie, \C{2}-1).
 %
 After all threads call \texttt{hcall_ready()}, the execution engine
-wakes up them, and the threads start executing system calls (\ie,
+wakes them up, and the threads start executing system calls (\ie,
 \C{3}).
-
-
+%
 While executing system calls, the execution engine keeps only one
 thread to run.
 %
