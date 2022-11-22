@@ -138,6 +138,9 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 uninitialized access bug.
 
 \PP{Design goal 2: Coverage-based interleaving search strategy}
+%
+\dr{history-based? coverage-based?}
+%
 The observation gives a direction that how a fuzzer should explore 
 the search space using a coverage metric.
 If interleaving coverage tracks that
@@ -211,24 +214,26 @@ which tracks interleaving orders of a \textit{single} instruction
 pair.
 %
 Alias coverage determines a thread interleaving \texttt{X} exposes a
-unique behavior if \texttt{X} contains an unexplored interleaving
-order $I_W \Rightarrow I_R$, where $I_R$ reads a value written by
-$I_W$ and they are executed by different threads.
-\autoref{fig:alias-coverage} illustrates the simplified
+unique behavior if \texttt{X} contains an unexplored
+\blue{directed-instruction pair} $I_W \rightarrow I_R$, where $I_R$
+reads a value written by $I_W$ and they are executed by different
+threads.  \autoref{fig:alias-coverage} illustrates the simplified
 explanation of why alias coverage does not satisfy the \textbf{Design
   goal 1}.
 %
 Assuming \texttt{Interleaving \#1} is executed first, alias coverage
 identifies \texttt{Interleaving \#1} exposes unique behaviors when it
-sees two unexplored interleaving orders:
-($\texttt{B1} \Rightarrow \texttt{A2}$) and
-($\texttt{B1} \Rightarrow \texttt{A4}$).
+sees two unexplored directed-instruction pair:
+($\texttt{B1} \rightarrow \texttt{A2}$) and
+($\texttt{B1} \rightarrow \texttt{A4}$).
 %
-The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
-However, according to alias coverage, \texttt{Interleaving \#2}
-does not contain any new coverage because ($\texttt{B1} \Rightarrow \texttt{A4}$) is already observed in \texttt{Interleaving \#1}.
-Krace considers that growing alias coverage is a promising signal 
-to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase alias coverage in this scenario.
+% The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
+However, according to alias coverage, \texttt{Interleaving \#2}, which
+causes the uninitialized access bug, does not contain any new coverage
+because ($\texttt{B1} \rightarrow \texttt{A4}$) is already observed in
+\texttt{Interleaving \#1}.
+% Krace considers that growing alias coverage is a promising signal 
+% to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase alias coverage in this scenario.
 %But, when alias coverage faces \texttt{Interleaving \#2} after
 %\texttt{Interleaving \#1}, it suffers from locating unobserved unique
 %behaviors of \texttt{Interleaving \#2}, because there is no unobserved
@@ -239,8 +244,9 @@ to explore thread interleavings further, but the \texttt{Interleaving \#2} does 
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
 to de-prioritize a multi-thread input in which a concurrency bug
-resides and switch to other seeds. In evaluation, we quantify the
+resides and switch to other inputs. In evaluation, we quantify the
 limitation in \autoref{table:comparison-interleaving-search}.
+
 Likewise, concurrent call pair~\cite{conzzer} coverage also suffers from
 distinguishing these two thread interleavings.
 %
@@ -250,9 +256,9 @@ pair, it is not aware of the fine-grained orders of instruction interleavings wi
 Since two thread interleavings in \autoref{fig:alias-coverage} take
 place in the same function (\ie, \texttt{A2} and \texttt{A4} are
 executed in the same function), concurrent call pair is also limited
-in distinguish the two interleavings, and shows the same limitation as
-alias coverage when it comes to discovering this uninitialized access
-bug.
+in distinguishing the two interleavings, and shows the same limitation
+as alias coverage when it comes to discovering this uninitialized
+access bug.
 
 % is also saturated with these two thread
 % interleavings, because once two functions \texttt{sendmsg()} and
