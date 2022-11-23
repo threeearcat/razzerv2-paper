@@ -102,7 +102,7 @@ to contain at most four memory-accessing instructions,
 which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
 
 
-\PP{Example of segmentizing thread interleaving}
+\PP{Example of interleaving segments}
 %
 \begin{figure}[t]
   \centering
@@ -114,50 +114,86 @@ which makes the problem of defining a coverage metric tractable while maintainin
   \label{fig:keyidea}
 \end{figure}
 %
-\autoref{fig:keyidea} visualizes how we segmentize a thread
-interleaving.
+\autoref{fig:keyidea} visualizes interleaving segments of a thread
+interleaving, and how they can be useful in exploring thread
+interleavings.
 %
 Let us assume we execute the two system calls in
-\autoref{fig:cve-2017-17712} concurrently while monitoring memory
-accesses annotated with timestamps.
+\autoref{fig:cve-2017-17712} concurrently, and identify that the
+executed thread interleaving is described in
+\autoref{fig:keyidea}-(a).
 %
-We can then draw a totally-ordered instruction sequence of the thread
-inteleaving as described in \autoref{fig:keyidea}-(a).
+Then, interleaving segments described in \autoref{fig:keyidea}-(b) are
+a part of this thread interleaving, representing interleaving of a
+small number (\eg, 3 or 4) of instructions.
+%
+For example, \texttt{Segment \#1} represents interleaving of three
+instructions \texttt{B1}, \texttt{A2}, and \texttt{A4}, stating that
+\texttt{B1} is executed before \texttt{A2} and \texttt{A4}.
+%
+Similarly, \texttt{Segment \#2} and \texttt{Segment \#3} describe
+interleavings of (\texttt{B1}, \texttt{A2}, \texttt{A6}, and
+\texttt{B2}), and (\texttt{B1}, \texttt{A4}, \texttt{A6}, and
+\texttt{B2}) respectively.
 
 
 
-Segmentizing this thread interleaving is performed in two steps.
+From these segments, a fuzzer can learn various useful information.
 %
-First, we pair up two instructions that access the same mermoy object.
+Taking an example of \texttt{Segment \#1}, besides execution order
+($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
+(represented in \texttt{Segment \#1}), a fuzzer easily realizes that
+there are more possible execution orders of the three instructions via
+rearranging the instructions.
 %
-In \autoref{fig:keyidea}-(a), there are three pairs of such
-interleaved instructions such as
-($\texttt{B1} \Rightarrow \texttt{A2}$) and
-($\texttt{B1} \Rightarrow \texttt{A4}$) (accessing
-\texttt{inet->hdrincl}), and ($\texttt{A6} \Rightarrow \texttt{B2}$)
-(accessing \texttt{sk->owned}).
+Accordingly, a fuzzer can decide that it is worth investing more
+computing power to further explore thread interleavings.
 %
-As we want to represent a combination of interleaving orders, the
-second step is to further combine instruction pairs into an
-interleaving segment.
+Moreover, a fuzzer can infer exact execution orders that have not been
+explored, such as
+($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) (which
+causes the uninitialized access bug if executed).
 %
-Each interleaving segment is formed by combining two instruction pairs
-so that interleaving segments contain at most four instructions.
-%
-For example, we combine two instruction pairs
-($\texttt{B1} \Rightarrow \texttt{A2}$) and
-($\texttt{B1} \Rightarrow \texttt{A4}$) to construct \texttt{Segment
-  \#1} in which three instructions \texttt{B1}, \texttt{A2}, and
-\texttt{A4} are included.
-%
-In accordance with timestamps annotated in these instructions, we can
-arrange the instructions in \texttt{Segment \#1}.
-%
-Likewise, \texttt{Segment \#2} and \texttt{Segment \#3} are the result
-of combining $\texttt{B1} \Rightarrow \texttt{A2}$ and
-$\texttt{A6} \Rightarrow \texttt{B2}$, and
-$\texttt{B1} \Rightarrow \texttt{A4}$ and
-$\texttt{A6} \Rightarrow \texttt{B2}$ respectively.
+A fuzzer therefore can systematically search thread interleavings
+directed by the inference, rather than random searching.
+
+
+
+
+
+
+% Segmentizing this thread interleaving is performed in two steps.
+% %
+% First, we pair up two instructions that access the same mermoy object.
+% %
+% In \autoref{fig:keyidea}-(a), there are three pairs of such
+% interleaved instructions such as
+% ($\texttt{B1} \Rightarrow \texttt{A2}$) and
+% ($\texttt{B1} \Rightarrow \texttt{A4}$) (accessing
+% \texttt{inet->hdrincl}), and ($\texttt{A6} \Rightarrow \texttt{B2}$)
+% (accessing \texttt{sk->owned}).
+% %
+% As we want to represent a combination of interleaving orders, the
+% second step is to further combine instruction pairs into an
+% interleaving segment.
+% %
+% Each interleaving segment is formed by combining two instruction pairs
+% so that interleaving segments contain at most four instructions.
+% %
+% For example, we combine two instruction pairs
+% ($\texttt{B1} \Rightarrow \texttt{A2}$) and
+% ($\texttt{B1} \Rightarrow \texttt{A4}$) to construct \texttt{Segment
+%   \#1} in which three instructions \texttt{B1}, \texttt{A2}, and
+% \texttt{A4} are included.
+% %
+% In accordance with timestamps annotated in these instructions, we can
+% arrange the instructions in \texttt{Segment \#1}.
+% %
+% Likewise, \texttt{Segment \#2} and \texttt{Segment \#3} are the result
+% of combining $\texttt{B1} \Rightarrow \texttt{A2}$ and
+% $\texttt{A6} \Rightarrow \texttt{B2}$, and
+% $\texttt{B1} \Rightarrow \texttt{A4}$ and
+% $\texttt{A6} \Rightarrow \texttt{B2}$ respectively.
 
 %
 % \autoref{fig:keyidea}-(a) represents the thread interleaving of the
@@ -206,8 +242,6 @@ $\texttt{A6} \Rightarrow \texttt{B2}$ respectively.
 Segmentizing thread interleaving provides two remarkable benefits to a
 fuzzer as follows.
 
-
-\dr{TODO: explain with fig3}
 
 
 First, tracking interleaving segments is a befitting choice to
@@ -325,6 +359,8 @@ confidently conclude that the current input unlikely causes a
 concurrency bug and proceed to the next input.
 
 
+
+\dr{} 
 \PP{Graph representation of interleaving segment}
 % \PP{Graph representation of interleaved instructions}
 As discussed, \intcov contains multiple interleaved instructions, 
