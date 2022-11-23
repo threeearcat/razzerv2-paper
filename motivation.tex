@@ -105,8 +105,8 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 %
 Otherwise, a fuzzer may think that there is no more interesting thread
 interleaving in the multi-thread input, and stop searching for new
-thread interleavings of the multi-thread input, missing the
-uninitialized access bug.
+thread interleavings of the input, missing the uninitialized access
+bug.
 
 \begin{figure}[t]
   \centering
@@ -125,10 +125,10 @@ uninitialized access bug.
 
 \PP{Observation 2: Feedback from explored executions}
 %
-We find that even if an explored execution does not cause 
-a concurrency bug, it provides useful feedback 
-to guide what interleavings should be further explored.
-
+We find that even if an explored execution does not cause a
+concurrency bug, it provides useful feedback to guide what
+interleavings should be further explored.
+%
 In the example of \autoref{fig:cve-2017-17712}, let us assume a fuzzer
 executes the two system calls \textit{sequentially} such that thread~B
 executes all instructions followed by the execution of thread~A (\ie,
@@ -139,12 +139,10 @@ fuzzer observes the three instructions, \texttt{B1}, \texttt{A2}, and
 they access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
-This execution orders do not cause the uninitialized access bug.
-%
-However, from the explored execution, one can easily imagine a new
-interleaving of these three instructions by changing the execution
-order of \texttt{B1} and \texttt{A2}, resulting in
-\autoref{fig:alias-coverage}-(b).
+From this execution order that does not cause the uninitialized access
+bug, one can easily imagine a new interleaving of these three
+instructions by changing the execution order of \texttt{B1} and
+\texttt{A2}, resulting in \autoref{fig:alias-coverage}-(b).
 % $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 The speculative interleaving is what exactly we are looking for; it

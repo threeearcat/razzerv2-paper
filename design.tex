@@ -246,9 +246,7 @@ directed by the inference, rather than random searching.
 %
 Segmentizing thread interleaving provides two remarkable benefits to a
 fuzzer as follows.
-
-
-
+%
 First, tracking interleaving segments is a befitting choice to
 determine whether to further explore thread interleavings of a
 multi-thread input.
@@ -413,7 +411,7 @@ accesses, the graph in \autoref{fig:interleavingsegmentgraph}-(b) also
 contains three vertices corresponding to the memory accesses conducted
 at \texttt{B1}, \texttt{A2}, and \texttt{A4}.
 %
-Between these vertices, this graph contains three edges; Specifically,
+Between these vertices, this graph contains three edges. Specifically,
 a program-order edge from \texttt{A2} to \texttt{A4} is drawn to
 represent ``\textit{\texttt{A2} is executed before \texttt{A4} in
   thread~A}''.
@@ -580,16 +578,19 @@ segment coverage and to search unexplored thread interleavings.
 
 \PP{Tracking interleaving segment coverage}
 %
-Semantically, segment graphs represent interleaving orders (via
-interleaving-order edges) of at most four instructions (via vertices),
-and different interleavings (\eg, \autoref{fig:keyidea}-(a).
+\dr{redundant}
 %
-If a fuzzer collects all segment graphs from a multi-thread input, a
-fuzzer can confidently conclude that the input no more reveals an
-interesting combination of interleaving orders.
+Semantically, segment graphs represent a combination of interleaving
+orders (via interleaving-order edges) of at most four instructions
+(via vertices).
 %
-Therefore, our fuzzer choose to collect explored segment graphs as
-interleaving coverage metric.
+If new segment graphs are continuously discovered, a fuzzer should
+invest more computing power to further explore thread interleavings.
+Otherwise, a fuzzer can confidently conclude that the input no more
+reveals an interesting combination of interleaving orders.
+%
+Therefore, our fuzzer chooses to track explored segment graphs as
+\intcov.
 
 
 In practice, however, \intcov contains a large number of segment
@@ -648,7 +649,7 @@ to distinguish different interleavings of the same vertices of
 
 
 
-\subsection{Coverage-directed Interleaving Search}
+\subsection{Coverage-directed Interleaving Exploration}
 \label{ss:scheduler}
 
 
@@ -671,24 +672,17 @@ to distinguish different interleavings of the same vertices of
 % \autoref{ss:overview}).
 
 
-
-\dr{}
-Taking these advantages of \intcov, our interleaving search strategy
-is \textit{not random} unlike previous approaches~\cite{krace, ski,
-  pctalgorithm, muzz}, Rather, it is a systematic exploration
-\textit{directed by explored interleaving coverage}.
-%
-
-
-
+Our interleaving exploration is \textit{not random} unlike previous
+approaches~\cite{krace, ski, pctalgorithm, muzz}, Rather, it is a
+systematic exploration \textit{directed by explored interleaving
+  coverage}.
 %
 % One important role of segment graphs are to infer unexplored
 % interleaving segments that the fuzzer will search for in future
 % iterations.
 % %
-In this subsection, we explain how we utilize a set of explored
-segment graphs to systematically and effectively explore thread
-interleavings.
+In this subsection, we explain how we utilize explored segment graphs
+to systematically and effectively explore thread interleavings.
 
 
 
@@ -771,18 +765,17 @@ interleaving to run in future iterations.
 
 \PP{Recomposing a thread interleaving}
 %
-A naive approach to explore segment graphs in given $G_{mutated}$
-could be selecting one segment graph in $G_{mutated}$, and running a
-multi-thread input while enforcing the execution order of instructions
-describing in the segment graph.
+A naive approach to explore segment mutations in given $G_{mutated}$
+could be selecting one segment mutation in $G_{mutated}$, and running
+a multi-thread input while enforcing the interleaving orders
+describing in the segment mutation.
 %
 However, it might require many executions because the size of
-$G_{mutated}$ could be large.
-%
-Instead, we choose a more efficient way. We \textit{recompose} a new
-thread interleaving from $G^*_{mutated} \subseteq G_{mutated}$, and by running
-the recomposed thread interleaving, we test multiple unexlored
-segment graphs in $G^*_{mutated}$ at once.
+$G_{mutated}$ could be large.  Instead, we choose a more efficient
+way. We \textit{recompose} a new thread interleaving from
+$G^*_{mutated} \subseteq G_{mutated}$, and by running the recomposed
+thread interleaving, we test multiple unexlored segment mutations in
+$G^*_{mutated}$ at once.
 
 
 \begin{figure}[t]
@@ -815,7 +808,7 @@ graph, we can test both \texttt{Segment \#1*} and \texttt{Segment
 When recomposing a thread interleaving, one important constraint is
 that it should not contain a loop (\ie, \autoref{fig:hint}-(c) should
 not contain a loop). Otherwise, a contradiction on the execution order
-arises similar with invalid mutation (\ie, an instruction should be
+arises similar with an invalid mutation (\ie, an instruction should be
 executed before itself).
 %
 To select a subset $G^*_{mutated}$ without making a loop, we start

@@ -46,7 +46,7 @@ To build a guest kernel, we use a kernel configuration used by
 \texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
 \sys search for bugs in similar kernel modules/subsystems.
 %
-We run intermittently \sys for approximately two monts on latest
+We run intermittently \sys for approximately two months on latest
 versions of the Linux kernel ranging from 5.19-rc2 to 6.0-rc7.
 
 
@@ -182,8 +182,9 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
   \label{table:comparison-interleaving-search}
 \end{table*}
 %
-Here, we measure the elapsed time and number of executions required to
-discover a given concurrency bug for each approach.
+We measure the elapsed time and number of executions required to
+discover a given concurrency bug to demonstrate the performance
+improvements of \sys against recent works.
 
 \PP{Comparison target}
 %
@@ -206,7 +207,6 @@ the baseline.
 
 \PP{Comparison method}
 %
-\dr{}
 With these kernel concurrency fuzzers, we measure the number of
 executions and the elapsed time required to discover concurrency bugs.
 %
@@ -215,14 +215,20 @@ seeds, which are known as impediments for a fair fuzzing
 evaluation~\cite{fuzzingeval}.
 %
 In order to eliminate impacts of such impediments, we disable the
-single-thread fuzzing~(\autoref{sss:singlethreadfuzzing}), and manually
-provide a multi-thread input as well as a pair of system calls that
-can cause each concurrency bug. Then, we observe how each fuzzer
-explore thread interleavings of a given pair of system calls.
+single-thread fuzzing~(\autoref{sss:singlethreadfuzzing}), and
+manually provide a multi-thread input (including a pair of system
+calls) that can cause each concurrency bug.
 %
-In this way, we can focus on the effectiveness of the thread
-interleaving exploration of each fuzzer without being interrupted by
-the randomness. \dr{N times of executions.}
+In this way, we eliminate the impact of how a fuzzer generates an
+input which is highly affectted by the randomness, and can focus on
+the effectiveness of the thread interleaving exploration of each
+fuzzer.
+%
+Then, we observe how each fuzzer explore thread interleavings of a
+given pair of system calls. During the evaluation, we limit the number
+of executions to 10000 if a concurrency bug if a fuzzer fails to
+discover a concurrency bug.
+
 
 
 % %
