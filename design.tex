@@ -1,4 +1,4 @@
-\section {Exploring Thread Interleaving Space}
+\section{Exploring Thread Interleaving Space}
 \label{s:design}
 
 \newcommand{\intcov}{interleaving segment coverage\xspace}
@@ -115,7 +115,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
 \end{figure}
 %
 \autoref{fig:keyidea} visualizes interleaving segments of a thread
-interleaving, and how they can be useful in exploring thread
+interleaving, and how they are useful in exploring thread
 interleavings.
 %
 Let us assume we execute the two system calls in
@@ -125,7 +125,7 @@ executed thread interleaving is described in
 %
 Then, interleaving segments described in \autoref{fig:keyidea}-(b) are
 a part of this thread interleaving, representing interleaving of a
-small number (\eg, 3 or 4) of instructions.
+small number (\eg, at most four) of instructions.
 %
 For example, \texttt{Segment \#1} represents interleaving of three
 instructions \texttt{B1}, \texttt{A2}, and \texttt{A4}, stating that
@@ -282,16 +282,15 @@ Accordingly, \textit{interleaving segments can act as an
 
 
 Second, explored interleaving segments can be exploited to
-systematically search thread interleavings to run in future
+systematically search for thread interleavings to run in future
 iterations.
 %
 Since each interleaving segment contains only a small number of memory
-accesses, we can easily enumerate interleavings that these memory
-accesses can produce.
+accesses, a fuzzer can easily enumerate interleavings that these
+memory accesses can produce.
 %
-If we figure out which of the enumerated interleavings have not been
-explored, we can direct a fuzzer to straightly explore the unexplored
-interleavings.
+If a fuzzer figures out which of the enumerated interleavings have not
+been explored, it can straightly explore the unexplored interleavings.
 %
 In this way, \textit{we can satisfy \textbf{Design goal 2} by
   exploring meaningful thread interleavings at each iteration and
@@ -348,10 +347,17 @@ In this way, \textit{we can satisfy \textbf{Design goal 2} by
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
+In this subsection, we explain how we decompose an explored thread
+interleaving into interleaving segments.
+%
+We represent an explored thread interleaving as a directed acyclic
+graph (DAG). Then, we compute subgraphs of the DAG called segment
+graphs, each of which represents an interleaving segment.
 
 
-Using a set of interleaving segments, we propose a novel interleaving
-coverage metric called \textit{\intcov}.  \Intcov is designed to track
+
+Using a set of segment graphs, we propose a novel interleaving
+coverage metric called \textit{\intcov}. \Intcov is designed to track
 interleaving orders within an interleaving segment and used for
 guiding a fuzzer to efficiently search possible instruction
 interleavings.  If per-input \intcov is saturated, a fuzzer can
@@ -360,7 +366,6 @@ concurrency bug and proceed to the next input.
 
 
 
-\dr{} 
 \PP{Graph representation of interleaving segment}
 % \PP{Graph representation of interleaved instructions}
 As discussed, \intcov contains multiple interleaved instructions, 
