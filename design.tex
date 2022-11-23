@@ -8,8 +8,8 @@
 In this section, we describe our approach to effectively achieve
 \textbf{Design goal 1} and \textbf{2}.
 %
-Unlike previous approaches, we propose a novel perspective on
-exploring thread interleavings.
+Unlike previous approaches, we propose a novel perspective on the
+thread interleaving exploration.
 %
 Specifically, our key insight lies in three steps:
 
@@ -55,6 +55,11 @@ effectively (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
       %the table?} \dr{No. we can remove this.}}
   %\label{table:learningfrommistakes}
   % \end{table}
+
+\dr{TODO:
+  1. why do we decompose thread interleavings?
+  2. how do we do that (e.g., four instructions)?
+}
 
 When fuzzing for discovering concurrency bugs with a coverage metric,
 the fundamental challenge is the large search space because
@@ -360,13 +365,17 @@ Using a set of segment graphs, we propose a novel interleaving
 coverage metric called \textit{\intcov}.
 %
 \Intcov is a collection of segment graphs, designed to track
-interleaving orders within an interleaving segment. Semantically, if
-per-input \intcov is saturated, a fuzzer can confidently conclude that
-the current input unlikely causes a concurrency bug and proceed to the
-next input.
+interleaving orders within an interleaving segment, and to guide a
+fuzzer to efficiently search possible instruction interleavings.
+
+
+
+
+% Semantically, if
+% per-input \intcov is saturated, a fuzzer can confidently conclude that
+% the current input unlikely causes a concurrency bug and proceed to the
+% next input.
 %
-Furthermore, \intcov is used for guiding a fuzzer to efficiently
-search possible instruction interleavings.
 
 
 
@@ -571,13 +580,25 @@ segment coverage and to search unexplored thread interleavings.
 
 \PP{Tracking interleaving segment coverage}
 %
-In practice, \intcov contains a large number of segment graphs,
-which consumes a large amount of memory even though the size of graphs
-is small.
+Semantically, segment graphs represent interleaving orders (via
+interleaving-order edges) of at most four instructions (via vertices),
+and different interleavings (\eg, \autoref{fig:keyidea}-(a).
+%
+If a fuzzer collects all segment graphs from a multi-thread input, a
+fuzzer can confidently conclude that the input no more reveals an
+interesting combination of interleaving orders.
+%
+Therefore, our fuzzer choose to collect explored segment graphs as
+interleaving coverage metric.
+
+
+In practice, however, \intcov contains a large number of segment
+graphs, which consumes a large amount of memory even though the size
+of graphs is small.
 %
 To reduce memory consumption, we hash each segment graph, and
-interleaving segment coverage tracks a system-wide hash table of
-segment graphs.
+interleaving segment coverage tracks a universal hash table of segment
+graphs.
 %
 To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
 %

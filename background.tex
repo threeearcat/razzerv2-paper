@@ -216,8 +216,8 @@ deadlocks~\cite{covcon, terragni2018effectiveness}.
 
 Recently, several approaches, classified as concurrency
 fuzzing~\cite{razzer, krace, snowboard, muzz, conzzer}, have been
-proposed to take consider of the \textit{concurrency aspect} of kernel
-execution into the fuzzing process.
+proposed to take consider of the \textit{concurrency aspect} of the
+kernel execution into the fuzzing process.
 %
 Concurrency fuzzers generally repeat the execution of a multi-thread
 input (\eg, a multi-threaded system call sequence) while
@@ -343,14 +343,16 @@ To determine which thread interleaving to run for each iteration, a
 fuzzer adopts a thread interleaving exploration scheme.
 %
 For instance, for every execution, Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard} enforces the execution order of a single
-pair of instructions, Krace~\cite{krace} randomly schedules
-instructions, and Conzzer~\cite{conzzer} designates two functions to
-run concurrently.
+Snowboard~\cite{snowboard} selects a single pair of instructions, and
+determines and enforces their execution order.
+%
+Whereas Krace~\cite{krace} randomly schedules instructions, and
+Conzzer~\cite{conzzer} designates two functions and run them
+concurrently.
 %
 After determining a thread interleaving to run, concurrency fuzzing
-overrides the kernel scheduler, and controls thread scheduling to run
-a thread interleaving as desired.
+overrides the kernel scheduler, and controls thread scheduling as
+desired.
 
 
 
