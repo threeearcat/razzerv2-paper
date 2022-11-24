@@ -46,7 +46,8 @@ Lastly, we explain the implementation detail of
 \subsection{Userspace Fuzzer}
 \label{ss:fuzzer}
 
-\dr{Use keywords: \textbf{decomposing}, \textbf{mutating}, \textbf{recomposing}}
+\dr{Rewrite by using keywords \textbf{decomposing}, \textbf{mutating},
+  \textbf{recomposing}}
 
 
 
@@ -279,6 +280,7 @@ $G^{*}_{mutated}$, a set of segment mutations, and forms a schedule
 for the selected subset until consuming $G_{mutated}$.
 %
 Each generated schedule as well as $I_{MT}$ is passed to the
+fg
 multi-thread executor to explore thread interleaving.
 
 
