@@ -17,31 +17,31 @@
     % \midrule
     \#7 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue_exclusive \\
     % \midrule
-    \#8 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue \\
+    \#8 & 5.19-rc2 & kernel & use-after-free access & KASAN: use-after-free Read in raw_notifier_call_chain \\
     % \midrule
-    \#9 & 5.19-rc2 & net/netfilter & general protection fault & general protection fault in cttimeout_net_exit \\
+    \#9 & 6.0-rc7 & kernel/sched & general protection fault & general protection fault in add_wait_queue \\
     % \midrule
-    \#10 & 6.0-rc7 & drivers/block & general protection fault & general protection fault in reset_interrupt \\
+    \#10 & 6.0-rc7 & drivers/usb/core & task hung & INFO: task hung in usb_get_descriptor & \checkmark~\cite{usbgetdescriptor} \\
     % \midrule
-    \#11 & 6.0-rc7 & arch/x86/kernel & stack-out-of-bounds access & KASAN: stack-out-of-bounds Read in unwind_next_frame\\
+    \#11 & 5.19-rc2 & net/netfilter & general protection fault & general protection fault in cttimeout_net_exit \\
     % \midrule
-    \#12 & 6.0-rc7 & drivers/usb/core & task hung & INFO: task hung in usb_get_descriptor & \checkmark~\cite{usbgetdescriptor} \\
+    \#12 & 6.0-rc7 & drivers/block & general protection fault & general protection fault in reset_interrupt \\
     % \midrule
-    \#13 & 6.0-rc7 & net/can & warning & WARNING in isotp_tx_timer_handler & \checkmark~\cite{isotptxtimerhandler} \\
+    \#13 & 6.0-rc7 & arch/x86/kernel & stack-out-of-bounds access & KASAN: stack-out-of-bounds Read in unwind_next_frame\\
     % \midrule
-    \#14 & 5.19-rc3 & fs/btfs & assertion violation& kernel BUG in assertfail & \checkmark~\cite{assertfail} \\
+    \#14 & 6.0-rc7 & net/can & warning & WARNING in isotp_tx_timer_handler & \checkmark~\cite{isotptxtimerhandler} \\
     % \midrule
     \#15 & 6.0-rc7 & drivers/net/slip & use-after-free access & KASAN: use-after-free Read in slip_ioctl \\
     % \midrule
     \#16 & 6.0-rc7 & sound/core/oss & use-after-free access & KASAN: use-after-free Read in snd_pcm_plug_read_transfer \\
     % \midrule
-    \#17 & 5.19-rc3 & net/key & assertion violation & kernel BUG in pfkey_send_acquire \\
+    \#17 & 5.19-rc3 & fs/btfs & assertion violation& kernel BUG in assertfail & \checkmark~\cite{assertfail} \\
     % \midrule
-    \#18 & 5.19-rc3 & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
+    \#18 & 5.19-rc3 & net/key & assertion violation & kernel BUG in pfkey_send_acquire \\
     % \midrule
-    \#19 & 6.0-rc7 & mm & assertion violation & Kernel BUG in find_lock_entries \\
+    \#19 & 5.19-rc3 & net/rxrpc & assertion violation & kernel BUG in rxrpc_destroy_all_connections \\
     % \midrule
-    \#20 & 6.0-rc7 & kernel & use-after-free access & KASAN: use-after-free Read in raw_notifier_call_chain \\
+    \#20 & 6.0-rc7 & mm & assertion violation & Kernel BUG in find_lock_entries \\
     % \midrule
     \#21 & 6.0-rc7 & net/ipv4 & use-after-free access & KASAN: use-after-free Read in tcp_write_timer_handler \\
     \bottomrule
