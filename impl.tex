@@ -46,6 +46,8 @@ Lastly, we explain the implementation detail of
 \subsection{Userspace Fuzzer}
 \label{ss:fuzzer}
 
+\dr{Use keywords: \textbf{decomposing}, \textbf{mutating}, \textbf{recomposing}}
+
 
 
 \begin{figure}
@@ -174,7 +176,7 @@ phase, the multi-thread fuzzing.
 \label{sss:multithreadfuzzing}
 %
 After $I_{ST}$ is passed with ($S_i$, $S_j$) and
-$G^{derived}_{(i,j)}$, the \textit{multi-thread generator} transforms
+$G_{mutated}$, the \textit{multi-thread generator} transforms
 $I_{ST}$ to a multi-thread input $I_{MT}$.
 %
 In addition, the multi-thread generator produces \textit{schedules}
@@ -250,18 +252,20 @@ schedules.
 %       much}}
 %   \label{f:mt-conversion}
 % \end{figure}
-\dr{TODO;}
 Given $I_{ST}$ and ($S_i$, $S_j$), the multi-thread generator produces
 $I_{MT}$ which preserves all system calls in $I_{ST}$, but executes
 $S_i$ and $S_j$ concurrently.
 %
-Assuming, $0 < i < j < n$, where n is the total number of syscalls in
-$I_{ST}$, the input transformation is simply done by dividing
+Assuming $1 \le i < j \le n$, where n is the total number of syscalls
+in $I_{ST}$, the input transformation is simply done by dividing
 $I_{ST}$ into two parts.
-
 %
-Then, the multi-thread generator assigns XXX to thread0, and YYY to
-thread1.
+The first part contains system calls from the 1st to the i-th, and the
+second part contains system calls from the (i+1)-th to the n-th.
+%
+Later, these two parts will be executed by two different threads,
+while $S_i$ and $S_j$ will be executed concurrently. A detailed
+example is provided in \autoref{s:appendix:inputtransform}.
 
 
 
@@ -269,11 +273,13 @@ thread1.
 On the other hand, the multi-thread generator repeatedly produces
 various schedules.
 %
-To generating schedules, the multi-thread generator takes
-$G^{derived}_{(i,j)}$ as input.
+To generate schedules, as described in \autoref{ss:scheduler}, the
+multi-thread generator repeat selecting a subset of $G_{mutated}$,
+$G^{*}_{mutated}$, a set of segment mutations, and forms a schedule
+for the selected subset until consuming $G_{mutated}$.
 %
-Then, for each repetition, the multi-thread generator selects a subset
-of $G^{derived}_{(i,j)}$, $G^{*}_{(i,j)}$, that are XXX.
+Each generated schedule as well as $I_{MT}$ is passed to the
+multi-thread executor to explore thread interleaving.
 
 
 
@@ -315,10 +321,9 @@ multi-thread executor collects memory accesses that racing system
 calls executed.
 %
 With these memory accesses, the multi-thread executor probes for
-interleaving segment coverage as described in
-\autoref{ss:coverage}. In addition, it derives more unobserved
-interleaving segment graphs as the single-thread executor does, and
-feeds unobserved interleaving segment graphs to the multi-thread
+segment coverage as described in \autoref{ss:coverage}. In addition,
+it derives more unobserved segment graphs as the single-thread
+executor does, and feeds unobserved segment graphs to the multi-thread
 generator to further explore thread interleavings.
 
 

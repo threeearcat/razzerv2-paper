@@ -182,7 +182,7 @@ fuzzer can effectively determine what to execute in future iterations,
 and quickly discover concurrency bugs without redundantly executing
 thread interleavings.
 
-\subsection{Limitation of prior approaches}
+
 \label{ss:existingapproaches}
 %
 % \begin{table}[t]
@@ -207,7 +207,9 @@ scheme do not satisfy \textbf{Design goal 1} and \textbf{2}.
 %
 We find that previously proposed interleaving coverage metrics are
 less-informative because none of them consider a combination of
-interleaving orders.
+interleaving orders. Therefore, they are limited in distinguish two
+interleavings in \autoref{fig:alias-coverage}, and do not satisfy
+\textbf{Design goal 1}.
 
 
 For example, let us suppose we adopt alias coverage~\cite{krace},
@@ -217,15 +219,12 @@ pair.
 Alias coverage determines a thread interleaving \texttt{X} exposes a
 unique behavior if \texttt{X} contains an unexplored
 \blue{directed-instruction pair} $I_W \rightarrow I_R$, where $I_R$
-reads a value written by $I_W$ and they are executed by different
-threads.  \autoref{fig:alias-coverage} illustrates the simplified
-explanation of why alias coverage does not satisfy the \textbf{Design
-  goal 1}.
+reads a value written by $I_W$.
 %
-Assuming \texttt{Interleaving \#1} is executed first, alias coverage
-identifies \texttt{Interleaving \#1} exposes unique behaviors when it
-sees two unexplored directed-instruction pair:
-($\texttt{B1} \rightarrow \texttt{A2}$) and
+Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage} is
+executed first, alias coverage identifies \texttt{Interleaving \#1}
+exposes unique behaviors when it sees two unexplored
+directed-instruction pair: ($\texttt{B1} \rightarrow \texttt{A2}$) and
 ($\texttt{B1} \rightarrow \texttt{A4}$).
 %
 % The \texttt{Interleaving \#2} is the interleaving orders causing the bug.

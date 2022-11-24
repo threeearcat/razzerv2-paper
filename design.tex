@@ -1,4 +1,4 @@
-\section{Decomposing Thread Interleaving Space}
+\section{Exploring Thread Interleaving Space}
 \label{s:design}
 
 \newcommand{\intcov}{interleaving segment coverage\xspace}
@@ -147,9 +147,9 @@ From these segments, a fuzzer can learn various useful information.
 %
 Taking an example of \texttt{Segment \#1}, besides execution order
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
-(represented in \texttt{Segment \#1}), a fuzzer easily realizes that
-there are more possible execution orders of the three instructions via
-rearranging the instructions.
+(represented in \texttt{Segment \#1}), a fuzzer easily rearranges the
+three instructions, resulting in different (unseen) execution orders
+of these instructions.
 %
 Accordingly, a fuzzer can decide that it is worth investing more
 computing power to further explore thread interleavings.
@@ -350,10 +350,10 @@ In this way, \textit{we can satisfy \textbf{Design goal 2} by
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-In this subsection, we explain how we decompose an explored thread
-interleaving into interleaving segments.
+In this subsection, we explain how we \textbf{decompose} an explored
+thread interleaving into interleaving segments.
 %
-We represent a thread interleaving as a directed acyclic graph
+We first represent a thread interleaving as a directed acyclic graph
 (DAG). Then, we compute subgraphs of the DAG called segment graphs,
 each of which represents an interleaving segment.
 
@@ -362,9 +362,11 @@ each of which represents an interleaving segment.
 Using a set of segment graphs, we propose a novel interleaving
 coverage metric called \textit{\intcov}.
 %
-\Intcov is a collection of segment graphs, designed to track
-interleaving orders within an interleaving segment, and to guide a
-fuzzer to efficiently search possible instruction interleavings.
+\Intcov is a collection of explored segment graphs, designed to track
+combinatorial interleaving orders within an interleaving segment.
+% , and
+% to guide a fuzzer to efficiently search possible instruction
+% interleavings.
 
 
 
@@ -391,21 +393,21 @@ we represent a thread interleaving as a DAG, where
 %   graph}).
 %
 a vertex represents a memory-accessing instruction, and an edge
-represents an execution ordering between two memory-access
+represents an execution ordering between two memory-accessing
 instructions.  Specifically, there are two types of edges,
 program-order edges and interleaving-order edges.
 %
-A program-order edge indicates an execution order between two 
-memory-accessing instruction in a single thread.
-Whereas, an interleaving-order edge indicates the execution
-order between two memory-access instructions that 1) access the same
-shared data, 2) at least one of them is a write operation, and 3) are
-executed by different threads.
+A program-order edge indicates an execution order between two
+memory-accessing instruction in a single thread.  Whereas, an
+interleaving-order edge indicates the execution order between two
+memory-accessing instructions that 1) access the same shared data, 2)
+at least one of them is a write operation, and 3) are executed by
+different threads.
 
 \autoref{fig:interleavingsegmentgraph} illustrates how a graph is
-derived from a interleaving.
+derived from a given interleaving.
 %
-Because the given interleaving described in
+Because the interleaving described in
 \autoref{fig:interleavingsegmentgraph}-(a) carries three memory
 accesses, the graph in \autoref{fig:interleavingsegmentgraph}-(b) also
 contains three vertices corresponding to the memory accesses conducted
@@ -487,12 +489,13 @@ interleaving orders of \texttt{B1} $\Rightarrow$ \texttt{A2} and
 \PP{Generating interleaving segment graph}
 %
 Let us assume executed memory accesses are represented in a list
-($m_1$, $m_2$, ..., $m_k$), which is sorted in order of execution of
+($m_1$, $m_2$, ..., $m_k$), which is sorted in execution order of
 memory accesses. (\ie, $m_i$ is executed before $m_j$ if $i<j$).
 %
 With this list of memory accesses, a fuzzer computes segment graphs in
 two steps: generating a graph $g$ representing a whole thread
-interleaving, and computing subgraphs of $g$ (\ie, segment graphs).
+interleaving, and computing subgraphs of $g$, segment graphs, each of
+which corresponds to an interleaving segment.
 
 
 Given a list of memory accesses, a fuzzer firstly generates vertices
@@ -551,8 +554,8 @@ thread interleaving.
 
 
 Afterwards, a fuzzer computes a set of segment graphs of $g$,
-$G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ has two
-interleaving-order edges.
+$G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ is a subgraph that has
+two interleaving-order edges.
 %
 To this end, a fuzzer selects two interleaving-order edges
 $e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
@@ -580,7 +583,7 @@ segment coverage and to search unexplored thread interleavings.
 %
 \dr{redundant}
 %
-Semantically, segment graphs represent a combination of interleaving
+Semantically, segment graphs represent combinatorial interleaving
 orders (via interleaving-order edges) of at most four instructions
 (via vertices).
 %
@@ -608,8 +611,8 @@ so that a fuzzer can distinguish different interleavings of the same
 vertices. For example, four segment graphs described in
 \autoref{fig:interleavingmutation} are hashed into different values.
 %
-Due to space constraints, we present how our graph hashing can be used
-to distinguish different interleavings of the same vertices of
+Due to space constraints, we present how our graph hashing works in
+distinguishing different interleavings of the same vertices of
 \autoref{fig:interleavingmutation} in \autoref{s:appendix:hash}.
 
 
@@ -672,32 +675,31 @@ to distinguish different interleavings of the same vertices of
 % \autoref{ss:overview}).
 
 
-Our interleaving exploration is \textit{not random} unlike previous
-approaches~\cite{krace, ski, pctalgorithm, muzz}, Rather, it is a
-systematic exploration \textit{directed by explored interleaving
-  coverage}.
+In order to decide which thread interleaving to run, we
+\textbf{mutate} \textit{explored} interleaving segments into
+\textit{unexplored} interleaving segments (called segment mutations),
+and \textbf{recompose} a thread interleaving to run from segment
+mutations.
 %
-% One important role of segment graphs are to infer unexplored
-% interleaving segments that the fuzzer will search for in future
-% iterations.
+We emphasize that our interleaving exploration is \textit{not random}
+unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz},
+Rather, it is a systematic exploration \textit{directed by explored
+  interleaving coverage}.
+%
+
+
+\PP{Mutating interleaving segment}
+%
+% The first step is to derive \textit{unexplored} segment graphs from
+% \textit{explored} segment graphs. We call this derivation operation
+% \textit{mutating a segment graph}.
 % %
-In this subsection, we explain how we utilize explored segment graphs
-to systematically and effectively explore thread interleavings.
-
-
-
-\PP{Interleaving segment mutation}
-%
-The first step is to derive \textit{unexplored} segment graphs from
-\textit{explored} segment graphs. We call this derivation operation
-\textit{mutating a segment graph}.
-%
 Suppose a set of \textit{explored} segment graphs
-$G = \{g_1, g_2, ..., g_n \}$ is given for a thread interleaving.
+$G = \{g_1, g_2, ..., g_n \}$ is given for a thread interleaving is
+executed.
 %
-For each $g_i \in G$, we mutate $g_i$ by \textit{flipping}
-interleaving-order edges in $g_i$, resulting in a different segment
-graph.
+For each $g_i \in G$, we mutate $g_i$ by \textit{flipping} its
+interleaving-order edges, resulting in a different segment graph.
 %
 The semantic behind ``\textit{flipping an interleaving-order edge}''
 is simple; it changes the interleaving order of an instruction pair
@@ -732,28 +734,28 @@ before \texttt{B1} (\ie, $\texttt{A2} \Rightarrow \texttt{B1}$).
 %
 Likewise, flipping both of $(\texttt{B1} \Rightarrow \texttt{A2})$ and
 $(\texttt{B1} \Rightarrow \texttt{A4})$ generates another segment
-graph of \autoref{fig:interleavingmutation}-(c).
-%
-Besides (b) and (c), however, flipping
+graph of \autoref{fig:interleavingmutation}-(c), which also represents
+another interleaving.
+
+Besides (b) and (c), however, flipping only
 $(\texttt{B1} \Rightarrow \texttt{A4})$ of
 \autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
-segment graph described in \autoref{fig:interleavingmutation}-(d).
-%
-In \autoref{fig:interleavingmutation}-(d), there is a loop
+segment graph described in \autoref{fig:interleavingmutation}-(d),
+which contains a loop
 $\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}
 \Rightarrow \texttt{B1}$.
 %
 Since edges represent execution orderings, a loop in a segment graph
 indicates a contradiction on the execution order, stating that any
 vertex on the loop should be executed before itself. Therefore, when a
-mutation contains a loop, a fuzzer discards it.
+mutation contains a loop, a fuzzer discards the mutation.
 %
 
 
-In this way, a fuzzer generates mutations of all $g_i \in G$. After
-that, from generated mutations, a fuzzer excludes 1) invalid mutations
-(\ie, ones that contain a loop), and 2) explored mutations (\ie, ones
-that their hash values are recorded in the hash table).
+In this way, a fuzzer generates mutations of all $g_i \in G$, while
+excluding 1) invalid mutations (\ie, ones that contain a loop), and 2)
+explored mutations (\ie, ones that their hash values are recorded in
+the hash table).
 %
 As a result, a fuzzer forms a set of \textit{unexplored} mutations
 $G_{mutated}$, and utilizes $G_{mutated}$ to determine what thread
@@ -795,7 +797,7 @@ We can then draw a graph which contains all vertices and all edges
 from \texttt{Segment \#1*} and \texttt{Segment \#2*} as described in
 \autoref{fig:hint}-(c).
 %
-It is worth noting that \autoref{fig:hint}-(c) contains five vertices,
+It is worth noting that \autoref{fig:hint}-(c) contains five vertices
 and six edges, which is a superset of vertices and edges from
 \texttt{Segment \#1*} and \texttt{Segment \#2*} respectively.
 %
