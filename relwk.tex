@@ -94,9 +94,10 @@ stronger concurrency bug detection capability.
 %
 For example, during our evaluation, \sys can easily trigger non-data
 race concurrency bugs~\cite{snowboardbug, cve20196974, cve20177533}
-that cannot be detected using a data race detector, while data race
-detectors can be helpful in detecting non-memory corruption bugs such
-as performance degradation.
+that cannot be detected using a data race detector (detailed in
+\autoref{s:appendix:datarace}), while data race detectors can be
+helpful in detecting non-memory corruption bugs such as performance
+degradation.
 %
 % Even though we do not make use of a data race detector during our
 % evaluation,
