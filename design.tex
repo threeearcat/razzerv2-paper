@@ -5,22 +5,36 @@
 \newcommand{\Intcov}{Interleaving segment coverage\xspace}
 
 
-In this section, we describe our approach to effectively achieve
-\textbf{Design goal 1} and \textbf{2}.
-%
-Unlike previous approaches, we propose a novel perspective on the
-thread interleaving exploration.
-%
-Specifically, our key insight lies in three steps:
+% In this section, we describe our approach to effectively achieve
+% \textbf{Design goal 1} and \textbf{2}.
 
+
+%
+% Specifically, we propose a novel perspective on the thread
+% interleaving exploration.
+% %
+% Specifically, our key idea lies in three steps:
+
+
+In order to explore thread interleavings of a multi-thread input, our
+approach takes an \textit{explored} thread interleaving as a seed
+interleaving.
+%
+With the seed interleaving, we explore thread interleavings of the
+multi-thread input in three steps:
+%
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
 \item \textbf{\textit{Decomposing}} an explored thread interleaving
-  into segments of a small number of instructions.
-\item \textbf{\textit{Mutating}} those segments to infer unexplored
-  interleaving of a small number of instructions.
+  into segments of a small number of instructions
+\item \textbf{\textit{Mutating}} decomposed segments to infer
+  unexplored interleaving of a small number of instructions
 \item \textbf{\textit{Recomposing}} a new thread interleaving from
-  mutated segments to further discover unexplored segments.
+  mutated segments to further discover unexplored segments
 \end{enumerate}
+%
+In our approach, decomposed interleaving segments will be tracked by
+an interleaving coverage metric. based on mutating interleaving
+segments and recomposing muteated segments.
 
 
 
@@ -32,13 +46,16 @@ In the following, we first explain our key intuition behind
 decomposing thread interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we design an interleaving coverage metric with
-interleaving segments to express combinatorial interleavings
-(\textbf{Design goal 1})~(\autoref{ss:coverage}).
+Then, we illustrate how we design an interleaving coverage metric to
+express combinatorial interleavings (\textbf{Design goal
+  1})~(\autoref{ss:coverage}).
 %
-Lastly, we explain how mutating interleaving segments and recomposing
-a new thread interleaving can help discover thread interleavings
-effectively (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+Lastly, we explain our speculative interleaving exploration method 
+
+how
+mutating interleaving segments and recomposing a new thread
+interleaving can help discover thread interleavings effectively
+(\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
 
 
