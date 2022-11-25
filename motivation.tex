@@ -6,14 +6,14 @@
 % - limitations of existing approaches
 
 This work is motivated by the observation that concurrency fuzzing
-requires new interleaving coverage metric and better exploration
-scheme.  In this section, we first study how concurrency bugs manifest
-depending on thread interleaving through a real-world concurrency bug
-example.
+requires a new interleaving coverage metric and a better interleaving
+exploration method.
 %
-From the study, we elicit design goals to effectively discover concurrency
-bugs in the kernel, and discuss why existing approaches have limitations 
-in satisfying the design goals.
+In this section, we first study how concurrency bugs manifest
+depending on thread interleaving through a real-world concurrency bug.
+From the study, we elicit design goals to effectively discover
+concurrency bugs in the kernel, and discuss why existing approaches
+have limitations in satisfying the design goals.
 
 %None of previous work properly addresses characteristics of \textit{offending thread interleaving} (\ie, one that causes a concurrency bug).
 %
@@ -297,7 +297,7 @@ access bug.
 \PP{Ineffective interleaving exploration scheme}
 %
 Stemming from the aforementioned limitations in coverage, 
-proposed interleaving search strategies do not efficiently 
+proposed interleaving search schemes do not efficiently 
 explore the search space guided by their interleaving coverage,
 not satisfying \textbf{Design goal 2}.
 

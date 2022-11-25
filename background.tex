@@ -172,13 +172,10 @@ Throughout decades, a number of fuzzing approaches~\cite{imf,
 proposed to discover vulnerabilities in the kernel.
 %
 These approaches, specifically coverage-guided fuzzing, execute a
-massive number of inputs (\ie, sequences of system calls) while a code
-coverage metric (\eg, branch coverage) tracks the execution path that
-each input explores.
-%
-In addition, during the execution of inputs, a fuzzer detects
-vulnerabilities with a help of various sanitizers~\cite{meds, kasan,
-  asan, ubsan, lockdep}.
+large number of random inputs (\ie, sequences of system calls) while a
+code coverage metric (\eg, branch coverage) tracks the execution path
+that each input explores, and various sanitizers detect
+vulnerabilities~\cite{meds, kasan, asan, ubsan, lockdep}.
 
 
 While conventional fuzzing techniques show the practicality even in
@@ -214,10 +211,10 @@ deadlocks~\cite{covcon, terragni2018effectiveness}.
 % possible interleavings grows exponentially to the number of memory
 % access operations.
 
-Recently, several approaches, classified as concurrency
-fuzzing~\cite{razzer, krace, snowboard, muzz, conzzer}, have been
-proposed to take consider of the \textit{concurrency aspect} of the
-kernel execution into the fuzzing process.
+Recently, several approaches~\cite{razzer, krace, snowboard, muzz,
+  conzzer}, classified as concurrency fuzzing, have been proposed to
+take consider of the \textit{concurrency aspect} of the kernel
+execution into the fuzzing process.
 %
 Concurrency fuzzers generally repeat the execution of a multi-thread
 input (\eg, a multi-threaded system call sequence) while controlling
@@ -253,6 +250,30 @@ interleavings.
 % coverage.
 
 % \dr{TODO: Do we need to tell about coverage-directed fuzzers?}
+
+
+
+
+\PP{Thread interleaving exploration}
+%
+Unlike conventional fuzzers, concurrency fuzzers consider thread
+interleaving is another input domain that a fuzzer needs to explore.
+%
+
+To explore diverse thread interleavings for each iteration,
+concurrency fuzzers adopt various thread interleaving exploration
+schemes.
+%
+For instance, for every iteration, Razzer~\cite{razzer} and
+Snowboard~\cite{snowboard} selects a single pair of instructions, and
+determines and enforces their execution order.
+%
+Whereas, Krace~\cite{krace} randomly schedules instructions, and
+Conzzer~\cite{conzzer} designates two functions and run them
+concurrently.
+%
+During runtime, concurrency fuzzing overrides the kernel's scheduler,
+and controls thread scheduling as desired.
 
 
 \PP{Interleaving coverage metric.}
@@ -325,28 +346,6 @@ explore thread interleavings of other multi-thread inputs.
 
 
 % \dr{TODO: MUZZ, and conzzer?}
-
-
-\PP{Thread interleaving exploration}
-%
-Unlike conventional fuzzers, concurrency fuzzers consider thread
-interleaving is another input domain that a fuzzer needs to explore.
-%
-
-To explore diverse thread interleavings for each iteration,
-concurrency fuzzers adopt various thread interleaving exploration
-schemes.
-%
-For instance, for every iteration, Razzer~\cite{razzer} and
-Snowboard~\cite{snowboard} selects a single pair of instructions, and
-determines and enforces their execution order.
-%
-Whereas, Krace~\cite{krace} randomly schedules instructions, and
-Conzzer~\cite{conzzer} designates two functions and run them
-concurrently.
-%
-During runtime, concurrency fuzzing overrides the kernel's scheduler,
-and controls thread scheduling as desired.
 
 
 
