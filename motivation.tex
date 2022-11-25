@@ -151,7 +151,7 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 \texttt{A4}))$, and, if executed, the interleaving triggers the
 uninitialized access bug.
 
-\PP{Design goal 2: Coverage-based interleaving exploration scheme}
+\PP{Design goal 2: Speculative interleaving exploration}
 %
 The observation gives a direction that how a fuzzer should explore 
 the search space using a coverage metric.
@@ -177,7 +177,7 @@ approaches~\cite{ski, krace, pctalgorithm, muzz}.
 }
 
 In summary, using the coverage metric expressing combinations of
-interleaving orders and the coverage-based exploration scheme, a
+interleaving orders and the speculative interleaving exploration, a
 fuzzer can effectively determine what to execute in future iterations,
 and quickly discover concurrency bugs without redundantly executing
 thread interleavings.
@@ -201,7 +201,7 @@ thread interleavings.
 %
 Altough prior approaches achieve their own successes, we find that
 their interleaving coverage metrics and interleaving exploration
-scheme do not satisfy \textbf{Design goal 1} and \textbf{2}.
+methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
 
 
 \PP{Less informative interleaving coverage}
@@ -294,12 +294,12 @@ access bug.
 % here, we find that they all share the same limitation.
 
 
-\PP{Ineffective interleaving exploration scheme}
+\PP{Ineffective interleaving exploration}
 %
-Stemming from the aforementioned limitations in coverage, 
-proposed interleaving search schemes do not efficiently 
-explore the search space guided by their interleaving coverage,
-not satisfying \textbf{Design goal 2}.
+Stemming from the aforementioned limitations in coverage, proposed
+thread interleaving methods do not efficiently explore the search
+space guided by their interleaving coverage, not satisfying
+\textbf{Design goal 2}.
 
 Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious.
 They do not make use of any interleaving coverage 
