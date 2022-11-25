@@ -220,13 +220,9 @@ proposed to take consider of the \textit{concurrency aspect} of the
 kernel execution into the fuzzing process.
 %
 Concurrency fuzzers generally repeat the execution of a multi-thread
-input (\eg, a multi-threaded system call sequence) while
-%
-1) an \textit{interleaivng coverage metric} captures unique behaviors
-of thread interleavings, and
-%
-2) a \textit{thread interleaving exploration scheme} determines
-which thread interleaving to run on each iteration.
+input (\eg, a multi-threaded system call sequence) while controlling
+thread scheduling and tracking unique behaviors of thread
+interleavings.
 
 
 % \PP{Coverage-guided fuzzing}
@@ -268,13 +264,11 @@ single thread without paying attention to thread interleavings.
 
 
 To capture unique behaviors of thread interleavings, a few concurrency
-fuzzing approaches~\cite{conzzer, krace} come up with interleaving
-coverage metrics.
-%
-These interleaving coverage metrics are used to track the execution
-order of concurrent events between threads, ranging from a
-finer-granularity (\eg, instruction~\cite{krace}) to a
-coarser-granularity (\eg, function~\cite{conzzer}).
+fuzzers~\cite{conzzer, krace} come up with interleaving coverage
+metrics, which track the execution order of concurrent events between
+threads, ranging from a finer-granularity (\eg,
+instruction~\cite{krace}) to a coarser-granularity (\eg,
+function~\cite{conzzer}).
 %
 Concurrency fuzzers aggregate interleaving coverage while repeatedly
 executing a multi-thread input, and if the multi-thread input no
@@ -333,26 +327,26 @@ explore thread interleavings of other multi-thread inputs.
 % \dr{TODO: MUZZ, and conzzer?}
 
 
-\PP{Thread interleaving exploration scheme} \dr{TODO: Rewording}
+\PP{Thread interleaving exploration}
 %
 Unlike conventional fuzzers, concurrency fuzzers consider thread
-scheduling is another input domain that a fuzzer needs to explore.
+interleaving is another input domain that a fuzzer needs to explore.
 %
 
-To determine which thread interleaving to run for each iteration, a
-fuzzer adopts a thread interleaving exploration scheme.
+To explore diverse thread interleavings for each iteration,
+concurrency fuzzers adopt various thread interleaving exploration
+schemes.
 %
-For instance, for every execution, Razzer~\cite{razzer} and
+For instance, for every iteration, Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} selects a single pair of instructions, and
 determines and enforces their execution order.
 %
-Whereas Krace~\cite{krace} randomly schedules instructions, and
+Whereas, Krace~\cite{krace} randomly schedules instructions, and
 Conzzer~\cite{conzzer} designates two functions and run them
 concurrently.
 %
-After determining a thread interleaving to run, concurrency fuzzing
-overrides the kernel scheduler, and controls thread scheduling as
-desired.
+During runtime, concurrency fuzzing overrides the kernel's scheduler,
+and controls thread scheduling as desired.
 
 
 
