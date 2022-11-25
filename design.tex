@@ -16,9 +16,10 @@
 % Specifically, our key idea lies in three steps:
 
 
-In order to explore thread interleavings of a multi-thread input, our
-approach takes an \textit{explored} thread interleaving as a seed
-interleaving.
+In order to explore thread interleavings of a given multi-thread input
+(\eg, \texttt{sendmsg()} and \texttt{setsockopt()} in
+\autoref{fig:cve-2017-17712}), our approach takes an \textit{explored}
+thread interleaving as a seed interleaving.
 %
 With the seed interleaving, we explore thread interleavings of the
 multi-thread input in three steps:
@@ -29,33 +30,25 @@ multi-thread input in three steps:
 \item \textbf{\textit{Mutating}} decomposed segments to infer
   unexplored interleaving of a small number of instructions
 \item \textbf{\textit{Recomposing}} a new thread interleaving from
-  mutated segments to further discover unexplored segments
+  mutated segments to further explore thread interleavings
 \end{enumerate}
 %
-In our approach, decomposed interleaving segments will be tracked by
-an interleaving coverage metric. based on mutating interleaving
-segments and recomposing muteated segments.
-
-
-
-
 
 
 
 In the following, we first explain our key intuition behind
-decomposing thread interleaving into \textit{interleaving
+decomposing a thread interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we design an interleaving coverage metric to
-express combinatorial interleavings (\textbf{Design goal
+Then, we illustrate how we utilize decomposed interleaving segments in
+designing an interleaving coverage metric which represents
+combinatorial interleavings (\textbf{Design goal
   1})~(\autoref{ss:coverage}).
 %
-Lastly, we explain our speculative interleaving exploration method 
-
-how
-mutating interleaving segments and recomposing a new thread
-interleaving can help discover thread interleavings effectively
-(\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+Lastly, we explain the speculative interleaving exploration method
+that mutates segments and recomposes a new thread interleaving to try
+in future iterations (\textbf{Design goal
+  2})~(\autoref{ss:scheduler}).
 
 
 
@@ -165,7 +158,7 @@ From these segments, a fuzzer can learn various useful information.
 Taking an example of \texttt{Segment \#1}, besides execution order
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
 (represented in \texttt{Segment \#1}), a fuzzer easily rearranges the
-three instructions, resulting in different (unseen) execution orders
+three instructions, and identifies different (unseen) execution orders
 of these instructions.
 %
 Accordingly, a fuzzer can decide that it is worth investing more
@@ -261,17 +254,17 @@ directed by the inference, rather than random searching.
 
 \PP{Benefits of segmentizing thread interleaving}
 %
-Segmentizing thread interleaving provides two remarkable benefits to a
-fuzzer as follows.
+In summary, segmentizing thread interleaving provides two remarkable
+benefits to a fuzzer.
 %
-First, tracking interleaving segments is a befitting choice to
-determine whether to further explore thread interleavings of a
+First, tracking explored interleaving segments is a befitting choice
+to determine whether to further explore thread interleavings of a
 multi-thread input.
 %
 % As mentioned above, most concurrency bugs manifest depending only on
 % the execution order of four memory accesses.
 %
-Considering a concurrency bug manifests depending on interleaving
+Considering most concurrency bugs manifest depending on interleaving
 orders of at most four memory accesses (which is exactly represented
 by an interleaving segment), if a fuzzer explores all interleaving
 segments, it is unlikely that a fuzzer misses a concurrency bug.
@@ -306,15 +299,12 @@ systematically search for thread interleavings to run in future
 iterations.
 %
 Since each interleaving segment contains only a small number of memory
-accesses, a fuzzer can easily enumerate interleavings that these
-memory accesses can produce.
+accesses, a fuzzer can speculatively enumerate interleavings of these
+memory accesses.
 %
 If a fuzzer figures out which of the enumerated interleavings have not
-been explored, it can straightly explore the unexplored interleavings.
-%
-In this way, \textit{we can satisfy \textbf{Design goal 2} by
-  exploring meaningful thread interleavings at each iteration and
-  minimizing redundant executions}.
+been explored, \textit{a fuzzer can straightly explore the speculative
+  interleavings, satisfying \textbf{Design goal 2}}.
 
 
 % 
