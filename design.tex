@@ -130,7 +130,7 @@ and executed thread interleavings described in
 Then, interleaving segments described in \autoref{fig:keyidea}-(b) are
 a part of the thread interleaving, comprised by at most four instructions.
 %
-For example, \texttt{Segment \#1} represents interleaving of three
+For example, \texttt{Segment \#1} represents interleavings of three
 instructions \texttt{B1}, \texttt{A2}, and \texttt{A4}, stating that
 \texttt{B1} is executed before \texttt{A2} and \texttt{A4}.
 %
@@ -138,7 +138,7 @@ Similarly, \texttt{Segment \#2} and \texttt{Segment \#3} describe
 interleavings of (\texttt{B1}, \texttt{A2}, \texttt{A6}, and
 \texttt{B2}), and (\texttt{B1}, \texttt{A4}, \texttt{A6}, and
 \texttt{B2}) respectively.
-We will discuss how to build segments in \autoref{ss:coverage}.
+How to build segments is described in \autoref{ss:coverage}.
 
 %
 %Accordingly, a fuzzer can decide that it is worth investing more
@@ -339,8 +339,8 @@ satisfying \textbf{Design goal 2}}.
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-As discussed, we \textbf{decompose} an explored sequence 
-of instruction interleavings into interleaving segments.
+As discussed, we \textbf{decompose} an explored instruction interleavings
+into interleaving segments.
 %
 We first represent observed interleavings as a directed acyclic graph
 (DAG). Then, we compute subgraphs of the DAG called \textit{segment
@@ -383,7 +383,7 @@ we represent a thread interleaving as a DAG, where
 %
 a vertex represents a memory-accessing instruction, and an edge
 represents an execution ordering between two memory-accessing
-instructions.  Specifically, there are two types of edges,
+instructions. There are two types of edges,
 program-order edges and interleaving-order edges.
 %
 A program-order edge indicates an execution order between two
@@ -463,8 +463,8 @@ different threads.
 % whole thread interleaving, and computing subgraphs of $g$, segment
 % graphs, each of which corresponds to an interleaving segment.
 %
-\autoref{fig:interleavingsegmentgraph} illustrates how to compute
-segment graphs with the execution example of
+\autoref{fig:interleavingsegmentgraph} illustrates how a fuzzer 
+computes segment graphs with the execution example of
 \autoref{fig:keyidea}-(a).
 %
 The first step is to represent the whole execution as a DAG. Since the
