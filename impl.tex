@@ -1,12 +1,10 @@
 \section{Design of \sys}
 \label{s:impl}
 
-\sys is a coverage-directed concurrency fuzzer to effectively discover
-kernel concurrency bugs.
-%
-The key improvement of \sys lies in adopting interleaving segment
-coverage and the speculative interleaving exploration described in
-\autoref{s:design}.
+\sys is a concurrency fuzzer tailored to effectively discover kernel
+concurrency bugs, where its key improvement lies in adopting
+interleaving segment coverage and the speculative interleaving
+exploration described in \autoref{s:design}.
 %
 
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
