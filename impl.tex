@@ -5,8 +5,8 @@
 kernel concurrency bugs.
 %
 The key improvement of \sys lies in adopting interleaving segment
-coverage and the coverage-directed interleaving search strategy
-described in \autoref{s:design}.
+coverage and the speculative interleaving exploration described in
+\autoref{s:design}.
 %
 
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
@@ -201,7 +201,7 @@ two-tuple (instruction address, scheduling order).
   \centering
   \includegraphics[width=0.75\linewidth]{fig/schedule.pdf}
   \caption{(a) Thread interleaving, and (b) schedule to run thread
-    interleaving of (a).}
+    interleaving of (a). \dr{remove}}
   \label{fig:schedule}
 \end{figure}
 

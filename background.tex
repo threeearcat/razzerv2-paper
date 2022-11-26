@@ -291,10 +291,13 @@ threads, ranging from a finer-granularity (\eg,
 instruction~\cite{krace}) to a coarser-granularity (\eg,
 function~\cite{conzzer}).
 %
-Concurrency fuzzers aggregate interleaving coverage while repeatedly
-executing a multi-thread input, and if the multi-thread input no
-longer provides new interleaving coverage, the fuzzer moves on to
-explore thread interleavings of other multi-thread inputs.
+Concurrency fuzzers utilize interleaving coverage as a signal to
+determine if a multi-thread input needs to be further tested.
+
+% while repeatedly
+% executing a multi-thread input, and if the multi-thread input no
+% longer provides new interleaving coverage, the fuzzer moves on to
+% explore thread interleavings of other multi-thread inputs.
 
 
 %
