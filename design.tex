@@ -138,7 +138,7 @@ Similarly, \texttt{Segment \#2} and \texttt{Segment \#3} describe
 interleavings of (\texttt{B1}, \texttt{A2}, \texttt{A6}, and
 \texttt{B2}), and (\texttt{B1}, \texttt{A4}, \texttt{A6}, and
 \texttt{B2}) respectively.
-We will discuss how to build segments in \yj{xx}.
+We will discuss how to build segments in \autoref{ss:coverage}.
 
 %
 %Accordingly, a fuzzer can decide that it is worth investing more
@@ -415,10 +415,11 @@ interleaving orders of \texttt{B1} $\Rightarrow$ \texttt{A2} and
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\linewidth]{fig/interleavingsegmentgraph.pdf}
-  \caption{(a) \texttt{Segment \#1} from \autoref{fig:keyidea}, and
-    (b) its segment graph. In (b), a dotted arrow represents a
-    program-order edge, and solid arrows represent interleaving-order
-    edges.}
+  \caption{(a) Graph representation of \autoref{fig:keyidea}-(a), and
+    (b) Segment graph corresponding \texttt{Segment \#1} in
+    \autoref{fig:keyidea}-(b). In each graph, a dotted arrow
+    represents a program-order edge, and solid arrows represent
+    interleaving-order edges.}
   \label{fig:interleavingsegmentgraph}
 \end{figure}
 
