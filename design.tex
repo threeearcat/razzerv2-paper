@@ -147,29 +147,25 @@ interleavings of (\texttt{B1}, \texttt{A2}, \texttt{A6}, and
 \texttt{B2}) respectively.
 We will discuss how to build segments in \yj{xx}.
 
-\yj{This paragraph is redundant with Benefits of segmentizing paragraph}
-From these segments, a fuzzer can learn various useful information.
+%\yj{This paragraph is redundant with Benefits of segmentizing paragraph}
+%From these segments, a fuzzer can learn various useful information.
 %
-Taking an example of \texttt{Segment \#1}, besides execution order
-($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
-(represented in \texttt{Segment \#1}), a fuzzer easily rearranges
-interleaving orders of the three instructions to generate 
-different (unseen) execution orders of these instructions.
+%Taking an example of \texttt{Segment \#1}, besides execution order
+%($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
+%(represented in \texttt{Segment \#1}), a fuzzer easily rearranges
+%interleaving orders of the three instructions to generate 
+%different (unseen) execution orders of these instructions.
 %
 %Accordingly, a fuzzer can decide that it is worth investing more
 %computing power to further explore thread interleavings.
 %
-Moreover, a fuzzer can infer exact execution orders that have not been
-explored, such as
-($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) (which
-causes the uninitialized access bug if executed).
+%Moreover, a fuzzer can infer exact execution orders that have not been
+%explored, such as
+%($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) (which
+%causes the uninitialized access bug if executed).
 %
-A fuzzer therefore can systematically search thread interleavings
-directed by the inference, rather than random searching.
-
-
-
-
+%A fuzzer therefore can systematically search thread interleavings
+%directed by the inference, rather than random searching.
 
 
 % Segmentizing this thread interleaving is performed in two steps.
@@ -249,7 +245,7 @@ directed by the inference, rather than random searching.
 
 \PP{Benefits of segmentizing thread interleaving}
 %
-In summary, segmentizing thread interleaving provides two remarkable
+Segmentizing instruction interleavings provides two 
 benefits to a fuzzer.
 %
 First, tracking explored interleaving segments is a befitting choice
