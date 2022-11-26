@@ -343,7 +343,8 @@ As discussed, we \textbf{decompose} an explored sequence
 of instruction interleavings into interleaving segments.
 %
 We first represent observed interleavings as a directed acyclic graph
-(DAG). Then, we compute subgraphs of the DAG called \textit{segment graphs}, each of which represents an interleaving segment.
+(DAG). Then, we compute subgraphs of the DAG called \textit{segment
+  graphs}, each of which represents an interleaving segment.
 
 
 
@@ -391,26 +392,6 @@ interleaving-order edge indicates the execution order between two
 memory-accessing instructions that 1) access the same shared data, 2)
 at least one of them is a write operation, and 3) are executed by
 different threads.
-
-\autoref{fig:interleavingsegmentgraph} illustrates how a graph is
-derived from a given interleaving.
-%
-Because the interleaving described in
-\autoref{fig:interleavingsegmentgraph}-(a) carries three memory
-accesses, the graph in \autoref{fig:interleavingsegmentgraph}-(b) also
-contains three vertices corresponding to the memory accesses conducted
-at \texttt{B1}, \texttt{A2}, and \texttt{A4}.
-%
-Between these vertices, this graph contains three edges. Specifically,
-a program-order edge from \texttt{A2} to \texttt{A4} is drawn to
-represent ``\textit{\texttt{A2} is executed before \texttt{A4} in
-  thread~A}''.
-%
-Similarly, the graph contains two interleaving-order edges, expressing
-interleaving orders of \texttt{B1} $\Rightarrow$ \texttt{A2} and
-\texttt{B1} $\Rightarrow$ \texttt{A4} respectively.
-
-
 
 \begin{figure}[t]
   \centering
@@ -477,37 +458,62 @@ interleaving orders of \texttt{B1} $\Rightarrow$ \texttt{A2} and
 
 \PP{Generating interleaving segment graph}
 %
-Let us assume executed memory accesses are represented in a list
-($m_1$, $m_2$, ..., $m_k$), which is sorted in execution order of
-memory accesses. (\ie, $m_i$ is executed before $m_j$ if $i<j$).
+% After tracing timestamp-annotated memory accesses, a fuzzer computes
+% segment graphs in two steps: generating a graph $g$ representing a
+% whole thread interleaving, and computing subgraphs of $g$, segment
+% graphs, each of which corresponds to an interleaving segment.
 %
-With this list of memory accesses, a fuzzer computes segment graphs in
-two steps: generating a graph $g$ representing a whole thread
-interleaving, and computing subgraphs of $g$, segment graphs, each of
-which corresponds to an interleaving segment.
-
-
-Given a list of memory accesses, a fuzzer firstly generates vertices
-$v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
+\autoref{fig:interleavingsegmentgraph} illustrates how to compute
+segment graphs with the execution example of
+\autoref{fig:keyidea}-(a).
 %
-Then, for all $m_i, m_j$ such that $i<j$, a fuzzer generates a
-directed edge $v_i \rightarrow v_j$ in two cases. A program-order edge
-is generated if $m_i$ and $m_j$ are executed by the same thread.
+The first step is to represent the execution as a DAG. Since the
+execution described in \autoref{fig:keyidea}-(a) carries five memory
+accesses, a fuzzer also generates five vertices corresponding each
+memory accesses as described in
+\autoref{fig:interleavingsegmentgraph}-(a).
 %
-Otherwise, an interleaving-order edge is generated if $m_i$ and $m_j$
-are executed by different threads, they access the same memory object,
-and one of them is a write operation.
+Between these vertices, a fuzzer generates edges to represent
+execution orderings. Specifically, program-order edges represented as
+dotted edges (\eg,
+$\texttt{A2} \Rightarrow \texttt{A4}, \texttt{A4} \Rightarrow
+\texttt{A6}$) are drawn to represent orderings in a \textit{single}
+thread, such as ``\textit{\texttt{A2} is executed before \texttt{A4}
+  in thread~A}''.
 %
-After two types of edges are generated, some vertices are not
-connected by any interleaving-order edge (in either direction), which
-indicates that instructions corresponding to these vertices did not
-access shared memory objects. These vertices are not interesting when
-tracking thread interleaving, and thus, a fuzzer discards such
-vertices.
+Similarly, a fuzzer generates interleaving-order edges represented as
+solid edges, expressing interleaving orders between threads. For
+example, $\texttt{B1} \Rightarrow \texttt{A2}$ represents interleaving
+between \texttt{B1} and \texttt{A2} that access the same memory object
+(\ie, \texttt{inet->hdrincl}).
 %
 As a result, a fuzzer generates a set of vertices $V$ and a set of
 edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
 thread interleaving.
+
+
+
+% Given a list of memory accesses, a fuzzer firstly generates vertices
+% $v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
+% %
+% Then, for all $m_i, m_j$ such that $i<j$, a fuzzer generates a
+% directed edge $v_i \rightarrow v_j$ in two cases. A program-order edge
+% is generated if $m_i$ and $m_j$ are executed by the same thread.
+% %
+% Otherwise, an interleaving-order edge is generated if $m_i$ and $m_j$
+% are executed by different threads, they access the same memory object,
+% and one of them is a write operation.
+% %
+% After two types of edges are generated, some vertices are not
+% connected by any interleaving-order edge (in either direction), which
+% indicates that instructions corresponding to these vertices did not
+% access shared memory objects. These vertices are not interesting when
+% tracking thread interleaving, and thus, a fuzzer discards such
+% vertices.
+% %
+% As a result, a fuzzer generates a set of vertices $V$ and a set of
+% edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
+% thread interleaving.
 
 
 % \dr{I think formally describing how to construct interleaving graphs
@@ -542,9 +548,9 @@ thread interleaving.
 
 
 
-Afterwards, a fuzzer computes a set of segment graphs of $g$,
-$G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ is a subgraph that has
-two interleaving-order edges.
+Afterwards, a fuzzer computes a set of subgraphs of $g$,
+$G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ is a segment graph
+that has two interleaving-order edges.
 %
 To this end, a fuzzer selects two interleaving-order edges
 $e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
@@ -664,8 +670,8 @@ distinguishing different interleavings of the same vertices of
 % \autoref{ss:overview}).
 
 
-In order to decide how to schedule instructions in a next iteration, a
-fuzzer speculates whole interleaving to run.
+In order to decide how to schedule instructions in the next iteration,
+a fuzzer speculates whole interleaving to run.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
 segments into \textit{unexplored} interleaving segments, where each
@@ -763,17 +769,20 @@ schedule instructions in future iterations.
 
 \PP{Recomposing interleaving segments into whole interleaving}
 %
-A naive approach to explore segment mutations in given $G_{mutated}$
-could be selecting one segment mutation in $G_{mutated}$, and running
-a multi-thread input while enforcing the interleaving orders
-describing in the segment mutation.
+One could select one mutated segment in $G_{mutated}$ and run an input
+while enforcing interleavings describing in the mutated segment.
 %
 However, it might require many executions because the size of
-$G_{mutated}$ could be large.  Instead, we choose a more efficient
-way. We \textit{recompose} a new thread interleaving from
-$G^*_{mutated} \subseteq G_{mutated}$, and by running the recomposed
-thread interleaving, we test multiple unexlored segment mutations in
-$G^*_{mutated}$ at once.
+$G_{mutated}$ could be large.
+%
+Instead, we select multiple mutated segments in $G_{mutated}$, and
+\textit{recompose} them into whole interleaving to run selected
+mutated segments at one.
+
+% choose a more efficient way. We \textit{recompose} a new
+% thread interleaving from $G^*_{mutated} \subseteq G_{mutated}$, and by
+% running the recomposed thread interleaving, we test multiple unexlored
+% segment mutations in $G^*_{mutated}$ at once.
 
 
 \begin{figure}[t]
@@ -789,8 +798,8 @@ $G^*_{mutated}$ at once.
 
 
 
-\autoref{fig:hint} demonstrates an idea of recomposing a thread
-interleaving. Suppose we have two segment mutations \texttt{Segment
+\autoref{fig:hint} demonstrates an idea of how we recompose into whole
+interleaving. Suppose we have two mutated segments \texttt{Segment
   \#1*} and \texttt{Segment \#2*} described in \autoref{fig:hint}-(a).
 %
 We can then draw a graph which contains all vertices and all edges
