@@ -691,7 +691,7 @@ interleaving.
 % \textit{mutating a segment graph}.
 % %
 Suppose a set of \textit{explored} segment graphs
-$G = \{g_1, g_2, ..., g_n \}$ is given for a thread interleaving.
+$G = \{g_1, g_2, ..., g_n \}$ is given.
 %
 For each $g_i \in G$, a fuzzer mutates $g_i$ by \textit{flipping} its
 interleaving-order edges, resulting in a different segment graph.
@@ -732,7 +732,7 @@ Likewise, flipping both of $(\texttt{B1} \Rightarrow \texttt{A2})$ and
 $(\texttt{B1} \Rightarrow \texttt{A4})$ generates another segment
 graph of \autoref{fig:interleavingmutation}-(c), which also represents
 another interleaving.
-
+%
 Besides (b) and (c), however, flipping only
 $(\texttt{B1} \Rightarrow \texttt{A4})$ of
 \autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
@@ -754,14 +754,14 @@ and 2) explored segments (\ie, ones that their hash values are
 recorded in the hash table).
 %
 As a result, a fuzzer forms a set of \textit{unexplored} mutated
-segments $G_{mutated}$, and utilizes $G_{mutated}$ to determine what
-thread interleaving to run in future iterations.
+segments $G_{mutated}$, and utilizes $G_{mutated}$ to determine how to
+schedule instructions in future iterations.
 
 
 
 
 
-\PP{Recomposing interleaving segments to whole interleaving}
+\PP{Recomposing interleaving segments into whole interleaving}
 %
 A naive approach to explore segment mutations in given $G_{mutated}$
 could be selecting one segment mutation in $G_{mutated}$, and running
