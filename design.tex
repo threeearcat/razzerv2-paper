@@ -15,40 +15,40 @@
 % %
 % Specifically, our key idea lies in three steps:
 
-
-In order to explore thread interleavings of a given multi-thread input
+This work focuses on how to efficiently explore the large search space 
+of thread interleavings when a multi-thread input
 (\eg, \texttt{sendmsg()} and \texttt{setsockopt()} in
-\autoref{fig:cve-2017-17712}), our approach takes an \textit{explored}
-thread interleaving as a seed interleaving.
+\autoref{fig:cve-2017-17712}) is given. Our approach is utilizing 
+an \textit{explored} thread interleaving as a seed interleaving.
 %
-With the seed interleaving, we explore thread interleavings of the
-multi-thread input in three steps:
+With the seed interleaving, we explore thread interleavings of 
+a given multi-thread input in the following three steps:
 %
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
 \item \textbf{\textit{Decomposing}} an explored thread interleaving
-  into segments of a small number of instructions
-\item \textbf{\textit{Mutating}} decomposed segments to infer
-  unexplored interleaving of a small number of instructions
+  into segments containing a small number of instructions.
+\item \textbf{\textit{Mutating}} thread interleavings within a segment
+  to generate unexplored interleavings for each segment. 
 \item \textbf{\textit{Recomposing}} a new thread interleaving from
-  mutated segments to further explore thread interleavings
+  mutated segments to further explore thread interleavings\yj{revisit this sentence}.
 \end{enumerate}
 %
 
 
 
-In the following, we first explain our key intuition behind
+In this section, we first explain our key intuition behind
 decomposing a thread interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we utilize decomposed interleaving segments in
-designing an interleaving coverage metric which represents
-combinatorial interleavings (\textbf{Design goal
+Then, we illustrate how we define an interleaving coverage metric 
+from decomposed interleaving segments.
+The coverage metric represents
+combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} (\textbf{Design goal
   1})~(\autoref{ss:coverage}).
 %
-Lastly, we explain the speculative interleaving exploration method
-that mutates segments and recomposes a new thread interleaving to try
-in future iterations (\textbf{Design goal
-  2})~(\autoref{ss:scheduler}).
+Lastly, we explain the speculative interleaving exploration method,
+which mutates segments and recomposes a new thread\yj{a new thread?} interleaving for 
+future iterations (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
 
 
@@ -73,27 +73,11 @@ in future iterations (\textbf{Design goal
 
 When fuzzing for discovering concurrency bugs with a coverage metric,
 the fundamental challenge is the large search space because
-combinations of interleaving orders increase the search space
+combinations of thread interleavings increase the search space
 exponentially.
 %
 Therefore, this work seeks to strike the balance in the trade-off
 between the bug-finding capability and the search complexity.
-
-Observed by a previous study~\cite{learningfrommistakes}, 92.4\% (97
-out of 105) of concurrency bugs manifest when a bug-finding system
-monitors specific interleaving orders of \textit{at most} four memory
-accesses referring to shared memory objects.
-%
-All other memory accesses beyond four accesses and their execution
-orders do not meaningfully affect manifestation of a concurrency bug.
-%
-The observation is also applied to the example of
-\autoref{fig:cve-2017-17712}. The uninitialized access bug is
-triggered by the execution order of three memory accesses (\eg,
-\texttt{A2}, \texttt{A4} and \texttt{B1}), while others (\eg,
-\texttt{A6} and \texttt{B2}) are irrelevant to the manifestation of
-the concurrency bug.
-
 
 \PP{Segmentizing thread interleaving}
 %
@@ -109,10 +93,22 @@ sub-spaces. We call a sub-space \textit{interleaving segment}.
 Each interleaving segment consists of instructions accessing 
 shared memory objects.
 % the same  memory objects. (\ie, conflicting instructions).
+To define the size (the number of instructions) of an interleaving segment,
+we use an observation from a previous study~\cite{learningfrommistakes} 
+in which 92.4\% (97 out of 105) of concurrency bugs manifest when a bug-finding system
+monitors specific interleaving orders of \textit{at most} four memory
+accesses referring to shared memory objects.
 %
+So, all other memory accesses beyond four accesses and their execution
+orders do not meaningfully affect manifestation of a concurrency bug.
 %
-When constructing an interleaving segment, following the observation, 
-we confine the size of a interleaving segment 
+The observation is also applied to the example of
+\autoref{fig:cve-2017-17712}. The uninitialized access bug is
+triggered by the execution order of three memory accesses (\eg,
+\texttt{A2}, \texttt{A4} and \texttt{B1}), while others (\eg,
+\texttt{A6} and \texttt{B2}) are irrelevant to the manifestation of
+the concurrency bug.
+Following the observation,  we confine the size of a interleaving segment 
 to contain at most four memory-accessing instructions,
 which makes the problem of defining a coverage metric tractable while maintaining a strong bug-finding capability.
 
@@ -129,18 +125,18 @@ which makes the problem of defining a coverage metric tractable while maintainin
   \label{fig:keyidea}
 \end{figure}
 %
-\autoref{fig:keyidea} visualizes interleaving segments of a thread
-interleaving, and how they are useful in exploring thread
-interleavings.
+\yj{interleaving vs interleavings?}
+\autoref{fig:keyidea} illustrates three interleaving segments 
+from a thread interleaving.%, and how they are useful in exploring thread
+%interleavings.
 %
-Let us assume we execute the two system calls in
-\autoref{fig:cve-2017-17712} concurrently, and identify that the
-executed thread interleaving is described in
+The example shows the execution of the two system calls 
+and executed thread interleavings described in
 \autoref{fig:keyidea}-(a).
 %
+\yj{Add a pointer 
 Then, interleaving segments described in \autoref{fig:keyidea}-(b) are
-a part of this thread interleaving, representing interleaving of a
-small number (\eg, at most four) of instructions.
+a part of the thread interleaving, comprised by at most four instructions.
 %
 For example, \texttt{Segment \#1} represents interleaving of three
 instructions \texttt{B1}, \texttt{A2}, and \texttt{A4}, stating that
@@ -152,17 +148,17 @@ interleavings of (\texttt{B1}, \texttt{A2}, \texttt{A6}, and
 \texttt{B2}) respectively.
 
 
-
+\yj{This paragraph is redundant with Benefits of segmentizing paragraph}
 From these segments, a fuzzer can learn various useful information.
 %
 Taking an example of \texttt{Segment \#1}, besides execution order
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
-(represented in \texttt{Segment \#1}), a fuzzer easily rearranges the
-three instructions, and identifies different (unseen) execution orders
-of these instructions.
+(represented in \texttt{Segment \#1}), a fuzzer easily rearranges
+interleaving orders of the three instructions to generate 
+different (unseen) execution orders of these instructions.
 %
-Accordingly, a fuzzer can decide that it is worth investing more
-computing power to further explore thread interleavings.
+%Accordingly, a fuzzer can decide that it is worth investing more
+%computing power to further explore thread interleavings.
 %
 Moreover, a fuzzer can infer exact execution orders that have not been
 explored, such as
