@@ -665,15 +665,15 @@ distinguishing different interleavings of the same vertices of
 
 
 In order to decide how to schedule instructions in a next iteration, a
-fuzzer speculates whole interleaving between threads to run.
+fuzzer speculates whole interleaving to run.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
 segments into \textit{unexplored} interleaving segments, where each
 mutated segment representes interleavings that has not been explored.
 %
 Afterwards, a fuzzer \textbf{recomposes} mutated segments into whole
-interleaving, and generates scheduling points to run the recomposed
-interleaving.
+interleaving, and generates scheduling points in order to run the
+recomposed interleaving.
 %
 
 %
@@ -778,8 +778,12 @@ $G^*_{mutated}$ at once.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{fig/hint.pdf}
-  \caption{}
+  \includegraphics[width=0.85\linewidth]{fig/hint.pdf}
+  \caption{Example of recomposing mutated segments into whole
+    interleaving. (a) represents mutated segments, (b) represents a
+    graph combining the two mutated segments, and (c) represents whole
+    interleaving to test \texttt{Segment \#1*} and \texttt{Segment
+      \#2*}}
   \label{fig:hint}
 \end{figure}
 
