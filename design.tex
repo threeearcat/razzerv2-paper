@@ -791,24 +791,24 @@ $G^*_{mutated}$ at once.
 
 \autoref{fig:hint} demonstrates an idea of recomposing a thread
 interleaving. Suppose we have two segment mutations \texttt{Segment
-  \#1*} and \texttt{Segment \#2*} described in \autoref{fig:hint}-(b).
+  \#1*} and \texttt{Segment \#2*} described in \autoref{fig:hint}-(a).
 %
 We can then draw a graph which contains all vertices and all edges
 from \texttt{Segment \#1*} and \texttt{Segment \#2*} as described in
-\autoref{fig:hint}-(c).
+\autoref{fig:hint}-(b).
 %
-It is worth noting that \autoref{fig:hint}-(c) contains five vertices
+It is worth noting that \autoref{fig:hint}-(b) contains five vertices
 and six edges, which is a superset of vertices and edges from
 \texttt{Segment \#1*} and \texttt{Segment \#2*} respectively.
 %
 Therefore, when we execute a thread interleaving corresponding to this
 graph, we can test both \texttt{Segment \#1*} and \texttt{Segment
-  \#2*} at once (\autoref{fig:hint}-(d)).
+  \#2*} at once (\autoref{fig:hint}-(c)).
 
 
 
 When recomposing a thread interleaving, one important constraint is
-that it should not contain a loop (\ie, \autoref{fig:hint}-(c) should
+that it should not contain a loop (\ie, \autoref{fig:hint}-(b) should
 not contain a loop). Otherwise, a contradiction on the execution order
 arises similar with an invalid mutation (\ie, an instruction should be
 executed before itself).
