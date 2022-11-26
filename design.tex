@@ -467,7 +467,7 @@ different threads.
 segment graphs with the execution example of
 \autoref{fig:keyidea}-(a).
 %
-The first step is to represent the execution as a DAG. Since the
+The first step is to represent the whole execution as a DAG. Since the
 execution described in \autoref{fig:keyidea}-(a) carries five memory
 accesses, a fuzzer also generates five vertices corresponding each
 memory accesses as described in
@@ -475,20 +475,17 @@ memory accesses as described in
 %
 Between these vertices, a fuzzer generates edges to represent
 execution orderings. Specifically, program-order edges represented as
-dotted edges (\eg,
-$\texttt{A2} \Rightarrow \texttt{A4}, \texttt{A4} \Rightarrow
-\texttt{A6}$) are drawn to represent orderings in a \textit{single}
-thread, such as ``\textit{\texttt{A2} is executed before \texttt{A4}
-  in thread~A}''.
+dotted edges (\eg, ($\texttt{A2} \Rightarrow \texttt{A4}$)) are drawn
+to represent orderings in a \textit{single} thread, such as
+``\textit{\texttt{A2} is executed before \texttt{A4} in thread~A}''.
 %
 Similarly, a fuzzer generates interleaving-order edges represented as
 solid edges, expressing interleaving orders between threads. For
-example, $\texttt{B1} \Rightarrow \texttt{A2}$ represents interleaving
-between \texttt{B1} and \texttt{A2} that access the same memory object
-(\ie, \texttt{inet->hdrincl}).
+example, ($\texttt{B1} \Rightarrow \texttt{A2}$) represents
+interleaving between \texttt{B1} and \texttt{A2} that access the same
+memory object (\ie, \texttt{inet->hdrincl}).
 %
-As a result, a fuzzer generates a set of vertices $V$ and a set of
-edges $E$, where a graph $g = (V, E)$ representes a \textit{whole}
+As a result, a fuzzer generates a DAG to represent a \textit{whole}
 thread interleaving.
 
 
@@ -548,23 +545,24 @@ thread interleaving.
 
 
 
-Afterwards, a fuzzer computes a set of subgraphs of $g$,
-$G = \{g_1, g_2, ..., g_n\}$, where $g_i \in G$ is a segment graph
-that has two interleaving-order edges.
+Afterwards, a fuzzer computes a subgraphs of the generated DAG, where
+each segment graph has two interleaving-order edges.
 %
-To this end, a fuzzer selects two interleaving-order edges
-$e_x, e_y \in E$ such that $e_x \neq e_y$ (for example,
+In order to compute a subgraph $g$, a fuzzer selects two
+interleaving-order edges.
+%
+As an example, let us assume a fuzzer selects
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
-($\texttt{B1} \Rightarrow \texttt{A4}$) in
-\autoref{fig:interleavingsegmentgraph}-(b)).
+($\texttt{B1} \Rightarrow \texttt{A4}$) from
+\autoref{fig:interleavingsegmentgraph}-(a).
 %
-A fuzzer then forms a segment graph $g_i = (V_i, E_i)$ where $V_i$ is
-a set of vertices that are connected by $e_x$ and $e_y$ (\ie,
-\texttt{B1}, \texttt{A2}, and \texttt{A4}), and $E_i$ is a set of
-edges connecting vertices in $V_i$ (\ie, one program-order edge
-($\texttt{A2} \Rightarrow \texttt{A4}$), and two interleaving-order
-edges ($\texttt{B1} \Rightarrow \texttt{A2}$) and
-($\texttt{B1} \Rightarrow \texttt{A4}$)).
+As three vertices \texttt{A2}, \texttt{A4}, and \texttt{B1} are
+connected by these two edges, a segment graph $g$ contains the three
+vertices (as described in \autoref{fig:interleavingsegmentgraph}-(b)).
+%
+Then, a fuzzer extracts edges that connect these vertices, and adds
+the edges into $g$, resulting in
+\autoref{fig:interleavingsegmentgraph}-(b).
 %
 Lastly, a fuzzer gathers segment graphs into a set
 $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track interleaving
