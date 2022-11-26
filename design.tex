@@ -664,16 +664,23 @@ distinguishing different interleavings of the same vertices of
 % \autoref{ss:overview}).
 
 
-In order to decide which thread interleaving to run, we
-\textbf{mutate} \textit{explored} interleaving segments into
-\textit{unexplored} interleaving segments (called segment mutations),
-and \textbf{recompose} a thread interleaving to run from segment
-mutations.
+In order to decide how to schedule instructions in a next iteration, a
+fuzzer speculates whole interleaving between threads to run.
 %
-We emphasize that our interleaving exploration is \textit{not random}
-unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz},
-Rather, it is a systematic exploration \textit{directed by explored
-  interleaving coverage}.
+Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
+segments into \textit{unexplored} interleaving segments, where each
+mutated segment representes interleavings that has not been explored.
+%
+Afterwards, a fuzzer \textbf{recomposes} mutated segments into whole
+interleaving, and generates scheduling points to run the recomposed
+interleaving.
+%
+
+%
+% We emphasize that our interleaving exploration is \textit{not random}
+% unlike previous approaches~\cite{krace, ski, pctalgorithm, muzz},
+% Rather, it is a systematic exploration \textit{directed by explored
+  % interleaving coverage}.
 %
 
 
@@ -686,7 +693,7 @@ Rather, it is a systematic exploration \textit{directed by explored
 Suppose a set of \textit{explored} segment graphs
 $G = \{g_1, g_2, ..., g_n \}$ is given for a thread interleaving.
 %
-For each $g_i \in G$, we mutate $g_i$ by \textit{flipping} its
+For each $g_i \in G$, a fuzzer mutates $g_i$ by \textit{flipping} its
 interleaving-order edges, resulting in a different segment graph.
 %
 The semantic behind ``\textit{flipping an interleaving-order edge}''
@@ -702,13 +709,14 @@ that access the shared data.
   \caption{Example of interleaving segment mutation. In this example,
     (a) represents an interleaving segment graph of
     \autoref{fig:interleavingsegmentgraph} while (b) and (c) represent
-    \textit{valid} mutations of (a). Whereas (d) is an
-    \textit{invalid} mutation of (a) because it contains a loop.}
+    \textit{valid} mutated segments of (a). Whereas (d) is an
+    \textit{invalid} mutated segment of (a) because it contains a
+    loop.}
   \label{fig:interleavingmutation}
 \end{figure}
 %
-\autoref{fig:interleavingmutation} illustrates how we mutate a segment
-graph.
+\autoref{fig:interleavingmutation} illustrates how a fuzzer mutates a
+segment graph.
 %
 For example, flipping ($\texttt{B1} \Rightarrow \texttt{A2}$) of
 \autoref{fig:interleavingmutation}-(a) produces a segment graph
@@ -736,24 +744,24 @@ $\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}
 Since edges represent execution orderings, a loop in a segment graph
 indicates a contradiction on the execution order, stating that any
 vertex on the loop should be executed before itself. Therefore, when a
-mutation contains a loop, a fuzzer discards the mutation.
+mutated segment contains a loop, a fuzzer discards the segment.
 %
 
 
-In this way, a fuzzer generates mutations of all $g_i \in G$, while
-excluding 1) invalid mutations (\ie, ones that contain a loop), and 2)
-explored mutations (\ie, ones that their hash values are recorded in
-the hash table).
+In this way, a fuzzer generates mutated segments of all $g_i \in G$,
+while excluding 1) invalid segments (\ie, ones that contain a loop),
+and 2) explored segments (\ie, ones that their hash values are
+recorded in the hash table).
 %
-As a result, a fuzzer forms a set of \textit{unexplored} mutations
-$G_{mutated}$, and utilizes $G_{mutated}$ to determine what thread
-interleaving to run in future iterations.
+As a result, a fuzzer forms a set of \textit{unexplored} mutated
+segments $G_{mutated}$, and utilizes $G_{mutated}$ to determine what
+thread interleaving to run in future iterations.
 
 
 
 
 
-\PP{Recomposing a thread interleaving}
+\PP{Recomposing interleaving segments to whole interleaving}
 %
 A naive approach to explore segment mutations in given $G_{mutated}$
 could be selecting one segment mutation in $G_{mutated}$, and running

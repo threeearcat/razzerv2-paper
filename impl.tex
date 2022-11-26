@@ -44,11 +44,6 @@ Lastly, we explain the implementation detail of
 \subsection{Userspace Fuzzer}
 \label{ss:fuzzer}
 
-\dr{Rewrite by using keywords \textbf{decomposing}, \textbf{mutating},
-  \textbf{recomposing}}
-
-
-
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/architecture.pdf}
@@ -110,8 +105,9 @@ Given $I_{ST}$ from the single-thread generator, the single-thread
 executor runs $I_{ST}$.
 %
 During the execution, the single-thread executor traces basic blocks
-and memory accesses executed by each system call with a support from
-instrumentation detailed in \autoref{ss:instrumentation}.
+and timestamp-annotated memory accesses executed by each system call
+with a support from instrumentation detailed in
+\autoref{ss:instrumentation}.
 
 With traced basic blocks and memory accesses, the single-thread
 executor conducts two tasks.
@@ -130,10 +126,12 @@ in $I_{ST}$ that potentially exposes new interleaving segment coverage
 if executed concurrently.
 %
 More specifically, for each system call pair ($S_i$, $S_j$) in
-$I_{ST}$, the single-thread executor constructs a set of explored
-interleaving segment graphs $G$ (as described in
-\autoref{ss:coverage}). Then, by mutating $g \in G$, the single-thread
-executor generates a set of unexplored segment graphs $G_{mutated}$
+$I_{ST}$, the single-thread executor draws a interleaving graph $g$
+from total memory accesses executed by $S_i$ and $S_j$.
+%
+Then, the single-thread executor decomposes $g$ into a set of segment
+graphs $G$ (as described in \autoref{ss:coverage}), and mutates
+$g_i \in G$ to derive a set of mutated segment graphs $G_{mutated}$
 (as described in \autoref{ss:scheduler}).
 %
 If $G_{mutated}$ is not empty, the single thread executor passes
