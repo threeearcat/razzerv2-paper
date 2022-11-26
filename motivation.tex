@@ -105,8 +105,7 @@ $(\texttt{A2} \Rightarrow \texttt{B1}) \wedge (\texttt{B1} \Rightarrow
 %
 Otherwise, a fuzzer may think that there is no more interesting thread
 interleaving in the multi-thread input, and stop searching for new
-thread interleavings of the input, missing the uninitialized access
-bug.
+thread interleavings of the input, missing the concurrency bug.
 
 \begin{figure}[t]
   \centering
@@ -139,10 +138,10 @@ fuzzer observes the three instructions, \texttt{B1}, \texttt{A2}, and
 they access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
-From this execution order that does not cause the uninitialized access
-bug, one can easily imagine a new interleaving of these three
-instructions by changing the execution order of \texttt{B1} and
-\texttt{A2}, resulting in \autoref{fig:alias-coverage}-(b).
+From this execution order, one can easily imagine a new interleaving
+of these three instructions by changing the execution order of
+\texttt{B1} and \texttt{A2}, resulting in
+\autoref{fig:alias-coverage}-(b).
 % $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 The speculative interleaving is what exactly we are looking for; it
