@@ -583,19 +583,17 @@ a fuzzer should
 invest more computing power to further explore thread interleavings.
 Otherwise, a fuzzer can conclude that the input no longer
 reveals an interesting combination of interleaving orders.
-
 In practice, however, \intcov contains a large number of segment
 graphs, which consumes a large amount of memory even though the size
-of graphs is small.
+of individual segment graphs is small.
 %
-To reduce memory consumption, we hash each segment graph, and
-interleaving segment coverage tracks a universal hash table of segment
-graphs.
+To reduce memory consumption, we hash each segment graph, 
+so interleaving segment coverage is stored as a universal hash table of segment graphs.
 %
 To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
 %
 The key property of Merkel hashing is reflecting directions of edges,
-so that a fuzzer can distinguish different interleavings of the same
+so that a fuzzer can distinguish different execution orders of the same
 vertices. For example, four segment graphs described in
 \autoref{fig:interleavingmutation} are hashed into different values.
 %
@@ -663,15 +661,18 @@ distinguishing different interleavings of the same vertices of
 % \autoref{ss:overview}).
 
 
-In order to decide how to schedule instructions in the next iteration,
-a fuzzer speculates whole interleaving to run.
+To explore the interleaving search space, we use detected segment 
+graphs for the next iteration.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
 segments into \textit{unexplored} interleaving segments, where each
-mutated segment representes an interleaving that is to be tested.
+mutated segment contains interleavings that is to be tested. 
+Using \intcov, a fuzzer can identify if a newly mutated segment 
+is tested or not.
 %
-Afterwards, a fuzzer \textbf{recomposes} mutated segments into whole
-interleaving, and generates scheduling points in order to run the
+Afterwards, a fuzzer \textbf{recomposes} mutated segments
+to obtain a whole sequence of interleavings, and generates 
+scheduling points where each interleaving happens from the
 recomposed interleaving.
 %
 
