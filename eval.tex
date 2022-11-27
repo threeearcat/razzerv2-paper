@@ -160,7 +160,7 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 
 
 
-\subsubsection{Comparison of interleaving search strategies}
+\subsubsection{Comparison of interleaving exploration methods}
 \label{sss:interleavingsearch}
 %
 % \begin{figure*}[t]
@@ -224,9 +224,10 @@ input which is highly affectted by the randomness, and can focus on
 the effectiveness of the thread interleaving exploration of each
 fuzzer.
 %
-Then, we observe how each fuzzer explores thread interleavings of a
-given pair of system calls. During the evaluation, we limit the number
-of executions to 10000.
+Then, we measure the number of executions and the elapsed time until
+each fuzzer triggers each concurrency bugs within a given pair of
+system calls. During the evaluation, we limit the number of executions
+to 10000.
 
 
 
@@ -290,7 +291,7 @@ in discovering concurrency bugs.
 
 
 
-\subsubsection{Justification of interleaving segment coverage}
+\subsubsection{Trade-off between the bug-}
 \label{sss:interleavingcoverage}
 %
 We also justify our design choice of interleaving segment coverage by
@@ -300,7 +301,7 @@ coverage.
 
 \PP{Comparison methodology}
 %
-
+In this evaluation, we 
 
 \PP{Result}
 %
@@ -308,12 +309,17 @@ coverage.
   \small
   \centering
   \input{table/aliascoverage}
-  \caption{\dr{aliascoverage}}
+  \caption{Trade-off between the bug-finding capability and the search
+    complexity. Out of 10 trials using the less-informative
+    interleaving coverage metric, \checkmark\xspace indicates that a
+    bug is triggered, while - indicates that a bug is not
+    triggered. The \texttt{Avg. exec.}  column denotes that the
+    average number of execution until the saturation of interleaving
+    coverage.}
   \label{table:aliascoverage}
 \end{table}
-
-
-As expected, 
+%
+\autoref{table:aliascoverage} shows the result.
 
 
 
@@ -333,7 +339,7 @@ In this subsection, we analyze various performance characteristics of
 \subsubsection{All-inclusive evaluation}
 \label{sss:allinclusive}
 
-We first provide performance characteristics of the whole \sys.
+Here, we provide performance characteristics of the whole \sys.
 
 
 \PP{Coverage growth.}

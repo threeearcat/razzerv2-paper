@@ -1,25 +1,27 @@
+\newcommand\mc[1]{\multicolumn{1}{l}{#1}}  % shortcut macro
+
 \resizebox{0.9\linewidth}{!}{
-  \begin{tabular}{l l l l l l l l l}
+  \begin{tabular}{l S l S l S l S l}
     \toprule
     \multirow{2}{*}{\textbf{Bug ID}} & \multicolumn{2}{c}{\textbf{\sys}} & \multicolumn{2}{c}{\textbf{Snowboard}~\cite{snowboard}} & \multicolumn{2}{c}{\textbf{Krace}~\cite{krace}} & \multicolumn{2}{c}{\textbf{Naive}} \\
     \cmidrule(rl){2-3} \cmidrule(rl){4-5} \cmidrule(rl){6-7} \cmidrule(rl){8-9}
-    & \# of exec. & Elapsed time & \# of exec. & Elapsed time & \# of exec. & Elapsed time & \# of exec. & Elapsed time \\
+    & \mc{\# of exec.} & Elapsed time & \mc{\# of exec.} & Elapsed time & \mc{\# of exec.} & Elapsed time & \mc{\# of exec.} & Elapsed time \\
     \midrule
-    CVE-2016-8655~\cite{cve20168655} & 6.6 & 2.2 & 12.1 & 4.0 & 96.0 & 44.2 & 270.2 & 85 \\
+    CVE-2016-8655~\cite{cve20168655} & 6 & 2.2 & 12 & 4.0 & 96 & 44.2 & 270 & 85 \\
     % \midrule
-    CVE-2017-2636~\cite{cve20172636} & 22 & 7.1 & 58.2 & 26.4 & 9.8 & 4.4 & 721.8 & 377.8 \\
+    CVE-2017-2636~\cite{cve20172636} & 22 & 7.1 & 58 & 26.4 & 9 & 4.4 & 721 & 377.8 \\
     % \midrule
-    CVE-2017-7533~\cite{cve20177533} & 21 & 23\dr{?} & 191 & 58.2 & 53 & 17.2 & 274.6 & 83.3 \\
+    CVE-2017-7533~\cite{cve20177533} & 21 & 23\dr{?} & 191 & 58 & 53 & 17.2 & 274 & 83.3 \\
     % \midrule
-    CVE-2017-17712~\cite{cve201717712} & 17.8 & 5.4 & 79.6 & 22.2 & 1296 & 359.3 & 1757 & 474.2 \\
+    CVE-2017-17712~\cite{cve201717712} & 17 & 5.4 & 79 & 22.2 & 1296 & 359.3 & 1757 & 474.2 \\
     % \midrule
-    CVE-2017-15649~\cite{cve201715649} & 38.8 & 13.2 & 31.6 & 10.0 & 342.6 & 100.0 & 1852.8 & 460.8 \\
+    CVE-2017-15649~\cite{cve201715649} & 38 & 13.2 & 31 & 10.0 & 342 & 100.0 & 1852 & 460.8 \\
     % \midrule
-    CVE-2018-12232~\cite{cve201812232} & 12 & 3.3 & 8 & 2.4 & 14.2 & 4.0 & 78.6 & 29.1 \\
+    CVE-2018-12232~\cite{cve201812232} & 12 & 3.3 & 8 & 2.4 & 14 & 4.0 & 78 & 29.1 \\
     % \midrule
-    CVE-2019-6974~\cite{cve20196974} & 81.6 & 52.4 & 229 & 139.4 & >10000 & >5720.1 & >10000 & >5578 \\
+    CVE-2019-6974~\cite{cve20196974} & 81 & 52.4 & 229 & 139.4 & >10000 & >5720.1 & >10000 & >5578 \\
     % \midrule
-    CVE-2019-11486~\cite{cve201911486} & 3.2 & <1 & 37.4 & 16.6 & 494 & 222.6 & >10000 & >3810 \\
+    CVE-2019-11486~\cite{cve201911486} & 3 & <1 & 37 & 16.6 & 494 & 222.6 & >10000 & >3810 \\
     % \midrule
     69e16d01d1de~\cite{snowboardbug} & 41 & 23.2 & 156 & 61.8 & >10000 & >3410.5 & >10000 & >3358 \\
     \bottomrule
