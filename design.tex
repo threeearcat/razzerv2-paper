@@ -49,8 +49,8 @@ from decomposed interleaving segments.
 %   1})~(\autoref{ss:coverage}).
 %
 Lastly, we explain the speculative interleaving exploration method,
-which mutates segments and recomposes mutated segments into whole
-thread interleaving for future iterations~(\textbf{Design goal
+which speculates whole interleaving based on mutated segments to guide
+instruction scheduling ~(\textbf{Design goal
   2})~(\autoref{ss:scheduler}). \yj{a new thread?}
 % interleaving for future iterations (\textbf{Design goal
 %   2})~(\autoref{ss:scheduler}).
@@ -117,7 +117,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
   \centering
   \includegraphics[width=0.99\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
-    \autoref{fig:cve-2017-17712}, and (b) instruction segments
+    \autoref{fig:cve-2017-17712}, and (b) interleaving segments
     contained in (a).  Note that we intentionally omit instructions
     that do not access globally-visible memory objects.}
   \label{fig:keyidea}
@@ -125,15 +125,17 @@ which makes the problem of defining a coverage metric tractable while maintainin
 %
 \yj{interleaving vs interleavings?}
 \autoref{fig:keyidea} illustrates three interleaving segments 
-from a thread interleaving.%, and how they are useful in exploring thread
-%interleavings.
+from the single execution of two system calls, 
+%thread interleaving.
 %
-The example shows the execution of the two system calls 
-and executed thread interleavings described in
+where the execution scenario is represented in
 \autoref{fig:keyidea}-(a).
+% example shows the execution of the two system calls 
+% and executed thread interleavings described in
 %
-Then, interleaving segments described in \autoref{fig:keyidea}-(b) are
-a part of the thread interleaving, comprised by at most four instructions.
+Then, interleaving segments described in \autoref{fig:keyidea}-(b)
+represents a part of its thread interleaving, comprised by at most
+four instructions.
 %
 For example, \texttt{Segment \#1} represents interleavings of three
 instructions \texttt{B1}, \texttt{A2}, and \texttt{A4}, stating that
@@ -376,13 +378,13 @@ combinatorial interleaving orders within an interleaving segment.
 
 \PP{Graph representation of thread interleaving}
 % \PP{Graph representation of interleaved instructions}
-As discussed,
+% As discussed,
 % \intcov contains multiple interleaved instructions, 
 % so
 % \intcov cannot be presented as a single instruction interleaving 
 % (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
 % Instead,
-we represent instruction interleavings as a DAG, where
+We represent a thread interleaving as a DAG, where
 % called an interleaving segment graph (shortly, \textit{segment
 %   graph}).
 %
@@ -402,7 +404,7 @@ different threads.
   \centering
   \includegraphics[width=0.8\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{(a) Graph representation of \autoref{fig:keyidea}-(a), and
-    (b) Segment graph corresponding \texttt{Segment \#1} in
+    (b) segment graph corresponding \texttt{Segment \#1} in
     \autoref{fig:keyidea}-(b). In each graph, a dotted arrow
     represents a program-order edge, and solid arrows represent
     interleaving-order edges.}
