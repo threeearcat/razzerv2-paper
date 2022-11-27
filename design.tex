@@ -471,14 +471,13 @@ different threads.
 % graphs, each of which corresponds to an interleaving segment.
 %
 \autoref{fig:interleavingsegmentgraph} illustrates how a fuzzer 
-computes segment graphs with the execution example of
+computes segment graphs from the execution example of
 \autoref{fig:keyidea}-(a).
 %
 The first step is to represent instruction interleavings as a DAG. 
-Since the
-execution described in \autoref{fig:keyidea}-(a) carries five memory
-accesses, a fuzzer also generates five vertices corresponding each
-memory accesses as described in
+Since the execution in \autoref{fig:keyidea}-(a) has five memory
+accesses, a fuzzer generates five vertices where each corresponds 
+to a memory-accessing instruction as described in
 \autoref{fig:interleavingsegmentgraph}-(a).
 %
 Between these vertices, a fuzzer generates edges to represent
@@ -495,8 +494,6 @@ memory object (\ie, \texttt{inet->hdrincl}).
 %
 As a result, a fuzzer generates a DAG to represent a \textit{whole}
 thread interleaving.
-
-
 
 % Given a list of memory accesses, a fuzzer firstly generates vertices
 % $v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
@@ -551,10 +548,9 @@ thread interleaving.
 % thread interleaving.
 
 
-
-
-Afterwards, a fuzzer computes a subgraphs of the generated DAG, where
-each segment graph has two interleaving-order edges.
+Afterwards, a fuzzer derives subgraphs from the generated DAG, where
+each graph has two interleaving-order edges. Therefore, 
+a subgraph  segment 
 %
 In order to compute a subgraph $g$, a fuzzer selects two
 interleaving-order edges.
