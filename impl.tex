@@ -19,11 +19,8 @@ The second stage is a \textit{multi-thread fuzzing} to explore thread
 interleavings and discover concurrency bugs.
 %
 In both stage, \sys traces timestamp-annotated memory accesses
-executed by each system call for probing unobserved interleaving
-segments.
-%
-And in the second stage, \sys adopts a mechanism to control thread
-scheduling as desired.
+executed by each system call, and in the second stage, \sys adopts a
+mechanism to control thread scheduling as desired.
 
 
 
@@ -102,18 +99,11 @@ values of arguments of existing system calls.
 \PP{Single-thread executor}
 %
 Given $I_{ST}$ from the single-thread generator, the single-thread
-executor runs $I_{ST}$.
+executor runs $I_{ST}$ while tracing basic blocks and
+timestamp-annotated memory accesses executed by each system call.
 %
-During the execution, the single-thread executor traces basic blocks
-and timestamp-annotated memory accesses executed by each system call
-with a support from instrumentation detailed in
-\autoref{ss:instrumentation}.
-
-With traced basic blocks and memory accesses, the single-thread
-executor conducts two tasks.
-%
-The first task is to computes branch coverage using traced basic
-blocks.
+After the execution is finished, the single-thread executor computes
+branch coverage using traced basic blocks.
 %
 If $I_{ST}$ exposes new branch coverage that has not been explored,
 \sys keeps $I_{ST}$, and feeds it back to the single-thread generator
@@ -121,18 +111,21 @@ so that the single-thread generator further mutates $I_{ST}$ to find
 more branch coverage.
 
 
-Second, the single-thread executor identifies a pair of system calls
+Moreover, the single-thread executor identifies a pair of system calls
 in $I_{ST}$ that potentially exposes new interleaving segment coverage
 if executed concurrently.
 %
-More specifically, for each system call pair ($S_i$, $S_j$) in
-$I_{ST}$, the single-thread executor draws a interleaving graph $g$
-from total memory accesses executed by $S_i$ and $S_j$.
+Specifically, for each system call pair ($S_i$, $S_j$) in $I_{ST}$,
+the single-thread executor considers the sequential execution of $S_i$
+and $S_j$ as a seed interleaving, and draws an interleaving graph from
+the seed interleaving.
 %
-Then, the single-thread executor decomposes $g$ into a set of segment
-graphs $G$ (as described in \autoref{ss:coverage}), and mutates
-$g_i \in G$ to derive a set of mutated segment graphs $G_{mutated}$
-(as described in \autoref{ss:scheduler}).
+To derive segment graphs that have not been explored, then the
+single-thread executor decomposes the interleaving graph into a set of
+segment graphs $G$ (as described in \autoref{ss:coverage}), and
+mutates segment graphs $g_i$ contained in $G$ to construct a set of
+unexplored mutated segment graphs $G_{mutated}$ (as described in
+\autoref{ss:scheduler}).
 %
 If $G_{mutated}$ is not empty, the single thread executor passes
 $I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the next
@@ -181,35 +174,35 @@ where each schedule describes how to enforce thread interleaving
 during runtime.
 %
 The \textit{multi-thread executor} then repeatedly tests each schedule
-of $I_{MT}$ one at a time with a support of the execution
+of $I_{MT}$ with a support of the execution
 engine~(\autoref{ss:engine}).
 
 
-\PP{Schedule}
-%
-A schedule is a specification of how to control thread scheduling.
-%
-It contains a starting system call and per-system call sequences of
-scheduling points that each scheduling point is described as a
-two-tuple (instruction address, scheduling order).
+% \PP{Schedule}
+% %
+% A schedule is a specification of how to control thread scheduling.
+% %
+% It contains a starting system call and per-system call sequences of
+% scheduling points that each scheduling point is described as a
+% two-tuple (instruction address, scheduling order).
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.75\linewidth]{fig/schedule.pdf}
-  \caption{(a) Thread interleaving, and (b) schedule to run thread
-    interleaving of (a). \dr{remove}}
-  \label{fig:schedule}
-\end{figure}
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=0.75\linewidth]{fig/schedule.pdf}
+%   \caption{(a) Thread interleaving, and (b) schedule to run thread
+%     interleaving of (a). \dr{remove}}
+%   \label{fig:schedule}
+% \end{figure}
 
-\autoref{fig:schedule} illustrates an example of a schedule. In order
-to run a thread interleaving in \autoref{fig:schedule}-(a), the
-execution should start with \texttt{sendmsg()}. So the schedule states
-that a starting syscall is \texttt{sendmsg()}.
-%
-Then, in \autoref{fig:schedule}-(a), three preemptions (excluding the
-end of system calls) are required at \texttt{A2}, \texttt{B1}, and
-\texttt{A4}. Each schedule point denotes an instruction on which a
-preemptions occurs, annotated with the order of preemption.
+% \autoref{fig:schedule} illustrates an example of a schedule. In order
+% to run a thread interleaving in \autoref{fig:schedule}-(a), the
+% execution should start with \texttt{sendmsg()}. So the schedule states
+% that a starting syscall is \texttt{sendmsg()}.
+% %
+% Then, in \autoref{fig:schedule}-(a), three preemptions (excluding the
+% end of system calls) are required at \texttt{A2}, \texttt{B1}, and
+% \texttt{A4}. Each schedule point denotes an instruction on which a
+% preemptions occurs, annotated with the order of preemption.
 
 
 %During fuzzing, the userspace fuzzer keeps generating different
@@ -367,8 +360,7 @@ function calls; \texttt{trace_basicblock()} before \texttt{A3} which
 is the first instruction of the basic block, and
 \texttt{trace_access()} before \texttt{A2} which is an instruction
 that accesses \texttt{inet->hdrincl}.
-
-
+%
 During runtime, \texttt{trace_basicblock()} takes the starting address
 of basic block as input (\ie, \texttt{A3}), and records it into
 \texttt{Basicblock record}.
@@ -382,7 +374,10 @@ when the memory access occurrs (\ie, \texttt{ts}).
 %
 \texttt{trace_access()} then records these five parameters into
 \texttt{Memory access record}.
-
+%
+During fuzzing, the userspace fuzzer reads values recorded in
+\texttt{Basicblock record} and \texttt{Memory access record}, and
+identify executed basic blocks and memory accesses.
 
 
 
