@@ -474,17 +474,17 @@ different threads.
 computes segment graphs from the execution example of
 \autoref{fig:keyidea}-(a).
 %
-The first step is to represent instruction interleavings as a DAG. 
-Since the execution in \autoref{fig:keyidea}-(a) has five memory
-accesses, a fuzzer generates five vertices where each corresponds 
-to a memory-accessing instruction as described in
-\autoref{fig:interleavingsegmentgraph}-(a).
+First, instruction interleavings are represented as DAGs.
+Given that the execution in \autoref{fig:keyidea}-(a) involves 
+five memory accesses, a fuzzer generates five vertices, 
+each of which corresponds to a memory-accessing instruction, 
+as shown in \autoref{fig:interleavingsegmentgraph}-(a).
 %
 Between these vertices, a fuzzer generates edges to represent
 execution orderings. Specifically, program-order edges represented as
 dotted edges (\eg, ($\texttt{A2} \Rightarrow \texttt{A4}$)) are drawn
-to represent orderings in a \textit{single} thread, such as
-``\textit{\texttt{A2} is executed before \texttt{A4} in thread~A}''.
+to represent orderings in a single thread, such as
+``\texttt{A2} is executed before \texttt{A4} in thread~A''.
 %
 Similarly, a fuzzer generates interleaving-order edges represented as
 solid edges, expressing interleaving orders between threads. For
@@ -492,8 +492,8 @@ example, ($\texttt{B1} \Rightarrow \texttt{A2}$) represents
 interleaving between \texttt{B1} and \texttt{A2} that access the same
 memory object (\ie, \texttt{inet->hdrincl}).
 %
-As a result, a fuzzer generates a DAG to represent a \textit{whole}
-thread interleaving.
+As a result, a fuzzer constructs a DAG to describe the whole
+interleavings and their orders.
 
 % Given a list of memory accesses, a fuzzer firstly generates vertices
 % $v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
@@ -548,14 +548,15 @@ thread interleaving.
 % thread interleaving.
 
 
-Afterwards, a fuzzer derives subgraphs from the generated DAG, where
-each graph has two interleaving-order edges. Therefore, 
-a subgraph represents  segment 
+Afterwards, a fuzzer derives subgraphs from the generated DAG with 
+each subgraph including two interleaving-order edges. A subgraph 
+is called \textit{segment graph} because it represents interleavings 
+in a segment.
 %
-In order to compute a subgraph $g$, a fuzzer selects two
+In order to compute a segment graph $g$, a fuzzer selects two
 interleaving-order edges.
 %
-As an example, let us assume a fuzzer selects
+In the example, assume a fuzzer selects
 ($\texttt{B1} \Rightarrow \texttt{A2}$) and
 ($\texttt{B1} \Rightarrow \texttt{A4}$) from
 \autoref{fig:interleavingsegmentgraph}-(a).
@@ -573,24 +574,13 @@ $G = \{g_1, g_2, ..., g_n\}$, and uses $G$ to track interleaving
 segment coverage and to search unexplored thread interleavings.
 
 
-
-
-
 \PP{Tracking interleaving segment coverage}
-%
-\dr{redundant}
-%
-Semantically, segment graphs represent interleavings (via
-interleaving-order edges) of at most four instructions (via vertices).
-%
-If new segment graphs are continuously discovered, a fuzzer should
+We use each segment for coverage called \textit{\intcov}. When a new segment graphs is detected, it is added to \intcov.
+If new segment graphs are continuously discovered, it indicates that 
+a fuzzer should
 invest more computing power to further explore thread interleavings.
-Otherwise, a fuzzer can confidently conclude that the input no more
+Otherwise, a fuzzer can conclude that the input no longer
 reveals an interesting combination of interleaving orders.
-%
-Therefore, our fuzzer chooses to track explored segment graphs as
-\intcov.
-
 
 In practice, however, \intcov contains a large number of segment
 graphs, which consumes a large amount of memory even though the size
