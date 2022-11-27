@@ -662,11 +662,11 @@ distinguishing different interleavings of the same vertices of
 
 
 To explore the interleaving search space, we use detected segment 
-graphs for the next iteration.
+graphs.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
 segments into \textit{unexplored} interleaving segments, where each
-mutated segment contains interleavings that is to be tested. 
+mutated segment contains interleavings to be tested. 
 Using \intcov, a fuzzer can identify if a newly mutated segment 
 is tested or not.
 %
@@ -689,18 +689,6 @@ scheduling points from the recomposed interleaving.
 % \textit{explored} segment graphs. We call this derivation operation
 % \textit{mutating a segment graph}.
 % %
-Suppose a set of \textit{explored} segment graphs
-$G = \{g_1, g_2, ..., g_n \}$ is given.
-%
-For each $g_i \in G$, a fuzzer mutates $g_i$ by \textit{flipping} its
-interleaving-order edges, resulting in a different segment graph.
-%
-The semantic behind ``\textit{flipping an interleaving-order edge}''
-is simple; it changes the interleaving order of an instruction pair
-that access the same memory object.
-
-
-
 
 \begin{figure}[t]
   \centering
@@ -713,6 +701,14 @@ that access the same memory object.
     loop.}
   \label{fig:interleavingmutation}
 \end{figure}
+
+Suppose a set of \textit{explored} segment graphs
+$G = \{g_1, g_2, ..., g_n \}$ is given.
+%
+For each $g_i \in G$, a fuzzer mutates $g_i$ by flipping a direction 
+of its interleaving-order edges, which implies changing 
+the interleaving order of an instruction pair that access the same 
+memory object.
 %
 \autoref{fig:interleavingmutation} illustrates how a fuzzer mutates a
 segment graph.
@@ -720,34 +716,35 @@ segment graph.
 Given an explored segment graph described in
 \autoref{fig:interleavingmutation}-(a), flipping
 ($\texttt{B1} \Rightarrow \texttt{A2}$) produces a segment graph
-described in \autoref{fig:interleavingmutation}-(b), which describes
-an interleaving different than \autoref{fig:interleavingmutation}-(a).
+described in \autoref{fig:interleavingmutation}-(b).
 %
-In \autoref{fig:interleavingmutation}-(a), an edge
-($\texttt{B1} \Rightarrow \texttt{A2}$) describes that
-``\textit{\texttt{B1} is executed before \texttt{A2}}'', while in
-\autoref{fig:interleavingmutation}-(b), an edge (\ie,
-$\texttt{A2} \Rightarrow \texttt{B1}$) describes that
-``\textit{\texttt{A2} is executed before \texttt{B1}}''.
+%In \autoref{fig:interleavingmutation}-(a), an edge
+%($\texttt{B1} \Rightarrow \texttt{A2}$) describes that
+%``\textit{\texttt{B1} is executed before \texttt{A2}}'', while in
+%\autoref{fig:interleavingmutation}-(b), an edge (\ie,
+%$\texttt{A2} \Rightarrow \texttt{B1}$) describes that
+%``\textit{\texttt{A2} is executed before \texttt{B1}}''.
 %
 Likewise, flipping both $(\texttt{B1} \Rightarrow \texttt{A2})$ and
 $(\texttt{B1} \Rightarrow \texttt{A4})$ in
-\autoref{fig:interleavingmutation}-(a) generates another segment graph
+\autoref{fig:interleavingmutation}-(a) generates a different segment graph
 of \autoref{fig:interleavingmutation}-(c), which also represents
 another interleaving.
 %
-Besides (b) and (c), however, flipping only
-$(\texttt{B1} \Rightarrow \texttt{A4})$ of
+Note that flipping only
+$(\texttt{B1} \Rightarrow \texttt{A4})$  of
 \autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
-segment graph described in \autoref{fig:interleavingmutation}-(d),
-which contains a loop
+segment graph as shown in \autoref{fig:interleavingmutation}-(d)
+because it creates a loop
 $\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}
 \Rightarrow \texttt{B1}$.
 %
+\yj{cut if no space.
 Since edges represent execution orderings, a loop in a segment graph
 indicates a contradiction on the execution order, stating that any
-vertex on the loop should be executed before itself. Therefore, when a
-mutated segment contains a loop, a fuzzer discards the segment.
+vertex on the loop should be executed before itself.}
+%
+When a mutated segment contains a loop, a fuzzer discards the segment.
 %
 
 
