@@ -15,11 +15,11 @@
 % %
 % Specifically, our key idea lies in three steps:
 
-This work focuses on how to efficiently explore the large search space 
-of thread interleavings when a multi-thread input
-(\eg, \texttt{sendmsg()} and \texttt{setsockopt()} in
-\autoref{fig:cve-2017-17712}) is given. Our approach is utilizing 
-an \textit{explored} thread interleaving as a seed interleaving.
+This work focuses on how to efficiently explore the large search space
+of thread interleaving when a multi-thread input (\eg,
+\texttt{sendmsg()} and \texttt{setsockopt()} in
+\autoref{fig:cve-2017-17712}) is given. Our approach utilizes an
+\textit{explored} thread interleaving as a seed interleaving.
 %
 With the seed interleaving, we explore thread interleavings of 
 a given multi-thread input in the following three steps:
@@ -27,10 +27,11 @@ a given multi-thread input in the following three steps:
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
 \item \textbf{\textit{Decomposing}} an explored thread interleaving
   into segments containing a small number of instructions.
-\item \textbf{\textit{Mutating}} thread interleavings within a segment
-  to generate unexplored interleavings for each segment. 
-\item \textbf{\textit{Recomposing}} a new thread interleaving from
-  mutated segments to further explore thread interleavings\yj{revisit this sentence}.
+\item \textbf{\textit{Mutating}} interleavings within a segment to
+  generate unexplored interleavings for each segment.
+\item \textbf{\textit{Recomposing}} mutated segments into whole thread
+  interleaving to determine how to schedule instructions.\yj{revisit
+    this sentence}.
 \end{enumerate}
 %
 
@@ -42,13 +43,17 @@ decomposing a thread interleaving into \textit{interleaving
 %
 Then, we illustrate how we define an interleaving coverage metric 
 from decomposed interleaving segments.
-The coverage metric represents
-combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} (\textbf{Design goal
-  1})~(\autoref{ss:coverage}).
+%
+% The coverage metric represents
+% combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} (\textbf{Design goal
+%   1})~(\autoref{ss:coverage}).
 %
 Lastly, we explain the speculative interleaving exploration method,
-which mutates segments and recomposes a new thread\yj{a new thread?} interleaving for 
-future iterations (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+which mutates segments and recomposes mutated segments into whole
+thread interleaving for future iterations~(\textbf{Design goal
+  2})~(\autoref{ss:scheduler}). \yj{a new thread?}
+% interleaving for future iterations (\textbf{Design goal
+%   2})~(\autoref{ss:scheduler}).
 
 
 
