@@ -674,6 +674,7 @@ Afterwards, a fuzzer \textbf{recomposes} mutated segments
 to obtain a whole sequence of interleavings, and generates 
 scheduling points from the recomposed interleaving.
 %
+\yj{When a fuzzer moves to the next iteration? No new mutation can be created?}
 
 %
 % We emphasize that our interleaving exploration is \textit{not random}
@@ -682,13 +683,6 @@ scheduling points from the recomposed interleaving.
   % interleaving coverage}.
 %
 
-
-\PP{Mutating interleaving segment}
-%
-% The first step is to derive \textit{unexplored} segment graphs from
-% \textit{explored} segment graphs. We call this derivation operation
-% \textit{mutating a segment graph}.
-% %
 
 \begin{figure}[t]
   \centering
@@ -702,6 +696,12 @@ scheduling points from the recomposed interleaving.
   \label{fig:interleavingmutation}
 \end{figure}
 
+\PP{Mutating interleaving segment}
+%
+% The first step is to derive \textit{unexplored} segment graphs from
+% \textit{explored} segment graphs. We call this derivation operation
+% \textit{mutating a segment graph}.
+% %
 Suppose a set of \textit{explored} segment graphs
 $G = \{g_1, g_2, ..., g_n \}$ is given.
 %
@@ -746,34 +746,27 @@ vertex on the loop should be executed before itself.}
 %
 When a mutated segment contains a loop, a fuzzer discards the segment.
 %
-
-
-In this way, a fuzzer generates mutated segment graphs of all
-$g_i \in G$, while excluding 1) invalid segment graphs (\ie, ones that
-contain a loop), and 2) explored segment graphs (\ie, ones that their
-hash values are recorded in the hash table).
+Also, a fuzzer drops a mutated segment if it is already explored. A fuzzer
+identifies the case when the hash value of a newly mutated segment graph
+has the same value in \intcov.
+%In this way, a fuzzer generates mutated segment graphs of all
+%$g_i \in G$, while excluding 1) invalid segment graphs (\ie, ones that
+%contain a loop), and 2) explored segment graphs (\ie, ones that their
+%hash values are recorded in the hash table).
 %
-As a result, a fuzzer forms a set of \textit{unexplored} mutated
-segment graphs $G_{mutated}$, and utilizes $G_{mutated}$ to determine
-how to schedule instructions in future iterations.
+In such way, a fuzzer forms a set of \textit{unexplored} mutated
+segment graphs, $G_{mutated}$, and recompose them for the next search.
 
-
-
-
-
-\PP{Recomposing mutated segment graphs into large graph}
+\PP{Recomposing mutated segment graphs}
 %
-\dr{large?}
+One could may take up a single mutated segment graph in $G_{mutated}$ 
+for the next search.
 %
-One could select one mutated segment graph in $G_{mutated}$ and run an
-input while enforcing interleaving orders described in the segment
-graph.
-%
-However, it might require many executions because the size of
+However, it might require many search iterations because the size of
 $G_{mutated}$ could be large.
 %
 Instead, we select multiple mutated segment graphs in $G_{mutated}$,
-and \textit{recompose} them into a large graph to test multiple
+and \textit{recompose} them to form a large graph to test multiple
 mutated segment graphs at one.
 
 % choose a more efficient way. We \textit{recompose} a new
