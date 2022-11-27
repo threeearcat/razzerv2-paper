@@ -666,7 +666,7 @@ a fuzzer speculates whole interleaving to run.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
 segments into \textit{unexplored} interleaving segments, where each
-mutated segment representes interleavings that has not been explored.
+mutated segment representes an interleaving that is to be tested.
 %
 Afterwards, a fuzzer \textbf{recomposes} mutated segments into whole
 interleaving, and generates scheduling points in order to run the
@@ -695,7 +695,7 @@ interleaving-order edges, resulting in a different segment graph.
 %
 The semantic behind ``\textit{flipping an interleaving-order edge}''
 is simple; it changes the interleaving order of an instruction pair
-that access the shared data.
+that access the same memory object.
 
 
 
@@ -715,19 +715,23 @@ that access the shared data.
 \autoref{fig:interleavingmutation} illustrates how a fuzzer mutates a
 segment graph.
 %
-For example, flipping ($\texttt{B1} \Rightarrow \texttt{A2}$) of
-\autoref{fig:interleavingmutation}-(a) produces a segment graph
+Given an explored segment graph described in
+\autoref{fig:interleavingmutation}-(a), flipping
+($\texttt{B1} \Rightarrow \texttt{A2}$) produces a segment graph
 described in \autoref{fig:interleavingmutation}-(b), which describes
 an interleaving different than \autoref{fig:interleavingmutation}-(a).
 %
-In \autoref{fig:interleavingmutation}-(a), \texttt{B1} is executed
-before \texttt{A2} (\ie, $\texttt{B1} \Rightarrow \texttt{A2}$), while
-in \autoref{fig:interleavingmutation}-(b), \texttt{A2} is executed
-before \texttt{B1} (\ie, $\texttt{A2} \Rightarrow \texttt{B1}$).
+In \autoref{fig:interleavingmutation}-(a), an edge
+($\texttt{B1} \Rightarrow \texttt{A2}$) describes that
+``\textit{\texttt{B1} is executed before \texttt{A2}}'', while in
+\autoref{fig:interleavingmutation}-(b), an edge (\ie,
+$\texttt{A2} \Rightarrow \texttt{B1}$) describes that
+``\textit{\texttt{A2} is executed before \texttt{B1}}''.
 %
-Likewise, flipping both of $(\texttt{B1} \Rightarrow \texttt{A2})$ and
-$(\texttt{B1} \Rightarrow \texttt{A4})$ generates another segment
-graph of \autoref{fig:interleavingmutation}-(c), which also represents
+Likewise, flipping both $(\texttt{B1} \Rightarrow \texttt{A2})$ and
+$(\texttt{B1} \Rightarrow \texttt{A4})$ in
+\autoref{fig:interleavingmutation}-(a) generates another segment graph
+of \autoref{fig:interleavingmutation}-(c), which also represents
 another interleaving.
 %
 Besides (b) and (c), however, flipping only
@@ -789,18 +793,29 @@ mutated segments at one.
 
 
 
-\autoref{fig:hint} demonstrates an idea of how we recompose into whole
-interleaving. Suppose we have two mutated segments \texttt{Segment
-  \#1*} and \texttt{Segment \#2*} described in \autoref{fig:hint}-(a).
+\autoref{fig:hint} demonstrates an idea of recomposing. Suppose we
+choose two mutated segments from $G_{mutated}$ called \texttt{Segment
+  \#1*} and \texttt{Segment \#2*} (\ie, \autoref{fig:hint}-(a)).
 %
-We can then draw a graph which contains all vertices and all edges
-from \texttt{Segment \#1*} and \texttt{Segment \#2*} as described in
+We can then \textit{merge} the two segment graphs, resulting in a
+large graph containing all vertices and all edges from \texttt{Segment
+  \#1*} and \texttt{Segment \#2*} as described in
 \autoref{fig:hint}-(b).
 %
-It is worth noting that \autoref{fig:hint}-(b) contains five vertices
-and six edges, which is a superset of vertices and edges from
-\texttt{Segment \#1*} and \texttt{Segment \#2*} respectively.
+In \autoref{fig:hint}-(b), five vertices are represented, where each
+vertex comes from either \texttt{Segment \#1*} or \texttt{Segment
+  \#2*}. It is worth noting that both segment graphs contain
+\texttt{A1} and \texttt{B1}, and only one copy is represented for each
+of them.
 %
+Then, edges of \texttt{Segment \#1*} and \texttt{Segment \#2*} are
+added into the merged graph.
+%
+Similar to the vertex case, an edge
+$\texttt{A2} \Rightarrow \texttt{B1}$ is contained in both segment
+graphs, and only one copy of the edge is added.
+%
+\dr{}
 Therefore, when we execute a thread interleaving corresponding to this
 graph, we can test both \texttt{Segment \#1*} and \texttt{Segment
   \#2*} at once (\autoref{fig:hint}-(c)).
