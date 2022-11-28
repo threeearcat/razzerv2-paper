@@ -425,14 +425,10 @@ average if successful, raning from 9 to 1296. Moreover, Krace even
 suffers from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
 %
 Throughout this evaluation, we confirm that the \sys's speculative
-interleaving exploration can handle the search complexity of
-interleaving segment coverage, and as a consequence \sys can quickly
+interleaving exploration can manage the search complexity of
+interleaving segment coverage, and consequently, \sys can quickly
 tirgger given concurrency bugs even much faster than previous
 approaches.
-
-
-\dr{Is it helpful to mention that there are a few concurrency bugs
-  that randomized search cannot find? ie, CVE-2019-6974.}
 
 
 
@@ -552,8 +548,8 @@ fuzzer to execute more interesting inputs (\ie, interesting thread
 interleaving) and not to waste computing resources.
 %
 The effectiveness of high input quality is pronounced in
-\autoref{ss:comparison}, showing \sys can discover concurrency bugs
-extremely fast.
+\autoref{sss:interleavingsearch}, showing \sys can discover
+concurrency bugs very quickly.
 
 
 
