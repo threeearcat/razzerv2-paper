@@ -356,8 +356,9 @@ We compare \sys to state-of-the-art kernel concurrency fuzzers,
 Snowboard~\cite{snowboard}, and Krace~\cite{krace}.
 %
 Unfortunately, we cannot directly run Snowboard and Krace for the
-comparison study becaues Krace is implemented only for file systems,
-and Snowboard is \dr{}.
+comparison study because Krace is implemented only for file systems,
+and Snowboard requires significant modifications according to our
+purpose\dr{}.
 %
 Therefore, we implement their approaches on the multi-thread fuzzing
 phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
@@ -421,12 +422,17 @@ ranging from 3 to 81.
 Whereas, Snowboard discovers concurrency bugs in 89 runs on average,
 ragning from 8 to 229, and Krace discovers them in 329.1 runs on
 average if successful, raning from 9 to 1296. Moreover, Krace even
-suffer from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
+suffers from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
 %
-% As a consequence, we confirm that our approaches and \sys is effective
-% in discovering concurrency bugs.
-%
+Throughout this evaluation, we confirm that the \sys's speculative
+interleaving exploration can handle the search complexity of
+interleaving segment coverage, and as a consequence \sys can quickly
+tirgger given concurrency bugs even much faster than previous
+approaches.
 
+
+\dr{Is it helpful to mention that there are a few concurrency bugs
+  that randomized search cannot find? ie, CVE-2019-6974.}
 
 
 
