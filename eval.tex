@@ -208,9 +208,10 @@ Also, during the evaluation, we limit the number of executions to
 \label{sss:interleavingcoverage}
 %
 In order to answer the question why a concurrency fuzzer adopts an
-informative interleaving coverage metric, we demonstrate what happens
-if a fuzzer adopts a less-informative interleaving coverage metric
-(\eg, alias coverage~\cite{krace}).
+informative interleaving coverage metric (\ie, interleaving segment
+coverage~\autoref{ss:coverage}), we demonstrate what happens if a
+fuzzer adopts a less-informative interleaving coverage metric (\eg,
+alias coverage~\cite{krace}).
 
 
 \PP{Comparison target}
@@ -340,16 +341,14 @@ evalution~\autoref{sss:interleavingsearch}.
 \end{table*}
 %
 One could argue that even if interleaving segment coverage is
-informative in describing unique behaviors of thread interleavings,
+informative in describing unique behaviors of offending interleavings,
 its search space is too large to explore, and thus, it is impractical.
 %
-To demonstrate our speculative interleaving exploration is effective
-in
-
-\dr{}
-We measure the elapsed time and number of executions required to
-discover a given concurrency bug to demonstrate the effectiveness of
-the speculative interleaving exploration~(\autoref{ss:scheduler}).
+However, it is tractable to track interleaving segment coverage with
+our speculative interleaving exploration. To demonstrate this, we
+compare the speculative interleaving
+exploration~\autoref{ss:scheduler} against various interleaving
+exploration methods proposed in prior approaches.
 
 \PP{Comparison target}
 %
@@ -412,22 +411,22 @@ kernel scheduler.
 On the other hand, the kernel scheduler fails to discover three
 concurrency bugs, CVE-2019-6974, CVE-2019-11486, and
 \texttt{69e16d01d1de} within 10K times of executions.
+%
+Regardless of the difficulty of discovering concurrency bugs, \sys can
+discover all of concurrency bugs very effectively.
+%
+\sys can discover given concurrency bugs in just 26.8 runs on average,
+ranging from 3 to 81.
+%
+Whereas, Snowboard discovers concurrency bugs in 89 runs on average,
+ragning from 8 to 229, and Krace discovers them in 329.1 runs on
+average if successful, raning from 9 to 1296. Moreover, Krace even
+suffer from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
+%
+% As a consequence, we confirm that our approaches and \sys is effective
+% in discovering concurrency bugs.
+%
 
-
-Regardless of the difficulty of discovering concurrency bugs, however,
-\sys can discover all of concurrency bugs very effectively.
-%
-\sys can discover given concurrency bugs in just 9.3 runs on average,
-ranging from 3 to 21.
-%
-\dr{}Whereas, Snowboard discovers concurrency bugs in XXX runs on
-average, ragning from YYY to ZZZ, and Krace discovers given
-concurrency bugs in KKK runs on average, raning from AAA to
-BBB. Moreover, Krace even fails to discover CVE-2019-6974 in our
-experiment.
-%
-As a consequence, we confirm that our approaches and \sys is effective
-in discovering concurrency bugs.
 
 
 
