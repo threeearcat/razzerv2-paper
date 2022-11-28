@@ -107,14 +107,30 @@ bugs are exposed and fixed accordingly.
   \label{table:knownbugs}
 \end{table}
 
-We compare \sys against various prior approaches 1) to demonstrate its
-performance improvement in discovering concurrency bugs
-(\autoref{sss:interleavingsearch}), and 2) justify the design choice
-of interleaivng segment coverage (\autoref{sss:interleavingcoverage}).
+We compare \sys against prior approaches in the perspective of the
+following: 1) is interleaving segment coverage~(\autoref{ss:coverage})
+really informative and helpful in discovering concurrency bugs?
+(\textbf{Design goal 1} in
+\autoref{s:motivation})~(\autoref{sss:interleavingcoverage}), and
+%
+2) is the speculative interleaving
+exploration~(\autoref{ss:scheduler}) effective in exploring the search
+space of thread interleavings (\textbf{Design goal
+  2})~(\autoref{sss:interleavingsearch}).
+
+% 1) to demonstrate its
+% performance improvement in discovering concurrency bugs
+% (\autoref{sss:interleavingsearch}), and 2) justify the design choice
+% of interleaivng segment coverage (\autoref{sss:interleavingcoverage}).
 
 % interleaving segment coverage with alias coverage~\cite{krace} and
 % concurrent call
 % pair~\cite{conzzer}~(\autoref{sss:interleavingcoverage}).
+
+For this evaluation, we select well-known concurrency bugs, and run
+fixed system calls that can cause each concurrency bug using \sys and
+previous approaches.
+
 
 
 \PP{Bug selection}
@@ -161,13 +177,13 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 
 
 
-\subsubsection{Comparison of interleaving coverage metric}
+\subsubsection{Trade-off between the bug-finding capability and the
+  search complexity}
 \label{sss:interleavingcoverage}
 %
-We also justify our design choice of interleaving segment coverage by
-showing what happens if a fuzzer adopts less-informative interleaving
-coverage.
-
+We justify our design choice of interleaving segment coverage by
+showing the trade-off between the bug-finding capability and the
+search complexity.
 
 \PP{Comparison methodology}
 %
