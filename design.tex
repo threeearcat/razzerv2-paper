@@ -27,33 +27,33 @@ a given multi-thread input in the following three steps:
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
 \item \textbf{\textit{Decomposing}} an explored thread interleaving
   into segments containing a small number of instructions.
-\item \textbf{\textit{Mutating}} interleavings within a segment to
+\item \textbf{\textit{Mutating}} interleavings within segments to
   generate unexplored interleavings for each segment.
 \item \textbf{\textit{Recomposing}} mutated segments into whole thread
-  interleaving to determine how to schedule instructions.\yj{revisit
-    this sentence}.
+  interleaving to determine how to schedule instructions.
+  %\yj{revisit this sentence}.
 \end{enumerate}
 %
 
 
 
-In this section, we first explain our key intuition behind
-decomposing a thread interleaving into \textit{interleaving
+In this section, we first explain our key intuition behind decomposing
+an explored interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we define an interleaving coverage metric 
-from decomposed interleaving segments.
+Then, we illustrate how we define an interleaving coverage metric by
+decomposing thread interleavings (\textit{step 1}) to satisfy
+\textbf{Design goal 1}.~(\autoref{ss:coverage}).
 %
 % The coverage metric represents
-% combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} (\textbf{Design goal
-%   1})~(\autoref{ss:coverage}).
+% combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} .
 %
 Lastly, we explain the speculative interleaving exploration method,
-which speculates whole interleaving based on mutated segments to guide
-instruction scheduling ~(\textbf{Design goal
-  2})~(\autoref{ss:scheduler}). \yj{a new thread?}
-% interleaving for future iterations (\textbf{Design goal
-%   2})~(\autoref{ss:scheduler}).
+which mutates interleaving segments (\textit{step 2}) and recomposes
+mutated segments (\textit{step 3}) to satisfy \textbf{Design goal
+  2}~(\autoref{ss:scheduler}).
+% \yj{a new thread?}  interleaving for future iterations
+% (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
 
 
@@ -72,8 +72,8 @@ instruction scheduling ~(\textbf{Design goal
   % \end{table}
 
 When fuzzing for discovering concurrency bugs with a coverage metric,
-the fundamental challenge is the large search space because
-combinations of thread interleavings increase the search space
+the fundamental challenge is the large search space because the
+consideration of multiple memory accesses increases the search space
 exponentially.
 %
 Therefore, this work seeks to strike the balance in the trade-off
@@ -82,7 +82,7 @@ between the bug-finding capability and the search complexity.
 \PP{Segmentizing thread interleaving}
 %
 To reduce the search complexity, we take the classical wisdom of
-problem decomposition where the complexity of a problem exponentially
+problem decomposition, where the complexity of a problem exponentially
 decreases as the problem size decreases.
 %
 Our key strategy is \textit{decomposing} the search space into small
@@ -238,9 +238,10 @@ How to build segments is described in \autoref{ss:coverage}.
 Segmentizing instruction interleavings provides two 
 benefits to a fuzzer.
 %
-First, when defining a coverage metric, tracking explored interleavings
-in each segment gives a befitting guidance to determine whether a 
-fuzzer further explores thread interleavings or not. 
+First, when defining an interleaving coverage metric, tracking
+explored interleavings in each segment gives a befitting guidance to
+determine whether a fuzzer further explores thread interleavings or
+not.
 %
 % As mentioned above, most concurrency bugs manifest depending only on
 % the execution order of four memory accesses.

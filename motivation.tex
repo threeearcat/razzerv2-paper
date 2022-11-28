@@ -58,8 +58,8 @@ initializing it at \texttt{A4}.
 
 \PP{Observation 1: Interleaving of multiple memory accesses}
 %
-This example demonstrates that a concurrency bug is caused by
-\textit{an interleaving of multiple memory accesses}.
+This example demonstrates that \textit{the offending interleaving
+  causing a concurrency bug consists of multiple memory accesses}.
 % combined result of multiple interleaving orders}\footnote{A
   % interleaving order denotes the execution order between a pair of
   % instructions that access the same memory object.}.
@@ -91,7 +91,8 @@ $(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$.
 \PP{Design goal 1: Informative interleaving coverage} The observation
 gives an insight of how to define interleaving coverage metric.  To
 discover the uninitialized access bug, an interleaving coverage metric
-should distinguish different interleavings of multiple instructions.
+should distinguish different interleavings of multiple memory
+accesses.
 %
 For example,
 $(\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4})$ (\ie,
@@ -137,16 +138,16 @@ fuzzer observes the three instructions, \texttt{B1}, \texttt{A2}, and
 they access the same memory object~(\ie, \texttt{inet->hdrincl}).
 % \yj{can a fuzzer know they are conflicting instructions?}
 %
-From this execution order, one can easily imagine a new interleaving
-of these three instructions by changing the execution order of
+From this execution, one can easily imagine a new interleaving of
+these three instructions by changing the execution order of
 \texttt{B1} and \texttt{A2}, resulting in
 \autoref{fig:alias-coverage}-(b).
 % $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 The speculative interleaving is what exactly we are looking for; it is
-the offending interleaving, \eg,
+the offending interleaving causing the uninitialized access bug, \eg,
 $(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$, and,
-if executed, the interleaving triggers the uninitialized access bug.
+if executed, the interleaving triggers the bug.
 
 \PP{Design goal 2: Speculative interleaving exploration}
 %
@@ -162,21 +163,17 @@ performing randomized exploration pervasively used in previous
 approaches~\cite{ski, krace, pctalgorithm, muzz}.
 % \yj{cite}
 %
-\blue{
-  %
-  Considering a concurrency bugs often manifest with a thread
-  interleaving that rarely happen, the systematic interleaving
-  exploration boosts up the concurrency bug discovery, as it directs
-  the fuzzer to execute unexplored thread interleaving instead of
-  executing random thread interleavings thousands of times.
-  %
-}
+Considering a concurrency bugs often manifest with a thread
+interleaving that rarely happen~\cite{exprace}, the systematic
+interleaving exploration boosts up the concurrency bug discovery, as
+it directs the fuzzer to execute unexplored thread interleaving
+instead of executing random thread interleavings thousands of times.
 
-In summary, using the coverage metric expressing combinations of
-interleaving orders and the speculative interleaving exploration, a
-fuzzer can effectively determine what to execute in future iterations,
-and quickly discover concurrency bugs without redundantly executing
-thread interleavings.
+In summary, using the coverage metric expressing interleavings of
+multiple memory accesses and the speculative interleaving exploration,
+a fuzzer can effectively determine what to execute in future
+iterations, and quickly discover concurrency bugs without redundantly
+executing thread interleavings.
 
 
 \subsection{Limitation of prior approaches}
