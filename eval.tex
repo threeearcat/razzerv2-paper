@@ -160,6 +160,42 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 
 
 
+
+\subsubsection{Comparison of interleaving coverage metric}
+\label{sss:interleavingcoverage}
+%
+We also justify our design choice of interleaving segment coverage by
+showing what happens if a fuzzer adopts less-informative interleaving
+coverage.
+
+
+\PP{Comparison methodology}
+%
+In this evaluation, we 
+
+\PP{Result}
+%
+\begin{table}[t]
+  \small
+  \centering
+  \input{table/aliascoverage}
+  \caption{Trade-off between the bug-finding capability and the search
+    complexity. Out of 10 trials using the less-informative
+    interleaving coverage metric, \checkmark\xspace indicates that a
+    bug is triggered, while - indicates that a bug is not
+    triggered. The \texttt{Avg. exec.}  column denotes that the
+    average number of execution until the saturation of interleaving
+    coverage.}
+  \label{table:aliascoverage}
+\end{table}
+%
+\autoref{table:aliascoverage} shows the result.
+
+Whereas, 
+
+
+
+
 \subsubsection{Comparison of interleaving exploration methods}
 \label{sss:interleavingsearch}
 %
@@ -287,42 +323,6 @@ experiment.
 %
 As a consequence, we confirm that our approaches and \sys is effective
 in discovering concurrency bugs.
-
-
-
-
-\subsubsection{Comparison of interleaving coverage metric}
-\label{sss:interleavingcoverage}
-%
-We also justify our design choice of interleaving segment coverage by
-showing what happens if a fuzzer adopts less-informative interleaving
-coverage.
-
-
-\PP{Comparison methodology}
-%
-In this evaluation, we 
-
-\PP{Result}
-%
-\begin{table}[t]
-  \small
-  \centering
-  \input{table/aliascoverage}
-  \caption{Trade-off between the bug-finding capability and the search
-    complexity. Out of 10 trials using the less-informative
-    interleaving coverage metric, \checkmark\xspace indicates that a
-    bug is triggered, while - indicates that a bug is not
-    triggered. The \texttt{Avg. exec.}  column denotes that the
-    average number of execution until the saturation of interleaving
-    coverage.}
-  \label{table:aliascoverage}
-\end{table}
-%
-\autoref{table:aliascoverage} shows the result.
-
-Whereas, 
-
 
 
 
