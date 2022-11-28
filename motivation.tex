@@ -41,7 +41,6 @@ In \autoref{fig:cve-2017-17712}, an uninitialized access bug may
 manifest when two system calls are executed concurrently:
 \texttt{sendmsg()} to send a message through an ipv4 socket, and
 \texttt{setsockopt()} to modify an option of the ipv4 socket.
-
 Let us assume \texttt{inet->hdrincl} is initially \texttt{1}.
 %
 During sending a message through the ipv4 socket, thread~A reads a
@@ -84,7 +83,7 @@ contribute to the bug.
 %\texttt{A4}))$ cause the uninitialized access bug, while all other
 %thread interleavings do not.
 Therefore, to trigger the kernel concurrency bug, a fuzzer must
-consider an interleaving of the three memory accesses, \eg,
+consider instruction interleavings of the three memory accesses, \eg,
 $(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$.
 
 

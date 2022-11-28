@@ -1,12 +1,42 @@
 \section{Introduction}
 \label{s:intro}
 
-\dr{I revise the observation 1 in motiv section. Please check it
-  before writing the intro section, and let me know if it seems not
-  good.}
-
-
 \dr{TODO: term consistency: interleaving order <-> interleaved instruction}
+
+Multi-core era, many techniques are integrated in kernel to improve performance. 
+
+The consequence of kernel concurrency bugs is disastrous. They crash
+the entire system, breaking availability or causing data loss. 
+Furthermore, attackers 
+exploit a concurrency bugs to mount a privilege escalation attack.
+A recent study~\cite{exprace} demonstrates that an user-level attacker 
+reliably exploits non-deterministic concurrency bugs without performing
+brute-force attacks.
+
+Identifying kernel concurrency bugs is much more difficult than 
+finding non-concurrency bugs. 
+In contrast to non-concurrency bugs which can be identified by 
+sequential testing of a single thread execution,
+kernel concurrency bugs are typically caused by the concurrent execution 
+of two or more threads.
+Kernel concurrency bugs manifest only by a specific sequence of
+instruction interleavings between threads. The interleavings happens 
+rarely because it happens only when a specific timing condition is met.
+To discover concurrency bugs, it is not practical to explore all
+the possible interleavings because the number of instruction
+executed by a system call in Linux is huge.
+%Due to such difficulty, traditional fuzzers..
+
+To increase efficiency of concurrency bug fuzzing, several approaches 
+have been proposed. SKI, Razzer, Snowboard, Krace.\yj{what else?}
+%Snowboard uses edge-coverage...
+
+To overcome the limitation of previous approaches, this paper proposes
+\sys. Key insights: 
+i) new coverage metric reflecting the nature of concurrency bugs.
+ii) systematic, efficient search strategy guided by the coverage metric.
+
+
 
 
 We describe our contributions in three folds:
