@@ -119,8 +119,7 @@ space of thread interleavings? (\textbf{Design goal
   2})~(\autoref{sss:interleavingsearch}).
 %
 In this evaluation, we select well-known concurrency bugs, and then
-run \sys and prior approaches with fixed system calls that can cause
-each concurrency bug.
+run \sys and prior approaches with these concurrency bugs.
 
 
 
@@ -141,10 +140,9 @@ each concurrency bug.
 comparison study.
 %
 For a fair comparison, our concurrency bug selection criteria are 1)
-concurrency bugs are used in previous studies on previous
-studies~\cite{exprace, razzer, snowboard, moonshine, fuze}, and 2)
-their exploits are publicly available so that we can make use of them
-for our evaluation.
+concurrency bugs are used in previous studies~\cite{exprace, razzer,
+  snowboard, moonshine, fuze}, and 2) their exploits are publicly
+available so that we can make use of them for our evaluation.
 
 But there are few exceptions as follows: Although the exploit of
 \texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
@@ -178,45 +176,41 @@ version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 \PP{Comparison method}
 %
 We measure the number of executions and the elapsed time required to
-discover concurrency bugs.
+discover each concurrency bug.
 %
-However, these metrics heavily depend on the randomness and initial
-seeds, which are known as impediments for a fair fuzzing
-evaluation~\cite{fuzzingeval}.
+However, these metrics heavily depend on initial seeds and the process
+of mutating seeds, which may vary across evaluations, and are known as
+impediments for a fair fuzzing evaluation~\cite{fuzzingeval}.
 %
-In order to eliminate impacts of such impediments, we disable the
-single-thread fuzzing~(\autoref{sss:singlethreadfuzzing}), and
-manually provide a multi-thread input (including a pair of system
-calls) that can cause each concurrency bug.
+In order to minimize effects of such impediments, we manually provide
+a multi-thread input as well as a pair of system calls that can cause
+each concurrency bug.
 %
-In this way, we eliminate the impact of how a fuzzer generates an
-input which is highly affectted by the randomness, and can focus on
-the effectiveness of the thread interleaving exploration of each
-fuzzer.
+Then, in all evaluations in this section, a fuzzer only explores
+thread interleavings of the multi-thread inputs we provide, without
+generating or mutating inputs.
 %
-Then, we measure the number of executions and the elapsed time until
-each fuzzer triggers each concurrency bugs within a given pair of
-system calls. During the evaluation, we limit the number of executions
-to 10000.
+In this way, we do not need to consider the process of mutation, and
+can focus on the effectiveness of the thread interleaving exploration
+of each approach.
+%
+Also, during the evaluation, we limit the number of executions to
+10000 for each measurement, which is large enough for our evaluation.
+%
+\dr{I do not use the term ``random'' here because the thread
+  interleaving exploration is random anyway.}
 
 
 
 
 
-\subsubsection{Trade-off between the bug-finding capability and the
-  search complexity}
+\subsubsection{Comparison of interleaving coverage metrics}
 \label{sss:interleavingcoverage}
 %
 In order to answer the question why a concurrency fuzzer adopts an
-informative interleaving coverage metric, we compare interleaving
-segment coverage and less-informative interleaving coverage (\eg,
-alias coverage~\cite{krace}).
-%
-We expect that interleaving segment coverage is not saturated until a
-given concurrency bug is triggered (\ie, showing the strong
-bug-finding capability), while less-informative interleaving coverage
-(\eg, alias coverage) is saturated quickly (\ie, showing the low
-search complexity).
+informative interleaving coverage metric, we demonstrate what happens
+if a fuzzer adopts a less-informative interleaving coverage metric
+(\eg, alias coverage~\cite{krace}).
 
 
 \PP{Comparison target}
@@ -226,17 +220,22 @@ interleaving coverage metric most relevant to interleaving segment
 coverage (\ie, both describe interleavings of instructions).
 %
 However, alias coverage is implemented only for file systems, so we
-mimick alias coverage in \sys by limiting the size of each
-interleaving segment to two. In other words, interleaving segments of
-size 2 describe interleavings of two instructions in which at least
-one is a write instruction.
+mimick alias coverage in \sys by limiting the number of vertices of
+each segment graph to two. In other words, as alias coverage does,
+interleaving segments of size 2 describe interleavings of two
+instructions where at least one of them is a write instruction.
 %
-Using mimicked alias coverage and interleaving segment coverage as a
-feedback of the \sys's speculative interleaving exploration, we run
-\sys with a fixed pair of system calls that can cause each concurrency
-bug, and measure two things: 1) the number of executions until each
-coverage metric is saturated, and 2) whether a given concurrency bug
-is triggered or not.
+Using mimicked alias coverage, we run \sys to see whether each
+concurrency bug is triggered until mimicked alias coverage is
+saturated.
+
+
+% as a
+% feedback of the \sys's speculative interleaving exploration, we run
+% \sys with a fixed pair of system calls that can cause each concurrency
+% bug, and measure two things: 1) the number of executions until each
+% coverage metric is saturated, and 2) whether a given concurrency bug
+% is triggered or not.
 
 
 \PP{Result}
@@ -258,26 +257,60 @@ is triggered or not.
 \autoref{table:aliascoverage} shows the result.
 %
 When using mimicked alias coverage, \textit{many (six ouf of nine)
-  concurrency bugs are not triggered in ten trials even if the
-  mimicked alias coverage is saturated}.
+  concurrency bugs are not triggered even if mimicked alias coverage
+  is saturated}.
 %
-In \autoref{s:motivation}, with an example of CVE-2017-17712, we
-provide how alias coverage is saturated even before the concurrency
-bug is triggered.
+The example of CVE-2017-17712 described in \autoref{s:motivation}
+(\ie, \autoref{fig:cve-2017-17712}) explains why this result comes
+out; alias coverage considers only interleavings between two
+instructions, which is \textit{not sufficient} to capture the
+offending interleaving containing multiple instructions. In fact, all
+listed concurrency bugs are caused by the interleaving order of three
+or four instructions.
 %
-Whereas, all listed concurrency bugs are triggered before interleaving
-segment coverage is saturated.
+On the other hand, alias coverage is saturated really quickly. With
+the speculative interleaving exploration, it is saturated in 13.9
+executions on average, ranging from 6 to 32.
 %
-As a consequence, we conclude that a fuzzer can rely on interleaving
-segment coverage when determining whether to stop probing new
-interleavings.
+We comprehend this result as the trade-off between the bug-finding
+capability and the search complexity; Alias coverage shows the
+\textit{low} search complexity while it also shows the \textit{weak}
+bug-finding capability.
+%
 
 
-On the other hand, alias coverage is saturated really quickly. It is
-saturated in 13.9 executions on average, ranging from 6 to 32.
+
+In the case of interleaving segment coverage, all listed concurrency
+bugs are triggered before the saturation of the interleaving coverage.
+Therefore, interleaving segment coverage shows the \textit{strong}
+bug-finding capability.
 %
-Whereas, interleaving segment coverage requires more executions, (at
-least) 27 executions on average, ranging from 3 to 81.
+Obviously, interleaving segment coverage entails the cost of the
+higher search complexity. Nevertheless, its search complexity is still
+manageable with a support of the speculative interleaving exploration,
+and we display it in the next
+evalution~\autoref{sss:interleavingsearch}.
+
+
+% that interleaving segment coverage is not saturated until a
+% given concurrency bug is triggered (\ie, showing the strong
+% bug-finding capability), while less-informative interleaving coverage
+% (\eg, alias coverage) is saturated quickly (\ie, showing the low
+% search complexity).
+
+
+
+
+%
+% As a consequence, we conclude that a fuzzer can rely on interleaving
+% segment coverage when determining whether to stop probing new
+% interleavings.
+
+
+
+
+%
+
 
 
 
@@ -307,8 +340,11 @@ least) 27 executions on average, ranging from 3 to 81.
 \end{table*}
 %
 One could argue that even if interleaving segment coverage is
-informative to describe unique behaviors of thread interleavings, its
-search space is too large to explore, and thus, it is impractical.
+informative in describing unique behaviors of thread interleavings,
+its search space is too large to explore, and thus, it is impractical.
+%
+To demonstrate our speculative interleaving exploration is effective
+in
 
 \dr{}
 We measure the elapsed time and number of executions required to
