@@ -81,15 +81,28 @@ approaches where it only mutates a single interleaving in each search step.
 
 \yj{DR write some implementation summary and evaluation digests.}
 We implmenet \sys across various software layers.
-
-
-We run \sys against the latest Linux kernel, and find \totalbugs
-concurrency bugs of which all of them show harmful behaviors such as
-memory corruptions, or assertion violations. We also emphasize that
-all concurrency bugs are found in subsystems where
-Syzkaller~\cite{syzkaller} is running for several years, demonstrating
-the effectiveness of \sys.
 %
+The \sys's core fuzzing framework embracing the aforementioned key
+ideas is implemented based on Syzkaller~\cite{syzkaller}. In addition,
+\sys incorporates a LLVM pass to trace memory accesses and basic
+blocks during runtime, and the execution engine based on QEMU/KVM to
+enforce thread scheduling as desired.
+%
+We run \sys against the latest version of the Linux kernel (ranging
+from 5.19-rc2 to 6.0-rc7), and find \totalbugs concurrency bugs of
+which all of them show harmful behaviors such as memory corruptions,
+task hangs, or assertion violations. We also emphasize that all
+concurrency bugs are found in subsystems where
+Syzkaller~\cite{syzkaller} has been testing for several years,
+demonstrating the effectiveness of \sys.
+%
+Moreover, we experimentally compare \sys against the state-of-the-art
+related work, Snowboard~\cite{snowboard} and Krace~\cite{krace},
+showing that \sys can explore thread interleavings more quickly than
+these works.
+
+
+
 
 
 We describe our contributions in three folds:
