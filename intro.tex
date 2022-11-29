@@ -74,7 +74,11 @@ search by referring to \intcov.
 
 \PP{Speculative exploration of interleavings} To explore new interleavings,
 \sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
-in a 
+in a segment, which generates new interleavings for testing. \sys 
+mutates as many segments as possible in the expectation that the 
+new interleavings include a large number of untested interleavings. 
+This search strategy quickly navigates the search space than previous 
+approaches where it only mutates a single interleaving in each search step.
 
 
 \yj{DR write some implementation summary and evaluation digests.}
