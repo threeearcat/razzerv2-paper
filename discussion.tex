@@ -3,11 +3,36 @@
 
 \PP{Data race detectors}
 %
-Data races are a \textit{subset} of concurrency bugs, 
-
-\PP{Concurrency bugs }
+Data races are a \textit{subset} of concurrency bugs, while this work
+focuses on concurrency bugs including data races and non-data race
+concurrency bugs.
 %
-% dr: bug that are not captured using segment
+In fact, data race detectors are orthogonal to \sys, thus, data race
+detectors can be easily integrated into \sys to provide a stronger
+concurrency bug detection capability.
+%
+For example, during our evaluation, \sys can easily trigger non-data
+race concurrency bugs (\eg, CVE-2019-6974, \texttt{69e16d01d1de}) that
+cannot be detected using a data race detector, while data race
+detectors can detect non-memory corruption bugs such as performance
+degradation. We provide more details in \autoref{s:appendix:datarace}.
+
+
+\PP{Larger interleaving segment}
+%
+While we restrict the size of each interleaving segment to four, a
+small fraction of concurrency bugs (\eg, 8 out of 105 from a survey
+study~\cite{learningfrommistakes}) are triggered with interleaving
+segments with size of larger than four.
+%
+Thus, interleaving segment coverage falls short in tracking offending
+interleavings of this kind of concurrency bugs, while the speculative
+interleaving exploration is still able to trigger them via recomposing
+multiple interleaving segments.
+%
+Since this kind of bugs also may severely affect the security of the
+kernel, we leave how to track their offending interleavings using
+interleaving coverage as future work.
 
 %%% Local Variables:
 %%% mode: latex

@@ -62,9 +62,8 @@ Specifically, Razzer~\cite{razzer}, arguably the first concurrency
 fuzzer, states that it is inspired by SKI~\cite{ski}, a CCT technique
 aiming the kernel.
 %
-We believe \sys takes one step further in this direction by
-incorporating informative interleaving coverage and coverage-directed
-interleaving search strategy.
+We believe \sys takes one step further in this direction by adopting
+interleaving segment coverage in tracking and exploring interleavings.
 %
 % Other concurrency fuzzers~\cite{krace, muzz, snowboard, conzzer} are
 % also (at least indirectly) affected by CCT techniques as all of them
@@ -85,22 +84,10 @@ A large volume of works~\cite{pacer, datacollider, hybridchecker,
 proposed to detect data races, a \textit{subset} of concurrency
 bugs~\cite{lkmm, linuxmemorymodel}.
 %
-% These works detect the occurence of two instructions that access the
-% same memory address without proper synchronization or ordering.
-%
-In fact, data race detectors are essentially orthogonal to \sys,
-thus, data race detectors can be integrated into \sys to provide a
-stronger concurrency bug detection capability.
-%
-For example, during our evaluation, \sys can easily trigger non-data
-race concurrency bugs~\cite{snowboardbug, cve20196974, cve20177533}
-that cannot be detected using a data race detector (detailed in
-\autoref{s:appendix:datarace}), while data race detectors can be
-helpful in detecting non-memory corruption bugs such as performance
-degradation.
-%
-% Even though we do not make use of a data race detector during our
-% evaluation,
+Most data race detectors monitor the execution to check the occurence
+of data races via the instrumentation~\cite{tsan, kcsan, helgrind} or
+the offline analysis~\cite{krace}. Thus, they are compatible with
+\sys, and not competitors of \sys.
 %
 We believe \sys and data race detectors contribute in discovering
 concurrency bugs in their own way.
