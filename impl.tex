@@ -1,15 +1,14 @@
 \section{Design of \sys}
 \label{s:impl}
 
-\sys is a concurrency fuzzer tailored to effectively discover kernel
-concurrency bugs, where its key improvement lies in adopting
-interleaving segment coverage and the speculative interleaving
-exploration described in \autoref{s:design}.
+\sys is a kernel fuzzer tailored to effectively discover concurrency
+bugs, where its key improvement lies in adopting interleaving segment
+coverage and the speculative interleaving exploration described in
+\autoref{s:design}.
 %
 
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
-fuzzing similar with recent concurrency fuzzings~\cite{razzer,
-  snowboard}.
+fuzzing.
 %
 The first stage is a \textit{single-thread fuzzing}, which focuses on
 identifying two system calls that may expose new interleaving
@@ -18,7 +17,7 @@ segments.
 The second stage is a \textit{multi-thread fuzzing} to explore thread
 interleavings and discover concurrency bugs.
 %
-In both stage, \sys traces timestamp-annotated memory accesses
+In both stages, \sys traces timestamp-annotated memory accesses
 executed by each system call, and in the second stage, \sys adopts a
 mechanism to control thread scheduling as desired.
 
@@ -44,8 +43,7 @@ Lastly, we explain the implementation detail of
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/architecture.pdf}
-  \caption{An overview of \sys's architecture. \dr{unobserved -->
-      unexplored}}
+  \caption{An overview of \sys's architecture.}
   \label{fig:workflow}
 \end{figure}
 
@@ -359,7 +357,7 @@ each instruction that accesses globally-visible memory objects.
 inserts callbacks, and how each callback records memory accesses and
 basic blocks.
 %
-When compiling a source code in (a), the compiler pass two inserts
+When compiling a source code in (a), the compiler pass inserts two
 function calls; \texttt{trace_basicblock()} before \texttt{A3} which
 is the first instruction of the basic block, and
 \texttt{trace_access()} before \texttt{A2} which is an instruction
@@ -369,19 +367,18 @@ During runtime, \texttt{trace_basicblock()} takes the starting address
 of basic block as input (\ie, \texttt{A3}), and records it into
 \texttt{Basicblock record}.
 %
-On the other hand, \texttt{trace_access()} takes five parameters, the
-address of the accessed memory object (\ie, \texttt{\&inet->hdrincl}),
-the instruction address accessing the memory object (\ie,
-\texttt{A2}), the size of the memory access (\ie, \texttt{1}), the
-type of the memory access (\ie, \texttt{read}), and the timestamp of
-when the memory access occurrs (\ie, \texttt{ts}).
+On the other hand, \texttt{trace_access()} takes five parameters,
+addresses of the accessed memory object and the instruction, the size
+and the type of the memory access, and the timestamp when the memory
+access occurs (\ie, \texttt{\&inet->hdrincl}, \texttt{A2}, \texttt{1},
+\texttt{read}, and \texttt{ts}).
 %
 \texttt{trace_access()} then records these five parameters into
 \texttt{Memory access record}.
 %
 During fuzzing, the userspace fuzzer reads values recorded in
 \texttt{Basicblock record} and \texttt{Memory access record}, and
-identify basic blocks and memory accesses executed by each system
+identifies basic blocks and memory accesses executed by each system
 call.
 
 
@@ -463,7 +460,7 @@ userspace fuzzer sends a schedule to run through hypercall interfaces
 before executing system calls.
 %
 After that, the threads notify the execution engine that they are
-ready to execute system calls, and start executing system calls,
+ready to execute system calls, and start executing system calls.
 %
 During the execution, the execution engine deliberately suspends and
 resumes the execution of system calls as described in the given
@@ -481,8 +478,8 @@ schedule.
 engine.
 %
 At the beginning, the userspace fuzzer spawns threads, where each
-thread is assigned a system call annotated with scheduling points
-(\C{1} in \autoref{fig:workflow-hypervisor}).
+thread is assigned a system call and scheduling points (\C{1} in
+\autoref{fig:workflow-hypervisor}).
 %
 Then, each thread invokes hypercalls (\ie, \texttt{hcall_sched()}) to
 deliver scheduling points to the execution engine, followed by a
@@ -605,19 +602,17 @@ schedule (\ie, \C{4}-1).
 In order to perform preemption, \sys leverages the hardware breakpoint
 feature~\cite{hwbp} shipped in modern Intel CPU chipsets.
 %
-When the execution engine receives scheduling points, the execution
-engine installs breakpoints on instructions on which scheduling points
-refer, and recognizes that a thread of the userspace fuzzer reaches a
-scheduling point when a breakpoint is hit.
-
-
+During the execution, the execution engine recognizes that the
+execution reaches a scheduling point when a breakpoint is hit.
+%
 When a thread hits a breakpoint, the execution engine stores context
 information (\eg, register values) in the hypervisor's memory, and
-changes the program counter of thread~A to an infinite loop called a
-trampoline.
+changes the program counter of the running thread to an infinite loop
+called a trampoline.
 %
-In the trampoline, the thread keeps calling \texttt{cond_resched()} to
-yield a CPU without proceeding with the system call execution.
+In the trampoline, the thread keeps calling a kernel API
+\texttt{cond_resched()} which yields a CPU. As a consequence, the
+thread is suspended in the trampoline without making a progress.
 %
 To resume the suspended thread, the execution engine restores
 registers including a program counter with the values stored when the
@@ -637,17 +632,13 @@ same time.
 In Intel CPU chipsets, at most four hardware breakpoints can be
 installed simultaneously, and the number of scheduling points can be
 larger than four.
-
+%
 \sys overcomes this restriction by leveraging the fact that scheduling
 points are ordered. Specifically, the execution engine installs
 breakpoints on first four scheduling points, and when a installed
 breakpoint is hit, the execution engine moves a breakpoint onto the
 next scheduling point.
 %
-\dr{}
-Also we expect that this restriction can be further mitigated by using
-a software breakpoint feature that does not have a restriction on the
-number of breakpoints.
 
 
 
@@ -687,7 +678,7 @@ Then, we ignore all scheduling points before \texttt{A6} (\ie,
 
 
 
-\PP{Virtual Machine Instrospection}
+\PP{Virtual Machine Instrospection (VMI)}
 %
 The execution engine introspects the target kernel for two reasons.
 %
@@ -697,25 +688,21 @@ the breakpoint is hit by a thread of the userspace fuzzer, or by an
 irrelevant thread.
 %
 If a breakpoint is hit by a thread of the userspace fuzzer, the
-execution engine suspends the thread and resumes the
-previously-suspended thread as specified in a schedule.
+execution engine perform preemption as specified in a schedule.
 %
 Otherwise, the execution engine ignores the breakpoint hit, and keeps
 running the kernel.
-
-
+%
 Second, when a running thread tries to acquire a lock, the execution
-engine inspects whether the lock is held by a suspended thread to
-prevent unexpected block.
+engine inspects whether the lock is held by a suspended thread, which
+may cause the unexpected block.
 %
 If it is the case, the execution engine performs preemption so that
 the lock-holder thread (\ie, the suspended thread) resumes the
 execution, and the lock-waiting thread gets suspended.
-
-
-While the virtual machine introspection is crucial to properly control
-thread scheduling, we leave details of how we implement the virtual
-machine introspection in the appendix
+%
+While the VMI is crucial to properly control thread scheduling, we
+leave details of how we implement the VMI in the appendix
 section~(\autoref{s:appendix:vmi}).
 
 
@@ -726,24 +713,24 @@ section~(\autoref{s:appendix:vmi}).
 
 We implement \sys in various software layers as follows:
 %
+The \sys's userspace fuzzer~(\autoref{ss:fuzzer}) is implemented based
+on \texttt{Syzkaller}~\cite{syzkaller}, a kernel fuzzer developed by
+Google, with 3334~\footnote{We use scc~\cite{scc} and
+  sloccount~\cite{sloccount} to measure LoC of GO and C, C++
+  respectively.} LoC in GoLang and 341 LoC in C++.
+%
 The target kernel instrumentation~(\autoref{ss:instrumentation}) is
 implemented in two parts, a compiler pass and callback functions. The
 compiler pass is implemented on the LLVM compiler suite
-12.0.1~\cite{llvm} with 323~\footnote{We use scc~\cite{scc} and
-  sloccount~\cite{sloccount} to measure LoC of GO and C, C++
-  respectively.} LoC in C++, and, the callback functions are
+12.0.1~\cite{llvm} with 323 LoC in C++, and, the callback functions are
 implemented in the Linux kernel source tree with 265 LoC in C.
 %
-The execution engine~(\autoref{ss:engine}) is implemented on QEMU
+Lastly, the execution engine~(\autoref{ss:engine}) is implemented on QEMU
 6.0.0 with 1662 LoC in C, and leverages KVM (Kernel-based Virtual
 Machine) to take advantage of hardware acceleration.
 %
 % In addition, the trampoline is enclosed into the target kernel source
 % tree as a loadable module.
-%
-Lastly, the \sys's userspace fuzzer~(\autoref{ss:fuzzer}) is
-implemented based on \texttt{Syzkaller}~\cite{syzkaller}, a kernel
-fuzzer developed by Google, with 3334 LoC in GoLang and 341 LoC in C++.
 
 
 

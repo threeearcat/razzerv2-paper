@@ -41,8 +41,8 @@ Ubuntu Server 20.04.4 LTS on Linux 5.4.143 as a host operating system.
 %
 During our experiments, we launch 32 virtual machines (VMs) where each
 VM is equipped with four vCPUs and 8\GB memory.
-
-To build a guest kernel, we use a kernel configuration used by
+%
+When building a guest kernel, we use a kernel configuration used by
 \texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
 \sys search the same kernel modules/subsystems.
 %
@@ -68,16 +68,10 @@ applicable to various subsystems.
 (\eg, \texttt{\#12}) but also critical bugs such as memory corruptions
 (\eg, \texttt{\#2}, \texttt{\#6}, and \texttt{\#14}).
 %
-It is worth noting that in our evaluation, unlike previous
-works~\cite{snowboard, krace} that rely on data race
-detectors~\cite{kcsan, tsan}, all concurrency bugs are found by
-observable and harmful incidents such as kernel panics or KASAN
-reports.
+It is worth noting that in our evaluation, all concurrency bugs are
+found by observable and harmful incidents such as kernel panics or
+KASAN reports.
 %
-\dr{}
-We believe data race detectors and our approach are complementary in
-finding concurrency bugs. We discuss this in the discussion
-section~(\autoref{s:discussion}).
 
 Interestingly, we find that many of bugs was previously found and
 addressed, but they reoccur possibly because of their incomplete

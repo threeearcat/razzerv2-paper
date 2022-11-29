@@ -4,8 +4,16 @@
 \subsection{Hashing segment graph}
 \label{s:appendix:hash}
 % \dr{I want to discuss about this part. I'm thinking taking this part
-%   out to the appendix section:}
-% %
+% out to the appendix section:}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.7\linewidth]{fig/interleavingmutation.pdf}
+  \caption{}
+  \label{fig:segmenthash}
+\end{figure}
+%
+
 In particular, for all vertices $v$ in $V_i$, we first calculate a
 hash value of $v$, $hash(v)$, which reflects its out-going edges. With
 $o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,

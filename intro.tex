@@ -64,7 +64,7 @@ a single interleaving (the size of segment is 2)\yj{OK?}.
 Using \intcov provides two benefits to fuzzers. First, a fuzzer can 
 consider interactions of multiple interleavings, which increase 
 accuracy of discovering concurrency bugs than considering a single 
-interleavings. A previous study\cite{learningfrommistakes} observes that
+interleavings. A previous study~\cite{learningfrommistakes} observes that
 most concurrency bugs occurs by interactions of at most four memory accesses of shared memory objects, implying multiple interleavings.
 Second, a fuzzer can generate unexplored interleavings for the next 
 search by referring to \intcov.
