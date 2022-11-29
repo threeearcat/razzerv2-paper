@@ -19,17 +19,21 @@ of thread interleaving when a multi-thread input (\eg,
 \autoref{fig:cve-2017-17712}) is given. Our approach utilizes an
 \textit{explored} thread interleaving as a seed interleaving.
 %
-With the seed interleaving, we explore thread interleavings of a given
-multi-thread input in the following three steps:\\[5pt]
-\textbf{1) \textit{Decomposing}} an explored thread interleaving
-into segments containing a small number of instructions.\\
-\textbf{2) \textit{Mutating}} interleavings within segments to
-generate unexplored interleavings for each segment.\\
-\textbf{3) \textit{Recomposing}} mutated segments into whole thread
-interleaving to determine how to schedule instructions in future.
+With the seed interleaving, we explore thread interleavings of 
+a given multi-thread input in the following three steps:
+%
+\begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
+\item \textbf{\textit{Decomposing}} an explored thread interleaving
+  into segments containing a small number of instructions.
+\item \textbf{\textit{Mutating}} interleavings within segments to
+  generate unexplored interleavings for each segment.
+\item \textbf{\textit{Recomposing}} mutated segments into whole thread
+  interleaving to determine how to schedule instructions in future.
+\end{enumerate}
+%
 
 
-\vspace{5pt}
+
 In this section, we first explain our key intuition behind decomposing
 an explored interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
