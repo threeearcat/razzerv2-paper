@@ -28,8 +28,7 @@ a given multi-thread input in the following three steps:
 \item \textbf{\textit{Mutating}} interleavings within segments to
   generate unexplored interleavings for each segment.
 \item \textbf{\textit{Recomposing}} mutated segments into whole thread
-  interleaving to determine how to schedule instructions.
-  \yj{revisit this sentence}.
+  interleaving to determine how to schedule instructions in future.
 \end{enumerate}
 %
 
@@ -70,7 +69,7 @@ mutated segments (\textit{step 3}) to satisfy \textbf{Design goal
   % \end{table}
 
 When fuzzing for discovering concurrency bugs with an interleaving
-coverage metric, the fundamental challenge is the large search space
+coverage metric, the fundamental challenge is the large search space,
 because the consideration of multiple memory accesses increases the
 search space exponentially.
 %
@@ -89,11 +88,12 @@ sub-spaces. We call a sub-space \textit{interleaving segment}.
 Each interleaving segment consists of instructions accessing 
 shared memory objects.
 % the same  memory objects. (\ie, conflicting instructions).
-To define the size (the number of instructions) of an interleaving segment,
-we use an observation from a previous study~\cite{learningfrommistakes} 
-in which 92.4\% (97 out of 105) of concurrency bugs manifest when a bug-finding system
-monitors specific interleaving orders of \textit{at most} four memory
-accesses referring to shared memory objects.
+To define the size (\ie, the number of instructions) of an
+interleaving segment, we use an observation from a previous
+study~\cite{learningfrommistakes} in which 92.4\% (97 out of 105) of
+concurrency bugs manifest when a bug-finding system monitors specific
+interleaving orders of \textit{at most} four memory accesses referring
+to shared memory objects.
 %
 So, all other memory accesses beyond four accesses and their execution
 orders do not meaningfully affect manifestation of a concurrency bug.

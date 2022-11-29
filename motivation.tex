@@ -116,7 +116,7 @@ interleavings of the input, missing the concurrency bug.
     \texttt{Interleaving \#2}.
     %
     We intentionally omits bug-irrelevant memory accesses (\ie,
-    \texttt{A6} and \texttt{B2}). \dr{missing (a) and (b)}}
+    \texttt{A6} and \texttt{B2}).}
   \label{fig:alias-coverage}
 \end{figure}
 
@@ -209,10 +209,10 @@ For example, let us suppose we adopt alias coverage~\cite{krace},
 which tracks interleaving orders of a \textit{single} instruction
 pair.
 %
-Alias coverage determines a thread interleaving \texttt{X} exposes a
-unique behavior if \texttt{X} contains an unexplored
-\red{directed-instruction pair} $I_W \rightarrow I_R$, where $I_R$
-reads a value written by $I_W$.
+Alias coverage determines an interleaved execution \texttt{X} exposes
+a new interleaving if \texttt{X} contains an unexplored
+directed-instruction pair $I_W \rightarrow I_R$, where $I_R$ reads a
+value written by $I_W$.
 %
 Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage} is
 executed first, alias coverage identifies \texttt{Interleaving \#1}
