@@ -116,6 +116,9 @@ in $I_{ST}$ that potentially exposes new interleaving segment coverage
 if executed concurrently.
 %
 Specifically, for each system call pair ($S_i$, $S_j$) in $I_{ST}$,
+
+
+
 the single-thread executor considers the sequential execution of $S_i$
 and $S_j$ as a seed interleaving, and draws an interleaving graph from
 the seed interleaving.
@@ -289,17 +292,17 @@ Each thread then runs an assigned system call concurrently, while
 the execution engine~(\autoref{ss:engine}) enforces a given schedule.
 
 
-During the execution of $I_{MT}$, \sys checks that the running thread
-interleaving causes a harmful behavior such as memory corruption or
-deadlock.
+During the execution of $I_{MT}$, the multi-thread executor also
+checks that the running thread interleaving causes a harmful behavior
+such as memory corruption or deadlock.
 %
-For this, \sys relies on various devloper tools such as assertions in
-the kernel, lockdep~\cite{lockdep}, kernel watchdog~\cite{watchdog}, and
-sanitizers~\cite{kasan, ubsan, asan}.
+For this, the multi-thread executor relies on various devloper tools
+such as assertions in the kernel, lockdep~\cite{lockdep}, kernel
+watchdog~\cite{watchdog}, and sanitizers~\cite{kasan, ubsan, asan}.
 %
 If these developer tools detect that an abnormal behavior occurs in
-the kernel, \sys writes a report of the abnormal behavior as well as
-$I_{MT}$ and the executed thread interleaving.
+the kernel, the multi-thread executor writes a report of the abnormal
+behavior as well as $I_{MT}$ and the executed thread interleaving.
 
 
 

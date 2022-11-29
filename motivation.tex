@@ -199,8 +199,8 @@ methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
 \PP{Less informative interleaving coverage}
 %
 We find that previously proposed interleaving coverage metrics are
-less-informative because none of them consider a combination of
-interleaving orders. Therefore, they are limited in distinguish two
+less-informative because none of them consider interleavings of
+multiple instructions. Thus, they are limited in distinguish two
 interleavings in \autoref{fig:alias-coverage}, and do not satisfy
 \textbf{Design goal 1}.
 
@@ -211,7 +211,7 @@ pair.
 %
 Alias coverage determines a thread interleaving \texttt{X} exposes a
 unique behavior if \texttt{X} contains an unexplored
-\blue{directed-instruction pair} $I_W \rightarrow I_R$, where $I_R$
+\red{directed-instruction pair} $I_W \rightarrow I_R$, where $I_R$
 reads a value written by $I_W$.
 %
 Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage} is
