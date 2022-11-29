@@ -259,7 +259,6 @@ interleavings.
 Unlike conventional fuzzers, concurrency fuzzers consider thread
 interleaving is another input domain that a fuzzer needs to explore.
 %
-
 To explore diverse thread interleavings, concurrency fuzzers adopt
 various thread interleaving exploration schemes.
 %
@@ -281,8 +280,7 @@ As Krace~\cite{krace} reveals, code coverage metrics (\eg, branch
 coverage) are not enough to capture unique behaviors of thread
 interleavings, because code coverage metrics only track behaviors in a
 single thread without paying attention to thread interleavings.
-
-
+%
 To capture unique behaviors of thread interleavings, a few concurrency
 fuzzers~\cite{conzzer, krace} come up with interleaving coverage
 metrics, which track the execution order of concurrent events between
