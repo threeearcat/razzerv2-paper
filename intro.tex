@@ -1,7 +1,6 @@
 \section{Introduction}
 \label{s:intro}
 
-\dr{TODO: term consistency: interleaving order <-> interleaved instruction}
 
 Multi-core era, many techniques are integrated in kernel to improve performance. 
 
@@ -32,14 +31,12 @@ have been proposed. SKI, Razzer, Snowboard, Krace.\yj{what else?}
 \dr{as far as I know, there are conzzer and muzz}
 % Snowboard uses edge-coverage...
 
-\dr{I am thinking about not mentioning Snowboard as a fuzzer. In fact,
-  it is *NOT* a concurrency fuzzer. The paper says Snowboard is a
-  framework to generate concurrenct test cases using a fuzzer.}
 
-\dr{Anyway, if we consider Snowboard as a fuzzer, Snowboard does not
+\dr{If we consider Snowboard as a fuzzer, Snowboard does not
   adopt an interleaving coverage metric, so it cannot distinguish two
   interleavings, and it relies on *heuristics* (= clustering
   strategies) to determine which interleavings should be explored}
+
 
 To overcome the limitation of previous approaches, this paper proposes
 \sys, a fuzzing framework for efficiently discovering kernel concurrency bugs.\yj{Do we focus only concurrency bugs?} \sys discovers not only data races but all interleaving-related bugs. 
@@ -81,7 +78,11 @@ This search strategy quickly navigates the search space than previous
 approaches where it only mutates a single interleaving in each search step.
 
 
+
 \yj{DR write some implementation summary and evaluation digests.}
+We implmenet \sys across various software layers.
+
+
 
 
 We describe our contributions in three folds:
