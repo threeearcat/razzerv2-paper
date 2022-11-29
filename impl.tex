@@ -28,9 +28,9 @@ In the following, we provide the overall design of
 \sys~(\autoref{ss:fuzzer}).
 %
 Then, we describe the target kernel
-instrumentation~(\autoref{ss:instrumentation}) to trace memory
-accesses, and the execution engine~(\autoref{ss:engine}) to control
-thread scheduling.
+instrumentation~(\autoref{ss:instrumentation}) to trace
+timestamp-annotated memory accesses, and the execution
+engine~(\autoref{ss:engine}) to control thread scheduling.
 %
 Lastly, we explain the implementation detail of
 \sys~(\autoref{ss:impl}).
@@ -377,7 +377,8 @@ when the memory access occurrs (\ie, \texttt{ts}).
 %
 During fuzzing, the userspace fuzzer reads values recorded in
 \texttt{Basicblock record} and \texttt{Memory access record}, and
-identify executed basic blocks and memory accesses.
+identify basic blocks and memory accesses executed by each system
+call.
 
 
 
@@ -635,10 +636,11 @@ larger than four.
 
 \sys overcomes this restriction by leveraging the fact that scheduling
 points are ordered. Specifically, the execution engine installs
-breakpoints on a first few (\eg, four) scheduling points, and when a
-installed breakpoint is hit, the execution engine moves a breakpoint
-onto the next scheduling point.
+breakpoints on first four scheduling points, and when a installed
+breakpoint is hit, the execution engine moves a breakpoint onto the
+next scheduling point.
 %
+\dr{}
 Also we expect that this restriction can be further mitigated by using
 a software breakpoint feature that does not have a restriction on the
 number of breakpoints.
@@ -660,6 +662,8 @@ number of breakpoints.
 
 
 \PP{Handling missing scheduling points}
+%
+\dr{TODO: rewrite}
 %
 It is worth noting that instructions on which scheduling points
 install may not be executed if the control flow changes due to kernel
@@ -698,7 +702,7 @@ running the kernel.
 
 Second, when a running thread tries to acquire a lock, the execution
 engine inspects whether the lock is held by a suspended thread to
-prevent unexpected block (\ie, both threads cannot make a progress).
+prevent unexpected block.
 %
 If it is the case, the execution engine performs preemption so that
 the lock-holder thread (\ie, the suspended thread) resumes the
