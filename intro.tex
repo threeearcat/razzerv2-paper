@@ -42,14 +42,13 @@ have been proposed. SKI, Razzer, Snowboard, Krace.\yj{what else?}
   strategies) to determine which interleavings should be explored}
 
 To overcome the limitation of previous approaches, this paper proposes
-\sys, a fuzzing framework for efficiently discovering kernel concurrency bugs.\yj{Do we focus only concurrency bugs?} \sys discovers not only data races but  
-
-
-Key insights: 
-i) new coverage metric reflecting the nature of concurrency bugs.
-ii) systematic, efficient search strategy guided by the coverage metric.
-
-
+\sys, a fuzzing framework for efficiently discovering kernel concurrency bugs.\yj{Do we focus only concurrency bugs?} \sys discovers not only data races but all interleaving-related bugs. 
+At its core, \sys aims to systematically explore the vast thread
+interleaving search space to quickly locate the multi-thread input and 
+interleavings leading to a concurrency bug. The key design idea of \sys 
+is i) defining a new, effective coverage metric reflecting the nature 
+of common concurrency bugs, and ii) performing our efficient search
+strategy guided by the coverage metric.
 
 
 We describe our contributions in three folds:
