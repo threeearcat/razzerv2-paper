@@ -287,7 +287,7 @@ besides execution order
 (represented in \texttt{Segment \#1}), a fuzzer easily rearranges
 interleaving orders of the three instructions to speculate 
 unexplored execution orders of these instructions such as
-$\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$ which
+($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) which
 causes the uninitialized access bug if executed.
 Therefore, instead of doing a randomized search (in most previous approaches), if a fuzzer figures out which of the enumerated interleavings have not been explored, \textit{a fuzzer can strategically 
 explore the search space with speculative interleavings, 
@@ -580,7 +580,7 @@ If new segment graphs are continuously discovered, it indicates that
 a fuzzer should
 invest more computing power to further explore thread interleavings.
 Otherwise, a fuzzer can conclude that the input no longer
-reveals an interesting combination of interleaving orders.
+reveals interesting interleavings.
 In practice, however, \intcov contains a large number of segment
 graphs, which consumes a large amount of memory even though the size
 of individual segment graphs is small.
@@ -591,12 +591,12 @@ so interleaving segment coverage is stored as a universal hash table of segment 
 To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
 %
 The key property of Merkel hashing is reflecting directions of edges,
-so that a fuzzer can distinguish different execution orders of the same
-vertices. For example, four segment graphs described in
+so that a fuzzer can distinguish different interleaving orders of the
+same vertices. For example, four segment graphs described in
 \autoref{fig:interleavingmutation} are hashed into different values.
 %
 Due to space constraints, we present how our graph hashing works in
-distinguishing different interleavings of the same vertices of
+distinguishing different interleavings of
 \autoref{fig:interleavingmutation} in \autoref{s:appendix:hash}.
 
 
