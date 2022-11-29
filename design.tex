@@ -569,7 +569,7 @@ the edges into $g$, resulting in
 %
 Lastly, a fuzzer gathers segment graphs into a set
 $G = \{g_1, g_2, ..., g_n\}$ (\ie, in \autoref{fig:keyidea}, $G$
-contains segment graphs corresponding to \texttt{Segment \#1},
+contains three segment graphs corresponding to \texttt{Segment \#1},
 \texttt{Segment \#2}, and \texttt{Segment \#3}), and uses $G$ to track
 interleaving segment coverage and to search unexplored thread
 interleavings.
@@ -787,10 +787,11 @@ over previous work?}
 \end{figure}
 
 
-\autoref{fig:hint} demonstrates a sketch of recomposing steps. Suppose we
-choose two mutated segment graphs from $G_{mutated}$ called
+\autoref{fig:hint} demonstrates a sketch of recomposing steps. Suppose
+we choose two mutated segment graphs from $G_{mutated}$ called
 \texttt{Segment \#1*} and \texttt{Segment \#2*} (\ie,
-\autoref{fig:hint}-(a)).
+\autoref{fig:hint}-(a)) that are derived from \texttt{Segment \#1} and
+\texttt{Segment \#2} in \autoref{fig:keyidea}-(b) respectively.
 %
 We can then merge the two segment graphs, resulting in a
 larger graph containing all vertices and all edges from \texttt{Segment
