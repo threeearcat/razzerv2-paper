@@ -34,12 +34,12 @@ have been proposed. SKI, Razzer, Snowboard, Krace.\yj{what else?}
 
 \dr{I am thinking about not mentioning Snowboard as a fuzzer. In fact,
   it is *NOT* a concurrency fuzzer. The paper says Snowboard is a
-  framework to generate concurrenct tests.}
+  framework to generate concurrenct test cases using a fuzzer.}
 
 \dr{Anyway, if we consider Snowboard as a fuzzer, Snowboard does not
   adopt an interleaving coverage metric, so it cannot distinguish two
-  interleavings, and it relies on *heuristics* to determine which
-  interleavings should be explored}
+  interleavings, and it relies on *heuristics* (= clustering
+  strategies) to determine which interleavings should be explored}
 
 To overcome the limitation of previous approaches, this paper proposes
 \sys, a framework for efficiently discovering kernel concurrency bugs. 
