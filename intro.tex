@@ -46,9 +46,31 @@ To overcome the limitation of previous approaches, this paper proposes
 At its core, \sys aims to systematically explore the vast thread
 interleaving search space to quickly locate the multi-thread input and 
 interleavings leading to a concurrency bug. The key design idea of \sys 
-is i) defining a new, effective coverage metric reflecting the nature 
-of common concurrency bugs, and ii) performing our efficient search
-strategy guided by the coverage metric.
+is i) defining a new, effective coverage metric reflecting the 
+common nature of concurrency bugs, and ii) performing an efficient search
+strategy to explore untested interleavings guided by the coverage metric.
+Hence, we show that \sys discovers concurrency bugs more quickly than 
+other approaches without compromising bug detecting capability 
+(sometimes, having better capability than previous work), saving a huge 
+amount of CPU costs in a large scale fuzzing. \sys achieves the goal 
+with the following two key ideas: segmentizing thread interleaving and speculative exploration  of interleavings.
+
+\PP{Segmentizing thread interleaving} From the execution of two threads,  
+\sys decomposes the large thread interleaving space into tractable 
+small sub-spaces, called \textit{interleaving segment} in which
+instructions access shared memory objects. The number of instructions 
+in a segment is small (four by default), so each segment may 
+contain multiple interleavings. Using interleaving segment, we propose 
+our new coverage metric, \textit{\intcov},
+defined as a set of detected segments. \Intcov generalizes coverage 
+metrics proposed by previous approaches where they only tracks 
+a single interleaving (the size of segment is 2)\yj{OK?}. 
+
+
+\PP{Speculative exploration of interleavings}
+
+
+\yj{DR write some implementation summary and evaluation digests.}
 
 
 We describe our contributions in three folds:
