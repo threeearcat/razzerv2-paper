@@ -83,6 +83,13 @@ approaches where it only mutates a single interleaving in each search step.
 We implmenet \sys across various software layers.
 
 
+We run \sys against the latest Linux kernel, and find \totalbugs
+concurrency bugs of which all of them show harmful behaviors such as
+memory corruptions, or assertion violations. We also emphasize that
+all concurrency bugs are found in subsystems where
+Syzkaller~\cite{syzkaller} is running for several years, demonstrating
+the effectiveness of \sys.
+%
 
 
 We describe our contributions in three folds:
