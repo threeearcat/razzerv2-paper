@@ -59,15 +59,22 @@ with the following two key ideas: segmentizing thread interleaving and speculati
 \sys decomposes the large thread interleaving space into tractable 
 small sub-spaces, called \textit{interleaving segment} in which
 instructions access shared memory objects. The number of instructions 
-in a segment is small (four by default), so each segment may 
+in a segment is small (at most four by default), and each segment may 
 contain multiple interleavings. Using interleaving segment, we propose 
-our new coverage metric, \textit{\intcov},
-defined as a set of detected segments. \Intcov generalizes coverage 
+our new coverage metric, \textit{\intcov}, defined as a set of detected segments. \Intcov generalizes coverage 
 metrics proposed by previous approaches where they only tracks 
 a single interleaving (the size of segment is 2)\yj{OK?}. 
+Using \intcov provides two benefits to fuzzers. First, a fuzzer can 
+consider interactions of multiple interleavings, which increase 
+accuracy of discovering concurrency bugs than considering a single 
+interleavings. A previous study\cite{learningfrommistakes} observes that
+most concurrency bugs occurs by interactions of at most four memory accesses of shared memory objects, implying multiple interleavings.
+Second, a fuzzer can generate unexplored interleavings for the next 
+search by referring to \intcov.
 
-
-\PP{Speculative exploration of interleavings}
+\PP{Speculative exploration of interleavings} To explore new interleavings,
+\sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
+in a 
 
 
 \yj{DR write some implementation summary and evaluation digests.}
