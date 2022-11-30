@@ -98,10 +98,14 @@ When discovering the uninitialized access bug, an interleaving
 coverage metric should distinguish different interleavings of multiple
 memory accesses.
 %
-For example, two interleavings in \autoref{fig:alias-coverage}-(a) and
-\autoref{fig:alias-coverage}-(b) should be distinguished, and thus,
+For example,
+$(\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4})$ (\ie,
+\autoref{fig:alias-coverage}-(a)) and
+$(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$ (\ie,
+\autoref{fig:alias-coverage}-(b)) should be distinguished, and thus,
 interleaving coverage should not be saturated until
-\autoref{fig:alias-coverage}-(b) is executed.
+$(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$ is
+executed.
 %
 Otherwise, a fuzzer may think that there is no more interesting thread
 interleaving in the multi-thread input after it executes

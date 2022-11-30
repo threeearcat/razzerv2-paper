@@ -121,12 +121,9 @@ which makes the problem of defining a coverage metric tractable while maintainin
   \label{fig:keyidea}
 \end{figure}
 %
-\autoref{fig:keyidea} illustrates three interleaving segments 
-from the single execution of two system calls, 
-%thread interleaving.
-%
-where the execution scenario is represented in
-\autoref{fig:keyidea}-(a).
+\autoref{fig:keyidea} illustrates interleaving segments from the
+single execution of two system calls, where the execution scenario is
+represented in \autoref{fig:keyidea}-(a).
 % example shows the execution of the two system calls 
 % and executed thread interleavings described in
 %
@@ -232,8 +229,7 @@ How to build segments is described in \autoref{ss:coverage}.
 
 \PP{Benefits of segmentizing thread interleaving}
 %
-Segmentizing instruction interleavings provides two 
-benefits to a fuzzer.
+Segmentizing thread interleavings provides two benefits to a fuzzer.
 %
 First, when defining an interleaving coverage metric, tracking
 explored interleavings in each segment gives a befitting guidance to
@@ -380,7 +376,7 @@ interleavings within an interleaving segment.
 % \intcov cannot be presented as a single instruction interleaving 
 % (e.g., $I_x \rightarrow I_y$) used in the alias coverage used in KRace.
 % Instead,
-We represent a thread interleaving as a DAG, where
+In the representation of DAG,
 % called an interleaving segment graph (shortly, \textit{segment
 %   graph}).
 %
@@ -591,8 +587,8 @@ so interleaving segment coverage is stored as a universal hash table of segment 
 To this end, we adopt Merkel hashing~\cite{treehashing, treehashing2}.
 %
 The key property of Merkel hashing is reflecting directions of edges,
-so that a fuzzer can distinguish different interleaving orders of the
-same vertices. For example, four segment graphs described in
+so that a fuzzer can distinguish different interleavings of the same
+vertices. For example, four segment graphs described in
 \autoref{fig:interleavingmutation} are hashed into different values.
 %
 Due to space constraints, we present how our graph hashing works in
