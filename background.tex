@@ -262,7 +262,7 @@ interleaving is another input domain that a fuzzer needs to explore.
 To explore diverse thread interleavings, concurrency fuzzers adopt
 various thread interleaving exploration schemes.
 %
-For instance, for every iteration, Razzer~\cite{razzer} and
+For instance, at every iteration, Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} selects a single pair of instructions, and
 determines and enforces their execution order.
 %
@@ -288,8 +288,9 @@ threads, ranging from a finer-granularity (\eg,
 instruction~\cite{krace}) to a coarser-granularity (\eg,
 function~\cite{conzzer}).
 %
-Concurrency fuzzers utilize interleaving coverage as a signal to
-determine if a multi-thread input needs to be further tested.
+Concurrency fuzzers utilize interleaving coverage when determining if
+thread interleavings of a multi-thread input needs to be further
+tested.
 
 % while repeatedly
 % executing a multi-thread input, and if the multi-thread input no

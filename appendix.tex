@@ -8,37 +8,65 @@
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.7\linewidth]{fig/interleavingmutation.pdf}
-  \caption{}
+  \includegraphics[width=0.7\linewidth]{fig/segmenthash.pdf}
+  \caption{Two different interleaving segment graphs representing
+    different interleavings of \texttt{A2}, \texttt{A4}, and
+    \texttt{B1} from \autoref{fig:cve-2017-17712}.}
   \label{fig:segmenthash}
 \end{figure}
 %
 
-In particular, for all vertices $v$ in $V_i$, we first calculate a
-hash value of $v$, $hash(v)$, which reflects its out-going edges. With
-$o_1, ..., o_m$ that $v \rightarrow o_x \in E_i$,
+In order to distinguish different interleavings of the same vertices,
+we adopt Merkel hashing~\cite{treehashing, treehashing2}.
+%
+In particular, given a graph $G = (V, E)$, for all vertices $v \in V$,
+we first calculate a hash value of $v$, $hash(v)$, which reflects its
+out-going edges.
+%
+Let us denote $o_1, ..., o_m$ as vertices that is connected by an edge
+$v \rightarrow o_x$. Then, $hash(v)$ is calculated as follow:
 %
 %
-\\[1pt]
+\\
 \[
   hash(v) = \mathcal{H}(v.label {++} o_1.label {++} ... {++}
   o_m.label)
 \]
-\\[1pt]
+\\
 %
-where $\mathcal{H}$ denotes the
-non-cryptographic FNV hash function~\cite{fnv, fnv-go}, and ${++}$
-denotes the label-concatenation operation.
+where $\mathcal{H}$ denotes the non-cryptographic FNV hash
+function~\cite{fnv, fnv-go}, and ${++}$ denotes the
+label-concatenation operation.
 %
-Then,
+Then, $hash(G)$ is defined as follows:
 %
 \\[1pt]
 \[
-  hash(g_i) = \underset{v \in V_i}{\oplus} hash(v)
+  hash(G) = \underset{v \in V}{\oplus} hash(v)
 \]
 \\[1pt]
 %
 where $\oplus$ denotes the XOR operation.
+
+Applying $hash(G)$ to \autoref{fig:segmenthash}, $hash(\texttt{B1})$
+is calculated as $\mathcal{H}(\texttt{A2} ++ \texttt{A4})$ in
+\autoref{fig:segmenthash}-(a), whereas, $hash(\texttt{B1})$ is
+calculated as $\mathcal{H}(\texttt{A4})$ in
+\autoref{fig:segmenthash}-(b).
+%
+Thus, hash values of even vertices labeled same (\ie, corresponding to
+the same instruction) is calculated differently according to edges
+connected to the vertex.
+%
+Likewise, values of $hash(\texttt{A2})$ are also calculated
+differently in the two graphs as the direction of edges connecting
+\texttt{A2} and \texttt{B1} is different in the two graphs.
+%
+As a consequence, values of $hash(G)$ (which are calculated as
+$hash(\texttt{B1}) \oplus hash(\texttt{A2}) \oplus hash(\texttt{A4}$))
+of \autoref{fig:segmenthash}-(a) and (b) are different, and \sys can
+distinguish the two graphs in \autoref{fig:segmenthash} using hash
+values of the two graphs.
 
 
 
