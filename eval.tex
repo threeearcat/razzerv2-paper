@@ -72,7 +72,6 @@ It is worth noting that in our evaluation, all concurrency bugs are
 found by observable and harmful incidents such as kernel panics or
 KASAN reports.
 %
-
 Interestingly, we find that many of bugs was previously found and
 addressed, but they reoccur possibly because of their incomplete
 fixes~\cite{learningfrommistakes}.
@@ -82,7 +81,7 @@ In \autoref{table:newbugs}, three that are marked in the
 after their fixes are applied.
 %
 These cases emphasize the importance of effective testing even after
-bugs are exposed and fixed accordingly.
+bugs are exposed and addressed accordingly.
 
 
 
@@ -137,18 +136,18 @@ For a fair comparison, our concurrency bug selection criteria are 1)
 concurrency bugs are used in previous studies~\cite{exprace, razzer,
   snowboard, moonshine, fuze}, and 2) their exploits are publicly
 available so that we can make use of them for our evaluation.
-
+%
 But there are few exceptions as follows: Although the exploit of
 \texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
 we successfully reproduce the concurrency bug from the description of
 the Snowboard~\cite{snowboard} paper. Thus, we inlcude this
 concurrency bug into the concurrency bug list for evaluation.
 %
-Whereas, even though Krace~\cite{krace} studies a subset of kernel
-concurrency bugs (\ie, data races), we do not take concurrency bugs
-from Krace, because we do not have access to ones used in Krace.
+% Whereas, even though Krace~\cite{krace} studies a subset of kernel
+% concurrency bugs (\ie, data races), we do not take concurrency bugs
+% from Krace, because we do not have access to ones used in Krace.
 %
-Also, we exclude two Android-related concurrency bugs (\ie,
+Whereas, we exclude two Android-related concurrency bugs (\ie,
 CVE-2019-1999~\cite{cve20191999} and CVE-2019-2025~\cite{cve20192025})
 evaluted by ExpRace~\cite{exprace}, because their exploits require to
 execute Android-specific code spaces where the current implementation
@@ -173,8 +172,8 @@ We measure the number of executions and the elapsed time required to
 discover each concurrency bug.
 %
 However, these metrics heavily depend on initial seeds and the process
-of mutating seeds, which may vary across evaluations, and are known as
-impediments for a fair fuzzing evaluation~\cite{fuzzingeval}.
+of mutating seeds, which may vary across evaluations and disturb a
+fair fuzzing evaluation~\cite{fuzzingeval}.
 %
 In order to minimize effects of such impediments, we manually provide
 a multi-thread input as well as a pair of system calls that can cause
@@ -260,7 +259,7 @@ The example of CVE-2017-17712 described in \autoref{s:motivation}
 out; alias coverage considers only interleavings between two
 instructions, which is \textit{not sufficient} to capture the
 offending interleaving containing multiple instructions. In fact, all
-listed concurrency bugs are caused by the interleaving order of three
+listed concurrency bugs are caused by thread interleavings of three
 or four instructions.
 %
 On the other hand, alias coverage is saturated really quickly. With

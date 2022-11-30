@@ -13,7 +13,7 @@
 % %
 % Specifically, our key idea lies in three steps:
 
-This work focuses on how to efficiently explore the large search space
+This work focuses on how to efficiently explore the vast search space
 of thread interleaving when a multi-thread input (\eg,
 \texttt{sendmsg()} and \texttt{setsockopt()} in
 \autoref{fig:cve-2017-17712}) is given. Our approach utilizes an
@@ -270,9 +270,8 @@ Accordingly, \textit{interleavings in each segment can act as an
 
 
 
-Second, explored interleaving segments can be used to
-systematically search for instruction interleavings in next 
-iterations.
+Second, explored interleaving segments can be used to systematically
+search for interleavings in next iterations.
 %
 Since each interleaving segment contains only a small number of memory
 accesses, a fuzzer can speculatively creates new interleavings
@@ -340,8 +339,8 @@ satisfying \textbf{Design goal 2}}.
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-As discussed, we \textbf{decompose} an explored instruction interleavings
-into interleaving segments.
+As discussed, we \textbf{decompose} an explored interleavings into
+interleaving segments.
 %
 We first represent observed interleavings as a directed acyclic graph
 (DAG). Then, we compute subgraphs of the DAG called \textit{segment
@@ -466,10 +465,10 @@ different threads.
 computes segment graphs from the execution example of
 \autoref{fig:keyidea}-(a).
 %
-First, instruction interleavings are represented as DAGs.
+First, the given thread interleaving is represented as a DAG.
 Given that the execution in \autoref{fig:keyidea}-(a) involves 
 five memory accesses, a fuzzer generates five vertices, 
-each of which corresponds to a memory-accessing instruction, 
+each of which corresponds to a memory-accessing instruction 
 as shown in \autoref{fig:interleavingsegmentgraph}-(a).
 %
 Between these vertices, a fuzzer generates edges to represent
@@ -485,7 +484,7 @@ interleaving between \texttt{B1} and \texttt{A2} that access the same
 memory object (\ie, \texttt{inet->hdrincl}).
 %
 As a result, a fuzzer constructs a DAG to describe the whole
-interleavings and their orders.
+thread interleaving.
 
 % Given a list of memory accesses, a fuzzer firstly generates vertices
 % $v_1$, $v_2$, ..., $v_k$ that correspond to executed memory accesses.
@@ -562,12 +561,12 @@ the edges into $g$, resulting in
 \autoref{fig:interleavingsegmentgraph}-(b).
 %
 Lastly, a fuzzer gathers segment graphs into a set
-$G = \{g_1, g_2, ..., g_n\}$ (\ie, in \autoref{fig:keyidea}, $G$
+$G = \{g_1, g_2, ..., g_n\}$ (\eg, in \autoref{fig:keyidea}, $G$
 contains three segment graphs corresponding to \texttt{Segment \#1},
 \texttt{Segment \#2}, and \texttt{Segment \#3}), and uses $G$ to track
 interleaving segment coverage and to search unexplored thread
 interleavings.
-%
+
 
 
 \PP{Tracking interleaving segment coverage}
@@ -659,10 +658,9 @@ To explore the interleaving search space, we use detected segment
 graphs.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
-segments into \textit{unexplored} interleaving segments, where each
-mutated segment contains interleavings to be tested. 
-Using \intcov, a fuzzer can identify if a newly mutated segment 
-is tested or not.
+segments into \textit{unexplored} interleaving segments, where mutated
+segments contain interleavings to be tested.  Using \intcov, a fuzzer
+can identify if a newly mutated segment is tested or not.
 %
 Afterwards, a fuzzer \textbf{recomposes} mutated segments
 to obtain a whole sequence of interleavings, and generates 
@@ -697,7 +695,8 @@ scheduling points from the recomposed interleaving.
 % \textit{mutating a segment graph}.
 % %
 Suppose a set of \textit{explored} segment graphs
-$G = \{g_1, g_2, ..., g_n \}$ is given.
+$G = \{g_1, g_2, ..., g_n \}$ (\ie, \autoref{fig:keyidea}-(b)) is
+given.
 %
 For each $g_i \in G$, a fuzzer mutates $g_i$ by flipping a direction 
 of its interleaving-order edges, which implies changing 
