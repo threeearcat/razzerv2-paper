@@ -2,7 +2,7 @@
 \label{s:impl}
 
 \sys is a kernel fuzzer tailored to effectively discover concurrency
-bugs, where its key improvement lies in adopting interleaving segment
+bugs, where its key improvements lie in adopting interleaving segment
 coverage (\autoref{ss:coverage}) and the speculative interleaving
 exploration (\autoref{ss:scheduler}).
 %
@@ -114,17 +114,16 @@ Specifically, for each system call pair ($S_i$, $S_j$) in $I_{ST}$,
 the single-thread executor collects memory accesses executed by the
 two system calls. Then, with these memory accesses, the single-thread
 executor computes a set of explored segment graphs $G$ (as described
-in \autoref{ss:coverage}), and a set of unexplored mutated segment
-graphs $G_{mutated}$ (as described in \autoref{ss:scheduler}).
+in \autoref{ss:coverage}), and checks $G$ contains new segment graphs
+that have not been explored.
 %
-If $G_{mutated}$ is not empty, the single thread executor passes
-$I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the next
-phase, the multi-thread fuzzing.
+If so, the single thread executor passes $I_{ST}$ as well as ($S_i$,
+$S_j$) and $G$ to the next phase, the multi-thread fuzzing.
 
 
-\PP{Example of CVE-2017-17712 in single-thread fuzzing}
+\PP{CVE-2017-17712 in single-thread fuzzing}
 %
-Let us explain how \sys discovers CVE-2017-17712 explained in
+Let us explain how \sys discovers CVE-2017-17712 demonstrated in
 \autoref{fig:cve-2017-17712}.
 %
 Assume the single-thread generator produces $I_{ST}$ as a sequence of
@@ -133,15 +132,13 @@ system calls (\texttt{r0 = socket()}, \texttt{setsocktopt(r0)},
 %
 After $I_{ST}$ is executed, from two system calls
 \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)}, the single-thread
-executor computes a set of segment graphs $G$ including
+executor computes a set of segment graphs $G$, which includes
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$) (\ie,
 \autoref{fig:alias-coverage}-(a)).
 %
-Then by deriving a set of mutated segment graphs $G_{mutated}$, the
-single-thread executor realizes that the two system calls possibly
-exhibits unexplored interleaving
-($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) (\ie,
-\autoref{fig:alias-coverage}-(b)) if executed concurrently.
+While ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
+has not been explored before, \sys determines that it is worth
+exploring interleavings between the two system calls.
 %
 Consequently, the single-thread executor passes $I_{ST}$ as well as
 the two system calls and $G_{mutated}$ to the next phase, multi-thread
@@ -180,13 +177,12 @@ fuzzing.
 \subsubsection{Multi-thread fuzzing}
 \label{sss:multithreadfuzzing}
 %
-After $I_{ST}$ is passed with ($S_i$, $S_j$) and
-$G_{mutated}$, the \textit{multi-thread generator} transforms
-$I_{ST}$ to a multi-thread input $I_{MT}$.
+After $I_{ST}$ is passed with ($S_i$, $S_j$) and $G$, the
+\textit{multi-thread generator} transforms $I_{ST}$ to a multi-thread
+input $I_{MT}$.
 %
 In addition, the multi-thread generator produces \textit{schedules}
-where each schedule describes how to enforce thread interleaving
-during runtime.
+where each schedule contains a set of scheduling points.
 %
 The \textit{multi-thread executor} then repeatedly tests each schedule
 of $I_{MT}$ with a support of the execution
@@ -243,12 +239,8 @@ engine~(\autoref{ss:engine}).
 %
 The multi-thread generator has two roles, 1) transforming $I_{ST}$
 into a multi-thread input $I_{MT}$ and 2) generating various
-schedules.
-
-
-
-
-
+schedules from a set of explored segment graphs $G$.
+%
 % \begin{figure}[t]
 %   \scriptsize
 %   \centering
@@ -257,16 +249,15 @@ schedules.
 %       much}}
 %   \label{f:mt-conversion}
 % \end{figure}
-Given $I_{ST}$ and ($S_i$, $S_j$), the multi-thread generator produces
-$I_{MT}$ which preserves all system calls in $I_{ST}$, but executes
-$S_i$ and $S_j$ concurrently.
+Given $I_{ST}$ and ($S_i$, $S_j$), the multi-thread generator first
+produces $I_{MT}$ which preserves all system calls in $I_{ST}$, but
+executes $S_i$ and $S_j$ concurrently.
 %
-Assuming $1 \le i < j \le n$, where n is the total number of syscalls
-in $I_{ST}$, the input transformation is simply done by dividing
+Assuming $i < j$, the input transformation is simply done by dividing
 $I_{ST}$ into two parts.
 %
 The first part contains system calls from the 1st to the i-th, and the
-second part contains system calls from the (i+1)-th to the n-th.
+second part contains system calls from the (i+1)-th to the last.
 %
 Later, these two parts will be executed by two different threads,
 while $S_i$ and $S_j$ will be executed concurrently. A detailed
@@ -274,18 +265,22 @@ example is provided in \autoref{s:appendix:inputtransform}.
 
 
 
-\dr{wip.}
 On the other hand, the multi-thread generator repeatedly produces
 various schedules.
 %
-To generate schedules, as described in \autoref{ss:scheduler}, the
-multi-thread generator repeat selecting a subset of $G_{mutated}$,
-$G^{*}_{mutated}$, a set of segment mutations, and forms a schedule
-for the selected subset until consuming $G_{mutated}$.
+To generate schedules, the multi-thread generator implements the
+speculative interleaving exploration method detailed in
+\autoref{ss:scheduler}.
 %
-Each generated schedule as well as $I_{MT}$ is passed to the
-fg
-multi-thread executor to explore thread interleaving.
+Briefly explaining, given a set of explored segment graphs $G$, the
+multi-thread generator mutates segment graphs in $G$ to derive a set
+of unexplored mutated segment graphs $G_{mutated}$.
+%
+Then, the multi-thread generator selects a subset of $G_{mutated}$,
+$G^{*}_{mutated}$, and forms a schedule for testing $G^*_{mutated}$.
+%
+Lastly, the generated schedule and $I_{MT}$ is passed to the
+multi-thread executor.
 
 
 
@@ -297,16 +292,9 @@ multi-thread executor to explore thread interleaving.
 The multi-thread executor runs $I_{MT}$ while enforcing a schedule
 generated by the multi-thread generator.
 %
-To this end, the multi-thread executor spawns multiple threads and
-assigns system calls to the threads.
-%
-Each thread then runs an assigned system call concurrently, while
-the execution engine~(\autoref{ss:engine}) enforces a given schedule.
-
-
-During the execution of $I_{MT}$, the multi-thread executor also
-checks that the running thread interleaving causes a harmful behavior
-such as memory corruption or deadlock.
+During the execution of $I_{MT}$, the multi-thread executor checks
+that the running thread interleaving causes a harmful behavior such as
+memory corruption or deadlock.
 %
 For this, the multi-thread executor relies on various devloper tools
 such as assertions in the kernel, lockdep~\cite{lockdep}, kernel
@@ -328,11 +316,23 @@ calls executed.
 %
 With these memory accesses, the multi-thread executor probes for
 segment coverage as described in \autoref{ss:coverage}. In addition,
-it derives more unobserved segment graphs as the single-thread
-executor does, and feeds unobserved segment graphs to the multi-thread
+it derives more unexplored segment graphs as the single-thread
+executor does, and feeds unexplored segment graphs to the multi-thread
 generator to further explore thread interleavings.
 
 
+
+\PP{CVE-2017-17712 in multi-thread fuzzing}
+%
+Once receiving $I_{ST}$, the multi-thread generator transforms
+$I_{ST}$ into $I_{MT}$. In this example, thread~A executes two system
+calls, \texttt{r0 = socket{}} and \texttt{setsockopt(r0)}, and
+thread~B executes one system call \texttt{sendmsg(r0)}, while two
+system calls \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)} will be
+executed concurrently (as described as $I_{MT}$ in
+\autoref{fig:workflow}).
+%
+\dr{wip.}
 
 
 
