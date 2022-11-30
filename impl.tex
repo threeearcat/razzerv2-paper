@@ -141,8 +141,7 @@ has not been explored before, \sys determines that it is worth
 exploring interleavings between the two system calls.
 %
 Consequently, the single-thread executor passes $I_{ST}$ as well as
-the two system calls and $G_{mutated}$ to the next phase, multi-thread
-fuzzing.
+the two system calls and $G$ to the next phase, multi-thread fuzzing.
 
 
 
@@ -333,9 +332,18 @@ system calls \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)} will be
 executed concurrently (as described as $I_{MT}$ in
 \autoref{fig:workflow}).
 %
-\dr{}
+Furthermore, the multi-thread generator produces a schedule according
+to the speculative interleaving exploration. Given $G$ including
+($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$), the
+multi-thread generator produces a mutated segment graph corresponding
+to ($\texttt{A2} \Rightarrow \texttt{B2} \Rightarrow \texttt{A4}$)
+(refer \autoref{fig:interleavingmutation}). Then, the multi-thread
+generator generates a schedule to test
+($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) (refer
+\autoref{fig:hint}).
 %
-
+Lastly, when the multi-thread executor runs $I_{MT}$ with the
+generated schedule, the uninitialized access bug is triggered.
 
 
 
