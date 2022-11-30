@@ -3,10 +3,9 @@
 
 \sys is a kernel fuzzer tailored to effectively discover concurrency
 bugs, where its key improvement lies in adopting interleaving segment
-coverage and the speculative interleaving exploration described in
-\autoref{s:design}.
+coverage (\autoref{ss:coverage}) and the speculative interleaving
+exploration (\autoref{ss:scheduler}).
 %
-
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
 fuzzing.
 %
@@ -62,12 +61,9 @@ produces a single-thread input (referred as $I_{ST}$) in the form of a
 sequence of random system calls.
 %
 And then, the \textit{single-thread executor} runs $I_{ST}$ to perform
-two tasks.
-%
-First, it tracks code coverage of $I_{ST}$ as conventional fuzzing
-does. Second, it identifies two system calls in $I_{ST}$ that
-potentially exhibit new interleaving segment coverage.  If identified,
-$I_{ST}$ will be passed to the next stage, the multi-thread fuzzing.
+identify two system calls in $I_{ST}$ that potentially exhibit new
+interleaving segment coverage.  If identified, $I_{ST}$ will be passed
+to the next stage, the multi-thread fuzzing.
 
 
 \PP{Single-thread generator}
@@ -84,10 +80,10 @@ call sequence based on well-formed system call description grammar
 including types of arguments and the type of a return value, as well
 as a range of feasible values of each argument.
 %
-According to \texttt{Syzlang}, \sys produces a single-thread system
-call sequence by repeatedly selecting a random system call and
-providing reasonable arguments of the system call.
-
+With \texttt{Syzlang}, \sys produces a single-thread system call
+sequence by repeatedly selecting a random system call and providing
+reasonable arguments of the system call.
+%
 The mutation strategy is an alternative of the generation strategy.
 When using a mutation strategy, \sys picks up an already-generated
 single-thread input, and modifies the single-thread input by appending
@@ -115,24 +111,41 @@ in $I_{ST}$ that potentially exposes new interleaving segment coverage
 if executed concurrently.
 %
 Specifically, for each system call pair ($S_i$, $S_j$) in $I_{ST}$,
-
-
-
-the single-thread executor considers the sequential execution of $S_i$
-and $S_j$ as a seed interleaving, and draws an interleaving graph from
-the seed interleaving.
-%
-To derive segment graphs that have not been explored, then the
-single-thread executor decomposes the interleaving graph into a set of
-segment graphs $G$ (as described in \autoref{ss:coverage}), and
-mutates segment graphs $g_i$ contained in $G$ to construct a set of
-unexplored mutated segment graphs $G_{mutated}$ (as described in
-\autoref{ss:scheduler}).
+the single-thread executor collects memory accesses executed by the
+two system calls. Then, with these memory accesses, the single-thread
+executor computes a set of explored segment graphs $G$ (as described
+in \autoref{ss:coverage}), and a set of unexplored mutated segment
+graphs $G_{mutated}$ (as described in \autoref{ss:scheduler}).
 %
 If $G_{mutated}$ is not empty, the single thread executor passes
 $I_{ST}$ as well as ($S_i$, $S_j$) and $G_{mutated}$ to the next
 phase, the multi-thread fuzzing.
 
+
+\PP{Example of CVE-2017-17712 in single-thread fuzzing}
+%
+Let us explain how \sys discovers CVE-2017-17712 explained in
+\autoref{fig:cve-2017-17712}.
+%
+Assume the single-thread generator produces $I_{ST}$ as a sequence of
+system calls (\texttt{r0 = socket()}, \texttt{setsocktopt(r0)},
+\texttt{sendmsg(r0)}) as described in \autoref{fig:workflow}.
+%
+After $I_{ST}$ is executed, from two system calls
+\texttt{setsockopt(r0)} and \texttt{sendmsg(r0)}, the single-thread
+executor computes a set of segment graphs $G$ including
+($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$) (\ie,
+\autoref{fig:alias-coverage}-(a)).
+%
+Then by deriving a set of mutated segment graphs $G_{mutated}$, the
+single-thread executor realizes that the two system calls possibly
+exhibits unexplored interleaving
+($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) (\ie,
+\autoref{fig:alias-coverage}-(b)) if executed concurrently.
+%
+Consequently, the single-thread executor passes $I_{ST}$ as well as
+the two system calls and $G_{mutated}$ to the next phase, multi-thread
+fuzzing.
 
 
 
