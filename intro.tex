@@ -10,8 +10,8 @@ Multi-core era, many techniques are integrated in kernel to improve performance.
 The consequence of kernel concurrency bugs is disastrous. They crash
 the entire system, breaking availability or causing data loss. 
 Furthermore, attackers 
-exploit a concurrency bugs to mount a privilege escalation attack.
-A recent study~\cite{exprace} demonstrates that an user-level attacker 
+exploit concurrency bugs to mount a privilege escalation attack.
+A recent study~\cite{exprace} demonstrates that a user-level attacker 
 reliably exploits non-deterministic concurrency bugs without performing
 brute-force attacks.
 
@@ -21,12 +21,11 @@ In contrast to non-concurrency bugs which can be identified by
 sequential testing of a single thread execution,
 kernel concurrency bugs are typically caused by the concurrent execution 
 of two or more threads.
-Kernel concurrency bugs manifest only by a specific sequence of
-instruction interleavings between threads. The interleavings happens 
-rarely because it happens only when a specific timing condition is met.
-To discover concurrency bugs, it is not practical to explore all
-the possible interleavings because the number of instruction
-executed by a system call in Linux is huge.
+Kernel concurrency bugs only appear in a particular pattern of 
+interleavings between threads. The thread interleaving happens 
+rarely because it takes place only when a certain timing condition is met.
+However, to discover concurrency bugs, exploring all the possible interleavings is not practical because 
+the number of instructions executed by a system call in Linux is huge.
 %Due to such difficulty, traditional fuzzers..
 
 To increase efficiency of concurrency bug fuzzing, several approaches
@@ -41,72 +40,70 @@ have been proposed. SKI, Razzer, Snowboard, Krace.\yj{what else?}
   strategies) to determine which interleavings should be explored}
 
 
-To overcome the limitation of previous approaches, this paper proposes
-\sys, a fuzzing framework for efficiently discovering kernel concurrency bugs.\yj{Do we focus only concurrency bugs?} \sys discovers not only data races but all interleaving-related bugs. 
+To overcome the shortcoming of existing methods, this paper proposes
+\sys, a fuzzing framework for kernel concurrency bugs. 
+\sys discovers not only data races but 
+all interleaving-related bugs. 
 At its core, \sys aims to systematically explore the vast thread
-interleaving search space to quickly locate the multi-thread input and 
-interleavings leading to a concurrency bug. The key design idea of \sys 
-is i) defining a new, effective coverage metric reflecting the 
-common nature of concurrency bugs, and ii) performing an efficient search
-strategy to explore untested interleavings guided by the coverage metric.
-Hence, we show that \sys discovers concurrency bugs more quickly than 
-other approaches without compromising bug detecting capability 
-(sometimes, having better capability than previous work), saving a huge 
-amount of CPU costs in a large scale fuzzing. \sys achieves the goal 
-with the following two key ideas: segmentizing thread interleaving and speculative exploration  of interleavings.
+interleaving search space to quickly identify the multi-thread input and 
+interleavings leading to a concurrency bug. The central idea behind \sys's design
+is i) defining a new, effective coverage metric that reflects the 
+common nature of concurrency bugs and ii) use that metric to drive 
+an efficient search strategy for discovering previously untested interleavings.
+Hence, we demonstrate that \sys saves a significant amount of CPU expenses 
+in large-scale fuzzing by fast finding concurrent bugs, 
+without sacrificing bug-detecting capability (sometimes having better 
+capability than earlier work).
+\sys achieves the goal with the following two key ideas: segmentizing thread interleaving and speculative exploration  of interleavings.
 
 \PP{Segmentizing thread interleaving} From the execution of two threads,  
 \sys decomposes the large thread interleaving space into tractable 
 small sub-spaces, called \textit{interleaving segment} in which
 instructions access shared memory objects. The number of instructions 
 in a segment is small (at most four by default), and each segment may 
-contain multiple interleavings. Using interleaving segment, we propose 
+contain multiple interleavings. Using interleaving segments, we propose 
 our new coverage metric, \textit{\intcov}, defined as a set of detected segments. \Intcov generalizes coverage 
 metrics proposed by previous approaches where they only tracks 
-a single interleaving (the size of segment is 2)\yj{OK?}. 
+a single interleaving (the size of a segment is 2)\yj{OK?}. 
 Using \intcov provides two benefits to fuzzers. First, a fuzzer can 
-consider interactions of multiple interleavings, which increase 
-accuracy of discovering concurrency bugs than considering a single 
-interleavings. A previous study~\cite{learningfrommistakes} observes that
-most concurrency bugs occurs by interactions of at most four memory accesses of shared memory objects, implying multiple interleavings.
-Second, a fuzzer can generate unexplored interleavings for the next 
-search by referring to \intcov.
+take into account the interactions of multiple interleavings, which increases
+accuracy of discovering concurrency bugs in comparison to considering a single 
+interleavings. A previous study~\cite{learningfrommistakes} identifies that
+most concurrency bugs occurs by multiple interleavings involving 
+at most four memory accesses of shared memory objects.
+Second, using \intcov, a fuzzer can produce a thread interleaving
+that have not yet been found for the subsequent search.
 
-\PP{Speculative exploration of interleavings} To explore new interleavings,
+\PP{Speculative exploration of interleavings} \yj{Speculative exploration
+might be a misleading term} To explore new interleavings,
 \sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
 in a segment, which generates new interleavings for testing. \sys 
 mutates as many segments as possible in the expectation that the 
 new interleavings include a large number of untested interleavings. 
 This search strategy quickly navigates the search space than previous 
-approaches where it only mutates a single interleaving in each search step.
+approaches in which only one interleaving is mutated at each search step
 
-
-
-\yj{DR write some implementation summary and evaluation digests.}
-%
 We implement \sys across various software layers.
-The \sys's core fuzzing framework embracing the aforementioned key
-ideas is implemented based on Syzkaller~\cite{syzkaller}.
+We extend Syzkaller~\cite{syzkaller} to generate concurrency fuzzing inputs 
+and segment mutations. 
 %
 In addition, \sys incorporates a LLVM pass to transform a kernel
 binary for tracking \intcov, and the QEMU/KVM-based execution engine
-to enforce thread scheduling as desired.
+to enforce thread scheduling obtained by segment mutations. 
 %
 We run \sys against the latest version of the Linux kernel (ranging
-from 5.19-rc2 to 6.0-rc7), and find \totalbugs concurrency bugs of
-which all of them show harmful behaviors such as memory corruptions,
-task hangs, or assertion violations. We also emphasize that all
-concurrency bugs are found in subsystems where
+from 5.19-rc2 to 6.0-rc7), and find new \totalbugs concurrency bugs all of
+which exhibits harmful behaviors such as memory corruption,
+task hangs, or assertion violations. We emphasize that all
+concurrency bugs found by \sys were lurking in subsystems where
 Syzkaller~\cite{syzkaller} has been testing for several years, which
-demonstrates the effectiveness of \sys.
+demonstrates the usefulness of \sys in bug-finding capability.
 %
-Moreover, we experimentally compare \sys against the state-of-the-art
-related work, showing that \sys can discover concurrency bugs more
-quickly than previous works.
-
-
-
-
+To quantify the efficiency of \sys, we experimentally compare \sys 
+against the state-of-the-art techniques, Snowboard and KRACE and 
+demonstrate that \sys discover concurrency bugs more quickly 
+(up to \yj{xx}$\times$) than previous work using the segment mutation 
+technique.
 
 We describe our contributions in three folds:
 
