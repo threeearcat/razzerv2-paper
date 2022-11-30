@@ -180,6 +180,9 @@ interleaving exploration boosts up the concurrency bug discovery, as
 it directs the fuzzer to execute unexplored thread interleaving
 instead of executing random interleavings thousands of times.
 
+
+\dr{cut?}
+%
 In summary, using the coverage metric expressing interleavings of
 multiple memory accesses and the speculative interleaving exploration,
 a fuzzer can effectively determine what to execute in future
@@ -214,13 +217,12 @@ methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
 %
 We find that previously proposed interleaving coverage metrics are
 limited in distinguishing two interleavings in
-\autoref{fig:alias-coverage}, because they consider a \textit{part of
-  the offending interleaving} (\eg, two instructions). Thus, they do
-not satisfy \textbf{Design goal 1}.
+\autoref{fig:alias-coverage}, because \textit{none of them considers
+  interleavings of multiple memory accesses}.  Thus, they do not
+satisfy \textbf{Design goal 1}.
 %
 For example, let us suppose we adopt alias coverage~\cite{krace},
-which tracks interleaving orders of a \textit{single} instruction
-pair.
+which tracks interleaving orders of \textit{two} instructions.
 %
 Alias coverage determines an interleaved execution \texttt{X} exposes
 a new interleaving if \texttt{X} contains an unexplored
@@ -238,6 +240,7 @@ However, according to alias coverage, \texttt{Interleaving \#2}, which
 causes the uninitialized access bug, does not contain any new coverage
 because ($\texttt{B1} \rightarrow \texttt{A4}$) is already explored in
 \texttt{Interleaving \#1}.
+%
 % Krace considers that growing alias coverage is a promising signal 
 % to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase alias coverage in this scenario.
 %But, when alias coverage faces \texttt{Interleaving \#2} after
