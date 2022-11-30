@@ -199,12 +199,11 @@ methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
 \PP{Less informative interleaving coverage}
 %
 We find that previously proposed interleaving coverage metrics are
-less-informative because none of them consider interleavings of
-multiple instructions. Thus, they are limited in distinguish two
-interleavings in \autoref{fig:alias-coverage}, and do not satisfy
-\textbf{Design goal 1}.
-
-
+less-informative because they consider a \textit{part of the offending
+  interleaving} (\eg, two instructions). Thus, they are limited in
+distinguish two interleavings in \autoref{fig:alias-coverage}, and do
+not satisfy \textbf{Design goal 1}.
+%
 For example, let us suppose we adopt alias coverage~\cite{krace},
 which tracks interleaving orders of a \textit{single} instruction
 pair.
@@ -216,8 +215,8 @@ value written by $I_W$.
 %
 Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage} is
 executed first, alias coverage identifies \texttt{Interleaving \#1}
-exposes unique behaviors when it sees two unexplored
-directed-instruction pair: ($\texttt{B1} \rightarrow \texttt{A2}$) and
+exposes new behaviors when it sees two unexplored directed-instruction
+pair: ($\texttt{B1} \rightarrow \texttt{A2}$) and
 ($\texttt{B1} \rightarrow \texttt{A4}$).
 %
 % The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
@@ -239,20 +238,22 @@ fuzzer needs to run these two system calls more, misleading a fuzzer
 to de-prioritize a multi-thread input in which a concurrency bug
 resides and switch to other inputs. In evaluation, we quantify the
 limitation in \autoref{table:comparison-interleaving-search}.
-
-\dr{I want to cut concurrenct call pair}
-Likewise, concurrent call pair~\cite{conzzer} coverage also suffers from
-distinguishing these two thread interleavings.
 %
-While concurrent call pair tracks a concurrently-executed function
-pair, it is not aware of the fine-grained orders of instruction interleavings within a function.
-%
-Since two thread interleavings in \autoref{fig:alias-coverage} take
-place in the same function (\ie, \texttt{A2} and \texttt{A4} are
-executed in the same function), concurrent call pair is also limited
-in distinguishing the two interleavings, and shows the same limitation
-as alias coverage when it comes to discovering this uninitialized
-access bug.
+% \dr{I want to cut concurrenct call pair}
+Likewise, concurrent call pair coverage~\cite{conzzer} also suffers
+from distinguishing these two thread interleavings. These two
+interleavings take place in the same functions (\ie,
+\texttt{raw_sendmsg()} and \texttt{do_ip_setsockopt()}), while
+concurrent call pair tracks a concurrently-executed function pair
+without aware of fine-grained interleavings of instruction within a
+function.
+% %
+% Since two thread interleavings in \autoref{fig:alias-coverage} take
+% place in the same function (\ie, \texttt{A2} and \texttt{A4} are
+% executed in the same function), concurrent call pair is also limited
+% in distinguishing the two interleavings, and shows the same limitation
+% as alias coverage when it comes to discovering this uninitialized
+% access bug.
 
 % is also saturated with these two thread
 % interleavings, because once two functions \texttt{sendmsg()} and
@@ -289,8 +290,8 @@ access bug.
 \PP{Ineffective interleaving exploration}
 %
 Stemming from the aforementioned limitations in coverage, proposed
-thread interleaving methods do not efficiently explore the search
-space guided by their interleaving coverage, not satisfying
+thread interleaving exploration methods do not efficiently explore the
+search space guided by their interleaving coverage, not satisfying
 \textbf{Design goal 2}.
 
 Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious.
