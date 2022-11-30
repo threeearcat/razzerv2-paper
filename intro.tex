@@ -88,9 +88,8 @@ ideas is implemented based on Syzkaller~\cite{syzkaller}.
 \dr{}
 %
 In addition, \sys incorporates a LLVM pass to transform a kernel
-binary for tracing memory accesses during runtime, and the
-QEMU/KVM-based execution engine to enforce thread scheduling as
-desired.
+binary for tracking \intcov, and the QEMU/KVM-based execution engine
+to enforce thread scheduling as desired.
 %
 We run \sys against the latest version of the Linux kernel (ranging
 from 5.19-rc2 to 6.0-rc7), and find \totalbugs concurrency bugs of

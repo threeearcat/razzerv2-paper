@@ -310,15 +310,16 @@ behavior as well as $I_{MT}$ and the executed thread interleaving.
 
 
 
-If $I_{MT}$ is executed without causing an abnormal behavior, the
-multi-thread executor collects memory accesses that racing system
-calls executed.
+Otherwise, if the execution of $I_{MT}$ does not causes an abnormal
+behavior, the multi-thread executor collects memory accesses that
+$S_i$ and $S_j$ executed.
 %
 With these memory accesses, the multi-thread executor probes for
-segment coverage as described in \autoref{ss:coverage}. In addition,
-it derives more unexplored segment graphs as the single-thread
-executor does, and feeds unexplored segment graphs to the multi-thread
-generator to further explore thread interleavings.
+\intcov as described in \autoref{ss:coverage} by decomposing the
+executed interelaving into a set of segment graphs $G$. In addition,
+the multi-thread executor feeds $G$ to the multi-thread generator,
+allowing the multi-thread generator to further explore thread
+interleavings.
 
 
 
@@ -332,8 +333,8 @@ system calls \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)} will be
 executed concurrently (as described as $I_{MT}$ in
 \autoref{fig:workflow}).
 %
-\dr{wip.}
-
+\dr{}
+%
 
 
 
