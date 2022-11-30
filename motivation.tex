@@ -10,10 +10,10 @@
 % exploration method.
 %
 In this section, we first study how concurrency bugs manifest
-depending on thread interleaving through a real-world concurrency bug.
-From the study, we elicit design goals to effectively discover
-concurrency bugs in the kernel, and discuss why existing approaches
-have limitations in satisfying the design goals.
+depending on thread interleaving through a real-world concurrency bug
+example.  From the study, we elicit design goals to effectively
+discover concurrency bugs in the kernel, and discuss why existing
+approaches have limitations in satisfying the design goals.
 
 %None of previous work properly addresses characteristics of \textit{offending thread interleaving} (\ie, one that causes a concurrency bug).
 %
@@ -51,14 +51,16 @@ thread~B may intervene in the middle of these two read operations.
 %
 In that case, if \texttt{B1} is executed between \texttt{A2} and
 \texttt{A4}, thread~A reads different values of \texttt{inet->hdrincl}
-at \texttt{A2} and \texttt{A4}, and dereference \texttt{rfv} without
+at \texttt{A2} and \texttt{A4}, and dereferences \texttt{rfv} without
 initializing it at \texttt{A4}.
 
 
 \PP{Observation 1: Interleaving of multiple memory accesses}
 %
-This example demonstrates that \textit{the offending interleaving
-  causing a concurrency bug consists of multiple memory accesses}.
+This example demonstrates that \textit{a specific interleaving of
+  multiple instructions is necessary to cause a concurrency bug}.
+  % the offending interleaving
+  % causing a concurrency bug consists of multiple memory accesses}.
 % combined result of multiple interleaving orders}\footnote{A
   % interleaving order denotes the execution order between a pair of
   % instructions that access the same memory object.}.
@@ -83,28 +85,38 @@ contribute to the bug.
 %\texttt{A4}))$ cause the uninitialized access bug, while all other
 %thread interleavings do not.
 Therefore, to trigger the kernel concurrency bug, a fuzzer must
-consider instruction interleavings of the three memory accesses, \eg,
+consider interleavings of the three memory accesses, \eg,
 $(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$.
 
 
-\PP{Design goal 1: Informative interleaving coverage} The observation
-gives an insight of how to define interleaving coverage metric.  To
-discover the uninitialized access bug, an interleaving coverage metric
-should distinguish different interleavings of multiple memory
-accesses.
+\PP{Design goal 1: Informative interleaving coverage}
 %
-For example,
-$(\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4})$ (\ie,
-\autoref{fig:alias-coverage}-(a)) and
-$(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$ (\ie,
-\autoref{fig:alias-coverage}-(b)) should be distinguished, and thus,
+% The observation gives an insight of how to define interleaving
+% coverage metric.
+%
+When discovering the uninitialized access bug, an interleaving
+coverage metric should distinguish different interleavings of multiple
+memory accesses.
+%
+For example, two interleavings in \autoref{fig:alias-coverage}-(a) and
+\autoref{fig:alias-coverage}-(b) should be distinguished, and thus,
 interleaving coverage should not be saturated until
-$(\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4})$ is
-executed.
+\autoref{fig:alias-coverage}-(b) is executed.
 %
 Otherwise, a fuzzer may think that there is no more interesting thread
-interleaving in the multi-thread input, and stop searching for new
-interleavings of the input, missing the concurrency bug.
+interleaving in the multi-thread input after it executes
+\autoref{fig:alias-coverage}-(a), and stop searching for new
+interleavings in the input, missing the concurrency bug.
+%
+\red{However, it is not trivial to determine the number of
+  instructions in tracking intructions' interleavings. If interleaving
+  coverage metric tracks interleavings of too few instructions (\eg,
+  2), it may miss interleavings that should be tested. On the other
+  hand, tracking interleavings of too many instructions (\eg,
+  thousands) is practically impossible.
+  %
+  This work seeks a balancing point of the number of instructions to
+  track.}
 
 \begin{figure}[t]
   \centering
@@ -158,15 +170,15 @@ coverage as feedback to infer \textit{unexplored} thread interleavings
 (\eg, $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 This allows a systematic way to explore the search space rather than
-performing randomized exploration pervasively used in previous
-approaches~\cite{ski, krace, pctalgorithm, muzz}.
+performing randomized \red{or heuristic} exploration pervasively used
+in previous approaches~\cite{ski, krace, pctalgorithm, muzz}.
 % \yj{cite}
 %
 Considering a concurrency bugs often manifest with a thread
 interleaving that rarely happen~\cite{exprace}, the systematic
 interleaving exploration boosts up the concurrency bug discovery, as
 it directs the fuzzer to execute unexplored thread interleaving
-instead of executing random thread interleavings thousands of times.
+instead of executing random interleavings thousands of times.
 
 In summary, using the coverage metric expressing interleavings of
 multiple memory accesses and the speculative interleaving exploration,
@@ -191,6 +203,8 @@ executing thread interleavings.
 % \autoref{table:motivation} summarizes interleaving coverage metrics and 
 % interleaving search strategies of prior approaches.
 %
+\dr{I want to shrink this part}
+%
 Altough prior approaches achieve their own successes, we find that
 their interleaving coverage metrics and interleaving exploration
 methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
@@ -199,9 +213,9 @@ methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
 \PP{Less informative interleaving coverage}
 %
 We find that previously proposed interleaving coverage metrics are
-less-informative because they consider a \textit{part of the offending
-  interleaving} (\eg, two instructions). Thus, they are limited in
-distinguish two interleavings in \autoref{fig:alias-coverage}, and do
+limited in distinguishing two interleavings in
+\autoref{fig:alias-coverage}, because they consider a \textit{part of
+  the offending interleaving} (\eg, two instructions). Thus, they do
 not satisfy \textbf{Design goal 1}.
 %
 For example, let us suppose we adopt alias coverage~\cite{krace},
@@ -213,8 +227,8 @@ a new interleaving if \texttt{X} contains an unexplored
 directed-instruction pair $I_W \rightarrow I_R$, where $I_R$ reads a
 value written by $I_W$.
 %
-Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage} is
-executed first, alias coverage identifies \texttt{Interleaving \#1}
+Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage}-(a)
+is executed first, alias coverage identifies \texttt{Interleaving \#1}
 exposes new behaviors when it sees two unexplored directed-instruction
 pair: ($\texttt{B1} \rightarrow \texttt{A2}$) and
 ($\texttt{B1} \rightarrow \texttt{A4}$).
@@ -236,8 +250,8 @@ because ($\texttt{B1} \rightarrow \texttt{A4}$) is already explored in
 Therefore, alias coverage may make the wrong decision about whether a
 fuzzer needs to run these two system calls more, misleading a fuzzer
 to de-prioritize a multi-thread input in which a concurrency bug
-resides and switch to other inputs. In evaluation, we quantify the
-limitation in \autoref{table:comparison-interleaving-search}.
+resides. In evaluation, we quantify the limitation in
+\autoref{table:comparison-interleaving-search}.
 %
 % \dr{I want to cut concurrenct call pair}
 Likewise, concurrent call pair coverage~\cite{conzzer} also suffers
