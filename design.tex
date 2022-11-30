@@ -243,14 +243,14 @@ not.
 % As mentioned above, most concurrency bugs manifest depending only on
 % the execution order of four memory accesses.
 %
-Considering most concurrency bugs manifest depending on interleaving
-orders of at most four memory accesses (which is exactly represented
-by an interleaving segment), 
-if a fuzzer explores all possible interleavings for each detected segment,
-it is unlikely that a fuzzer misses a concurrency bug.
+Considering most concurrency bugs manifest depending on interleavings
+of at most four memory accesses (which are exactly represented by
+interleaving segments), if a fuzzer explores all possible
+interleavings for each detected segment, it is unlikely that a fuzzer
+misses a concurrency bug.
 %
-Accordingly, \textit{interleaving orders in each segment can act as an
-interleaving coverage metric, satisfying \textbf{Design goal 1}}.
+Accordingly, \textit{interleavings in each segment can act as an
+  interleaving coverage metric, satisfying \textbf{Design goal 1}}.
 
 
 % \Intcov and the form of segment graph express semantically rich
@@ -280,12 +280,12 @@ iterations.
 %
 Since each interleaving segment contains only a small number of memory
 accesses, a fuzzer can speculatively creates new interleavings
-from an explored interleavings.
+from explored interleavings.
 Taking an example of \texttt{Segment \#1} in \autoref{fig:keyidea},
 besides execution order
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
 (represented in \texttt{Segment \#1}), a fuzzer easily rearranges
-interleaving orders of the three instructions to speculate 
+the three instructions to speculate 
 unexplored execution orders of these instructions such as
 ($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) which
 causes the uninitialized access bug if executed.
