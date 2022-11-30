@@ -744,18 +744,24 @@ Since edges represent execution orderings, a loop in a segment graph
 indicates a contradiction on the execution order, stating that any
 vertex on the loop should be executed before itself.}
 %
-When a mutated segment contains a loop, a fuzzer discards the segment.
+When a mutated segment graph contains a loop, a fuzzer discards the
+segment.
 %
-Also, a fuzzer drops a mutated segment if it is already explored. A fuzzer
-identifies the case when the hash value of a newly mutated segment graph
-has the same value in \intcov.
-%In this way, a fuzzer generates mutated segment graphs of all
-%$g_i \in G$, while excluding 1) invalid segment graphs (\ie, ones that
-%contain a loop), and 2) explored segment graphs (\ie, ones that their
-%hash values are recorded in the hash table).
+Also, a fuzzer drops a mutated segment graph if it is already
+explored. A fuzzer identifies the case when the hash value of a newly
+mutated segment graph is recorded in \intcov.
+% In this way, a fuzzer generates mutated segment graphs of all
+% $g_i \in G$, while excluding 1) invalid segment graphs (\ie, ones
+% that contain a loop), and 2) explored segment graphs (\ie, ones that
+% their hash values are recorded in the hash table).
 %
 In such way, a fuzzer forms a set of \textit{unexplored} mutated
-segment graphs, $G_{mutated}$, and recompose them for the next search.
+segment graphs $G_{mutated}$, and recomposes them for the next search.
+%
+In the case of \autoref{fig:keyidea}, $G_{mutated}$ contains mutated
+segment graphs (including \autoref{fig:interleavingmutation}-(b) and
+\autoref{fig:interleavingmutation}-(c)) derived from \texttt{Segment
+  \#1}, \texttt{Segment \#2}, and \texttt{Segment \#3}.
 
 \PP{Recomposing mutated segment graphs}
 %
@@ -826,10 +832,12 @@ not contain a loop).
 %executed before itself).
 %
 To select a subset $G^*_{mutated}$ without making a loop, we start
-with an empty set of $G^*_{mutated}$. Then, we iterate over mutations
-in $g^* \in G_{mutated}$ where $g^*$ is a mutation of a segment graph $g$.
-From $g^*$, we try to add edges in
-$g^*$ into $G^*_{mutated}$ one by one and check it causes a loop or not. If it does not form a loop, we add the segment graph $g^*$ into $G^*_{mutated}$.
+with an empty set of $G^*_{mutated}$. Then, we iterate over mutated
+segment graphs in $g^* \in G_{mutated}$ where $g^*$ is a mutated
+segment graph of a segment graph $g$.  From $g^*$, we try to add edges
+in $g^*$ into $G^*_{mutated}$ one by one and check it causes a loop or
+not. If it does not form a loop, we add the segment graph $g^*$ into
+$G^*_{mutated}$.
 %
 After iterating all mutated segment graphs in $G_{mutated}$,
 a fuzzer obtains $G^*_{mutated}$ not containing a loop. Then, 

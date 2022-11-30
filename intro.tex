@@ -85,9 +85,12 @@ We implement \sys across various software layers.
 The \sys's core fuzzing framework embracing the aforementioned key
 ideas is implemented based on Syzkaller~\cite{syzkaller}.
 %
-In addition, \sys incorporates a LLVM pass to trace memory accesses
-and basic blocks during runtime, and the execution engine based on
-QEMU/KVM to enforce thread scheduling as desired.
+\dr{}
+%
+In addition, \sys incorporates a LLVM pass to transform a kernel
+binary for tracing memory accesses during runtime, and the
+QEMU/KVM-based execution engine to enforce thread scheduling as
+desired.
 %
 We run \sys against the latest version of the Linux kernel (ranging
 from 5.19-rc2 to 6.0-rc7), and find \totalbugs concurrency bugs of

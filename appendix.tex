@@ -82,19 +82,24 @@ execution engine takes control from the running thread to the
 suspended thread.
 %
 Inspecting the lock contention is conducted by hooking lockdep
-functions~\cite{lockdep} that are commonly called from synchronization
-prmitives.
+functions (\ie, \texttt{lock_acquire()} and \texttt{lock_release()} in
+\texttt{kernel/locking/lockdep.c})~\cite{lockdep} that are commonly
+called from synchronization primitives.
 %
 When the lockdep functions are called, the execution engine determines
 whether the running thread can make a progress through various
 information such as the address of the synchronization primitive, and
 operation type (\ie, lock, unlock, and trylock).
+%
+If the running thread cannot make a progress, the execution engine
+perform preemption to prevent unexpected block.
 
 \subsection{Non-data race concurrency bug}
 \label{s:appendix:datarace}
 
-There are two types of concurrency bugs according to how they
-adversely affects a program.
+Data races are a subset of concurrency bugs as described in the
+follow.
+
 
 \begin{figure}
   \centering
@@ -162,7 +167,7 @@ concurrently~\cite{data-race-fix1, data-race-fix2, data-race-fix3}.
 
 % https://stackoverflow.com/questions/11276259/are-data-races-and-race-condition-actually-the-same-thing-in-context-of-conc
 %
-\PP{Non-data race concurrency bug}
+\PP{Example of non-data race concurrency bug}
 %
 \autoref{fig:concurrencybugs} shows the examples of non-data race
 concurrency bug (\ie, CVE-2019-6974).
