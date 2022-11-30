@@ -780,9 +780,10 @@ over previous work?}
   \includegraphics[width=0.85\linewidth]{fig/hint.pdf}
   \caption{Example of recomposing mutated segments into whole
     interleaving. (a) represents mutated segments, (b) represents a
-    graph combining the two mutated segments, and (c) represents whole
-    interleaving to test \texttt{Segment \#1*} and \texttt{Segment
-      \#2*}\yj{revision idea: add vertical bars for each column to make them appear steps.}}
+    graph combining the two mutated segments, and (c) represents a
+    sequence of instructions to test \texttt{Segment \#1*} and
+    \texttt{Segment \#2*}\yj{revision idea: add vertical bars for each
+      column to make them appear steps.}}
   \label{fig:hint}
 \end{figure}
 
@@ -838,20 +839,36 @@ all mutated segment graphs
 generates scheduling points to execute instruction orders 
 specified in $G^*_{mutated}$.
 
+
 \PP{Generating scheduling points}
 %
-As a final step, once $G^{*}_{mutated}$ is obtained, a fuzzer 
-creates scheduling points. A scheduling point describes an instruction 
-pair and its interleaving direction. How to enforce a schedule point is 
-described in \autoref{ss:engine}.
+As a final step, once $G^{*}_{mutated}$ (\ie, \autoref{fig:hint}-(b))
+is obtained, a fuzzer creates scheduling points, where each scheduling
+point describes an instruction on which preemption should occur and
+the next thread to run.
+%
+% How to enforce a schedule point is described in \autoref{ss:engine}.
 %In this sequence, scheduling points are just instructions that the
 %preemption should happen; \ie, the next instruction is executed by a
 %different thread.
-A fuzzer can generate scheduling points by conducting a topological sort~\cite{topologicalsort} of $G^{*}_{mutated}$.
+A fuzzer can generate scheduling points by conducting a topological
+sort~\cite{topologicalsort} to $G^{*}_{mutated}$.
 %
 Since $G^{*}_{mutated}$ is acyclic, a topological sort
 always returns a sequence of vertices (\ie, instructions) that does
 not violate a program order.
+%
+\autoref{fig:hint}-(c) shows the result of conducting the topological
+sort to \autoref{fig:hint}-(b).
+%
+As shown in the figure, a fuzzer can obtain the sequence of
+instructions to test mutated segments \texttt{Segment \#1*} and
+\texttt{Segment \#2*}. In this instruction sequence, a fuzzer selects
+scheduling points as instructions on which preemption occurs, \ie,
+\texttt{A2} and \texttt{B2}, and uses scheduling points when enforcing
+thread scheduling as detailed in \autoref{ss:engine}.
+
+
 %
 % \dr{I wrote the time complexity when writing the first draft. Do we
 %   need it?}
