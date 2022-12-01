@@ -28,6 +28,7 @@ discover concurrency bugs in the latest Linux kernel.
     \texttt{Recurrent} column denotes that a crash was previously
     addressed but reoccurs even after its patch is applied.}
   \label{table:newbugs}
+  \vspace{-5pt}
 \end{table*}
 
 \PP{Experimental setup.}
@@ -98,6 +99,7 @@ bugs are exposed and addressed accordingly.
     ExpRace~\cite{exprace}, FUZE~\cite{fuze}, and
     Snowboard~\cite{snowboard}.}
   \label{table:knownbugs}
+  \vspace{-5pt}
 \end{table}
 
 We compare \sys against prior approaches in the following
@@ -246,6 +248,7 @@ saturated.
     average number of execution until the saturation of interleaving
     coverage.}
   \label{table:aliascoverage}
+  \vspace{-5pt}
 \end{table}
 %
 \autoref{table:aliascoverage} shows the result.
@@ -332,6 +335,7 @@ evalution~(\autoref{sss:interleavingsearch}).
     discover each concurrency bug. The \texttt{Naive} column indicates
     the kernel's scheduler (\ie, no thread scheduling control applied).}
   \label{table:comparison-interleaving-search}
+  \vspace{-5pt}
 \end{table*}
 %
 One could argue that even if interleaving segment coverage is
@@ -450,6 +454,7 @@ Here, we provide performance characteristics of the whole \sys.
   \includegraphics[width=0.9\linewidth]{fig/coverage_graph-crop.pdf}
   \caption{Coverage growth of \sys.}
   \label{fig:eval:coverage}
+  \vspace{-5pt}
 \end{figure}
 %
 Since coverage metrics are the paramount performance metric of
@@ -495,6 +500,7 @@ discover concurrency bugs \textit{faster}.
     throughput of \texttt{Syzkaller} with memory access tracing
     enabled.}
   \label{table:throughput}
+  \vspace{-5pt}
 \end{table}
 %
 All \sys's mechanisms provide benefits in finding concurrency bugs
@@ -558,6 +564,7 @@ concurrency bugs very quickly.
     (\texttt{Comp. overhead}) and runtime overhead (\texttt{Runtime
       overhead}).}
   \label{table:elapsedtime}
+  \vspace{-5pt}
 \end{table}
 %
 In \sys, there are two types of overheads for executing a single
