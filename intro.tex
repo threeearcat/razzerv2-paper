@@ -84,7 +84,14 @@ Second, using \intcov, a fuzzer can produce a thread interleaving
 that have not yet been found for the subsequent search.
 
 \PP{Speculative exploration of interleavings} \yj{Speculative exploration
-might be a misleading term} To explore new interleavings,
+  might be a misleading term}
+%
+\dr{I don't get a point. I think it is a proper term because we
+  speculate mutated segments, then check that they are executable
+  (some of them are not executable because of lock or race-steered
+  control flow).}
+%
+To explore new interleavings,
 \sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
 in a segment, which generates new interleavings for testing. \sys 
 mutates as many segments as possible in the expectation that the 
