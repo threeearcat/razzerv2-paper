@@ -33,13 +33,13 @@ given multi-thread input in the following three steps:
 %
 
 
-
+\dr{}
 In this section, we first explain our key intuition behind decomposing
 an explored interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we define an interleaving coverage metric by
-decomposing thread interleavings (\textit{step 1}) to satisfy
+Then, we illustrate how we define an interleaving coverage metric from
+decomposed interleaving segments (\textit{step 1}) to satisfy
 \textbf{Design goal 1}.~(\autoref{ss:coverage}).
 %
 % The coverage metric represents
@@ -91,7 +91,7 @@ shared memory objects.
 To define the size (\ie, the number of instructions) of an
 interleaving segment, we use an observation from an extensive
 survey~\cite{learningfrommistakes} in which 92.4\% (97 out of 105) of
-concurrency bugs manifest when a bug-finding system monitors specific
+concurrency bugs manifest when a bug-finding system detects specific
 interleavings of \textit{at most} four memory accesses referring to
 shared memory objects.
 %
@@ -339,7 +339,7 @@ satisfying \textbf{Design goal 2}}.
 \subsection{Interleaving Segment Coverage}
 \label{ss:coverage}
 
-As discussed, we \textbf{decompose} an explored interleavings into
+As discussed, we \textbf{decompose} explored thread interleavings into
 interleaving segments.
 %
 We first represent observed interleavings as a directed acyclic graph
@@ -662,11 +662,12 @@ segments into \textit{unexplored} interleaving segments, where mutated
 segments contain interleavings to be tested.  Using \intcov, a fuzzer
 can identify if a newly mutated segment is tested or not.
 %
+\dr{}
 Afterwards, a fuzzer \textbf{recomposes} mutated segments
 to obtain a whole sequence of interleavings, and generates 
 scheduling points from the recomposed interleaving.
 %
-\yj{When a fuzzer moves to the next iteration? No new mutation can be created?}
+% \yj{When a fuzzer moves to the next iteration? No new mutation can be created?}
 
 %
 % We emphasize that our interleaving exploration is \textit{not random}
@@ -695,13 +696,13 @@ scheduling points from the recomposed interleaving.
 % \textit{mutating a segment graph}.
 % %
 Suppose a set of \textit{explored} segment graphs
-$G = \{g_1, g_2, ..., g_n \}$ (\ie, \autoref{fig:keyidea}-(b)) is
-given.
+$G = \{g_1, g_2, ..., g_n \}$ (\eg, segment graphs corresponding to
+\autoref{fig:keyidea}-(b)) is given.
 %
-For each $g_i \in G$, a fuzzer mutates $g_i$ by flipping a direction 
-of its interleaving-order edges, which implies changing 
-the interleaving order of an instruction pair that access the same 
-memory object.
+For each $g_i \in G$, a fuzzer mutates $g_i$ by flipping the
+directions of its interleaving-order edges, which implies changing the
+interleaving order of an instruction pair that access the same memory
+object.
 %
 \autoref{fig:interleavingmutation} illustrates how a fuzzer mutates a
 segment graph.
@@ -751,6 +752,7 @@ mutated segment graph is recorded in \intcov.
 In such way, a fuzzer forms a set of \textit{unexplored} mutated
 segment graphs $G_{mutated}$, and recomposes them for the next search.
 %
+\dr{}
 In the case of \autoref{fig:keyidea}, $G_{mutated}$ contains mutated
 segment graphs (including \autoref{fig:interleavingmutation}-(b) and
 \autoref{fig:interleavingmutation}-(c)) derived from \texttt{Segment
@@ -766,8 +768,9 @@ $G_{mutated}$ could be large.
 %
 Instead, we select multiple mutated segment graphs in $G_{mutated}$,
 and \textit{recompose} them to form a large graph to test multiple
-mutated segment graphs at one execution. \yj{briefly discuss the benefit
-over previous work?}
+mutated segments at one execution.
+%
+% \yj{briefly discuss the benefit over previous work?}
 
 % choose a more efficient way. We \textit{recompose} a new
 % thread interleaving from $G^*_{mutated} \subseteq G_{mutated}$, and by
@@ -834,7 +837,7 @@ $G^*_{mutated}$.
 %
 After iterating all mutated segment graphs in $G_{mutated}$,
 a fuzzer obtains $G^*_{mutated}$ not containing a loop. Then, 
-the fuzzer excludes selected segment graphs from the set of 
+the fuzzer excludes selected mutated segment graphs from the set of 
 all mutated segment graphs
 (\ie, $G_{mutated} = G_{mutated} \setminus G^*_{mutated}$), and
 generates scheduling points to execute instruction orders 
@@ -852,13 +855,14 @@ the next thread to run.
 %In this sequence, scheduling points are just instructions that the
 %preemption should happen; \ie, the next instruction is executed by a
 %different thread.
-A fuzzer can generate scheduling points by conducting a topological
+A fuzzer generates scheduling points by conducting a topological
 sort~\cite{topologicalsort} to $G^{*}_{mutated}$.
 %
 Since $G^{*}_{mutated}$ is acyclic, a topological sort
 always returns a sequence of vertices (\ie, instructions) that does
 not violate a program order.
 %
+\dr{}
 \autoref{fig:hint}-(c) shows the result of conducting the topological
 sort to \autoref{fig:hint}-(b).
 %
