@@ -28,20 +28,26 @@ Unfortunately, to discover concurrency bugs, exploring all the possible interlea
 the number of instructions executed by a system call in Linux is huge.
 %Due to such difficulty, traditional fuzzers..
 
+%\dr{as far as I know, there are conzzer and muzz}
+%\dr{If we consider Snowboard as a fuzzer, Snowboard does not
+%  adopt an interleaving coverage metric, so it cannot distinguish two
+%  interleavings, and it relies on *heuristics* (= clustering
+%  strategies) to determine which interleavings should be explored}
 To increase efficiency of concurrency bug fuzzing, several approaches
-have been proposed. Razzer~\cite{razzer} uses static analysis to 
+have been proposed. \yj{how to put SKI?} Razzer~\cite{razzer} uses static analysis to 
 identify memory-accessing instruction pairs of the same objects, and 
-Snowboard uses dynamic analysis. 
+Snowboard~\cite{snowboard} uses dynamic analysis. 
+From the detected instruction pairs, they perform randomized 
+scheduling to generate new thread interleavings. Alas,
+the randomized exploration are inefficient to explore the large 
+thread interleaving search space. Instead, we emphasize that 
+coverage-guided searching would be more preferable strategy 
+for concurrency fuzzing. Unfortunately, it is not well-studied that 
+what form of coverage would be efficient in concurrency fuzzing.
 
-SKI, Razzer, Snowboard, Krace.\yj{what else?}
-\dr{as far as I know, there are conzzer and muzz}
-% Snowboard uses edge-coverage...
+KRACE~\cite{krace} pro
 
 
-\dr{If we consider Snowboard as a fuzzer, Snowboard does not
-  adopt an interleaving coverage metric, so it cannot distinguish two
-  interleavings, and it relies on *heuristics* (= clustering
-  strategies) to determine which interleavings should be explored}
 
 
 To overcome the shortcoming of existing methods, this paper proposes
