@@ -37,15 +37,15 @@ the number of instructions executed by a system call in Linux is huge.
 %  strategies) to determine which interleavings should be explored}
 To increase efficiency of concurrency bug fuzzing, several approaches
 have been proposed for exploring thread interleaving. 
-Razzer~\cite{razzer} uses static analysis to 
-identify memory-accessing instruction pairs of the same objects, and 
-Snowboard~\cite{snowboard} uses dynamic analysis. 
-From the detected instruction pairs, they perform heuristic approaches
-to obtain new thread interleaving. Alas, they are coverage-oblivious, 
-so they cannot prune unnecessary executions where the outcome 
-of a thread interleaving result in the same kind. 
-We emphasize that 
-coverage-guided searching would be more preferable strategy 
+Razzer~\cite{razzer} uses static analysis whereas
+Snowboard~\cite{snowboard} uses dynamic analysis
+to identify instruction pairs accessing the same objects.
+From detected instruction pairs, they use heuristics 
+to generate new thread interleaving. Alas, they are coverage-oblivious, 
+so they cannot prune redundant executions of a thread interleaving, 
+having identical results.
+We underline that 
+coverage-guided searching is the preferred strategy 
 for concurrency fuzzing. however, it is not well-studied that 
 what form of coverage would be efficient in concurrency fuzzing.
 KRACE~\cite{krace} proposes alias coverage, which simply tracks 
