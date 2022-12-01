@@ -470,10 +470,8 @@ While the number of taken branches just reaches to 300K, the number of
 interleaving segments is over 20M. Thus, the scale of interleaving
 coverage is more than 66 times of code coverage.
 %
-This result follows the traditional belief that the search space of
-thread interleaving is very large. As a consequence, storing
-interleaving segment coverage consumes more memory than storing branch
-coverage.
+As a consequence, storing interleaving segment coverage consumes more
+memory than storing branch coverage.
 %
 In our implementation, both branch coverage and interleaving segment
 coverage are represented as hash tables where each element is 8
@@ -531,8 +529,7 @@ As shown in the \texttt{Syzkaller-memtrace} column in
 \autoref{table:throughput}, it shows the throughput similar to that of
 \sys; the \texttt{Syzkaller-memtrace}'s throughput is just 4.1\%
 higher than the throughput of \sys.
-
-
+%
 These results indicate that the throughput of \sys is mainly degraded
 by the heavy instrumentation to trace memory accesses.
 %
@@ -568,7 +565,7 @@ concurrency bugs very quickly.
 \end{table}
 %
 In \sys, there are two types of overheads for executing a single
-multi-thread input, such as computational overheads, and runtime
+multi-thread input, \ie, computational overheads and runtime
 overheads.
 %
 Specifically, computation overheads are caused by tracking
@@ -579,15 +576,10 @@ before executing the input~(\autoref{ss:scheduler}).
 On the other hand, runtime overheads are caused by tracing memory
 accesses~(\autoref{ss:instrumentation}) and controlling thread
 scheduling~(\autoref{ss:engine}).
-
-
+%
 To closely examine these overheads, we measure the elapsed time for
 executing a single multi-thread input, and break down the elapsed time
-into time taken by each components (\ie, tracking interleaving segment
-coverage~(\autoref{ss:coverage}), searching a thrad
-interleaving~(\autoref{ss:scheduler}), tracing memory
-accesses~(\autoref{ss:instrumentation}), and controlling thread
-scheduling~(\autoref{ss:engine})).
+into time taken by each components.
 %
 For this measurement, we run 10 thousands times and take an average.
 
