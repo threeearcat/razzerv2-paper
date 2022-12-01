@@ -121,8 +121,8 @@ which makes the problem of defining a coverage metric tractable while maintainin
   \includegraphics[width=0.99\linewidth]{fig/intuition.pdf}
   \caption{(a) A thread interleaving example of
     \autoref{fig:cve-2017-17712}, and (b) interleaving segments
-    contained in (a).  Note that we intentionally omit instructions
-    that do not access globally-visible memory objects.}
+    contained in (a).  Note that red circles correspond to
+    instructions involved in triggering the uninitialized access bug.}
   \label{fig:keyidea}
   \vspace{-7pt}
 \end{figure}
@@ -686,7 +686,7 @@ recomposed interleaving.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.7\linewidth]{fig/interleavingmutation.pdf}
+  \includegraphics[width=0.65\linewidth]{fig/interleavingmutation.pdf}
   \caption{Example of interleaving segment mutation. In this example,
     (a) represents an interleaving segment graph of
     \autoref{fig:interleavingsegmentgraph} while (b) and (c) represent
