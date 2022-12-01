@@ -129,11 +129,10 @@ interleavings in the input, missing the concurrency bug.
   \caption{Two thread interleavings between thread~A and thread~B
     described in \autoref{fig:cve-2017-17712}.
     %
-    The uninitialized access bug manifests only in
-    \texttt{Interleaving \#2}.
+    The uninitialized access bug manifests only in (b).
     %
-    We intentionally omits bug-irrelevant memory accesses (\ie,
-    \texttt{A6} and \texttt{B2}).}
+    We omit bug-irrelevant memory accesses (\ie, \texttt{A6} and
+    \texttt{B2}).}
   \label{fig:alias-coverage}
   \vspace{-5pt}
 \end{figure}
@@ -233,17 +232,18 @@ a new interleaving if \texttt{X} contains an unexplored
 directed-instruction pair $I_W \rightarrow I_R$, where $I_R$ reads a
 value written by $I_W$.
 %
-Assuming \texttt{Interleaving \#1} in \autoref{fig:alias-coverage}-(a)
-is executed first, alias coverage identifies \texttt{Interleaving \#1}
-exposes new behaviors when it sees two unexplored directed-instruction
-pair: ($\texttt{B1} \rightarrow \texttt{A2}$) and
+Assuming \autoref{fig:alias-coverage}-(a) is executed first, alias
+coverage identifies \autoref{fig:alias-coverage}-(a) exposes new
+behaviors when it sees two unexplored directed-instruction pair:
+($\texttt{B1} \rightarrow \texttt{A2}$) and
 ($\texttt{B1} \rightarrow \texttt{A4}$).
 %
 % The \texttt{Interleaving \#2} is the interleaving orders causing the bug.
-However, according to alias coverage, \texttt{Interleaving \#2}, which
-causes the uninitialized access bug, does not contain any new coverage
-because ($\texttt{B1} \rightarrow \texttt{A4}$) is already explored in
-\texttt{Interleaving \#1}.
+However, according to alias coverage,
+\autoref{fig:alias-coverage}-(b), which causes the uninitialized
+access bug, does not exhibit any new coverage because
+($\texttt{B1} \rightarrow \texttt{A4}$) is already explored in
+\autoref{fig:alias-coverage}-(a).
 %
 % Krace considers that growing alias coverage is a promising signal 
 % to explore thread interleavings further, but the \texttt{Interleaving \#2} does not increase alias coverage in this scenario.

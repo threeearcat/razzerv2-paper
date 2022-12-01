@@ -402,10 +402,10 @@ different threads.
   \centering
   \includegraphics[width=0.8\linewidth]{fig/interleavingsegmentgraph.pdf}
   \caption{(a) Graph representation of \autoref{fig:keyidea}-(a), and
-    (b) segment graph corresponding \texttt{Segment \#1} in
-    \autoref{fig:keyidea}-(b). In each graph, a dotted arrow
-    represents a program-order edge, and solid arrows represent
-    interleaving-order edges.}
+    (b) segment graph corresponding to \texttt{Segment \#1} in
+    \autoref{fig:keyidea}-(b) (extracted from the gray part of
+    (a)). In each graph, dotted arrows represent program-order edges,
+    and solid arrows represent interleaving-order edges.}
   \label{fig:interleavingsegmentgraph}
   \vspace{-7pt}
 \end{figure}
@@ -786,12 +786,12 @@ mutated segments at one execution.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{fig/hint.pdf}
+  \includegraphics[width=0.99\linewidth]{fig/hint.pdf}
   \caption{Example of recomposing mutated segments into whole
-    interleaving. (a) represents mutated segments, (b) represents a
-    graph combining the two mutated segments, and (c) represents a
-    sequence of instructions to test \texttt{Segment \#1*} and
-    \texttt{Segment \#2*}}
+    interleaving, where (a) represents mutated segments, (b)
+    represents a graph combining the two mutated segments, and (c)
+    represents a sequence of instructions to test \texttt{Segment
+      \#1*} and \texttt{Segment \#2*}}
   \label{fig:hint}
   \vspace{-5pt}
 \end{figure}
