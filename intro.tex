@@ -34,7 +34,7 @@ the number of instructions executed by a system call in Linux is huge.
 %  interleavings, and it relies on *heuristics* (= clustering
 %  strategies) to determine which interleavings should be explored}
 To increase efficiency of concurrency bug fuzzing, several approaches
-have been proposed. \yj{how to put SKI?} Razzer~\cite{razzer} uses static analysis to 
+have been proposed. \yj{how to put SKI?}\dr{we don't need to. It is not a fuzzer} Razzer~\cite{razzer} uses static analysis to 
 identify memory-accessing instruction pairs of the same objects, and 
 Snowboard~\cite{snowboard} uses dynamic analysis. 
 From the detected instruction pairs, they perform randomized 
