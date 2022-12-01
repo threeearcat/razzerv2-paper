@@ -20,7 +20,7 @@ of thread interleaving when a multi-thread input (\eg,
 \textit{explored} thread interleaving as a seed interleaving.
 %
 With the seed interleaving, we explore thread interleavings of the
-given multi-thread input in the following three steps:
+given input in the following three steps:
 %
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
 \item \textbf{\textit{Decomposing}} an explored thread interleaving
@@ -33,24 +33,29 @@ given multi-thread input in the following three steps:
 %
 
 
-\dr{}
 In this section, we first explain our key intuition behind decomposing
 an explored interleaving into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we define an interleaving coverage metric from
-decomposed interleaving segments (\textit{step 1}) to satisfy
-\textbf{Design goal 1}.~(\autoref{ss:coverage}).
+Then, we illustrate how we define an interleaving coverage metric
+based on \textit{step 1} to satisfy \textbf{Design goal
+  1}~(\autoref{ss:coverage}).
 %
 % The coverage metric represents
 % combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} .
 %
-Lastly, we explain the speculative interleaving exploration method,
-which mutates interleaving segments (\textit{step 2}) and recomposes
-mutated segments (\textit{step 3}) to satisfy \textbf{Design goal
-  2}~(\autoref{ss:scheduler}).
+Lastly, we explain the speculative interleaving exploration method
+based on \textit{step 2} and \textit{step 3} to satisfy \textbf{Design
+  goal 2}~(\autoref{ss:scheduler}).
 % \yj{a new thread?}  interleaving for future iterations
 % (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
+
+\red{
+Throughout this section, we use \autoref{fig:cve-2017-17712} as a
+running example to show how a seed interleaving~(\ie,
+\autoref{fig:keyidea}-(a)) is used to explore the offending
+interleaving~(\ie, \autoref{fig:interleavingmutation}-(c)).
+}
 
 
 
@@ -662,10 +667,9 @@ segments into \textit{unexplored} interleaving segments, where mutated
 segments contain interleavings to be tested.  Using \intcov, a fuzzer
 can identify if a newly mutated segment is tested or not.
 %
-\dr{}
-Afterwards, a fuzzer \textbf{recomposes} mutated segments
-to obtain a whole sequence of interleavings, and generates 
-scheduling points from the recomposed interleaving.
+Afterwards, a fuzzer \textbf{recomposes} mutated segments to obtain a
+\dr{}whole interleaving, and generates scheduling points from the
+recomposed interleaving.
 %
 % \yj{When a fuzzer moves to the next iteration? No new mutation can be created?}
 
@@ -733,10 +737,10 @@ because it creates a loop
 $\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}
 \Rightarrow \texttt{B1}$.
 %
-\yj{cut if no space.
-Since edges represent execution orderings, a loop in a segment graph
-indicates a contradiction on the execution order, stating that any
-vertex on the loop should be executed before itself.}
+% \yj{cut if no space.
+% Since edges represent execution orderings, a loop in a segment graph
+% indicates a contradiction on the execution order, stating that any
+% vertex on the loop should be executed before itself.}
 %
 When a mutated segment graph contains a loop, a fuzzer discards the
 segment.
@@ -752,11 +756,10 @@ mutated segment graph is recorded in \intcov.
 In such way, a fuzzer forms a set of \textit{unexplored} mutated
 segment graphs $G_{mutated}$, and recomposes them for the next search.
 %
-\dr{}
 In the case of \autoref{fig:keyidea}, $G_{mutated}$ contains mutated
 segment graphs (including \autoref{fig:interleavingmutation}-(b) and
-\autoref{fig:interleavingmutation}-(c)) derived from \texttt{Segment
-  \#1}, \texttt{Segment \#2}, and \texttt{Segment \#3}.
+(c)) derived from \texttt{Segment \#1}, \texttt{Segment \#2}, and
+\texttt{Segment \#3}.
 
 \PP{Recomposing mutated segment graphs}
 %
@@ -848,30 +851,30 @@ specified in $G^*_{mutated}$.
 %
 As a final step, once $G^{*}_{mutated}$ (\ie, \autoref{fig:hint}-(b))
 is obtained, a fuzzer creates scheduling points, where each scheduling
-point describes an instruction on which preemption should occur and
-the next thread to run.
+point describes an instruction on which preemption should occur
+(including the end of each system call) and the next thread to run.
 %
 % How to enforce a schedule point is described in \autoref{ss:engine}.
 %In this sequence, scheduling points are just instructions that the
 %preemption should happen; \ie, the next instruction is executed by a
 %different thread.
 A fuzzer generates scheduling points by conducting a topological
-sort~\cite{topologicalsort} to $G^{*}_{mutated}$.
+sort~\cite{topologicalsort} to $G^{*}_{mutated}$, which generates a
+sequence of instructions to run.
 %
-Since $G^{*}_{mutated}$ is acyclic, a topological sort
-always returns a sequence of vertices (\ie, instructions) that does
-not violate a program order.
-%
-\dr{}
+% Since $G^{*}_{mutated}$ is acyclic, a topological sort
+% always returns a sequence of vertices (\ie, instructions) that does
+% not violate a program order.
+% %
 \autoref{fig:hint}-(c) shows the result of conducting the topological
 sort to \autoref{fig:hint}-(b).
 %
 As shown in the figure, a fuzzer can obtain the sequence of
 instructions to test mutated segments \texttt{Segment \#1*} and
 \texttt{Segment \#2*}. In this instruction sequence, a fuzzer selects
-scheduling points as instructions on which preemption occurs, \ie,
-\texttt{A2} and \texttt{B2}, and uses scheduling points when enforcing
-thread scheduling as detailed in \autoref{ss:engine}.
+scheduling points as \texttt{A2}, \texttt{B2} and \texttt{A6}, and
+uses scheduling points when enforcing thread scheduling as detailed in
+\autoref{ss:engine}.
 
 
 %
