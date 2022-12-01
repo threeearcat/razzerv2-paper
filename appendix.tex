@@ -49,13 +49,14 @@ Then, $hash(G)$ is defined as follows:
 where $\oplus$ denotes the XOR operation.
 
 Applying $hash(G)$ to \autoref{fig:segmenthash}, $hash(\texttt{B1})$
-is calculated as $\mathcal{H}(\texttt{A2} ++ \texttt{A4})$ in
+is calculated as
+$\mathcal{H}(\texttt{B1} ++ \texttt{A2} ++ \texttt{A4})$ in
 \autoref{fig:segmenthash}-(a), whereas, $hash(\texttt{B1})$ is
-calculated as $\mathcal{H}(\texttt{A4})$ in
+calculated as $\mathcal{H}(\texttt{B1} ++ \texttt{A4})$ in
 \autoref{fig:segmenthash}-(b).
 %
 Thus, hash values of even vertices labeled same (\ie, corresponding to
-the same instruction) is calculated differently according to edges
+the same instruction) are calculated differently according to edges
 connected to the vertex.
 %
 Likewise, values of $hash(\texttt{A2})$ are also calculated

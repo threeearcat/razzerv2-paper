@@ -8,7 +8,7 @@ Concurrency bugs are common in modern kernels due to
 the pervasive adoption of efficient but difficult-to-reason
 parallelization techniques.
 The consequence of kernel concurrency bugs is disastrous. They crash
-the entire system, breaking availability\yj{cites} or causing data loss\yj{cites: check snowboard}.
+the entire system, breaking availability~\cite{cve201812232, snowboardbug} or causing data loss~\cite{dataloss}.
 Furthermore, attackers 
 exploit concurrency bugs to mount a privilege escalation attack.
 A recent study~\cite{exprace} demonstrates that a user-level attacker 

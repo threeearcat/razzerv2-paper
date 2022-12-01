@@ -11,8 +11,8 @@ kernel~(\autoref{ss:realworldbugs}),
 2) compare \sys against prior concurrency fuzzing
 techniques~(\autoref{ss:comparison}), and
 %
-3) provide comprehensive performance characteristics of \sys (\eg,
-throughput and overheads)~(\autoref{ss:characteristics}).
+3) provide comprehensive performance characteristics of
+\sys~(\autoref{ss:characteristics}).
 %
 
 \subsection{Finding Real-world Concurrency Bugs}
@@ -32,9 +32,9 @@ discover concurrency bugs in the latest Linux kernel.
 
 \PP{Experimental setup.}
 %
-To discover new concurrency bugs, we evaluate \sys on a two-socket
-machine equipped with Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz (40M
-cache) and 512\GB of RAM.
+In this evaluation, we run \sys on a two-socket machine equipped with
+Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz (40M cache) and 512\GB of
+RAM.
 %
 This machine provides 32 total cores and 64 total threads, and runs
 Ubuntu Server 20.04.4 LTS on Linux 5.4.143 as a host operating system.
@@ -63,7 +63,7 @@ kernel from specific device drivers~(\eg, \texttt{\#1}, and
 \texttt{\#16}, and \texttt{\#17}); Since \sys is not tailored to
 specific subsystems, \sys entails the \textit{generality} and is
 applicable to various subsystems.
-
+%
 \sys is also able to find not only less-harmful bugs such as warnings
 (\eg, \texttt{\#12}) but also critical bugs such as memory corruptions
 (\eg, \texttt{\#2}, \texttt{\#6}, and \texttt{\#14}).
@@ -202,9 +202,9 @@ Also, during the evaluation, we limit the number of executions to
 %
 In order to answer the question why a concurrency fuzzer adopts an
 informative interleaving coverage metric (\ie, interleaving segment
-coverage~\autoref{ss:coverage}), we demonstrate what happens if a
-fuzzer adopts a less-informative interleaving coverage metric (\eg,
-alias coverage~\cite{krace}).
+coverage), we demonstrate what happens if a fuzzer adopts a
+less-informative interleaving coverage metric (\eg, alias
+coverage~\cite{krace}).
 
 
 \PP{Comparison target}
@@ -259,8 +259,9 @@ The example of CVE-2017-17712 described in \autoref{s:motivation}
 out; alias coverage considers only interleavings between two
 instructions, which is \textit{not sufficient} to capture the
 offending interleaving containing multiple instructions. In fact, all
-listed concurrency bugs are caused by thread interleavings of three
-or four instructions.
+listed concurrency bugs are caused by thread interleavings of three or
+four instructions, which supports our design choices on the size of
+interleaving segments (\autoref{ss:overview}).
 %
 On the other hand, alias coverage is saturated really quickly. With
 the speculative interleaving exploration, it is saturated in 13.9
@@ -274,14 +275,14 @@ bug-finding capability.
 
 
 
-In the case of interleaving segment coverage, all listed concurrency
-bugs are triggered before the saturation of interleaving segment
-coverage.  Therefore, interleaving segment coverage shows the
+Whereas, in the case of interleaving segment coverage, all listed
+concurrency bugs are triggered before the saturation of interleaving
+segment coverage.  Thus, interleaving segment coverage shows the
 \textit{strong} bug-finding capability.
 %
 Obviously, interleaving segment coverage entails the cost of the
 higher search complexity. Nevertheless, its search complexity is still
-manageable with a support of the speculative interleaving exploration,
+tractable with a support of the speculative interleaving exploration,
 and we display it in the next
 evalution~(\autoref{sss:interleavingsearch}).
 
@@ -334,8 +335,9 @@ evalution~(\autoref{sss:interleavingsearch}).
 \end{table*}
 %
 One could argue that even if interleaving segment coverage is
-informative in describing unique behaviors of offending interleavings,
-its search space is too large to explore, and thus, it is impractical.
+informative in describing unique behaviors of offending thread
+interleavings, its search space is too large to explore, and thus, it
+is impractical.
 %
 However, it is tractable to track interleaving segment coverage with
 our speculative interleaving exploration. To demonstrate this, we
@@ -421,7 +423,8 @@ Throughout this evaluation, we confirm that the \sys's speculative
 interleaving exploration can manage the search complexity of
 interleaving segment coverage, and consequently, \sys can tirgger
 given concurrency bugs even much faster than previous approaches.
-
+% 
+\dr{}
 
 
 
@@ -531,15 +534,15 @@ higher than the throughput of \sys.
 These results indicate that the throughput of \sys is mainly degraded
 by the heavy instrumentation to trace memory accesses.
 %
-However, as Krace~\cite{krace} states, it can be understandable as a
-trade-off between throughput and input quality.
+However, as Krace~\cite{krace} states, it can be understandable as the
+cost for the high input quality.
 %
 In the fuzzer's perspective, while tracking memory accesses has
 negative impacts on throughput, it provides a higher chance for a
 fuzzer to execute more interesting inputs (\ie, interesting thread
 interleaving) and not to waste computing resources.
 %
-The effectiveness of high input quality is pronounced in
+The effectiveness of high input quality is more pronounced in
 \autoref{sss:interleavingsearch}, showing \sys can discover
 concurrency bugs very quickly.
 
