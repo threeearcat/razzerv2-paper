@@ -34,7 +34,9 @@ the number of instructions executed by a system call in Linux is huge.
 %  interleavings, and it relies on *heuristics* (= clustering
 %  strategies) to determine which interleavings should be explored}
 To increase efficiency of concurrency bug fuzzing, several approaches
-have been proposed. \yj{how to put SKI?}\dr{we don't need to. It is not a fuzzer} Razzer~\cite{razzer} uses static analysis to 
+have been proposed. 
+\yj{overage-oblivious}
+Razzer~\cite{razzer} uses static analysis to 
 identify memory-accessing instruction pairs of the same objects, and 
 Snowboard~\cite{snowboard} uses dynamic analysis. 
 From the detected instruction pairs, they perform randomized 
@@ -87,13 +89,7 @@ at most four memory accesses of shared memory objects.
 Second, using \intcov, a fuzzer can produce a thread interleaving
 that have not yet been found for the subsequent search.
 
-\PP{Speculative exploration of interleavings} \yj{Speculative exploration
-  might be a misleading term}
-%
-\dr{I don't get a point. I think it is a proper term because we
-  speculate mutated segments, then check that they are executable
-  (some of them are not executable because of lock or race-steered
-  control flow).}
+\PP{Mutating interleaving segments} 
 %
 To explore new interleavings,
 \sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
