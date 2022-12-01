@@ -20,11 +20,13 @@ finding non-concurrency bugs.
 In contrast to non-concurrency bugs which are identified by 
 sequential testing of a single thread execution,
 kernel concurrency bugs are typically caused by the concurrent execution 
-of two or more threads.
+of two or more threads. 
 Kernel concurrency bugs only emerge in a particular pattern of 
 interleavings between threads. The thread interleaving happens 
 rarely because it takes place only when a certain timing condition is met.
-Unfortunately, to discover concurrency bugs, exploring all the possible interleavings is not practical because 
+Therefore, kernel concurrency fuzzer must consider two dimensions: 
+how to navigate thread interleaving in addition to generating multi-thread input seeds (e.g., system call pairs and their parameter values).
+Unfortunately, exploring all the possible interleavings is not practical because 
 the number of instructions executed by a system call in Linux is huge.
 %Due to such difficulty, traditional fuzzers..
 
@@ -34,26 +36,25 @@ the number of instructions executed by a system call in Linux is huge.
 %  interleavings, and it relies on *heuristics* (= clustering
 %  strategies) to determine which interleavings should be explored}
 To increase efficiency of concurrency bug fuzzing, several approaches
-have been proposed. 
-\yj{overage-oblivious}
+have been proposed for exploring thread interleaving. 
 Razzer~\cite{razzer} uses static analysis to 
 identify memory-accessing instruction pairs of the same objects, and 
 Snowboard~\cite{snowboard} uses dynamic analysis. 
-From the detected instruction pairs, they perform randomized 
-scheduling to generate new thread interleavings. Alas,
-the randomized exploration are inefficient to explore the large 
-thread interleaving search space. Instead, we emphasize that 
+From the detected instruction pairs, they perform heuristic approaches
+to obtain new thread interleaving. Alas, they are coverage-oblivious, 
+so they cannot prune unnecessary executions where the outcome 
+of a thread interleaving result in the same kind. 
+We emphasize that 
 coverage-guided searching would be more preferable strategy 
 for concurrency fuzzing. however, it is not well-studied that 
 what form of coverage would be efficient in concurrency fuzzing.
 KRACE~\cite{krace} proposes alias coverage, which simply tracks 
 a single alias pair instruction. We observe that tracking single 
-instruction pairs are not sufficient. Furthermore, KRACE uses 
+instruction pairs is not sufficient. Furthermore, KRACE uses 
 the alias coverage to decide continuing to explore or not 
-in the current multi-thread input. When exploring the thread 
-interleaving space, it also take a similar randomized approach, 
+in the current multi-thread input. When exploring a thread 
+interleaving space, it takes a randomized approach, 
 sharing the similar inefficiency of previous techniques.
-
 
 To overcome the shortcoming of existing methods, this paper proposes
 \sys, a fuzzing framework for kernel concurrency bugs. 
