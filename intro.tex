@@ -24,12 +24,16 @@ of two or more threads.
 Kernel concurrency bugs only emerge in a particular pattern of 
 interleavings between threads. The thread interleaving happens 
 rarely because it takes place only when a certain timing condition is met.
-However, to discover concurrency bugs, exploring all the possible interleavings is not practical because 
+Unfortunately, to discover concurrency bugs, exploring all the possible interleavings is not practical because 
 the number of instructions executed by a system call in Linux is huge.
 %Due to such difficulty, traditional fuzzers..
 
 To increase efficiency of concurrency bug fuzzing, several approaches
-have been proposed. SKI, Razzer, Snowboard, Krace.\yj{what else?}
+have been proposed. Razzer~\cite{razzer} uses static analysis to 
+identify memory-accessing instruction pairs of the same objects, and 
+Snowboard uses dynamic analysis. 
+
+SKI, Razzer, Snowboard, Krace.\yj{what else?}
 \dr{as far as I know, there are conzzer and muzz}
 % Snowboard uses edge-coverage...
 
