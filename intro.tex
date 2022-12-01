@@ -46,7 +46,11 @@ for concurrency fuzzing. however, it is not well-studied that
 what form of coverage would be efficient in concurrency fuzzing.
 KRACE~\cite{krace} proposes alias coverage, which simply tracks 
 a single alias pair instruction. We observe that tracking single 
-in
+instruction pairs are not sufficient. Furthermore, KRACE uses 
+the alias coverage to decide continuing to explore or not 
+in the current multi-thread input. When exploring the thread 
+interleaving space, it also take a similar randomized approach, 
+sharing the similar inefficiency of previous techniques.
 
 
 To overcome the shortcoming of existing methods, this paper proposes
