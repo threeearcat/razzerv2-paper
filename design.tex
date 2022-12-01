@@ -44,7 +44,7 @@ based on \textit{step 1} to satisfy \textbf{Design goal
 % The coverage metric represents
 % combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} .
 %
-Lastly, we explain the speculative interleaving exploration method
+Lastly, we explain the mutation-based interleaving exploration method
 based on \textit{step 2} and \textit{step 3} to satisfy \textbf{Design
   goal 2}~(\autoref{ss:scheduler}).
 % \yj{a new thread?}  interleaving for future iterations
@@ -279,19 +279,20 @@ Second, explored interleaving segments can be used to systematically
 search for interleavings in next iterations.
 %
 Since each interleaving segment contains only a small number of memory
-accesses, a fuzzer can speculatively creates new interleavings
-from explored interleavings.
-Taking an example of \texttt{Segment \#1} in \autoref{fig:keyidea},
-besides execution order
+accesses, a fuzzer can speculatively creates new interleavings from
+explored interleavings.  Taking an example of \texttt{Segment \#1} in
+\autoref{fig:keyidea}, besides execution order
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
-(represented in \texttt{Segment \#1}), a fuzzer easily rearranges
-the three instructions to speculate 
-unexplored execution orders of these instructions such as
+(represented in \texttt{Segment \#1}), a fuzzer easily rearranges the
+three instructions to speculate unexplored execution orders of these
+instructions such as
 ($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) which
-causes the uninitialized access bug if executed.
-Therefore, instead of doing a randomized \red{or heuristic} search (as in most previous approaches), if a fuzzer figures out which of the enumerated interleavings have not been explored, \textit{a fuzzer can strategically 
-explore the search space with speculative interleavings, 
-satisfying \textbf{Design goal 2}}.
+causes the uninitialized access bug if executed.  Therefore, instead
+of doing a randomized \red{or heuristic} search (as in most previous
+approaches), if a fuzzer figures out which of the enumerated
+interleavings have not been explored, \textit{a fuzzer can
+  strategically explore the search space with speculative
+  interleavings, satisfying \textbf{Design goal 2}}.
 
 
 % 

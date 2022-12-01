@@ -3,7 +3,7 @@
 
 \sys is a kernel fuzzer tailored to effectively discover concurrency
 bugs, where its key improvements lie in adopting interleaving segment
-coverage (\autoref{ss:coverage}) and the speculative interleaving
+coverage (\autoref{ss:coverage}) and the mutation-based interleaving
 exploration (\autoref{ss:scheduler}).
 %
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
@@ -268,7 +268,7 @@ On the other hand, the multi-thread generator repeatedly produces
 various schedules.
 %
 To generate schedules, the multi-thread generator implements the
-speculative interleaving exploration method detailed in
+mutation-based interleaving exploration method detailed in
 \autoref{ss:scheduler}.
 %
 Briefly explaining, given a set of explored segment graphs $G$, the
@@ -333,7 +333,7 @@ executed concurrently (as described as $I_{MT}$ in
 \autoref{fig:workflow}).
 %
 Furthermore, the multi-thread generator produces a schedule according
-to the speculative interleaving exploration. Given $G$ including
+to the mutation-basd interleaving exploration. Given $G$ including
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$), the
 multi-thread generator produces a mutated segment graph corresponding
 to ($\texttt{A2} \Rightarrow \texttt{B2} \Rightarrow \texttt{A4}$)
