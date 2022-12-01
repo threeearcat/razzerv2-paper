@@ -4,8 +4,8 @@
 % For decades, immense efforts have been made to effectively discover
 % concurrency bugs in the kernel.
 %
-In this section, we describe prior efforts in three categories, kernel
-fuzzing, controlled concurrency testing, and data race detection.
+In this section, we describe prior efforts such as, kernel fuzzing,
+controlled concurrency testing, and data race detection.
 
 
 \PP{Kernel fuzzing}
@@ -36,14 +36,13 @@ concurrency bugs in the kernel.
 
 
 
-\PP{Controlled concurrency testing}
+\PP{Controlled concurrency testing (CCT)}
 %
-Controlled concurrency testing~\cite{ski, pctalgorithm, sparsernr,
-  chess, nagarakatte2012multicore, abdelrasoul2017promoting,
-  cai2016radius, mukherjee2020learning, schedulebounding} (abbreviated
-as CCT) introduces an idea of overriding the kernel scheduler and
-methodically testing thread interleavings of a \textit{given} test
-scenario.
+CCT~\cite{ski, pctalgorithm, sparsernr, chess,
+  nagarakatte2012multicore, abdelrasoul2017promoting, cai2016radius,
+  mukherjee2020learning, schedulebounding} introduces an idea of
+overriding the kernel scheduler and methodically testing thread
+interleavings of a \textit{given} input.
 %
 % In addition, they adopt various techniques to reduce the search space
 % of thread interleavings such as
@@ -53,14 +52,13 @@ scenario.
 % %
 % dynamic partial order reduction~\cite{dpor1, dpor2, dpor3}.
 %
-To the best of our knowledge, concurrency fuzzing stems from CCT
-techniques with an idea of merging \textit{the test case generation}
-(\ie, fuzzing) and \textit{the thread interleaving exploration} (\ie,
-CCT).
+To the best of our knowledge, concurrency fuzzing stems from CCT with
+an idea of merging \textit{the test case generation} (\ie, fuzzing)
+and \textit{the thread interleaving exploration} (\ie, CCT).
 %
-Specifically, Razzer~\cite{razzer}, arguably the first concurrency
-fuzzer, states that it is inspired by SKI~\cite{ski}, a CCT technique
-aiming the kernel.
+Specifically, Razzer~\cite{razzer}, arguably the first kernel
+concurrency fuzzer, states that it is inspired by SKI~\cite{ski}, a
+CCT technique aiming the kernel.
 %
 We believe \sys takes one step further in this direction by adopting
 interleaving segment coverage in tracking and exploring the

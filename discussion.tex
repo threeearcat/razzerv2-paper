@@ -21,14 +21,14 @@ degradation. We provide more details in \autoref{s:appendix:datarace}.
 \PP{Larger interleaving segment}
 %
 While we restrict the size of each interleaving segment to four, a
-small fraction of concurrency bugs (\eg, 8 out of 105 from a survey
+small fraction of concurrency bugs (\eg, 8 out of 105 from the survey
 study~\cite{learningfrommistakes}) are triggered with interleaving
 segments with size of larger than four.
 %
 Thus, interleaving segment coverage falls short in tracking offending
-interleavings of this kind of concurrency bugs, while the speculative
-interleaving exploration is still able to trigger them via recomposing
-multiple interleaving segments.
+interleavings of this kind of concurrency bugs. Nonetheless, the
+mutation-based interleaving exploration is still able to trigger them
+via recomposing multiple interleaving segments.
 %
 Since this kind of bugs also may severely affect the security of the
 kernel, we leave how to track their offending interleavings using

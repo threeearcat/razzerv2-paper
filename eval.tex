@@ -423,8 +423,6 @@ Throughout this evaluation, we confirm that the \sys's speculative
 interleaving exploration can manage the search complexity of
 interleaving segment coverage, and consequently, \sys can tirgger
 given concurrency bugs even much faster than previous approaches.
-% 
-\dr{}
 
 
 
@@ -465,21 +463,19 @@ interleaving coverage (a line denoted by \texttt{Interleaving segment}).
 %
 While the number of taken branches just reaches to 300K, the number of
 interleaving segments is over 20M. Thus, the scale of interleaving
-coverage is more than 66 times of code coverage during our evaluation.
+coverage is more than 66 times of code coverage.
 %
-This result follows the conventional belief that the search space of
-thread interleaving is very large.
-
-One thing to note about this scale difference is that storing
+This result follows the traditional belief that the search space of
+thread interleaving is very large. As a consequence, storing
 interleaving segment coverage consumes more memory than storing branch
 coverage.
 %
 In our implementation, both branch coverage and interleaving segment
-coverage are represented as hash tables where each element is
-8-byte. Therefore, storing interleaving segment coverage consumes
-about 180\MB while storing branch coverage requires 2\MB.
+coverage are represented as hash tables where each element is 8
+bytes. Therefore, storing interleaving segment coverage consumes about
+180\MB while storing branch coverage requires 2\MB.
 %
-We can consider this result as a traditional space-time
+We can consider this result as a well-known space-time
 tradeoff~\cite{spacetimetradeoff}; we invest \textit{more memory} to
 discover concurrency bugs \textit{faster}.
 %
