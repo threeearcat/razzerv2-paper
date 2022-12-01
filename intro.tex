@@ -1,14 +1,14 @@
 \section{Introduction}
 \label{s:intro}
 
-\dr{I make a decision to denote ``(thread) interleaving'' as a whole
-  interleaving. MUZZ and Krace use the term like this.}
+%\dr{I make a decision to denote ``(thread) interleaving'' as a whole
+%  interleaving. MUZZ and Krace use the term like this.}
 
-
-Multi-core era, many techniques are integrated in kernel to improve performance. 
-
+Concurrency bugs are common in modern kernels due to 
+the pervasive adoption of efficient but difficult-to-reason
+parallelization techniques.
 The consequence of kernel concurrency bugs is disastrous. They crash
-the entire system, breaking availability or causing data loss. 
+the entire system, breaking availability\yj{cites} or causing data loss\yj{cites: check snowboard}.
 Furthermore, attackers 
 exploit concurrency bugs to mount a privilege escalation attack.
 A recent study~\cite{exprace} demonstrates that a user-level attacker 
@@ -17,11 +17,11 @@ brute-force attacks.
 
 Identifying kernel concurrency bugs is much more difficult than 
 finding non-concurrency bugs. 
-In contrast to non-concurrency bugs which can be identified by 
+In contrast to non-concurrency bugs which are identified by 
 sequential testing of a single thread execution,
 kernel concurrency bugs are typically caused by the concurrent execution 
 of two or more threads.
-Kernel concurrency bugs only appear in a particular pattern of 
+Kernel concurrency bugs only emerge in a particular pattern of 
 interleavings between threads. The thread interleaving happens 
 rarely because it takes place only when a certain timing condition is met.
 However, to discover concurrency bugs, exploring all the possible interleavings is not practical because 
