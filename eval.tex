@@ -1,25 +1,24 @@
 \section{Evaluation}
 \label{s:eval}
 
-To verify the effectiveness of our approach, we evaluate \sys in
-various aspects.
+To demonstrate the effectiveness of our approach, 
+we evaluate \sys in various aspects.
 %
-Specifically, we 1) demonstrate the practicality of \sys by providing
+Specifically, we 1) demonstrate the usefulness of \sys by providing
 newly found concurrency bugs in the Linux
 kernel~(\autoref{ss:realworldbugs}),
 %
-2) compare \sys against prior concurrency fuzzing
+2) quantitatively compare \sys against prior concurrency fuzzing
 techniques~(\autoref{ss:comparison}), and
 %
-3) provide comprehensive performance characteristics of
+3) analyze comprehensive performance characteristics of
 \sys~(\autoref{ss:characteristics}).
 %
 
 \subsection{Finding Real-world Concurrency Bugs}
 \label{ss:realworldbugs}
 
-In order to demonstrate the practicality of \sys, we run \sys to
-discover concurrency bugs in the latest Linux kernel.
+We run \sys to discover concurrency bugs in the latest Linux kernel.
 
 \begin{table*}[t]
   \centering
@@ -33,7 +32,7 @@ discover concurrency bugs in the latest Linux kernel.
 
 \PP{Experimental setup.}
 %
-In this evaluation, we run \sys on a two-socket machine equipped with
+We run \sys on a two-socket machine equipped with
 Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz (40M cache) and 512\GB of
 RAM.
 %
@@ -43,29 +42,32 @@ Ubuntu Server 20.04.4 LTS on Linux 5.4.143 as a host operating system.
 During our experiments, we launch 32 virtual machines (VMs) where each
 VM is equipped with four vCPUs and 8\GB memory.
 %
-When building a guest kernel, we use a kernel configuration used by
+We use a Linux kernel configuration used by
 \texttt{Syzkaller}~\cite{syzkaller} so that \texttt{Syzkaller} and
 \sys search the same kernel modules/subsystems.
+The kernel versions we run on \sys ranges from 5.19-rc2 to 6.0-rc7.
 %
-We run intermittently \sys for approximately two months on latest
-versions of the Linux kernel ranging from 5.19-rc2 to 6.0-rc7.
+%We run intermittently \sys for approximately two months on latest
+%versions of the Linux kernel ranging from 5.19-rc2 to 6.0-rc7.
 
 
 \PP{Newly found concurrency bugs.}
 %
-During our evaluation, \sys discovers 83 unique crash titles including
+During our evaluation period, \sys discovers 83 unique crash titles including
 ones that \texttt{Syzkaller} also finds. Among them, \totalbugs are
-newly identified as harmful concurrency bugs as summarized in
+newly identified as harmful concurrency bugs. The result is summarized in
 \autoref{table:newbugs}.
 %
 This table shows that \sys is able to find bugs across the entire
-kernel from specific device drivers~(\eg, \texttt{\#1}, and
+kernel layers from specific device drivers~(\eg, \texttt{\#1}, and
 \texttt{\#6}) to various network subsystems (\eg, \texttt{\#2},
-\texttt{\#16}, and \texttt{\#17}); Since \sys is not tailored to
-specific subsystems, \sys entails the \textit{generality} and is
-applicable to various subsystems.
+\texttt{\#16}, and \texttt{\#17}). 
+Unlike KRACE, which focuses on 
+kernel file systems, \sys is not tailored to specific subsystems.
+%\sys entails the \textit{generality} and is
+%applicable to various subsystems.
 %
-\sys is also able to find not only less-harmful bugs such as warnings
+\sys is able to find not only less-harmful bugs such as warnings
 (\eg, \texttt{\#12}) but also critical bugs such as memory corruptions
 (\eg, \texttt{\#2}, \texttt{\#6}, and \texttt{\#14}).
 %
@@ -73,20 +75,15 @@ It is worth noting that in our evaluation, all concurrency bugs are
 found by observable and harmful incidents such as kernel panics or
 KASAN reports.
 %
-Interestingly, we find that many of bugs was previously found and
-addressed, but they reoccur possibly because of their incomplete
-fixes~\cite{learningfrommistakes}.
+Interestingly, we find that some bugs were previously found and
+patched, but they reoccur in later kernel version because the patches are
+incomplete fixes~\cite{learningfrommistakes}.
 %
 In \autoref{table:newbugs}, three that are marked in the
-\texttt{Recurrent} column are cases that concurrency bugs reoccur even
-after their fixes are applied.
+\texttt{Recurrent} column shows the cases that concurrency bugs reoccur.
 %
-These cases emphasize the importance of effective testing even after
-bugs are exposed and addressed accordingly.
-
-
-
-
+These cases underline the significance of thorough testing even after 
+bugs have been identified and supposedly fixed.
 
 \subsection{Comparison with prior approaches}
 \label{ss:comparison}
@@ -102,21 +99,19 @@ bugs are exposed and addressed accordingly.
   \vspace{-5pt}
 \end{table}
 
-We compare \sys against prior approaches in the following
-perspectives: 1) is interleaving segment
-coverage~(\autoref{ss:coverage}) really informative and helpful in
+We compare \sys against prior approaches to answer the following
+questions: 1) is interleaving segment
+coverage~(\autoref{ss:coverage}) informative and helpful in
 discovering concurrency bugs?  (\textbf{Design goal 1} in
 \autoref{s:motivation})~(\autoref{sss:interleavingcoverage}), and
 %
-2) is the speculative interleaving
+2) how is the mutation-based interleaving
 exploration~(\autoref{ss:scheduler}) effective in exploring the search
 space of thread interleavings? (\textbf{Design goal
   2})~(\autoref{sss:interleavingsearch}).
 %
-In this evaluation, we select well-known concurrency bugs, and then
-run \sys and prior approaches with these concurrency bugs.
-
-
+To evaluate the points, we collect well-known concurrency bugs as a test set, 
+and then run \sys and prior approaches on the test set.
 
 % 1) to demonstrate its
 % performance improvement in discovering concurrency bugs
@@ -131,40 +126,41 @@ run \sys and prior approaches with these concurrency bugs.
 
 \PP{Bug selection}
 %
-\autoref{table:knownbugs} represents concurrency bugs we use for the
+\autoref{table:knownbugs} shows concurrency bugs for the
 comparison study.
 %
-For a fair comparison, our concurrency bug selection criteria are 1)
+Our concurrency bug selection criteria are 1)
 concurrency bugs are used in previous studies~\cite{exprace, razzer,
   snowboard, moonshine, fuze}, and 2) their exploits are publicly
 available so that we can make use of them for our evaluation.
 %
-But there are few exceptions as follows: Although the exploit of
+However, there are few exceptions as follows: Although the exploit of
 \texttt{69e16d01d1de}~\cite{snowboardbug} is not publicly available,
 we successfully reproduce the concurrency bug from the description of
-the Snowboard~\cite{snowboard} paper. Thus, we inlcude this
-concurrency bug into the concurrency bug list for evaluation.
+the Snowboard~\cite{snowboard} paper, so we include the bug.
 %
 % Whereas, even though Krace~\cite{krace} studies a subset of kernel
 % concurrency bugs (\ie, data races), we do not take concurrency bugs
 % from Krace, because we do not have access to ones used in Krace.
 %
-Whereas, we exclude two Android-related concurrency bugs (\ie,
+We exclude two Android-related concurrency bugs (\ie,
 CVE-2019-1999~\cite{cve20191999} and CVE-2019-2025~\cite{cve20192025})
-evaluted by ExpRace~\cite{exprace}, because their exploits require to
-execute Android-specific code spaces where the current implementation
-of \sys (and \texttt{Syzkaller}) is limited to exploring.
+evaluated in ExpRace~\cite{exprace}.
+%, because their exploits require to
+%execute Android-specific code spaces where the current implementation
+%of \sys (and \texttt{Syzkaller}) is limited to exploring.
+To run tests on a consistent environment, we use the same kernel 
+of version v6.0-rc7 and make the bugs available by rolling back patches 
+that addressed concurrency bugs.
 
-
-
-\PP{Kernel preparation}
+%\PP{Kernel preparation}
 %
-Since concurrency bugs in \autoref{table:knownbugs} are introduced,
-found, and fixed at different times, it is hard to find a kernel
-version that is vulnerable to all listed bugs.
+%Since concurrency bugs in \autoref{table:knownbugs} are introduced,
+%found, and fixed at different times, it is hard to find a kernel
+%version that is vulnerable to all listed bugs.
 %
-Therefore, we inject the concurrency bugs into the Linux kernel
-version v6.0-rc7 by reverting patches fixing the concurrency bugs.
+%Therefore, we inject the concurrency bugs into the Linux kernel
+%version v6.0-rc7 by reverting patches fixing the concurrency bugs.
 
 
 
@@ -174,20 +170,22 @@ We measure the number of executions and the elapsed time required to
 discover each concurrency bug.
 %
 However, these metrics heavily depend on initial seeds and the process
-of mutating seeds, which may vary across evaluations and disturb a
-fair fuzzing evaluation~\cite{fuzzingeval}.
+of mutating multi-thread input seeds, which may vary across evaluations and 
+disturb a fair fuzzing evaluation~\cite{fuzzingeval}.
 %
-In order to minimize effects of such impediments, we manually provide
-a multi-thread input as well as a pair of system calls that can cause
+To confine such noisy interference, we manually provide
+a multi-thread input as well as a pair of system calls that triggers
 each concurrency bug.
+Therefore, we evenly compare how accurately and quickly fuzzers can discover 
+concurrency bugs when bug-triggering inputs are given.
 %
-Then, in all evaluations in this section, a fuzzer only explores
-thread interleavings of the multi-thread inputs we provide, without
-generating or mutating inputs.
+%Then, in all evaluations in this section, a fuzzer only explores
+%thread interleavings of the multi-thread inputs we provide, without
+%generating or mutating inputs.
 %
-In this way, we do not need to consider the process of mutation, and
-can focus on the effectiveness of the thread interleaving exploration
-of each approach.
+%In this way, we do not need to consider the process of mutation, and
+%can focus on the effectiveness of the thread interleaving exploration
+%of each approach.
 %
 Also, during the evaluation, we limit the number of executions to
 10000 for each measurement, which is large enough for our evaluation.
@@ -202,9 +200,9 @@ Also, during the evaluation, we limit the number of executions to
 \subsubsection{Comparison of interleaving coverage metrics}
 \label{sss:interleavingcoverage}
 %
-In order to answer the question why a concurrency fuzzer adopts an
+In order to answer the question why a concurrency fuzzer should adopt an
 informative interleaving coverage metric (\ie, interleaving segment
-coverage), we demonstrate what happens if a fuzzer adopts a
+coverage), we demonstrate performance of \sys if it adopts a
 less-informative interleaving coverage metric (\eg, alias
 coverage~\cite{krace}).
 
@@ -216,16 +214,14 @@ interleaving coverage metric most relevant to interleaving segment
 coverage (\ie, both describe interleavings of instructions).
 %
 However, alias coverage is implemented only for file systems, so we
-mimick alias coverage in \sys by limiting the number of vertices of
-each segment graph to two. In other words, as alias coverage does,
-interleaving segments of size 2 describe interleavings of two
-instructions where at least one of them is a write instruction.
+emulate alias coverage in \sys by limiting the number of vertices of
+each segment graph to two. Hence, like alias coverage,
+interleaving segments of size 2 contains a single interleaving 
+between two instructions where at least one of them is a write instruction.
 %
-Using mimicked alias coverage, we run \sys to see whether each
-concurrency bug is triggered until mimicked alias coverage is
+Using the emulated alias coverage, we run \sys to see whether each
+concurrency bug is triggered until the emulated alias coverage is
 saturated.
-
-
 % as a
 % feedback of the \sys's speculative interleaving exploration, we run
 % \sys with a fixed pair of system calls that can cause each concurrency
@@ -253,41 +249,41 @@ saturated.
 %
 \autoref{table:aliascoverage} shows the result.
 %
-When using mimicked alias coverage, \textit{many (six ouf of nine)
-  concurrency bugs are not triggered even if mimicked alias coverage
-  is saturated}.
+When using emulated alias coverage, \textit{many (six ouf of nine)
+concurrency bugs are not discovered even if emulated alias coverage
+completely is saturated}.
 %
 The example of CVE-2017-17712 described in \autoref{s:motivation}
-(\ie, \autoref{fig:cve-2017-17712}) explains why this result comes
+(\ie, \autoref{fig:cve-2017-17712}) explains why such poor results come 
 out; alias coverage considers only interleavings between two
-instructions, which is \textit{not sufficient} to capture the
-offending interleaving containing multiple instructions. In fact, all
+instructions, which is \textit{not sufficient} to execute the
+offending interleaving containing multiple instructions. We manually 
+identify that all
 listed concurrency bugs are caused by thread interleavings of three or
-four instructions, which supports our design choices on the size of
+four instructions, which supports our design choice on the size of
 interleaving segments (\autoref{ss:overview}).
 %
-On the other hand, alias coverage is saturated really quickly. With
-the speculative interleaving exploration, it is saturated in 13.9
+On the other hand, alias coverage is saturated quickly. With
+our mutation-based interleaving exploration, it is saturated after 13.9
 executions on average, ranging from 6 to 32.
 %
-We comprehend this result as the trade-off between the bug-finding
+
+\PP{Bug-finding capability and search complexity trade-off}
+The result indicates the trade-off between the bug-finding
 capability and the search complexity; Alias coverage shows the
-\textit{low} search complexity while it also shows the \textit{weak}
+\textit{lower} search complexity while it also shows the \textit{weaker}
 bug-finding capability.
 %
-
-
-
-Whereas, in the case of interleaving segment coverage, all listed
-concurrency bugs are triggered before the saturation of interleaving
-segment coverage.  Thus, interleaving segment coverage shows the
-\textit{strong} bug-finding capability.
-%
-Obviously, interleaving segment coverage entails the cost of the
-higher search complexity. Nevertheless, its search complexity is still
-tractable with a support of the speculative interleaving exploration,
-and we display it in the next
-evalution~(\autoref{sss:interleavingsearch}).
+Whereas, using interleaving segment coverage, \sys can discover all listed
+concurrency bugs before the saturation of interleaving
+segment coverage. Thus, interleaving segment coverage shows the
+\textit{stronger} bug-finding capability but it sets more larger search 
+space than the alias coverage.
+Hence, interleaving segment coverage entails the cost of the
+higher search complexity. Nevertheless, we claim that 
+its search complexity is still tractable to perform the mutation-based 
+interleaving exploration, and we validate our claim  in the next
+evaluation~(\autoref{sss:interleavingsearch}).
 
 
 % that interleaving segment coverage is not saturated until a
@@ -314,7 +310,7 @@ evalution~(\autoref{sss:interleavingsearch}).
 
 
 
-\subsubsection{Effectiveness of the speculative interleaving
+\subsubsection{Effectiveness of mutation-based interleaving
   exploration}
 \label{sss:interleavingsearch}
 %
@@ -330,7 +326,7 @@ evalution~(\autoref{sss:interleavingsearch}).
   \input{table/comparison-interleaving-search.tex}
   \caption{Result of the comparison study against various
     state-of-the-art kernel concurrency fuzzers (\ie,
-    Krace~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
+    KRACE~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
     number of executions and the elapsed time (secs) required to
     discover each concurrency bug. The \texttt{Naive} column indicates
     the kernel's scheduler (\ie, no thread scheduling control applied).}
@@ -339,37 +335,35 @@ evalution~(\autoref{sss:interleavingsearch}).
 \end{table*}
 %
 One could argue that even if interleaving segment coverage is
-informative in describing unique behaviors of offending thread
-interleavings, its search space is too large to explore, and thus, it
-is impractical.
+informative to describe offending thread interleavings, 
+its search space is too large to explore.
+%informative in describing unique behaviors of offending thread
+%interleavings, its search space is too large to explore, and thus, it
+%is impractical.
 %
-However, it is tractable to track interleaving segment coverage with
-our speculative interleaving exploration. To demonstrate this, we
-compare the speculative interleaving
+However, it is tractable to run the mutation-based interleaving exploration
+using \intcov.
+To demonstrate this, we compare the mutation-based interleaving
 exploration~\autoref{ss:scheduler} against various interleaving
 exploration methods proposed in prior approaches.
 
 \PP{Comparison target}
 %
 We compare \sys to state-of-the-art kernel concurrency fuzzers,
-Snowboard~\cite{snowboard}, and Krace~\cite{krace}.
+Snowboard~\cite{snowboard}, and KRACE~\cite{krace}.
 %
-Unfortunately, we cannot directly run Snowboard and Krace for the
-comparison study because Krace is implemented only for file systems,
+Unfortunately, we cannot directly run Snowboard and KRACE for the
+comparison study because KRACE is implemented only for file systems,
 and Snowboard requires significant modifications according to our
-purpose\dr{}.
+purpose\dr{}\yj{Yeah, it is a vague excuse}.
 %
 Therefore, we implement their approaches on the multi-thread fuzzing
 phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
-random delay injection scheme of Krace, and 2) the
-enforcing-single-interleaving-order scheme of Snowboard.
+random delay injection scheme of KRACE, and 2) the
+enforcing-single-interleaving-order scheme used by Snowboard.
 %
-In addition of recent concurrency fuzzing works, we also compare with
-the kernel scheduler (\ie, no thread scheduling control applied) as
-the baseline.
-
-
-
+In addition to them, we also compare with the kernel scheduler 
+(\ie, no thread scheduling control applied) as the naive baseline.
 
 % %
 % Arguably, the most straightforward metric to compare fuzzing
@@ -394,46 +388,36 @@ the baseline.
 \autoref{table:comparison-interleaving-search} shows the comparison
 result.
 %
-In this table, \texttt{\sys}, \texttt{Snowboard}, and \texttt{Krace}
+In this table, \texttt{\sys}, \texttt{Snowboard}, and \texttt{KRACE}
 columns display the number of executions and the elapsed time taken by
 their corresponding works, and the \texttt{Naive} column corresponds
 to the kernel scheduler without any thread scheduling control enabled.
 %
-
 %
-Looking at the \texttt{Naive} column, we can identify the difficulty
-of discovering varies from bug to bug.
+In the \texttt{Naive} column, we can identify the difficulty
+of discovering varies from a bug to a bug.
 %
 For example, CVE-2018-12232 appears as the easiest concurrency bug to
-discover since it can be discovered within 78 executions even with the
-kernel scheduler.
+discover since it can be discovered within 78 executions even with the naive kernel scheduler.
 %
 On the other hand, the kernel scheduler fails to discover three
 concurrency bugs, CVE-2019-6974, CVE-2019-11486, and
 \texttt{69e16d01d1de} within 10K times of executions.
 %
-Regardless of the difficulty of discovering, \sys can discover all of
-concurrency bugs very effectively.
+Regardless of the varying difficulty, \sys can discover all of
+concurrency bugs within a short time.
 %
-\sys can discover given concurrency bugs in just 26.8 runs on average,
-ranging from 3 to 81.
+\sys can discover given concurrency bugs in just 26.8 runs on average, ranging from 3 to 81.
 %
 Whereas, Snowboard discovers concurrency bugs in 89 runs on average,
-ragning from 8 to 229, and Krace discovers them in 329.1 runs on
-average if successful, raning from 9 to 1296. Moreover, Krace even
-suffers from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
-%
-Throughout this evaluation, we confirm that the \sys's speculative
-interleaving exploration can manage the search complexity of
-interleaving segment coverage, and consequently, \sys can tirgger
-given concurrency bugs even much faster than previous approaches.
+ranging from 8 to 229 runs, and KRACE discovers them in 329.1 runs on
+average if successful, ranging from 9 to 1296 runs. 
+Moreover, KRACE even suffers from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
 
-
-
-
-
-
-
+In summary, we confirm that the \sys's mutation-based 
+interleaving exploration exhibits superior performance by 
+quickly navigating the search space even if \intcov 
+constructs more complex search space than the alias coverage.
 
 \subsection{Performance characteristics of \sys}
 \label{ss:characteristics}
@@ -459,7 +443,7 @@ Here, we provide performance characteristics of the whole \sys.
 %
 Since coverage metrics are the paramount performance metric of
 fuzzing, we measure the coverage growth for both code coverage (\ie,
-the number of taken branches) and interelaving coverage (\ie, the
+the number of taken branches) and interleaving coverage (\ie, the
 number of observed interleaving segments) during 100 hours of fuzzing.
 
 As shown in \autoref{fig:eval:coverage}, there is a notable difference
@@ -533,7 +517,7 @@ higher than the throughput of \sys.
 These results indicate that the throughput of \sys is mainly degraded
 by the heavy instrumentation to trace memory accesses.
 %
-However, as Krace~\cite{krace} states, it can be understandable as the
+However, as KRACE~\cite{krace} states, it can be understandable as the
 cost for the high input quality.
 %
 In the fuzzer's perspective, while tracking memory accesses has
