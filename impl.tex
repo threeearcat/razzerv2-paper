@@ -142,11 +142,11 @@ includes
 %
 Assuming
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$) has
-not been explored before, \sys determines that it is worth exploring
+been unseen before, \sys determines that it is worth exploring
 interleavings between the two system calls.
 %
-Consequently, the single-thread executor passes $I_{ST}$ as well as
-the two system calls and $G$ to the multi-thread fuzzing phase.
+Thus, the single-thread executor passes $I_{ST}$ as well as the two
+system calls and $G$ to the multi-thread fuzzing phase.
 
 
 
@@ -687,23 +687,20 @@ next scheduling point.
 
 \PP{Handling missing scheduling points}
 %
-\dr{TODO: rewrite}
+During the execution, instructions on which scheduling points install
+might not be executed, for example, if the control flow changes due to
+kernel internal states.
 %
-It is worth noting that instructions on which scheduling points
-install may not be executed if the control flow changes due to kernel
-internal states.
+In such case, the execution engine does not mess up the order of
+scheduling points.
 %
-In such case, the execution engine keeps the order of scheduling
-points.
+For example, when executing a schedule of
+\autoref{fig:workflow-hypervisor}, it is possible that thread~A may
+skip \texttt{A2}, and hit a breakpoint installed on \texttt{A6}.
 %
-\dr{}
-For example, when executing a schedule of \autoref{fig:schedule}, it
-is possible that thread~A may not execute \texttt{A2}, and hit a
-breakpoint on \texttt{A6}.
-%
-Then, we ignore all scheduling points before \texttt{A6} (\ie,
-\texttt{A2} and \texttt{B1}), and keep enforcing a schedule after
-\texttt{A6} (\ie, \texttt{B2}).
+If so, the execution engine ignores all scheduling points before
+\texttt{A6} (\ie, \texttt{A2} and \texttt{B2}), and keeps enforcing a
+schedule after \texttt{A6}.
 
 
 
@@ -717,7 +714,7 @@ the breakpoint is hit by a thread of the userspace fuzzer, or by an
 irrelevant thread.
 %
 If a breakpoint is hit by a thread of the userspace fuzzer, the
-execution engine perform preemption as specified in a schedule.
+execution engine perform preemption.
 %
 Otherwise, the execution engine ignores the breakpoint hit, and keeps
 running the kernel.

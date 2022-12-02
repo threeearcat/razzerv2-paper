@@ -86,8 +86,8 @@ decreases as the problem size decreases.
 Our key strategy is \textit{decomposing} the search space into small
 sub-spaces, called \textit{interleaving segments}.
 %
-Each interleaving segment represents an interleaving of a small number
-of instructions accessing shared memory objects.
+Interleaving segments represent interleavings of a small number of
+instructions accessing shared memory objects.
 %
 To define the size (\ie, the number of instructions) of an
 interleaving segment, we use the finding from an extensive
@@ -120,7 +120,7 @@ which makes the problem of defining a coverage metric tractable while maintainin
     contained in (a).  Note that red circles correspond to
     instructions involved in triggering the uninitialized access bug.}
   \label{fig:keyidea}
-  \vspace{-7pt}
+  \vspace{-8pt}
 \end{figure}
 %
 \autoref{fig:keyidea} illustrates interleaving segments from the
@@ -685,7 +685,7 @@ recomposed interleaving.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.55\linewidth]{fig/interleavingmutation.pdf}
+  \includegraphics[width=0.65\linewidth]{fig/interleavingmutation.pdf}
   \caption{Example of interleaving segment mutation. In this example,
     (a) represents an interleaving segment graph of
     \autoref{fig:interleavingsegmentgraph} while (b) and (c) represent
