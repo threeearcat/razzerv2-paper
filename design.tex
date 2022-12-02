@@ -285,7 +285,7 @@ three instructions to speculate unexplored execution orders of these
 instructions such as
 ($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) which
 causes the uninitialized access bug if executed.  Therefore, instead
-of doing a randomized search (as in most previous approaches), if a
+of doing a randomized search (as in most prior approaches), if a
 fuzzer figures out which of the enumerated interleavings have not been
 explored, \textit{a fuzzer can strategically explore the search space
   with speculative interleavings, satisfying \textbf{Design goal 2}}.
@@ -352,7 +352,7 @@ Using a set of segment graphs, we propose a novel interleaving
 coverage metric called \textit{\intcov}.
 %
 \Intcov is a collection of explored segment graphs, designed to track
-interleavings within an interleaving segment.
+interleavings within interleaving segments.
 % , and
 % to guide a fuzzer to efficiently search possible instruction
 % interleavings.
@@ -542,10 +542,10 @@ thread interleaving.
 % thread interleaving.
 
 
-Afterwards, a fuzzer derives subgraphs from the generated DAG with 
-each subgraph including two interleaving-order edges. A subgraph 
-is called \textit{segment graph} because it represents interleavings 
-in a segment.
+Afterwards, a fuzzer derives subgraphs from the generated DAG with
+each subgraph including two interleaving-order edges. A subgraph is
+called \textit{segment graph} because it represents interleavings in
+an interleaving segment.
 %
 In order to compute a segment graph $g$, a fuzzer selects two
 interleaving-order edges.
@@ -564,24 +564,26 @@ the edges into $g$, resulting in
 \autoref{fig:interleavingsegmentgraph}-(b).
 %
 Lastly, a fuzzer gathers segment graphs into a set
-$G = \{g_1, g_2, ..., g_n\}$ (\eg, in \autoref{fig:keyidea}, $G$
-contains three segment graphs corresponding to \texttt{Segment \#1},
-\texttt{Segment \#2}, and \texttt{Segment \#3}), and uses $G$ to track
-interleaving segment coverage and to search unexplored thread
-interleavings.
+$G = \{g_1, g_2, ..., g_n\}$ (\eg, in \autoref{fig:keyidea}, three
+segment graphs corresponding to \texttt{Segment \#1}, \texttt{\#2},
+and \texttt{\#3}), and uses $G$ to track interleaving segment coverage
+and to search unexplored thread interleavings.
 
 
 
 \PP{Tracking interleaving segment coverage}
-We use each segment for coverage called \textit{\intcov}. When a new segment graph is detected, it is added to \intcov.
-If new segment graphs are continuously discovered, it indicates that 
-a fuzzer should
-invest more computing power to further explore thread interleavings.
-Otherwise, a fuzzer can conclude that the input no longer
-reveals interesting interleavings.
-In practice, however, \intcov contains a large number of segment
-graphs, which consumes a large amount of memory even though the size
-of individual segment graphs is small.
+%
+Our interleaving coverage called \textit{\intcov} tracks segment
+graphs. When a new segment graph is detected, it is added to \intcov.
+If new segment graphs are continuously discovered in a multi-thread
+input, it indicates that a fuzzer should invest more computing power
+to further explore thread interleavings in the input.  Otherwise, a
+fuzzer can conclude that the input no longer reveals interesting
+interleavings.
+%
+In practice, however, \intcov contains a large number
+of segment graphs, which consumes a large amount of memory even though
+the size of individual segment graphs is small.
 %
 To reduce memory consumption, we hash each segment graph, 
 so interleaving segment coverage is stored as a universal hash table of segment graphs.
@@ -662,8 +664,10 @@ graphs.
 %
 Specifically, a fuzzer \textbf{mutates} \textit{explored} interleaving
 segments into \textit{unexplored} interleaving segments, where mutated
-segments contain interleavings to be tested.  Using \intcov, a fuzzer
-can identify if a newly mutated segment is tested or not.
+segments contain interleavings to be tested.
+%
+% Using \intcov, a fuzzer can identify if a newly mutated segment is
+% tested or not.
 %
 Afterwards, a fuzzer \textbf{recomposes} mutated segments to obtain a
 \dr{}whole interleaving, and generates scheduling points from the
@@ -681,7 +685,7 @@ recomposed interleaving.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.65\linewidth]{fig/interleavingmutation.pdf}
+  \includegraphics[width=0.55\linewidth]{fig/interleavingmutation.pdf}
   \caption{Example of interleaving segment mutation. In this example,
     (a) represents an interleaving segment graph of
     \autoref{fig:interleavingsegmentgraph} while (b) and (c) represent
@@ -728,11 +732,10 @@ $(\texttt{B1} \Rightarrow \texttt{A4})$ in
 of \autoref{fig:interleavingmutation}-(c), which also represents
 another interleaving.
 %
-Note that flipping only
-$(\texttt{B1} \Rightarrow \texttt{A4})$  of
-\autoref{fig:interleavingmutation}-(a) generates an \textit{invalid}
-segment graph as shown in \autoref{fig:interleavingmutation}-(d)
-because it creates a loop
+Note that flipping only $(\texttt{B1} \Rightarrow \texttt{A4})$ of
+\autoref{fig:interleavingmutation}-(a), however, generates an
+\textit{invalid} segment graph as shown in
+\autoref{fig:interleavingmutation}-(d) because it creates a loop
 $\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}
 \Rightarrow \texttt{B1}$.
 %
@@ -753,12 +756,16 @@ mutated segment graph is recorded in \intcov.
 % their hash values are recorded in the hash table).
 %
 In such way, a fuzzer forms a set of \textit{unexplored} mutated
-segment graphs $G_{mutated}$, and recomposes them for the next search.
+segment graphs $G_{mutated}$ (\eg, in \autoref{fig:keyidea}, mutated
+segment graphs derived from \texttt{Segment \#1}, \texttt{\#2}, and
+\texttt{\#3}), and recomposes them for the next search.
 %
-In the case of \autoref{fig:keyidea}, $G_{mutated}$ contains mutated
-segment graphs (including \autoref{fig:interleavingmutation}-(b) and
-(c)) derived from \texttt{Segment \#1}, \texttt{Segment \#2}, and
-\texttt{Segment \#3}.
+% In the case of \autoref{fig:keyidea}, $G_{mutated}$ contains mutated
+% segment graphs (including \autoref{fig:interleavingmutation}-(b) and
+% (c)) derived from \texttt{Segment \#1}, \texttt{Segment \#2}, and
+% \texttt{Segment \#3}.
+
+
 
 \PP{Recomposing mutated segment graphs}
 %
@@ -782,26 +789,25 @@ mutated segments at one execution.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.99\linewidth]{fig/hint.pdf}
-  \caption{Example of recomposing mutated segments into whole
-    interleaving, where (a) represents mutated segments, (b)
-    represents a graph combining the two mutated segments, and (c)
-    represents a sequence of instructions to test \texttt{Segment
-      \#1*} and \texttt{Segment \#2*}}
+  \caption{Example of recomposing mutated segment graphs into a whole
+    thread interleaving, where (a) represents mutated segment graphs,
+    (b) represents a graph combining the two mutated segment graphs,
+    and (c) represents an instruction sequence to test \texttt{Segment
+      \#1*} and \texttt{\#2*}}
   \label{fig:hint}
   \vspace{-5pt}
 \end{figure}
 
 
-\autoref{fig:hint} demonstrates a sketch of recomposing steps. Suppose
-we choose two mutated segment graphs from $G_{mutated}$ called
-\texttt{Segment \#1*} and \texttt{Segment \#2*} (\ie,
-\autoref{fig:hint}-(a)) that are derived from \texttt{Segment \#1} and
-\texttt{Segment \#2} in \autoref{fig:keyidea}-(b) respectively.
+\autoref{fig:hint} demonstrates a sketch of recomposing
+steps. Suppose, from $G_{mutated}$, we select two mutated segment
+graphs called \texttt{Segment \#1*} and \texttt{\#2*} (\ie,
+\autoref{fig:hint}-(a)), which are derived from \texttt{Segment \#1}
+and \texttt{\#2} in \autoref{fig:keyidea}-(b) respectively.
 %
-We can then merge the two segment graphs, resulting in a
-larger graph containing all vertices and all edges from \texttt{Segment
-  \#1*} and \texttt{Segment \#2*} as described in
-\autoref{fig:hint}-(b).
+We can then merge the two segment graphs, resulting in a larger graph
+containing all vertices and all edges from \texttt{Segment \#1*} and
+\texttt{\#2*} as described in \autoref{fig:hint}-(b).
 %
 %In \autoref{fig:hint}-(b), five vertices are represented, where each
 %vertex comes from either \texttt{Segment \#1*} or \texttt{Segment
@@ -818,48 +824,49 @@ larger graph containing all vertices and all edges from \texttt{Segment
 %
 %\dr{}
 %
-Therefore, when we execute instruction interleavings corresponding to this
-large graph, we can test both \texttt{Segment \#1*} and \texttt{Segment
-  \#2*} at once (\autoref{fig:hint}-(c)).
+This large graph describe all interleavings from selected mutated
+segment graphs, and later, is used to schedule instructions to test
+both \texttt{Segment \#1*} and \texttt{\#2*} at once (\ie,
+\autoref{fig:hint}-(c)).
 
 When recomposing mutated segment graphs, one important constraint is
-that it should not contain a loop (\ie, \autoref{fig:hint}-(b) should
-not contain a loop). 
+that a loop should not be formed (\ie, \autoref{fig:hint}-(b) should
+not contain a loop).
 %Otherwise, a contradiction on the execution order
 %arises similar with an invalid mutation (\ie, an instruction should be
 %executed before itself).
 %
-To select a subset $G^*_{mutated}$ without making a loop, we start
-with an empty set of $G^*_{mutated}$. Then, we iterate over mutated
-segment graphs in $g^* \in G_{mutated}$ where $g^*$ is a mutated
-segment graph of a segment graph $g$.  From $g^*$, we try to add edges
-in $g^*$ into $G^*_{mutated}$ one by one and check it causes a loop or
-not. If it does not form a loop, we add the segment graph $g^*$ into
-$G^*_{mutated}$.
+To select multiple mutated segment graphs without making a loop, a
+fuzzer starts with an empty set of $G^*_{mutated}$. Then, a fuzzer
+iterates over all mutated segment graphs $g \in G_{mutated}$. From
+$g$, a fuzzer tries to add edges in $g$ into $G^*_{mutated}$ one by
+one and check it causes a loop or not. If it does not form a loop, a
+fuzzer adds the segment graph $g$ into $G^*_{mutated}$.
 %
-After iterating all mutated segment graphs in $G_{mutated}$,
-a fuzzer obtains $G^*_{mutated}$ not containing a loop. Then, 
-the fuzzer excludes selected mutated segment graphs from the set of 
-all mutated segment graphs
-(\ie, $G_{mutated} = G_{mutated} \setminus G^*_{mutated}$), and
-generates scheduling points to execute instruction orders 
-specified in $G^*_{mutated}$.
+After iterating all mutated segment graphs in $G_{mutated}$, a fuzzer
+obtains $G^*_{mutated}$ which is a subset of $G_{mutated}$ without
+containing a loop. Then, a fuzzer excludes selected mutated segment
+graphs from the set of all mutated segment graphs (\ie,
+$G_{mutated} = G_{mutated} \setminus G^*_{mutated}$), and generates
+scheduling points to test mutated interleaving segments contained in
+$G^*_{mutated}$.
 
 
 \PP{Generating scheduling points}
 %
 As a final step, once $G^{*}_{mutated}$ (\ie, \autoref{fig:hint}-(b))
 is obtained, a fuzzer creates scheduling points, where each scheduling
-point describes an instruction on which preemption should occur
-(including the end of each system call) and the next thread to run.
+point describes an instruction on which preemption should happen
+(including the end of each system call) as well as the next thread to
+run.
 %
 % How to enforce a schedule point is described in \autoref{ss:engine}.
 %In this sequence, scheduling points are just instructions that the
 %preemption should happen; \ie, the next instruction is executed by a
 %different thread.
 A fuzzer generates scheduling points by conducting a topological
-sort~\cite{topologicalsort} to $G^{*}_{mutated}$, which generates a
-sequence of instructions to run.
+sort~\cite{topologicalsort} to $G^{*}_{mutated}$, which generates an
+instruction sequence.
 %
 % Since $G^{*}_{mutated}$ is acyclic, a topological sort
 % always returns a sequence of vertices (\ie, instructions) that does
@@ -868,9 +875,9 @@ sequence of instructions to run.
 \autoref{fig:hint}-(c) shows the result of conducting the topological
 sort to \autoref{fig:hint}-(b).
 %
-As shown in the figure, a fuzzer can obtain the sequence of
-instructions to test mutated segments \texttt{Segment \#1*} and
-\texttt{Segment \#2*}. In this instruction sequence, a fuzzer selects
+As shown in the figure, the resulting instruction sequence can be used
+to test merged mutated segments, \ie, \texttt{Segment \#1*} and
+\texttt{\#2*}. In this instruction sequence, a fuzzer selects
 scheduling points as \texttt{A2}, \texttt{B2} and \texttt{A6}, and
 uses scheduling points when enforcing thread scheduling as detailed in
 \autoref{ss:engine}.
