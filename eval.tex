@@ -379,9 +379,10 @@ We compare \sys to state-of-the-art kernel concurrency fuzzers,
 Snowboard~\cite{snowboard}, and KRACE~\cite{krace}.
 %
 Unfortunately, we cannot directly run Snowboard and KRACE for the
-comparison study; KRACE is implemented only for file systems, and
-Snowboard runs based on the binary translation of QEMU, 
-
+comparison study; KRACE is implemented only for file systems. and
+Snowboard runs based on the binary translation of QEMU without the
+hardware acceleration (\ie, KVM), and thus, its current implementation
+is not suitable the elapsed time comparison.
 %
 Therefore, we implement their approaches on the multi-thread fuzzing
 phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
