@@ -174,10 +174,8 @@ proposed to discover vulnerabilities in the kernel.
 These approaches, specifically coverage-guided fuzzing, execute a
 large number of random inputs (\ie, sequences of system calls) while a
 code coverage metric (\eg, branch coverage) tracks the execution path
-that each input explores, and various sanitizers detect
-vulnerabilities~\cite{meds, kasan, asan, ubsan, lockdep}.
-
-
+that each input explores.
+%
 While conventional fuzzing techniques show the practicality even in
 large system softwares, they mostly focus on the \textit{sequential
   aspect} of the execution (\ie, the execution path of a single
@@ -266,7 +264,7 @@ For instance, at every iteration, Razzer~\cite{razzer} and
 Snowboard~\cite{snowboard} selects a single pair of instructions, and
 determines and enforces their execution order.
 %
-Whereas, Krace~\cite{krace} randomly schedules instructions, and
+Whereas, KRACE~\cite{krace} randomly schedules instructions, and
 Conzzer~\cite{conzzer} designates two functions and run them
 concurrently.
 %
@@ -276,7 +274,7 @@ and controls thread scheduling as desired.
 
 \PP{Interleaving coverage metric.}
 %
-As Krace~\cite{krace} reveals, code coverage metrics (\eg, branch
+As KRACE~\cite{krace} reveals, code coverage metrics (\eg, branch
 coverage) are not enough to capture unique behaviors of thread
 interleavings, because code coverage metrics only track behaviors in a
 single thread without paying attention to thread interleavings.

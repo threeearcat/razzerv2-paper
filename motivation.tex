@@ -220,15 +220,14 @@ methods do not satisfy \textbf{Design goal 1} and \textbf{2}.
 %
 We find that previously proposed interleaving coverage metrics are
 limited in distinguishing two interleavings in
-\autoref{fig:alias-coverage}, because \textit{none of them considers
-  interleavings of multiple memory accesses}.  Thus, they do not
-satisfy \textbf{Design goal 1}.
+\autoref{fig:alias-coverage}.  Thus, they do not satisfy
+\textbf{Design goal 1}.
 %
 For example, let us suppose we adopt alias coverage~\cite{krace},
 which tracks interleaving orders of \textit{two} instructions.
 %
 Alias coverage determines an interleaved execution \texttt{X} exposes
-a new interleaving if \texttt{X} contains an unexplored
+a new behavior if \texttt{X} contains an unexplored
 directed-instruction pair $I_W \rightarrow I_R$, where $I_R$ reads a
 value written by $I_W$.
 %
@@ -320,8 +319,8 @@ coverage-oblivious.  They do not make use of any interleaving coverage
 and perform their heuristic-based interleaving exploration, which
 inevitably execute redundant thread interleavings.
 %
-Krace~\cite{krace} also explores thread interleavings randomly without
-considering what thread interleavings are explored before.  Krace
+KRACE~\cite{krace} also explores thread interleavings randomly without
+considering what thread interleavings are explored before.  KRACE
 limitedly utilizes interleaving coverage only when deciding whether it
 runs a given multi-thread input more.
 \dr{
