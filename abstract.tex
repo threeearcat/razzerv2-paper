@@ -12,18 +12,17 @@ of coverage.  As a result, they either conduct wasteful searches with
 redundant executions or overlook concurrent bugs that their coverage 
 cannot address.
 
-To overcome such limitations, we propose \sys, a fuzzing framework
-for kernel concurrency bugs. When exploring the search space, 
-\sys decomposes entire thread interleavings to a set of segments
-each of which has the small number of interleavings, and 
-uses individual segments as coverage, called \intcov.
-At each search step, \sys mutates interleavings in each segment
-to construct new thread interleavings that has not yet been explored 
-(i.e., not recorded in the \intcov). With \sys, 
-we discover new 21 concurrency bugs in Linux kernels and 
-demonstrate the efficiency by showing that \sys can 
-identify known bugs up to \yj{xx} times quickly than 
-the state-of-the-art approaches, Snowboard and KRACE.
+To overcome such limitations, we propose \sys, a fuzzing framework for
+kernel concurrency bugs. When exploring the search space, \sys
+decomposes entire thread interleavings to a set of segments each of
+which has the small number of instructions, and utilizes individual
+segments as interleaving coverage, called \intcov.  At each search
+step, \sys mutates interleavings in each segment to construct new
+thread interleavings that has not yet been explored (i.e., not
+recorded in the \intcov). With \sys, we discover new 21 concurrency
+bugs in Linux kernels and demonstrate the efficiency by showing that
+\sys can identify known bugs up to \yj{xx} times quickly than the
+state-of-the-art approaches, Snowboard and KRACE.
 
 \end{abstract}
 
