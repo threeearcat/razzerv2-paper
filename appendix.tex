@@ -6,7 +6,7 @@
 % \dr{I want to discuss about this part. I'm thinking taking this part
 % out to the appendix section:}
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.7\linewidth]{fig/segmenthash.pdf}
   \caption{Two different interleaving segment graphs representing
@@ -75,6 +75,48 @@ values of the two graphs.
 \label{s:appendix:inputtransform}
 
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\linewidth]{fig/inputtransform.pdf}
+  \caption{Example of the input transformation conducted by the
+    userspace fuzzer~(\autoref{ss:fuzzer}). $I_{MT}$ is a multi-thread
+    input to trigger an uninitialized access bug described in
+    \autoref{fig:cve-2017-17712}.}
+  \label{fig:inputtransform}
+\end{figure}
+
+\sys generates a single-thread input $I_{ST}$ in the single-thread
+fuzzing phase~\autoref{sss:singlethreadfuzzing}, and then in the
+multi-thread fuzzing phase~\autoref{sss:multithreadfuzzing},
+transforms $I_{ST}$ into a multi-thread input.
+%
+\autoref{fig:inputtransform} demonstrates an example of the input
+transformation. Let us assume $I_{ST}$ is generated as a sequence of
+system calls as described in \autoref{fig:inputtransform}-(a), where
+\texttt{setsockopt(r0)} and \texttt{sendmsg(r0)} executes source codes
+in \autoref{fig:cve-2017-17712}. When $I_{ST}$ is executed, the
+single-thread executor identifies that \texttt{setsockopt(r0)}
+executed \texttt{B1}, and \texttt{sendmsg(r0)} executed \texttt{A2}
+and \texttt{A4}, and their execution order was
+($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$).
+%
+After drawing an segment graph with these three instructions, the
+single-thread executor identifies that the segment graph has not been
+explored, and consequently, $I_{ST}$ is passed to the multi-thread
+fuzzing phase with a purpose of executing \texttt{setsockopt(r0)} and
+\texttt{sendmsg(r0)} concurrently.
+
+
+When the multi-thread generator receives $I_{ST}$ and the two system
+calls \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)}, the
+multi-thread generator simply splits $I_{ST}$ into two parts, where
+the first part conatins system calls from the first system call until
+\texttt{setsockopt(r0)}, and the second contains the rest of the
+system calls. Then, the multi-thread generator assigns the first part
+to \texttt{Thread~A} and the second part to \texttt{Thread~B}.
+
+
+\dr{}
 
 \subsection{Virtual Machine Introspection}
 \label{s:appendix:vmi}
@@ -126,11 +168,7 @@ perform preemption to prevent unexpected block.
 \subsection{Non-data race concurrency bug}
 \label{s:appendix:datarace}
 
-Data races are a subset of concurrency bugs as described in the
-follow.
-
-
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.85\linewidth]{fig/racecondition.pdf}
   \caption{Example of non-data race concurrency bug (CVE-2019-6974)
@@ -139,6 +177,8 @@ follow.
   \label{fig:concurrencybugs}
 \end{figure}
 
+Data races are a subset of concurrency bugs as described in the
+follow.
 
 \PP{Data race.}
 %

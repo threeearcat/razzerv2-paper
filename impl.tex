@@ -17,23 +17,21 @@ exploration (\autoref{ss:scheduler}).
 As shown in \autoref{fig:workflow}, \sys consists of two stages of
 fuzzing.
 %
-The first stage is a \textit{single-thread fuzzing}, which focuses on
-identifying two system calls that may expose new interleaving
-segments.
-%
-The second stage is a \textit{multi-thread fuzzing} to explore thread
-interleavings and discover concurrency bugs.
+The first stage is a \textit{single-thread fuzzing}, which searches
+execution paths similar with conventional fuzzing, and the second
+stage is a \textit{multi-thread fuzzing} to explore thread
+interleavings.
 %
 In both stages, \sys traces timestamp-annotated memory accesses
 executed by each system call, and in the second stage, \sys adopts a
-mechanism to control thread scheduling as desired.
+mechanism to control thread scheduling.
 
 
 
 In the following, we provide the overall design of
 \sys~(\autoref{ss:fuzzer}).
 %
-Then, we describe the target kernel
+Then, we describe the kernel
 instrumentation~(\autoref{ss:instrumentation}) to trace
 timestamp-annotated memory accesses, and the execution
 engine~(\autoref{ss:engine}) to control thread scheduling.
@@ -130,16 +128,22 @@ Assume the single-thread generator produces $I_{ST}$ as a sequence of
 three system calls \texttt{r0 = socket()}, \texttt{setsocktopt(r0)},
 \texttt{sendmsg(r0)} as described in \autoref{fig:workflow}.
 %
-Then, the single-thread executor runs this $I_{ST}$. Afterwards, from
+Then, the single-thread executor runs this $I_{ST}$, and collects
 memory accesses executed by two system calls \texttt{setsockopt(r0)}
-and \texttt{sendmsg(r0)}, the single-thread executor computes a set of
-segment graphs $G$, which includes
+and \texttt{sendmsg(r0)}.
+%
+Since these memory accesses are annotated with timestamps, the
+single-thread executor identifies that all memory accesses executed by
+\texttt{setsockopt(r0)} are followed by memory accesses executed by
+\texttt{sendmsg(r0)}, and computes a set of segment graphs $G$, which
+includes
 ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$) (\ie,
 \autoref{fig:alias-coverage}-(a)).
 %
-While ($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$)
-has not been explored before, \sys determines that it is worth
-exploring interleavings between the two system calls.
+Assuming
+($\texttt{B1} \Rightarrow \texttt{A2} \Rightarrow \texttt{A4}$) has
+not been explored before, \sys determines that it is worth exploring
+interleavings between the two system calls.
 %
 Consequently, the single-thread executor passes $I_{ST}$ as well as
 the two system calls and $G$ to the multi-thread fuzzing phase.
@@ -181,8 +185,8 @@ After $I_{ST}$ is passed with ($S_i$, $S_j$) and $G$, the
 \textit{multi-thread generator} transforms $I_{ST}$ to a multi-thread
 input $I_{MT}$.
 %
-In addition, the multi-thread generator produces \textit{schedules}
-where each schedule contains a set of scheduling points.
+In addition, the multi-thread generator produces \textit{schedules},
+each of which contains a set of scheduling points.
 %
 The \textit{multi-thread executor} then repeatedly tests each schedule
 of $I_{MT}$ with a support of the execution
@@ -250,7 +254,7 @@ schedules from a set of explored segment graphs $G$.
 %   \label{f:mt-conversion}
 % \end{figure}
 Given $I_{ST}$ and ($S_i$, $S_j$), the multi-thread generator first
-produces $I_{MT}$ which preserves all system calls in $I_{ST}$, but
+produces $I_{MT}$, which preserves all system calls in $I_{ST}$, but
 executes $S_i$ and $S_j$ concurrently.
 %
 Assuming $i < j$, the input transformation is simply done by dividing
@@ -276,8 +280,9 @@ Briefly explaining, given a set of explored segment graphs $G$, the
 multi-thread generator mutates segment graphs in $G$ to derive a set
 of unexplored mutated segment graphs $G_{mutated}$.
 %
-Then, the multi-thread generator selects a subset of $G_{mutated}$,
-$G^{*}_{mutated}$, and forms a schedule for testing $G^*_{mutated}$.
+Then, the multi-thread generator selects a subset of $G_{mutated}$
+called $G^{*}_{mutated}$, and forms a schedule for testing mutated
+segment graphs contained in $G^*_{mutated}$.
 %
 Lastly, the generated schedule and $I_{MT}$ is passed to the
 multi-thread executor.
@@ -313,10 +318,10 @@ $S_i$ and $S_j$ executed.
 %
 With these memory accesses, the multi-thread executor probes for
 \intcov as described in \autoref{ss:coverage} by decomposing the
-executed interelaving into a set of segment graphs $G$. In addition,
-the multi-thread executor feeds $G$ to the multi-thread generator,
-allowing the multi-thread generator to further explore thread
-interleavings.
+executed interelaving into another set of segment graphs $G'$. In
+addition, the multi-thread executor feeds $G'$ to the multi-thread
+generator, allowing the multi-thread generator to further explore
+thread interleavings.
 
 
 
@@ -345,7 +350,7 @@ generated schedule, the uninitialized access bug is triggered.
 
 
 
-\subsection{Target Kernel Instrumentation}
+\subsection{Kernel Instrumentation}
 \label{ss:instrumentation}
 
 \sys requires to trace basic blocks (for tracking code coverage) and
@@ -504,27 +509,27 @@ thread is assigned a system call and scheduling points (\C{1} in
 \autoref{fig:workflow-hypervisor}).
 %
 Then, each thread invokes hypercalls (\ie, \texttt{hcall_sched()}) to
-deliver scheduling points to the execution engine, followed by a
-hypercall \texttt{hcall_ready()} that sleeps until all threads call
-are ready (\ie, \C{2}).
+deliver scheduling points to the execution engine (\ie, \C{2}). When
+the execution engine receives a scheduling point, the execution engine
+installs a breakpoint on an instruction on which the scheduling point
+refers (\ie, \C{2}-1).
 %
-\dr{sched point order, thread}
+It is worth noting that \texttt{hcall_sched()} takes the order of
+scheduling points as a second paramter. In this example, preemption
+will occur first on \texttt{A2}, followed by \texttt{B2} and
+\texttt{A6} in order during the execution.
 %
-Meanwhile, when the execution engine receives a scheduling point, the
-execution engine installs a breakpoint on an instruction on which the
-scheduling point indicates (\ie, \C{2}-1).
-%
-After all threads call \texttt{hcall_ready()}, the execution engine
-wakes them up, and the threads start executing system calls (\ie,
-\C{3}).
+After delivering scheduling points, each thread calls
+\texttt{hcall_ready()}, which sleeps until all threads call are ready,
+and after all threads call \texttt{hcall_ready()}, the execution
+engine wakes them up, and the threads start executing system calls
+(\ie, \C{3}).
 %
 While executing system calls, the execution engine keeps only one
-thread to run.
-%
-When the running thread reaches a scheduling point, the execution
-engine performs preemption (\ie, \C{4}) by suspending the running
-thread and resuming the next thread to run as specified in the given
-schedule (\ie, \C{4}-1).
+thread to run. When the running thread reaches a scheduling point, the
+execution engine performs preemption (\ie, \C{4}) by suspending the
+running thread and resuming the next thread to run as specified in the
+given schedule (\ie, \C{4}-1).
 
 
 
@@ -630,9 +635,9 @@ During the execution, the execution engine recognizes that the
 execution reaches a scheduling point when a breakpoint is hit.
 %
 When a thread hits a breakpoint, the execution engine stores context
-information (\eg, register values) in the hypervisor's memory, and
-changes the program counter of the running thread to an infinite loop
-called a trampoline.
+information (\eg, register values) of the running thread in the
+hypervisor's memory, and changes the program counter of the tthread to
+an infinite loop called a trampoline.
 %
 In the trampoline, the thread keeps calling a kernel API
 \texttt{cond_resched()} which yields a CPU. As a consequence, the
@@ -743,11 +748,11 @@ Google, with 3334~\footnote{We use scc~\cite{scc} and
   sloccount~\cite{sloccount} to measure LoC of GO and C, C++
   respectively.} LoC in GoLang and 341 LoC in C++.
 %
-The target kernel instrumentation~(\autoref{ss:instrumentation}) is
+The kernel instrumentation~(\autoref{ss:instrumentation}) is
 implemented in two parts, a compiler pass and callback functions. The
 compiler pass is implemented on the LLVM compiler suite
-12.0.1~\cite{llvm} with 323 LoC in C++, and, the callback functions are
-implemented in the Linux kernel source tree with 265 LoC in C.
+12.0.1~\cite{llvm} with 323 LoC in C++, and, the callback functions
+are implemented in the Linux kernel source tree with 265 LoC in C.
 %
 Lastly, the execution engine~(\autoref{ss:engine}) is implemented on QEMU
 6.0.0 with 1662 LoC in C, and leverages KVM (Kernel-based Virtual
