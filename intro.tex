@@ -68,10 +68,10 @@ common nature of concurrency bugs and ii) use that metric to drive
 an efficient search strategy for discovering previously untested interleavings.
 Hence, we demonstrate that \sys saves a significant amount of CPU expenses 
 in large-scale fuzzing by fast finding concurrent bugs, 
-without sacrificing bug-detecting capability (sometimes having better 
-capability than earlier work \dr{I don't get a point}).
+without sacrificing bug-detecting capability or even better 
+capability than earlier work.
 \sys achieves the goal with the following two key ideas:
-segmenting thread interleaving and speculative\dr{mutation-based?} exploration of interleavings.
+segmenting thread interleaving and mutation-based exploration of interleavings.
 
 \PP{Segmentizing thread interleaving} From the execution of two threads,  
 \sys decomposes the large thread interleaving space into tractable 
