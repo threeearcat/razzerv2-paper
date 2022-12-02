@@ -6,7 +6,7 @@
   \includegraphics[width=0.95\linewidth]{fig/architecture.pdf}
   \caption{An overview of \sys's architecture.}
   \label{fig:workflow}
-  \vspace{-5pt}
+  \vspace{-8pt}
 \end{figure}
 
 \sys is a kernel fuzzer tailored to effectively discover concurrency
@@ -485,9 +485,9 @@ In order to request the execution engine to enforce a schedule, the
 userspace fuzzer sends a schedule to run through hypercall interfaces
 before executing system calls.
 %
-After that, the threads notify the execution engine that they are
-ready to execute system calls, and start executing system calls.
-%
+% After that, the threads notify the execution engine that they are
+% ready to execute system calls, and start executing system calls.
+% %
 During the execution, the execution engine deliberately suspends and
 resumes the execution of system calls as described in the given
 schedule.
@@ -509,10 +509,10 @@ thread is assigned a system call and scheduling points (\C{1} in
 \autoref{fig:workflow-hypervisor}).
 %
 Then, each thread invokes hypercalls (\ie, \texttt{hcall_sched()}) to
-deliver scheduling points to the execution engine (\ie, \C{2}). When
-the execution engine receives a scheduling point, the execution engine
+deliver scheduling points to the execution engine (\C{2}). When the
+execution engine receives a scheduling point, the execution engine
 installs a breakpoint on an instruction on which the scheduling point
-refers (\ie, \C{2}-1).
+refers (\C{2}-1).
 %
 It is worth noting that \texttt{hcall_sched()} takes the order of
 scheduling points as a second paramter. In this example, preemption
@@ -523,13 +523,13 @@ After delivering scheduling points, each thread calls
 \texttt{hcall_ready()}, which sleeps until all threads call are ready,
 and after all threads call \texttt{hcall_ready()}, the execution
 engine wakes them up, and the threads start executing system calls
-(\ie, \C{3}).
+(\C{3}).
 %
 While executing system calls, the execution engine keeps only one
 thread to run. When the running thread reaches a scheduling point, the
-execution engine performs preemption (\ie, \C{4}) by suspending the
-running thread and resuming the next thread to run as specified in the
-given schedule (\ie, \C{4}-1).
+execution engine performs preemption (\C{4}) by suspending the running
+thread and resuming the next thread to run as specified in the given
+schedule (\C{4}-1).
 
 
 
