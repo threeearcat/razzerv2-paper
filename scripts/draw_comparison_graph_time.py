@@ -89,7 +89,7 @@ def draw():
     # ax.bar_label(rects3, padding=3, rotation=0, size=18)
     # ax.bar_label(rects4, padding=3, rotation=0, size=18)
 
-    plt.xticks(rotation=60)
+    plt.xticks(rotation=35)
     plt.tick_params(axis="x", length=20)
 
     # plt.show()

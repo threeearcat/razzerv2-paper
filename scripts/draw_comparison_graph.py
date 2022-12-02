@@ -85,7 +85,7 @@ def draw():
             y = 300 + 10
         plt.text(i + 0.2 + width * 3, y, val, ha="center", size=18)
 
-    plt.xticks(rotation=60)
+    plt.xticks(rotation=35)
     plt.tick_params(axis="x", length=20)
 
     # plt.show()

@@ -338,20 +338,20 @@ evaluation~(\autoref{sss:interleavingsearch}).
   \centering
   \includegraphics[width=0.99\linewidth]{fig/comparison_graph_execution-crop.pdf}
   \caption{Number of executions required for each concurrency fuzzer
-    to discover given concurrency bugs. The \texttt{Naive} column
-    indicates the kernel's scheduler (\ie, no thread scheduling
-    control applied).}
+    to discover concurrency bugs listed in
+    \autoref{table:knownbugs}. The \texttt{Naive} column indicates the
+    kernel's scheduler (\ie, no thread scheduling control applied).}
   \label{fig:eval:comparison-execution}
-  \vspace{-5pt}
+  \vspace{-8pt}
 \end{figure}
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.99\linewidth]{fig/comparison_graph_time-crop.pdf}
   \caption{Elaped time required for each concurrency fuzzer to
-    discover given concurrency bugs.}
+    discover concurrency bugs listed in \autoref{table:knownbugs}.}
   \label{fig:eval:comparison-time}
-  \vspace{-5pt}
+  \vspace{-8pt}
 \end{figure}
 
 % \begin{figure*}
@@ -379,9 +379,9 @@ We compare \sys to state-of-the-art kernel concurrency fuzzers,
 Snowboard~\cite{snowboard}, and KRACE~\cite{krace}.
 %
 Unfortunately, we cannot directly run Snowboard and KRACE for the
-comparison study because KRACE is implemented only for file systems,
-and Snowboard requires significant modifications according to our
-purpose\dr{}\yj{Yeah, it is a vague excuse}.
+comparison study; KRACE is implemented only for file systems, and
+Snowboard runs based on the binary translation of QEMU, 
+
 %
 Therefore, we implement their approaches on the multi-thread fuzzing
 phase~(\autoref{sss:multithreadfuzzing}) of \sys by applying 1) the
