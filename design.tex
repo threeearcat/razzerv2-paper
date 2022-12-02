@@ -17,10 +17,12 @@ This work focuses on how to efficiently explore the vast search space
 of thread interleaving when a multi-thread input (\eg,
 \texttt{sendmsg()} and \texttt{setsockopt()} in
 \autoref{fig:cve-2017-17712}) is given. Our approach utilizes an
-\textit{explored} thread interleaving as a seed interleaving.
+\textit{explored} thread interleaving as a seed interleaving (\eg,
+\autoref{fig:keyidea}-(a)).
 %
 With the seed interleaving, we explore thread interleavings of the
-given input in the following three steps:
+given input (\eg, \autoref{fig:hint}-(c)) in the following three
+steps:
 %
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
 \item \textbf{\textit{Decomposing}} an explored thread interleaving
@@ -31,7 +33,6 @@ given input in the following three steps:
   interleaving to determine how to schedule instructions in future.
 \end{enumerate}
 %
-
 
 In this section, we first explain our key intuition behind decomposing
 an explored interleaving into \textit{interleaving
@@ -49,13 +50,6 @@ based on \textit{step 2} and \textit{step 3} to satisfy \textbf{Design
   goal 2}~(\autoref{ss:scheduler}).
 % \yj{a new thread?}  interleaving for future iterations
 % (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
-
-\red{
-Throughout this section, we use \autoref{fig:cve-2017-17712} as a
-running example to show how a seed interleaving~(\ie,
-\autoref{fig:keyidea}-(a)) is used to explore the offending
-interleaving~(\ie, \autoref{fig:interleavingmutation}-(c)).
-}
 
 
 
@@ -88,11 +82,11 @@ problem decomposition, where the complexity of a problem exponentially
 decreases as the problem size decreases.
 %
 Our key strategy is \textit{decomposing} the search space into small
-sub-spaces. We call a sub-space \textit{interleaving segment}.
+sub-spaces, called \textit{interleaving segments}.
 %
-Each interleaving segment consists of instructions accessing 
-shared memory objects.
-% the same  memory objects. (\ie, conflicting instructions).
+Each interleaving segment represents an interleaving of a small number
+of instructions accessing shared memory objects.
+
 To define the size (\ie, the number of instructions) of an
 interleaving segment, we use an observation from an extensive
 survey~\cite{learningfrommistakes} in which 92.4\% (97 out of 105) of
@@ -134,8 +128,8 @@ represented in \autoref{fig:keyidea}-(a).
 % and executed thread interleavings described in
 %
 Then, interleaving segments described in \autoref{fig:keyidea}-(b)
-represents a part of its thread interleaving, comprised by at most
-four instructions.
+represent a part of its thread interleaving, comprised by at most four
+instructions.
 %
 For example, \texttt{Segment \#1} represents an interleaving of three
 instructions \texttt{B1}, \texttt{A2}, and \texttt{A4}, stating that

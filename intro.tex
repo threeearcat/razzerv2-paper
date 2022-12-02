@@ -92,7 +92,7 @@ that have not yet been found for the subsequent search.
 \PP{Mutating interleaving segments} 
 %
 To explore new interleavings,
-\sys mutates the mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
+\sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
 in a segment, which generates new interleavings for testing. \sys 
 mutates as many segments as possible in the expectation that the 
 new interleavings include a large number of untested interleavings. 
@@ -113,7 +113,7 @@ which exhibits harmful behaviors such as memory corruption,
 task hangs, or assertion violations. We emphasize that all
 concurrency bugs found by \sys were lurking in subsystems where
 Syzkaller~\cite{syzkaller} has been testing for several years, which
-demonstrates the usefulness of \sys in bug-finding capability.
+demonstrates the usefulness of \sys in discovering concurrency bugs.
 %
 To quantify the efficiency of \sys, we experimentally compare \sys 
 against the state-of-the-art techniques, Snowboard and KRACE and 
@@ -124,9 +124,10 @@ technique.
 We describe our contributions in three folds:
 
 \begin{itemize}
-\item interleaving segment coverage
-\item speculative interleaving exploration based on explored interleaving
-\item We have found \totalbugs race conditions.
+\item \textbf{\Intcov:}
+\item \textbf{Mutation-based interleaving exploration:}
+\item \textbf{Practical impact:}
+  We have found \totalbugs race conditions.
 \end{itemize}
 
 %%% Local Variables:
