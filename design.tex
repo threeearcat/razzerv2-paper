@@ -289,11 +289,10 @@ three instructions to speculate unexplored execution orders of these
 instructions such as
 ($\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$) which
 causes the uninitialized access bug if executed.  Therefore, instead
-of doing a randomized \red{or heuristic} search (as in most previous
-approaches), if a fuzzer figures out which of the enumerated
-interleavings have not been explored, \textit{a fuzzer can
-  strategically explore the search space with speculative
-  interleavings, satisfying \textbf{Design goal 2}}.
+of doing a randomized search (as in most previous approaches), if a
+fuzzer figures out which of the enumerated interleavings have not been
+explored, \textit{a fuzzer can strategically explore the search space
+  with speculative interleavings, satisfying \textbf{Design goal 2}}.
 
 
 % 

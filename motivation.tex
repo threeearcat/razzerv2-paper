@@ -181,9 +181,9 @@ in previous approaches~\cite{ski, krace, pctalgorithm, muzz}.
 %
 Considering a concurrency bugs often manifest with a thread
 interleaving that rarely happen~\cite{exprace}, the systematic
-interleaving exploration boosts up the concurrency bug discovery, as
-it directs the fuzzer to execute unexplored thread interleaving
-instead of executing random interleavings thousands of times.
+interleaving exploration boosts up the concurrency bug discovery, as a
+fuzzer directly executes unexplored thread interleavings instead of
+executing random interleavings thousands of times.
 
 
 \dr{cut?}
@@ -311,27 +311,27 @@ function.
 %
 Stemming from the aforementioned limitations in coverage, proposed
 thread interleaving exploration methods do not efficiently explore the
-search space guided by their interleaving coverage, not satisfying
-\textbf{Design goal 2}.
-
-Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are
+search space of thread interleaving due to the lack of guidance of
+their interleaving coverage, not satisfying \textbf{Design goal 2}.
+%
+Specifically, Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are
 coverage-oblivious.  They do not make use of any interleaving coverage
 and perform their heuristic-based interleaving exploration, which
 inevitably execute redundant thread interleavings.
 %
-KRACE~\cite{krace} also explores thread interleavings randomly without
-considering what thread interleavings are explored before.  KRACE
-limitedly utilizes interleaving coverage only when deciding whether it
-runs a given multi-thread input more.
-\dr{
-안어울리는 문장:
-Whereas, we use the coverage to
-infer which thread interleavings to search further in future
-iterations.
-}
+KRACE~\cite{krace} randomly schedules instructions at every iteration
+without considering what thread interleavings are explored before.
+KRACE limitedly utilizes interleaving coverage only when deciding
+whether it runs a given multi-thread input more.
+% \dr{
+% 안어울리는 문장:
+% Whereas, we use the coverage to
+% infer which thread interleavings to search further in future
+% iterations.
+% }
 %
-While Conzzer~\cite{conzzer} designates two functions and run them
-concurrently, Conzzer still leaves instructions' interleaving
+Whereas Conzzer~\cite{conzzer} designates two functions and run them
+concurrently, but it still leaves instructions' interleaving
 uncontrolled and scheduled randomly.
 %
 As a consequence, existing approaches do not systematically search for
