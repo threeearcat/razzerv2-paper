@@ -57,6 +57,33 @@ def draw():
         bbox_to_anchor=(0.5, 1.3),
     )
 
+    for i in range(len(x)):
+        val = c2fuzz[i]
+        y = val
+        if y > 200:
+            y = 200
+        plt.text(i + 0.2, y, c2fuzz[i], ha="center", size=18)
+
+    for i in range(len(x)):
+        val = snowboard[i]
+        y = val
+        if y > 200:
+            y = 200
+        plt.text(i + 0.2 + width, y, snowboard[i], ha="center", size=18)
+
+    for i in range(len(x)):
+        val = krace[i]
+        y = val
+        if y > 200:
+            y = 200 - 7
+        plt.text(i + 0.2 + width * 2, y, val, ha="center", size=18)
+
+    for i in range(len(x)):
+        val = naive[i]
+        y = val
+        if y > 200:
+            y = 200 + 7
+        plt.text(i + 0.2 + width * 3, y, val, ha="center", size=18)
     # ax.bar_label(rects1, padding=3, rotation=0, size=18)
     # ax.bar_label(rects2, padding=3, rotation=0, size=18)
     # ax.bar_label(rects3, padding=3, rotation=0, size=18)
@@ -66,7 +93,7 @@ def draw():
     plt.tick_params(axis="x", length=20)
 
     # plt.show()
-    plt.savefig("comparison_graph_time.png", dpi=300, bbox_inches="tight")
+    plt.savefig("comparison_graph_time.pdf", dpi=300, bbox_inches="tight")
 
 
 draw()

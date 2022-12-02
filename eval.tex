@@ -321,26 +321,43 @@ evaluation~(\autoref{sss:interleavingsearch}).
 %   \label{fig:eval:comparison}
 % \end{figure*}
 %
-\begin{table*}
-  \centering
-  \input{table/comparison-interleaving-search.tex}
-  \caption{Result of the comparison study against various
-    state-of-the-art kernel concurrency fuzzers (\ie,
-    KRACE~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
-    number of executions and the elapsed time (secs) required to
-    discover each concurrency bug. The \texttt{Naive} column indicates
-    the kernel's scheduler (\ie, no thread scheduling control applied).}
-  \label{table:comparison-interleaving-search}
-  \vspace{-5pt}
-\end{table*}
+% \begin{table*}
+%   \centering
+%   \input{table/comparison-interleaving-search.tex}
+%   \caption{Result of the comparison study against various
+%     state-of-the-art kernel concurrency fuzzers (\ie,
+%     KRACE~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
+%     number of executions and the elapsed time (secs) required to
+%     discover each concurrency bug. The \texttt{Naive} column indicates
+%     the kernel's scheduler (\ie, no thread scheduling control applied).}
+%   \label{table:comparison-interleaving-search}
+%   \vspace{-5pt}
+% \end{table*}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.99\linewidth]{fig/comparison_graph-crop.pdf}
-  \caption{Coverage growth of \sys.}
-  \label{fig:eval:coverage}
+  \includegraphics[width=0.99\linewidth]{fig/comparison_graph_execution-crop.pdf}
+  \caption{Number of executions required for each concurrency fuzzer
+    to discover given concurrency bugs. The \texttt{Naive} column
+    indicates the kernel's scheduler (\ie, no thread scheduling
+    control applied).}
+  \label{fig:eval:comparison-execution}
   \vspace{-5pt}
 \end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.99\linewidth]{fig/comparison_graph_time-crop.pdf}
+  \caption{Elaped time required for each concurrency fuzzer to
+    discover given concurrency bugs.}
+  \label{fig:eval:comparison-time}
+  \vspace{-5pt}
+\end{figure}
+
+% \begin{figure*}
+% \subfloat[First.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_execution-crop.pdf}}
+% \subfloat[First.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_time-crop.pdf}}\\
+% \end{figure*}
 
 %
 One could argue that even if interleaving segment coverage is
@@ -394,17 +411,17 @@ In addition to them, we also compare with the kernel scheduler
 
 \PP{Result}
 %
-\autoref{table:comparison-interleaving-search} shows the comparison
-result.
+\autoref{fig:eval:comparison-execution} and
+\autoref{fig:eval:comparison-time} show the comparison result.
 %
-In this table, \texttt{\sys}, \texttt{Snowboard}, and \texttt{KRACE}
-columns display the number of executions and the elapsed time taken by
-their corresponding works, and the \texttt{Naive} column corresponds
-to the kernel scheduler without any thread scheduling control enabled.
+In these figures, \texttt{\sys}, \texttt{Snowboard}, and
+\texttt{KRACE} display the number of executions and the elapsed time
+taken by their corresponding works, and \texttt{Naive} corresponds to
+the kernel scheduler without any thread scheduling control enabled.
 %
 %
-In the \texttt{Naive} column, we can identify the difficulty
-of discovering varies from a bug to a bug.
+In \texttt{Naive}, we can identify the difficulty of discovering
+varies from a bug to a bug.
 %
 For example, CVE-2018-12232 appears as the easiest concurrency bug to
 discover since it can be discovered within 78 executions even with the naive kernel scheduler.
