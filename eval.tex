@@ -433,12 +433,16 @@ concurrency bugs, CVE-2019-6974, CVE-2019-11486, and
 Regardless of the varying difficulty, \sys can discover all of
 concurrency bugs within a short time.
 %
-\sys can discover given concurrency bugs in just 26.8 runs on average, ranging from 3 to 81.
+\sys can discover given concurrency bugs within just 26.8 runs
+(ranging from 3 to 81) and 13 seconds (ranging from 1 to 52) on
+average.
 %
-Whereas, Snowboard discovers concurrency bugs in 89 runs on average,
-ranging from 8 to 229 runs, and KRACE discovers them in 329.1 runs on
-average if successful, ranging from 9 to 1296 runs. 
-Moreover, KRACE even suffers from discovering CVE-2019-6974 and \texttt{69e16d01d1de}.
+Whereas, Snowboard discovers concurrency bugs within 89 runs (ranging
+from 8 to 229 runs) and 37.5 seconds (ranging from 2 to 139) on
+average, and KRACE discovers them, if successful, within 329.1 runs
+(ranging from 9 to 1296) and 107 seconds (ranging from 4 to 359) on
+average.  Moreover, KRACE even suffers from discovering CVE-2019-6974
+and \texttt{69e16d01d1de}.
 
 In summary, we confirm that the \sys's mutation-based 
 interleaving exploration exhibits superior performance by 
