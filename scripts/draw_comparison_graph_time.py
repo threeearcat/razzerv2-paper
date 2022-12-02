@@ -24,10 +24,10 @@ def draw():
         "69e16d01d1de",
     ]
 
-    c2fuzz = [6, 22, 30, 17, 38, 12, 81, 3, 41]
-    snowboard = [12, 58, 191, 79, 31, 8, 229, 37, 156]
-    krace = [96, 9, 53, 1296, 342, 14, 10000, 494, 10000]
-    naive = [270, 721, 274, 1757, 1852, 78, 10000, 10000, 10000]
+    c2fuzz = [2, 7, 16, 5, 13, 3, 52, 1, 23]
+    snowboard = [4, 26, 58, 22, 10, 2, 139, 16, 61]
+    krace = [44, 4, 24, 359, 100, 4, 5720, 222, 3410]
+    naive = [85, 377, 83, 474, 460, 29, 5578, 3810, 3358]
 
     x = np.arange(len(labels))  # the label locations
     width = 0.2  # the width of the bars
@@ -46,10 +46,10 @@ def draw():
     rects3 = ax.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color="#7c64bc")
     rects4 = ax.bar(x + 0.2 + width * 3, naive, width, label="Naive", color="#39a767")
 
-    ax.set_ylim(0, 300)
+    ax.set_ylim(0, 200)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel("# of executions")
+    ax.set_ylabel("Elapsed time (s)")
     ax.set_xticks(x, labels)
     ax.legend(
         loc="upper center",
@@ -66,7 +66,7 @@ def draw():
     plt.tick_params(axis="x", length=20)
 
     # plt.show()
-    plt.savefig("comparison_graph_execution.png", dpi=300, bbox_inches="tight")
+    plt.savefig("comparison_graph_time.png", dpi=300, bbox_inches="tight")
 
 
 draw()
