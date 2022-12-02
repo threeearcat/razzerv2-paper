@@ -175,7 +175,7 @@ coverage as feedback to infer \textit{unexplored} thread interleavings
 (\eg, $\texttt{A2} \Rightarrow \texttt{B1} \Rightarrow \texttt{A4}$).
 %
 This allows a systematic way to explore the search space rather than
-performing randomized \red{or heuristic} exploration pervasively used
+performing randomized or heuristic-based exploration pervasively used
 in previous approaches~\cite{ski, krace, pctalgorithm, muzz}.
 % \yj{cite}
 %
@@ -315,21 +315,25 @@ thread interleaving exploration methods do not efficiently explore the
 search space guided by their interleaving coverage, not satisfying
 \textbf{Design goal 2}.
 
-Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are coverage-oblivious.
-They do not make use of any interleaving coverage 
-and perform their \dr{}randomized interleaving exploration.
+Razzer~\cite{razzer} and Snowboard~\cite{snowboard} are
+coverage-oblivious.  They do not make use of any interleaving coverage
+and perform their heuristic-based interleaving exploration, which
+inevitably execute redundant thread interleavings.
 %
 Krace~\cite{krace} also explores thread interleavings randomly without
 considering what thread interleavings are explored before.  Krace
 limitedly utilizes interleaving coverage only when deciding whether it
-runs a given multi-thread input more. Whereas, we use the coverage to
+runs a given multi-thread input more.
+\dr{
+안어울리는 문장:
+Whereas, we use the coverage to
 infer which thread interleavings to search further in future
 iterations.
+}
 %
-Conzzer~\cite{conzzer} is the only work that attempts to direct a
-fuzzer based on interleaving coverage, but as discussed,  
-it's interleaving coverage metric, concurrent call pair, does not capture instruction-level interleavings orders, missing important 
-search guidelines.
+While Conzzer~\cite{conzzer} designates two functions and run them
+concurrently, Conzzer still leaves instructions' interleaving
+uncontrolled and scheduled randomly.
 %
 As a consequence, existing approaches do not systematically search for
 thread interleavings.  Rather, they \textit{blindly} go through

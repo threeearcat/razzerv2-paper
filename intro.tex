@@ -31,6 +31,8 @@ how to navigate thread interleaving and generate multi-thread input seeds (e.g.,
 Unfortunately, exploring all the possible interleavings is not practical because 
 The number of instructions executed by a system call in Linux is huge.
 Due to such difficulty, traditional fuzzers
+%
+\dr{seems like incomplete?}
 
 %\dr{as far as I know, there are conzzer and muzz}
 %\dr{If we consider Snowboard as a fuzzer, Snowboard does not
@@ -58,20 +60,21 @@ interleaving space, it takes a randomized approach,
 sharing the similar inefficiencies of previous techniques.
 
 To overcome the shortcoming of existing methods, this paper proposes
-sys, a fuzzing framework for kernel concurrency bugs. 
+\sys, a fuzzing framework for kernel concurrency bugs. 
 \sys discovers not only data races but 
 all interleaving-related bugs. 
 At its core, \sys aims to systematically explore the vast thread
 interleaving search space to quickly identify the multi-thread input and 
-interleavings leading to a concurrency bug The central idea behind \sys's design
+interleavings leading to a concurrency bug. The central idea behind \sys's design
 is i) defining a new, effective coverage metric that reflects the 
 common nature of concurrency bugs and ii) use that metric to drive 
 an efficient search strategy for discovering previously untested interleavings.
 Hence, we demonstrate that \sys saves a significant amount of CPU expenses 
 in large-scale fuzzing by fast finding concurrent bugs, 
 without sacrificing bug-detecting capability (sometimes having better 
-capability than earlier work).
-\sys achieves the goal with the following two key ideas: segmenting thread interleaving and speculative exploration of interleavings.
+capability than earlier work \dr{I don't get a point}).
+\sys achieves the goal with the following two key ideas:
+segmenting thread interleaving and speculative\dr{mutation-based?} exploration of interleavings.
 
 \PP{Segmentizing thread interleaving} From the execution of two threads,  
 \sys decomposes the large thread interleaving space into tractable 
