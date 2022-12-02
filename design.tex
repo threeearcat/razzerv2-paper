@@ -20,12 +20,12 @@ of thread interleaving when a multi-thread input (\eg,
 \textit{explored} thread interleaving as a seed interleaving (\eg,
 \autoref{fig:keyidea}-(a)).
 %
-With the seed interleaving, we explore thread interleavings of the
-given input (\eg, \autoref{fig:hint}-(c)) in the following three
-steps:
+With the seed interleaving, a fuzzer explores thread interleavings
+(\eg, \autoref{fig:hint}-(c)) of the given input in the following
+three steps:
 %
 \begin{enumerate}[labelsep=0pt, label=\textbf{\arabic*) }]
-\item \textbf{\textit{Decomposing}} an explored thread interleaving
+\item \textbf{\textit{Decomposing}} the explored thread interleaving
   into segments containing a small number of instructions.
 \item \textbf{\textit{Mutating}} interleavings within segments to
   generate unexplored interleavings for each segment.
@@ -35,19 +35,21 @@ steps:
 %
 
 In this section, we first explain our key intuition behind decomposing
-an explored interleaving into \textit{interleaving
+explored interleavings into \textit{interleaving
   segments}~(\autoref{ss:overview}).
 %
-Then, we illustrate how we define an interleaving coverage metric
-based on \textit{step 1} to satisfy \textbf{Design goal
-  1}~(\autoref{ss:coverage}).
+Then, we propose a novel interleaving coverage metric based on
+decomposed interleaving segments (\ie, \textit{step 1}) to satisfy
+\textbf{Design goal 1}~(\autoref{ss:coverage}).
 %
 % The coverage metric represents
 % combinatorial interleavings\yj{I do not like the term, combinatorial interleaving. Is it widely used?} .
 %
-Lastly, we explain the mutation-based interleaving exploration method
-based on \textit{step 2} and \textit{step 3} to satisfy \textbf{Design
-  goal 2}~(\autoref{ss:scheduler}).
+Lastly, we explain how to mutate (\ie, \textit{step 2}) and recompsoe
+(\ie, \textit{step 3}) interleaving segments to explore thread
+interleavings while satisfying \textbf{Design goal
+  2}~(\autoref{ss:scheduler}).
+%
 % \yj{a new thread?}  interleaving for future iterations
 % (\textbf{Design goal 2})~(\autoref{ss:scheduler}).
 
@@ -86,7 +88,7 @@ sub-spaces, called \textit{interleaving segments}.
 %
 Each interleaving segment represents an interleaving of a small number
 of instructions accessing shared memory objects.
-
+%
 To define the size (\ie, the number of instructions) of an
 interleaving segment, we use an observation from an extensive
 survey~\cite{learningfrommistakes} in which 92.4\% (97 out of 105) of
