@@ -75,14 +75,18 @@ def draw():
         val = krace[i]
         y = val
         if y > 300:
-            y = 300 - 10
+            y = 300 - 15
+        if val == 10000:
+            val = ">10000"
         plt.text(i + 0.2 + width * 2, y, val, ha="center", size=18)
 
     for i in range(len(x)):
         val = naive[i]
         y = val
         if y > 300:
-            y = 300 + 10
+            y = 300 + 5
+        if val == 10000:
+            val = ">10000"
         plt.text(i + 0.2 + width * 3, y, val, ha="center", size=18)
 
     plt.xticks(rotation=35)

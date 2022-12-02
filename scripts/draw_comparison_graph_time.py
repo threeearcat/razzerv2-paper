@@ -76,6 +76,8 @@ def draw():
         y = val
         if y > 200:
             y = 200 - 7
+        if val == 5720 or val == 3410:
+            val = ">" + str(val)
         plt.text(i + 0.2 + width * 2, y, val, ha="center", size=18)
 
     for i in range(len(x)):
@@ -83,6 +85,8 @@ def draw():
         y = val
         if y > 200:
             y = 200 + 7
+        if val == 5578 or val == 3810 or val == 3358:
+            val = ">" + str(val)
         plt.text(i + 0.2 + width * 3, y, val, ha="center", size=18)
     # ax.bar_label(rects1, padding=3, rotation=0, size=18)
     # ax.bar_label(rects2, padding=3, rotation=0, size=18)
