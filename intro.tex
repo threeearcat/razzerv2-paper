@@ -99,14 +99,14 @@ new interleavings include a large number of untested interleavings.
 This search strategy quickly navigates the search space than previous 
 approaches in which only one interleaving is mutated at each search step
 
-We implement \sys across various software layers.
-We extend Syzkaller~\cite{syzkaller} to generate concurrency fuzzing inputs 
-and segment mutations. 
-%
-In addition, \sys incorporates an LLVM pass to transform a kernel
-binary for tracking \intcov, and the QEMU/KVM-based execution engine
-to enforce thread scheduling obtained by segment mutations. 
-%
+% We implement \sys across various software layers.
+% We extend Syzkaller~\cite{syzkaller} to generate concurrency fuzzing inputs 
+% and segment mutations. 
+% %
+% In addition, \sys incorporates an LLVM pass to transform a kernel
+% binary for tracking \intcov, and the QEMU/KVM-based execution engine
+% to enforce thread scheduling obtained by segment mutations. 
+% %
 We run \sys against the latest version of the Linux kernel (ranging
 from 5.19-rc2 to 6.0-rc7), and find new \totalbugs concurrency bugs all of
 which exhibits harmful behaviors such as memory corruption,
@@ -131,7 +131,7 @@ We describe our contributions in three folds:
   grounds for a fuzzer to track the exploration progress of thread
   interelavings.
   %
-\item \textbf{Strategical interleaving exploration:}
+\item \textbf{Mutation-based interleaving exploration:}
   %
   Unlike most previous studies that rely on the randomized or simple
   heuristic-based thread interleaving exploration, we propose the
