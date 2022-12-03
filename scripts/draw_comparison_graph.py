@@ -13,15 +13,15 @@ rc("font", **font)
 
 def draw():
     labels = [
-        "   #1",
-        "   #2",
-        "   #3",
-        "   #4",
-        "   #5",
-        "   #6",
-        "   #7",
-        "   #8",
-        "   #9",
+        " Vul #1",
+        " Vul #2",
+        " Vul #3",
+        " Vul #4",
+        " Vul #5",
+        " Vul #6",
+        " Vul #7",
+        " Vul #8",
+        " Vul #9",
         # "CVE-2016-8655",
         # "CVE-2017-2636",
         # "CVE-2017-7533",
@@ -61,14 +61,14 @@ def draw():
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel("# of executions")
-    ax.set_xticks(x, labels, horizontalalignment="left")
+    ax.set_xticks(x, labels, horizontalalignment="left", size=22)
     ax.legend(
         loc="upper center",
         ncol=4,
         bbox_to_anchor=(1.1, 1.4),
     )
 
-    r = -30
+    r = 30
 
     for i in range(len(x)):
         val = c2fuzz[i]
@@ -131,7 +131,7 @@ def draw():
 
     # Add some text for labels, title and custom x-ayis tick labels, etc.
     ay.set_ylabel("Elapsed time (s)")
-    ay.set_xticks(x, labels, horizontalalignment="left")
+    ay.set_xticks(x, labels, horizontalalignment="left", size=22)
 
     for i in range(len(x)):
         val = c2fuzz[i]
