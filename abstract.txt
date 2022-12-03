@@ -1,2 +1,2 @@
 WARN: unresolved char in
- > individual segments as interleaving coverage, called \intcov.
+ > \redTo explore the vast search space, most previous approaches

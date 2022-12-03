@@ -8,9 +8,9 @@ or more threads. However, because the search space of thread
 interleaving is vast, it is practically impossible to investigate all
 conceivable thread interleavings.
 %
-To explore the vast search space, most previous approaches perform
-simple heuristic searches without having coverage for thread
-interleaving or with an insufficient form of coverage. As a result,
+\red{To explore the vast search space, most previous approaches
+  perform simple heuristic searches without having coverage for thread
+  interleaving or with an insufficient form of coverage.} As a result,
 they either conduct wasteful searches with redundant executions or
 overlook concurrent bugs that their coverage cannot address.
 
@@ -22,9 +22,9 @@ decomposes entire thread interleavings to a set of segments each of
 which contains the small number of instructions, and utilizes
 individual segments as interleaving coverage, called \intcov.
 %
-At each search step, \sys mutates interleavings in each segment to
+\red{At each search step, \sys mutates interleavings in each segment to
 construct new thread interleavings that has not yet been explored
-(\ie, not recorded in the \intcov).
+(\ie, not recorded in the \intcov).}
 %
 With \sys, we discover new 21 concurrency bugs in Linux kernels and
 demonstrate the efficiency by showing that \sys can identify known

@@ -78,7 +78,7 @@ To overcome the shortcoming of existing techniques, this paper proposes
 \sys discovers not only data races but 
 all interleaving-related bugs. 
 At its core, \sys aims to systematically explore the vast thread
-interleaving search space to quickly identify the multi-thread input and 
+interleaving search space to \red{quickly identify the multi-thread input} and 
 interleavings leading to a concurrency bug. The central idea behind \sys's design
 is i) defining a new, effective coverage metric that reflects the 
 common nature of concurrency bugs and ii) use that metric to drive 
@@ -95,8 +95,11 @@ segmenting thread interleaving and mutation-based exploration of interleavings.
 small sub-spaces, called \textit{interleaving segment} in which
 instructions access shared memory objects. The number of instructions 
 in a segment is small (at most four by default), and each segment may 
-contain multiple interleavings. Using interleaving segments, we propose 
-our new coverage metric, \textit{\intcov}, which is defined as a set of detected segments. \Intcov generalizes coverage 
+contain \red{multiple interleavings}. Using interleaving segments, we propose 
+our new coverage metric, \textit{\intcov}, which is defined as a set of detected segments.
+%
+\dr{I don't think this is wrong, but we don't have claims or evidences about it}
+\Intcov generalizes coverage 
 metrics proposed by previous approaches where they only track 
 a single interleaving (the size of a segment is 2). 
 Using \intcov provides two benefits to fuzzers. First, a fuzzer can 
