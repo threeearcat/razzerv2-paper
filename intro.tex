@@ -64,9 +64,9 @@ and how to navigate thread interleavings (\ie, concurrent aspects).
 %sharing the similar inefficiencies of previous techniques.
 
 
-For decades, coverage-guided fuzzing has been studied to effectively
-explore the search space of execution paths~\cite{janus, hydra,
-  healer, imf, hfl, syzkaller, klee, s2e, kafl}.
+For decades, coverage-guided fuzzing has been extensively studied to
+effectively explore the search space of execution paths~\cite{janus,
+  hydra, healer, imf, hfl, syzkaller, klee, s2e, kafl}.
 %
 % proven to be effective in exploring such a huge search space\yj{cite}.
 However, little progress has been made in exploring thread
@@ -78,17 +78,17 @@ metric), and how to utilize interleaving coverage metric in exploring
 thread interleavings.
 %
 For example, Razzer~\cite{razzer} and Snowboard~\cite{snowboard} use
-own heuristics combined by static or dynamic analysis, but they are
-coverage-oblivious.  They cannot prune redundant executions of thread
-interleavings that produce identical results.
+their own heuristics combined by static or dynamic analysis, but they
+are coverage-oblivious.  They cannot prune redundant executions of
+thread interleavings that produce identical coverage.
 %
 KRACE~\cite{krace} proposes alias coverage, which tracks
 concurrently-executed \textit{two} instructions, but alias coverage
-suffers from effectively summarizing the behavior of concurrency bugs,
-because most concurrency bugs are caused by the execution order of
-\textit{more} instructions~\cite{learningfrommistakes}.  Furthermore,
-KRACE randomly schedules instructions during runtime without
-considering what thread interleavings are explored before.
+suffers from effectively summarizing the behavior of concurrency bugs.
+This is because most concurrency bugs are caused by the execution
+order of \textit{more} instructions~\cite{learningfrommistakes}.
+Furthermore, KRACE randomly schedules instructions during runtime
+without considering what thread interleavings are explored before.
 
 To overcome the shortcoming of existing techniques, this paper proposes
 \sys, a fuzzing framework for kernel concurrency bugs. 
@@ -100,7 +100,7 @@ interleavings leading to concurrency bugs. The central idea behind \sys
 is i) defining a new, effective interleaving coverage metric that reflects the 
 common nature of concurrency bugs, and ii) using that metric to drive 
 an efficient search strategy for discovering previously untested thread interleavings.
-Hence, we demonstrate that \sys saves a significant amount of CPU expenses 
+Hence, we demonstrate that \sys significantly saves cpu costs
 in kernel fuzzing by finding concurrent bugs quickly.
 % without sacrificing bug-detecting capability or even better 
 % capability than earlier work.
@@ -109,7 +109,7 @@ segmentizing thread interleaving and the mutation-based thread interleaving expl
 
 \PP{Segmentizing thread interleaving}
 %
-Our key idea starts from the finding of a previous
+Our key idea starts from the finding in the previous
 study~\cite{learningfrommistakes}, stating that most concurrency bugs
 occur by a specific execution order of at most four memory accesses to
 shared memory objects.
@@ -142,9 +142,9 @@ interleaving segments recorded in \intcov. For mutating a segment,
 \sys changes interleaving orders of instructions in each
 interleaving segment.
 %
-In such way, \sys proactively infers what instructions' interleavings
-are possible before actually running them, allowing \sys to strategize
-how to test interleavings.
+In such a way, \sys proactively infers what instructions'
+interleavings are possible before actually running them, allowing \sys
+to effectively determine the next interleavings to be tested.
 %
 Then, \sys schedules instructions to test as many mutated interleaving
 segments as possible in a single execution, quickly navigating the search space of thread interleavings.
@@ -159,9 +159,9 @@ We implement \sys across various software layers.  We extend
 Syzkaller~\cite{syzkaller} to implement the core logic of the
 exploration of execution paths and thread interleavings.
 %
-In addition, \sys incorporates an LLVM pass to transform a kernel
-binary for tracking \intcov, and the QEMU/KVM-based execution engine
-to enforce thread scheduling.
+In addition, \sys incorporates an LLVM pass to transform a kernel for
+tracking \intcov, and the QEMU/KVM-based execution engine to enforce
+thread scheduling.
 %
 We run \sys against the latest version of the Linux kernel (ranging
 from 5.19-rc2 to 6.0-rc7), and find new \totalbugs concurrency bugs all of
@@ -183,7 +183,7 @@ We describe our contributions in three folds:
   %
   Based on the idea of segmentizing thread interleaving, we propose
   \intcov, which encodes interleavings of multiple instructions, and
-  provides solid grounds for a fuzzer to track the progress of
+  provides solid clues for a fuzzer to track the progress of
   exploring thread interleavings.
   %
 \item \textbf{Mutation-based interleaving exploration:}
@@ -195,8 +195,8 @@ We describe our contributions in three folds:
   %
 \item \textbf{Practical impact:}
   %
-  We discovered new \totalbugs harmful concurrency bugs in
-  recent Linux kernels in which extensive testing has been performed,
+  We discovered new \totalbugs harmful concurrency bugs in recent
+  Linux kernels, which have been extensively tested before,
   demonstrating the practicality of \sys.
   %
 \end{itemize}
