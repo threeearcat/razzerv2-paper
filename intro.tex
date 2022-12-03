@@ -15,14 +15,14 @@ Even worse, a recent study~\cite{exprace} demonstrates that a user-level attacke
 reliably exploits non-deterministic concurrency bugs without performing
 brute-force attacks.
 
-Identifying kernel concurrency bugs, however, is much more difficult than 
+However, discovering kernel concurrency bugs is much more difficult than 
 finding non-concurrency bugs. 
-In contrast to non-concurrency bugs which are identified by 
+In contrast to non-concurrency bugs which are discovered by 
 sequential testing of single-thread execution,
 kernel concurrency bugs are typically caused by the concurrent execution 
 of two or more threads. 
 Kernel concurrency bugs only emerge in a particular pattern of 
-interleavings between threads. The thread interleaving happens 
+interleavings between threads. The bug-causing interleaving happens 
 rarely because it takes place only when a certain timing condition is met.
 Therefore, the kernel concurrency fuzzer must consider two dimensions: 
 how to navigate thread interleaving and generate multi-thread input seeds (e.g., system call pairs and their parameter values).
