@@ -60,8 +60,15 @@ has proven its effectiveness\yj{cite}.
 However, how to define and use coverage in concurrency fuzzing is 
 not well-studied. When generating interleavings to test,
 Razzer~\cite{razzer} and Snowboard~\cite{snowboard} use own heuristics
-combined by static or dynamic analysis, but 
-
+combined by static or dynamic analysis, but they are coverage-oblivious.
+They cannot prune redundant executions of thread interleaving
+that produce identical results. 
+KRACE~\cite{krace} proposes alias coverage, which simply tracks 
+a single alias-pair instruction. We observe that tracking single 
+instruction pairs are not sufficient. Furthermore, KRACE uses 
+the alias coverage to decide whether to continue to explore or not 
+in the current multi-threaded input. When generating test interleavings,
+KRACE takes a randomized approach,
 
 
 Alias coverage cannot effectively summarize the behavior 
