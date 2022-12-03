@@ -111,12 +111,30 @@ When the multi-thread generator receives $I_{ST}$ and the two system
 calls \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)}, the
 multi-thread generator simply splits $I_{ST}$ into two parts, where
 the first part conatins system calls from the first system call until
-\texttt{setsockopt(r0)}, and the second contains the rest of the
+\texttt{setsockopt(r0)}, and the second part contains the rest of the
 system calls. Then, the multi-thread generator assigns the first part
-to \texttt{Thread~A} and the second part to \texttt{Thread~B}.
-
-
-\dr{}
+to \texttt{Thread~A} and the second part to
+\texttt{Thread~B}~(\autoref{fig:inputtransform}-(b)).
+%
+During runtime, all system calls are executed in the same order as in
+$I_{ST}$ except \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)}.
+%
+Specifically, \texttt{thread~A} executes \texttt{r0 = socket()} first
+as it is the first system call in $I_{ST}$. And then, when
+\texttt{thread~A} sees the next system call is
+\texttt{setsockopt(r0)}, it defers the execution of
+\texttt{setsockopt(r0)} to execute it with \texttt{sendmsg(r0)}.
+%
+As the next system call in $I_{ST}$ is \texttt{write(r0)},
+\texttt{thread~B} executes it. Now, the next system call in $I_{ST}$
+is \texttt{sendmsg(r0)}, so the two threads execute the two system
+calls \texttt{setsockopt(r0)} and \texttt{sendmsg(r0)} concurrently.
+%
+Lastly, \texttt{thread~B} executes \texttt{close(r0)} which is the
+last system call in $I_{ST}$.
+%
+In this way, \sys continuously transforms $I_{ST}$ to $I_{MT}$, and
+the multi-thread fuzzing stage keeps exploring thread interleavings.
 
 \subsection{Virtual Machine Introspection}
 \label{s:appendix:vmi}
