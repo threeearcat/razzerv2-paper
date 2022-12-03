@@ -85,10 +85,10 @@ thread interleavings that produce identical coverage.
 KRACE~\cite{krace} proposes alias coverage, which tracks
 concurrently-executed \textit{two} instructions, but alias coverage
 suffers from effectively summarizing the behavior of concurrency bugs.
-This is because most concurrency bugs are caused by the execution
-order of \textit{more} instructions~\cite{learningfrommistakes}.
-Furthermore, KRACE randomly schedules instructions during runtime
-without considering what thread interleavings are explored before.
+This is because most concurrency bugs are caused by interelavings of
+\textit{more} instructions~\cite{learningfrommistakes}.  Furthermore,
+KRACE randomly schedules instructions during runtime without
+considering what thread interleavings are explored before.
 
 To overcome the shortcoming of existing techniques, this paper proposes
 \sys, a fuzzing framework for kernel concurrency bugs. 
