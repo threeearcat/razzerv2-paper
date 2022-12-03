@@ -2,9 +2,11 @@
 \label{s:eval}
 
 To demonstrate the effectiveness of our approach, 
-we evaluate \sys in various aspects.
+% we evaluate \sys in various aspects.
+% %
+% Specifically,
 %
-Specifically, we 1) demonstrate the usefulness of \sys by providing
+we 1) demonstrate the usefulness of \sys by providing
 newly found concurrency bugs in the Linux
 kernel~(\autoref{ss:realworldbugs}),
 %
@@ -78,7 +80,7 @@ patched, but they reoccur in later kernel version because the patches are
 incomplete fixes~\cite{learningfrommistakes}.
 %
 In \autoref{table:newbugs}, three that are marked in the
-\texttt{Recurrent} column shows the cases that concurrency bugs reoccur.
+\texttt{Recurrent} column shows such cases.
 %
 These cases underline the significance of thorough testing even after 
 bugs have been identified and supposedly fixed.
@@ -363,6 +365,7 @@ evaluation~(\autoref{sss:interleavingsearch}).
     indicates the kernel's scheduler (\ie, no thread scheduling
     control applied).}
   \label{fig:eval:comparison}
+  \vspace{-5pt}
 % \subfloat[The number of executions.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_execution-crop.pdf}}
 % \subfloat[The elapsed time.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_time-crop.pdf}}\\
 \end{figure*}
