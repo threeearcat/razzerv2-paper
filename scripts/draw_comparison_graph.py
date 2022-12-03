@@ -56,6 +56,7 @@ def draw():
     rects3 = ax.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color="#7c64bc")
     rects4 = ax.bar(x + 0.2 + width * 3, naive, width, label="Naive", color="#39a767")
 
+    ax.set_xlim(0, 9)
     ax.set_ylim(0, 300)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
@@ -125,6 +126,7 @@ def draw():
     rects3 = ay.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color="#7c64bc")
     rects4 = ay.bar(x + 0.2 + width * 3, naive, width, label="Naive", color="#39a767")
 
+    ay.set_xlim(0, 9)
     ay.set_ylim(0, 200)
 
     # Add some text for labels, title and custom x-ayis tick labels, etc.
