@@ -11,11 +11,11 @@ The consequence of kernel concurrency bugs is disastrous. They crash
 the entire system, breaking availability~\cite{cve201812232, snowboardbug} or causing data loss~\cite{dataloss}.
 Furthermore, attackers 
 exploit concurrency bugs to mount a privilege escalation attack.
-A recent study~\cite{exprace} demonstrates that a user-level attacker 
+Even worse, a recent study~\cite{exprace} demonstrates that a user-level attacker 
 reliably exploits non-deterministic concurrency bugs without performing
 brute-force attacks.
 
-Identifying kernel concurrency bugs is much more difficult than 
+Identifying kernel concurrency bugs, however, is much more difficult than 
 finding non-concurrency bugs. 
 In contrast to non-concurrency bugs which are identified by 
 sequential testing of single-thread execution,
@@ -27,7 +27,7 @@ rarely because it takes place only when a certain timing condition is met.
 Therefore, the kernel concurrency fuzzer must consider two dimensions: 
 how to navigate thread interleaving and generate multi-thread input seeds (e.g., system call pairs and their parameter values).
 Unfortunately, exploring all the possible interleavings is not practical because 
-The number of instructions executed by a system call in Linux is huge.
+the number of instructions executed by a system call in Linux is huge.
 
 %\dr{as far as I know, there are conzzer and muzz}
 %\dr{If we consider Snowboard as a fuzzer, Snowboard does not
@@ -125,9 +125,25 @@ We describe our contributions in three folds:
 
 \begin{itemize}
 \item \textbf{\Intcov:}
-\item \textbf{Mutation-based interleaving exploration:}
+  %
+  Based on the idea of segmentizing thread interleaving, \intcov
+  encodes interleavings of multiple instructions, which provides solid
+  grounds for a fuzzer to track the exploration progress of thread
+  interelavings.
+  %
+\item \textbf{Strategical interleaving exploration:}
+  %
+  Unlike most previous studies that rely on the randomized or simple
+  heuristic-based thread interleaving exploration, we propose the
+  mutation-based interleaving exploration, which strategically and
+  quickly explores the search space of thread interleavings.
+  %
 \item \textbf{Practical impact:}
-  We have found \totalbugs race conditions.
+  %
+  We have found \totalbugs harmful concurrency bugs in the latest
+  Linux kernel from where extensive testing has been made,
+  demonstrating the practicality of \sys.
+  %
 \end{itemize}
 
 %%% Local Variables:
