@@ -12,8 +12,7 @@
 In this section, we first study how concurrency bugs manifest
 depending on thread interleaving through a real-world concurrency bug
 example.  Then, we elicit design goals to effectively discover kernel
-concurrency bugs, and discuss why prior works have limitations in
-satisfying the design goals.
+concurrency bugs, and discuss limitations in prior work. 
 
 %None of previous work properly addresses characteristics of \textit{offending thread interleaving} (\ie, one that causes a concurrency bug).
 %
@@ -29,7 +28,7 @@ satisfying the design goals.
   \centering
   \includegraphics[width=0.85\linewidth]{fig/cve-2017-10661.pdf}
   \caption{Simplified code snippet of CVE-2017-17712. If \texttt{B1}
-    is executed between \texttt{A2} and \texttt{A4}, concurrenct
+    is executed between \texttt{A2} and \texttt{A4}, concurrent
     accesses on \texttt{inet->hdrincl} leads to uninitialized stack
     pointer usage on \texttt{rfv}, and an attacker may gain root
     privileges through a dedicated attack
