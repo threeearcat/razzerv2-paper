@@ -21,16 +21,15 @@ When exploring the search space of thread interleavings, \sys
 decomposes an entire thread interleaving into a set of segments, each
 of which represents an interleaving of the small number of
 instructions, and utilizes individual segments as interleaving
-coverage, called \intcov.
+coverage, called interleaving segment coverage.
 %
 When searching for thread interleavings, \sys mutates interleavings in
 explored interleaving segments to construct new thread interleavings
 that has not yet been explored.
-% (\ie, not recorded in the \intcov).
 %
 With \sys, we discover new 21 concurrency bugs in Linux kernels, and
 demonstrate the efficiency of \sys by showing that \sys can identify
-known bugs up to 4.1 times quickly than the state-of-the-art
+known bugs on average 4.1 times quickly than the state-of-the-art
 approaches, Snowboard and KRACE.
 
 \end{abstract}
