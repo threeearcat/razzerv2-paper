@@ -114,15 +114,15 @@ interleavings in the input, missing the opportunity to
 find the concurrency bug.
 %
 However, it is crucial that how many instructions the coverage 
-metric tracks to distinguish different interleavings.
+metric consider to distinguish different interleavings.
 If interleaving coverage metric tracks interleavings 
 of too few instructions (\eg, 2), it may miss interleavings 
 that should be tested. On the other hand, tracking interleavings 
 of too many instructions (\eg, thousands) cause high search 
-complexity due to its large search space.
+complexity due to its large coveragespace.
 Therefore, this work seeks a balancing point in bug-finding 
 capability and search complexity 
-when defining  interleaving coverage metric.
+when defining an interleaving coverage metric.
 
 \begin{figure}[t]
   \centering
