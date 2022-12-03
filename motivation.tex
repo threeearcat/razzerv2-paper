@@ -110,7 +110,8 @@ executed.
 Otherwise, a fuzzer may think that there is no more interesting thread
 interleaving in the multi-thread input after it executes
 \autoref{fig:alias-coverage}-(a), and stop searching for new
-interleavings in the input, missing the concurrency bug.
+interleavings in the input, missing the opportunity to 
+find the concurrency bug.
 %
 \red{However, it is not trivial to determine the number of
   instructions in tracking intructions' interleavings. If interleaving
