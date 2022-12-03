@@ -111,8 +111,8 @@ segmentizing thread interleaving and the mutation-based thread interleaving expl
 %
 Our key idea starts from the finding in the previous
 study~\cite{learningfrommistakes}, stating that most concurrency bugs
-occur by a specific execution order of at most four memory accesses to
-shared memory objects.
+occur if at most four memory accesses referring to shared memory
+objects are interleaved.
 %
 Based on this finding, \sys decomposes the large thread interleaving
 space into tractable small sub-spaces, called \textit{interleaving
