@@ -146,10 +146,11 @@ In such a way, \sys proactively infers what instructions'
 interleavings are possible before actually running them, allowing \sys
 to effectively determine the next interleavings to be tested.
 %
-Then, \sys schedules instructions to test as many mutated interleaving
-segments as possible in a single execution, quickly navigating the search space of thread interleavings.
-%\sys mutates as many segments as possible and schedule generated 
-%thread interleavings
+%Then, \sys schedules instructions to test as many mutated interleaving
+%segments as possible in a single execution, quickly navigating the search space of thread interleavings.
+\sys mutates as many segments as possible and generates unexplored thread interleavings
+from mutated segments, quickly navigating the search space of thread interleavings. 
+
 
 % than previous approaches in which only one interleaving
 % is mutated at each search step
