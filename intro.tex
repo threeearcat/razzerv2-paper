@@ -65,9 +65,10 @@ that produce identical results.
 KRACE~\cite{krace} proposes alias coverage, which records 
 single interleavings (a pair of instruction) between two threads, but tracking 
 single interleaving cannot effectively summarize the behavior 
-of concurrency bugs. According to a study~\cite{learningfrommistakes}, 
+of concurrency bugs because
 most concurrency bugs are caused by at most four instructions and their
-interleavings. Furthermore, KRACE uses 
+interleavings~\cite{learningfrommistakes}.
+Furthermore, KRACE uses 
 the alias coverage to decide whether to continue to explore or not 
 in the current multi-threaded input. When generating test interleavings,
 KRACE takes a simple randomized approach.
