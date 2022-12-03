@@ -55,6 +55,9 @@ the number of instructions executed by a system call in Linux is huge.
 %interleaving space, it takes a randomized approach, 
 %sharing the similar inefficiencies of previous techniques.
 
+
+Coverage-guided fuzzing has proven to be effective in exploring such a huge search space\yj{cite}.
+However, little is known about how to define and apply coverage in concurrent fuzzing.
 To explore such large search space, coverage-guided fuzzing 
 has proven its effectiveness\yj{cite}. 
 However, how to define and use coverage in concurrency fuzzing is 
@@ -64,21 +67,16 @@ combined by static or dynamic analysis, but they are coverage-oblivious.
 They cannot prune redundant executions of thread interleaving
 that produce identical results. 
 KRACE~\cite{krace} proposes alias coverage, which records 
-single interleavings between two threads, but tracking 
+single interleavings (a pair of instruction) between two threads, but tracking 
 single interleaving cannot effectively summarize the behavior 
 of concurrency bugs. According to a study~\cite{learningfrommistakes}, 
-
-
-
-instruction pairs are not sufficient. Furthermore, KRACE uses 
+most concurrency bugs are caused by at most four instructions and their
+interleavings. Furthermore, KRACE uses 
 the alias coverage to decide whether to continue to explore or not 
 in the current multi-threaded input. When generating test interleavings,
-KRACE takes a randomized approach,
+KRACE takes a simple randomized approach.
 
-
-
-
-To overcome the shortcoming of existing methods, this paper proposes
+To overcome the shortcoming of existing techniques, this paper proposes
 \sys, a fuzzing framework for kernel concurrency bugs. 
 \sys discovers not only data races but 
 all interleaving-related bugs. 
