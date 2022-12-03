@@ -179,7 +179,7 @@ that each input explores.
 While conventional fuzzing techniques show the practicality even in
 large system softwares, they mostly focus on the \textit{sequential
   aspect} of the execution (\ie, the execution path of a single
-thread), while the concurrency aspect (\ie, thread interleaving) is
+thread), while the concurrent aspect (\ie, thread interleaving) is
 left uncontrolled.
 %
 As a consequence, conventional fuzzing is limited in discovering
@@ -211,8 +211,8 @@ deadlocks~\cite{covcon, terragni2018effectiveness}.
 
 Recently, several approaches~\cite{razzer, krace, snowboard, muzz,
   conzzer}, classified as concurrency fuzzing, have been proposed to
-take consider of the \textit{concurrency aspect} of the kernel
-execution into the fuzzing process.
+take consider of both the sequential aspect and the
+\textit{concurrent aspect} of the kernel execution into fuzzing.
 %
 Concurrency fuzzers generally repeat the execution of a multi-thread
 input (\eg, a multi-threaded system call sequence) while controlling

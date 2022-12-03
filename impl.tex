@@ -18,9 +18,9 @@ As shown in \autoref{fig:workflow}, \sys consists of two stages of
 fuzzing.
 %
 The first stage is a \textit{single-thread fuzzing}, which searches
-execution paths similar with conventional fuzzing, and the second
-stage is a \textit{multi-thread fuzzing} to explore thread
-interleavings.
+execution paths using branch coverage, and the second stage is a
+\textit{multi-thread fuzzing} to explore thread interleavings using
+\intcov.
 %
 In both stages, \sys traces timestamp-annotated memory accesses
 executed by each system call, and in the second stage, \sys adopts a

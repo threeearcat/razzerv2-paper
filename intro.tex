@@ -111,15 +111,15 @@ segmentizing thread interleaving and the mutation-based thread interleaving expl
 %
 Our key idea starts from the finding of a previous
 study~\cite{learningfrommistakes}, stating that most concurrency bugs
-occur by a specific execution order involving at most four memory
-accesses to shared memory objects.
+occur by a specific execution order of at most four memory accesses to
+shared memory objects.
 %
 Based on this finding, \sys decomposes the large thread interleaving
 space into tractable small sub-spaces, called \textit{interleaving
   segment}. The number of instructions in an interleaving segment is
 small (at most four by default), and each interleaving segment
 represents an interleaving of those instructions.
-%
+
 Using interleaving segments, we propose our novel interleaving
 coverage metric, \textit{\intcov}, which is defined as a set of
 detected interleaving segments.
@@ -130,7 +130,7 @@ detected interleaving segments.
 % a single interleaving (the size of a segment is 2).
 Using \intcov provides two benefits to fuzzers. First, a fuzzer can
 take into account interactions of multiple instructions, which
-increases accuracy of discovering concurrency bugs compared to
+increases accuracy of discovering concurrency bugs in comparison to
 previous approaches~\cite{krace, conzzer}.  Second, using \intcov, a
 fuzzer can produce thread interleavings that have not yet been found
 for the subsequent search.
@@ -144,7 +144,7 @@ interleaving segment.
 %
 In such way, \sys proactively infers what instructions' interleavings
 are possible before actually running them, allowing \sys to strategize
-which interleavings to test.
+how to test interleavings.
 %
 Then, \sys schedules instructions to test as many mutated interleaving
 segments as possible in the single execution, quickly navigating the
@@ -154,9 +154,9 @@ search space of thread interleavings.
 % is mutated at each search step
 
 
-We implement \sys across various software layers.
-We extend Syzkaller~\cite{syzkaller} to generate concurrency fuzzing inputs 
-and segment mutations. 
+We implement \sys across various software layers.  We extend
+Syzkaller~\cite{syzkaller} to implement the core logic of the
+exploration of execution paths and thread interleavings.
 %
 In addition, \sys incorporates an LLVM pass to transform a kernel
 binary for tracking \intcov, and the QEMU/KVM-based execution engine
@@ -173,8 +173,7 @@ demonstrates the usefulness of \sys in discovering concurrency bugs.
 To quantify the efficiency of \sys, we experimentally compare \sys 
 against the state-of-the-art techniques, Snowboard and KRACE, and 
 demonstrate that \sys discover concurrency bugs more quickly 
-(up to \yj{xx}$\times$) than previous work using the segment mutation 
-technique.
+(up to 4.1$\times$) than previous works.
 
 We describe our contributions in three folds:
 
