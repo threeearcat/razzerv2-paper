@@ -135,7 +135,7 @@ previous approaches~\cite{krace, conzzer}.  Second, using \intcov, a
 fuzzer can produce thread interleavings that have not yet been found
 for the subsequent search.
 
-\PP{Mutation-based thread interelavings exploartion} 
+\PP{Mutation-based thread interleavings exploration} 
 %
 To effectively explore thread interleavings, \sys mutates observed
 interleaving segments recorded in \intcov. For mutating a segment,
@@ -147,8 +147,9 @@ are possible before actually running them, allowing \sys to strategize
 how to test interleavings.
 %
 Then, \sys schedules instructions to test as many mutated interleaving
-segments as possible in the single execution, quickly navigating the
-search space of thread interleavings.
+segments as possible in a single execution, quickly navigating the search space of thread interleavings.
+%\sys mutates as many segments as possible and schedule generated 
+%thread interleavings
 
 % than previous approaches in which only one interleaving
 % is mutated at each search step
@@ -173,7 +174,7 @@ demonstrates the usefulness of \sys in discovering concurrency bugs.
 To quantify the efficiency of \sys, we experimentally compare \sys 
 against the state-of-the-art techniques, Snowboard and KRACE, and 
 demonstrate that \sys discover concurrency bugs more quickly 
-(up to 4.1$\times$) than previous works.
+(4.1$\times$ on average) than previous works.
 
 We describe our contributions in three folds:
 
@@ -182,20 +183,20 @@ We describe our contributions in three folds:
   %
   Based on the idea of segmentizing thread interleaving, \intcov
   encodes interleavings of multiple instructions, which provides solid
-  grounds for a fuzzer to track the exploration progress of thread
-  interelavings.
+  grounds for a fuzzer to track the progress of exploring thread
+  interleavings.
   %
 \item \textbf{Mutation-based interleaving exploration:}
   %
   Unlike the random or simple heuristic exploration of thread
-  interleavings (as in most previous approachees), the mutation-based
+  interleavings (as in most previous approaches), the mutation-based
   interleaving exploration strategically and quickly explores the
   search space of thread interleavings.
   %
 \item \textbf{Practical impact:}
   %
-  We have found \totalbugs harmful concurrency bugs in the latest
-  Linux kernel from where extensive testing has been made,
+  We discovered new \totalbugs harmful concurrency bugs in
+  recent Linux kernels in which extensive testing has been performed,
   demonstrating the practicality of \sys.
   %
 \end{itemize}
