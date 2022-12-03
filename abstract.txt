@@ -1,2 +1,2 @@
 WARN: unresolved char in
- > \redTo explore the vast search space, most previous approaches
+ > coverage, called \intcov.

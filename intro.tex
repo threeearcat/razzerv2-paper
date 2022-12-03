@@ -98,29 +98,31 @@ At its core, \sys aims to systematically explore the vast search space of thread
 interleavings to quickly identify
 thread interleavings leading to concurrency bugs. The central idea behind \sys's design
 is i) defining a new, effective interleaving coverage metric that reflects the 
-common nature of concurrency bugs and ii) use that metric to drive 
-an efficient search strategy for discovering previously untested interleavings.
+common nature of concurrency bugs, and ii) using that metric to drive 
+an efficient search strategy for discovering previously untested thread interleavings.
 Hence, we demonstrate that \sys saves a significant amount of CPU expenses 
-in large-scale fuzzing by finding concurrent bugs quickly.
+in kernel fuzzing by finding concurrent bugs quickly.
 % without sacrificing bug-detecting capability or even better 
 % capability than earlier work.
 \sys achieves the goal with the following two key ideas:
-segmenting thread interleaving and mutation-based exploration of interleavings.
+segmenting thread interleaving and the mutation-based thread interleaving exploration.
 
-\PP{Segmentizing thread interleaving} From the execution of threads,  
-\sys decomposes the large thread interleaving space into tractable 
+\PP{Segmentizing thread interleaving} From the execution of threads,
+\sys decomposes the large thread interleaving space into tractable
 small sub-spaces, called \textit{interleaving segment} in which
-instructions access shared memory objects. The number of instructions 
-in a segment is small (at most four by default), and each segment may 
-contain \red{multiple interleavings}. Using interleaving segments, we propose 
-our new interleaving coverage metric, \textit{\intcov}, which is defined as a set of detected segments.
+instructions access shared memory objects. The number of instructions
+in an interleaving segment is small (at most four by default), and
+each interleaving segment represents an interleaving of those
+instructions.  Using interleaving segments, we propose our new
+interleaving coverage metric, \textit{\intcov}, which is defined as a
+set of detected segments.
 %
 % \dr{I don't think this is wrong, but we don't have claims or evidences about it}
 % \Intcov generalizes coverage 
 % metrics proposed by previous approaches where they only track 
 % a single interleaving (the size of a segment is 2). 
 Using \intcov provides two benefits to fuzzers. First, a fuzzer can 
-take into account the interactions of multiple interleavings, which increases
+take into account the interactions of multiple instructions, which increases
 accuracy of discovering concurrency bugs in comparison to considering a single 
 interleavings. A previous study~\cite{learningfrommistakes} identifies that
 most concurrency bugs occur by multiple interleavings involving 
@@ -128,7 +130,7 @@ at most four memory accesses of shared memory objects.
 Second, using \intcov, a fuzzer can produce thread interleavings
 that have not yet been found for the subsequent search.
 
-\PP{Mutating interleaving segments} 
+\PP{Mutation-based thread interelavings exploartion} 
 %
 To explore new interleavings,
 \sys mutates observed interleavings recorded in \intcov. For mutating a segment, \sys changes interleaving orders of observed interleavings 
@@ -138,7 +140,7 @@ new interleavings include a large number of untested interleavings.
 This search strategy quickly navigates the search space than previous 
 approaches in which only one interleaving is mutated at each search step
 
-\dr{what about remove texts about implementation?}
+
 We implement \sys across various software layers.
 We extend Syzkaller~\cite{syzkaller} to generate concurrency fuzzing inputs 
 and segment mutations. 

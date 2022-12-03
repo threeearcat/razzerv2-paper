@@ -670,7 +670,7 @@ segments contain interleavings to be tested.
 % tested or not.
 %
 Afterwards, a fuzzer \textbf{recomposes} mutated segments to obtain a
-\dr{}whole interleaving, and generates scheduling points from the
+speculative interleaving, and generates scheduling points from the
 recomposed interleaving.
 %
 % \yj{When a fuzzer moves to the next iteration? No new mutation can be created?}
@@ -789,11 +789,11 @@ mutated segments at one execution.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.99\linewidth]{fig/hint.pdf}
-  \caption{Example of recomposing mutated segment graphs into a whole
-    thread interleaving, where (a) represents mutated segment graphs,
-    (b) represents a graph combining the two mutated segment graphs,
-    and (c) represents an instruction sequence to test \texttt{Segment
-      \#1*} and \texttt{\#2*}}
+  \caption{Example of recomposing mutated segment graphs into a
+    speculative thread interleaving, where (a) represents mutated
+    segment graphs, (b) represents a graph combining the two mutated
+    segment graphs, and (c) represents an instruction sequence to test
+    \texttt{Segment \#1*} and \texttt{\#2*}}
   \label{fig:hint}
   \vspace{-5pt}
 \end{figure}
