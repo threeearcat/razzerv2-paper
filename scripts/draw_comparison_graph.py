@@ -49,12 +49,14 @@ def draw():
     # rects2 = ax.bar(x - width / 2, snowboard, width, label="Snowboard")
     # rects3 = ax.bar(x + width / 2, krace, width, label="KRACE")
     # rects4 = ax.bar(x + width / 2 + width, naive, width, label="Naive")
-    rects1 = ax.bar(x + 0.2, c2fuzz, width, label="SegFuzz", color="#449cd4")
-    rects2 = ax.bar(
-        x + 0.2 + width, snowboard, width, label="Snowboard", color="#f3c975"
-    )
-    rects3 = ax.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color="#7c64bc")
-    rects4 = ax.bar(x + 0.2 + width * 3, naive, width, label="Naive", color="#39a767")
+    col1 = "#7c64bc"
+    col2 = "#449cd4"
+    col3 = "#39a767"
+    col4 = "#f3c975"
+    rects1 = ax.bar(x + 0.2, c2fuzz, width, label="SegFuzz", color=col1)
+    rects2 = ax.bar(x + 0.2 + width, snowboard, width, label="Snowboard", color=col2)
+    rects3 = ax.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color=col3)
+    rects4 = ax.bar(x + 0.2 + width * 3, naive, width, label="Naive", color=col4)
 
     ax.set_xlim(0, 9)
     ax.set_ylim(0, 300)
@@ -119,12 +121,10 @@ def draw():
     # rects2 = ay.bar(x - width / 2, snowboard, width, label="Snowboard")
     # rects3 = ay.bar(x + width / 2, krace, width, label="KRACE")
     # rects4 = ay.bar(x + width / 2 + width, naive, width, label="Naive")
-    rects1 = ay.bar(x + 0.2, c2fuzz, width, label="SegFuzz", color="#449cd4")
-    rects2 = ay.bar(
-        x + 0.2 + width, snowboard, width, label="Snowboard", color="#f3c975"
-    )
-    rects3 = ay.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color="#7c64bc")
-    rects4 = ay.bar(x + 0.2 + width * 3, naive, width, label="Naive", color="#39a767")
+    rects1 = ay.bar(x + 0.2, c2fuzz, width, label="SegFuzz", color=col1)
+    rects2 = ay.bar(x + 0.2 + width, snowboard, width, label="Snowboard", color=col2)
+    rects3 = ay.bar(x + 0.2 + width * 2, krace, width, label="KRACE", color=col3)
+    rects4 = ay.bar(x + 0.2 + width * 3, naive, width, label="Naive", color=col4)
 
     ay.set_xlim(0, 9)
     ay.set_ylim(0, 200)
