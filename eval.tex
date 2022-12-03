@@ -321,42 +321,52 @@ evaluation~(\autoref{sss:interleavingsearch}).
 %   \label{fig:eval:comparison}
 % \end{figure*}
 %
-\begin{table*}
+% \begin{table*}
+%   \centering
+%   \input{table/comparison-interleaving-search.tex}
+%   \caption{Result of the comparison study against various
+%     state-of-the-art kernel concurrency fuzzers (\ie,
+%     KRACE~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
+%     number of executions and the elapsed time (secs) required to
+%     discover each concurrency bug. The \texttt{Naive} column indicates
+%     the kernel's scheduler (\ie, no thread scheduling control applied).}
+%   \label{table:comparison-interleaving-search}
+%   \vspace{-5pt}
+% \end{table*}
+
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=0.99\linewidth]{fig/comparison_graph_execution-crop.pdf}
+%   \caption{Number of executions required for each fuzzer to discover
+%     concurrency bugs listed in \autoref{table:knownbugs}. The
+%     \texttt{Naive} column indicates the kernel's scheduler (\ie, no
+%     thread scheduling control applied).}
+%   \label{fig:eval:comparison-execution}
+%   \vspace{-8pt}
+% \end{figure}
+
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=0.99\linewidth]{fig/comparison_graph_time-crop.pdf}
+%   \caption{Elaped time required for each fuzzer to discover
+%     concurrency bugs listed in \autoref{table:knownbugs}.}
+%   \label{fig:eval:comparison-time}
+%   \vspace{-8pt}
+% \end{figure}
+
+\begin{figure*}[t]
   \centering
-  \input{table/comparison-interleaving-search.tex}
+  \includegraphics[width=0.99\linewidth]{fig/comparison_graph_execution-crop.pdf}
   \caption{Result of the comparison study against various
     state-of-the-art kernel concurrency fuzzers (\ie,
     KRACE~\cite{krace} and Snowboard~\cite{snowboard}). We measure the
     number of executions and the elapsed time (secs) required to
     discover each concurrency bug. The \texttt{Naive} column indicates
-    the kernel's scheduler (\ie, no thread scheduling control applied).}
-  \label{table:comparison-interleaving-search}
-  \vspace{-5pt}
-\end{table*}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.99\linewidth]{fig/comparison_graph_execution-crop.pdf}
-  \caption{Number of executions required for each fuzzer to discover
-    concurrency bugs listed in \autoref{table:knownbugs}. The
-    \texttt{Naive} column indicates the kernel's scheduler (\ie, no
-    thread scheduling control applied).}
-  \label{fig:eval:comparison-execution}
-  \vspace{-8pt}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.99\linewidth]{fig/comparison_graph_time-crop.pdf}
-  \caption{Elaped time required for each fuzzer to discover
-    concurrency bugs listed in \autoref{table:knownbugs}.}
-  \label{fig:eval:comparison-time}
-  \vspace{-8pt}
-\end{figure}
-
-\begin{figure*}
-\subfloat[First.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_execution-crop.pdf}}
-\subfloat[First.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_time-crop.pdf}}\\
+    the kernel's scheduler (\ie, no thread scheduling control
+    applied).}
+  \label{fig:eval:comparison}
+% \subfloat[The number of executions.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_execution-crop.pdf}}
+% \subfloat[The elapsed time.]{\includegraphics[width=0.5\linewidth]{fig/comparison_graph_time-crop.pdf}}\\
 \end{figure*}
 
 %
@@ -412,8 +422,7 @@ In addition to them, we also compare with the kernel scheduler
 
 \PP{Result}
 %
-\autoref{fig:eval:comparison-execution} and
-\autoref{fig:eval:comparison-time} show the comparison result.
+\autoref{fig:eval:comparison} shows the comparison result.
 %
 In these figures, \texttt{\sys}, \texttt{Snowboard}, and
 \texttt{KRACE} display the number of executions and the elapsed time
